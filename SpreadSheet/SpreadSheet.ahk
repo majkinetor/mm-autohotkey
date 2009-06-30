@@ -708,7 +708,7 @@ SS_ScrollCell(hCtrl) {
 }
 
 /*
-	Function:	SetCellText
+	Function:	SetCellString
 				Set the text of the cell
 	
 	Parameters:
