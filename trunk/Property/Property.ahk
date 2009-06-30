@@ -121,8 +121,8 @@ Handler(hCtrl, event, name, value, param){
 
 
 /*
-  Title:		Properties GUI
-				Settings/Properties control editor/viewer.
+  Title:		Property
+				Properties viewer and editor.
  */
 
 /*
@@ -131,15 +131,24 @@ Handler(hCtrl, event, name, value, param){
 				Creates property control.
 
  Parameters:
-				hGui	- Handle of the parent
-				X .. H	- Control coordinates
+				hGui	- Handle of the parent.
+				X .. H	- Control coordinates.
 				Style   - White space separated list of style names.
-				Handler - Notification handler
+				Handler - Notification handler.
  
  Handler:
+ >			Result : Handler(hCtrl, Event, Name, Value, Param)
+
+				hCtrl	- Handle of the control that sends notification.
+				Event	- Event name. Can be S (Select) EB (Edit Before) and EA (Edit After)
+				Name	- Name of the selected property.
+				Value	- Value of the selected property. If event is EA, this argument contains user input.
+				Param	- Parameter of the selected property.  If event is EA, this argument contains user input.
+				Result	- Return 1 to prevent selection (S) or to prevent user changing the value (EA).
+				
 
  Retunrs:
-				Control handle
+				Control's handle.
 
  */
 Property_Add(hGui, X=0, Y=0, W=200, H=100, Style="", Handler="") {
@@ -152,7 +161,7 @@ Property_Add(hGui, X=0, Y=0, W=200, H=100, Style="", Handler="") {
 
 /*
  Function:		AddFromFile
-				Add properties from file
+				Add properties from a file.
 
  Parameters:
 				FileName - File from which to import properties. The file contains property definition list.
@@ -211,7 +220,7 @@ Property_Count(hCtrl) {
 
 /*
  Function:		Define
-				Export the propety definition list from the control
+				Export the propety definition list from the control.
 
  */
 Property_Define(hCtrl) {
@@ -272,7 +281,7 @@ Property_Find(hCtrl, Name, StartAt=0) {
 				Get the property value.
 
  Parameters:
-				Name	- Property name for which to get value.
+				Name	- Property name for which to get the value.
 
  Returns:
 				Value
@@ -281,6 +290,11 @@ Property_GetValue( hCtrl, Name ) {
 	ifEqual Name,,return	
 	return SS_GetCellText(hCtrl, 2, Property_Find( hCtrl, Name))
 }
+
+Property_SetValue( hCtrl, Name, Value ) {
+	ifEqual Name,,return	
+}
+
 
 
 /*
@@ -394,10 +408,10 @@ Property_Insert(hCtrl, Properties, Position=0){
 
 /*
  Function:		Save
-				Save content of the control to the file.
+				Save content of the control in a file.
 
  Parameters:
-				FileName	- File to save to. If exists, it will be deleted first without confirmation.
+				FileName	- File to save to. If exists, it will be first deleted (without confirmation).
  
  Returns:
 				FALSE if there was a problem saving file, TRUE otherwise
@@ -411,10 +425,10 @@ Property_Save(hCtrl, FileName) {
 
 /*
  Function:		SetColors
-				Set colors for any subset of property elements
+				Set colors of property elements.
 
  Parameters:
-				colors	- String containing white space separated colors of property elements
+				colors	- String containing white space separated colors of property elements.
 
  Colors:		
 				PB PF - property bg & fg 
@@ -436,7 +450,7 @@ Property_SetColors(hCtrl, colors){
 
 /*
   Function:		SetFont
- 				Set font for Propety element
+ 				Set font of propety element.
 
   Parameters:
 				Element	- One of the four available elements: Property, Value, Separator, Hyperlink
