@@ -76,6 +76,11 @@ F1::
 	msgbox % Property_Count(hctrl)
 return
 
+F2::
+	Property_SetValue(hCtrl, "Digit", 5)
+return
+
+
 GuiClose:
 	ExitApp
 return
@@ -85,7 +90,7 @@ Btn:
 		Reload
 
 	if A_GuiControl = Save
-		msgbox % Property_Save(hCtrl, "Properties")
+		Property_Save(hCtrl, "Properties")
 return
 
 Handler(hCtrl, event, name, value, param){
@@ -234,6 +239,8 @@ Property_Define(hCtrl) {
 		s = %s%Name=%p%`nType=
 		if type=EXPANDED
 			s .= "Separator"
+		else if type contains BUTTON
+			s .= "Button"
 		else if type contains WIDEBUTTON
 			s .= "WideButton"
 		else if type contains INTEGER
@@ -293,6 +300,8 @@ Property_GetValue( hCtrl, Name ) {
 
 Property_SetValue( hCtrl, Name, Value ) {
 	ifEqual Name,,return	
+	i := Property_Find( hCtrl, Name)
+	return SS_SetCell(hCtrl, 2, i, "txt=" Value)
 }
 
 
@@ -376,8 +385,9 @@ Property_Insert(hCtrl, Properties, Position=0){
 		if (type="ComboBox")
 	 		tpe := "COMBOBOX FIXEDSIZE", Value := SS_CreateCombo(hCtrl, Value), Data := Param
 		
+
 		if (Type="Button")		
-			 tpe := "BUTTON FORCETEXT FIXEDSIZE"
+			tpe := "BUTTON FORCETEXT FIXEDSIZE"
 
 		if (Type="WideButton")	
 			 tpe := "WIDEBUTTON FORCETEXT", txtal2="CENTER MIDDLE"
