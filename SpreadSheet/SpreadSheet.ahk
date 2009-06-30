@@ -699,7 +699,7 @@ SS_SaveFile(hCtrl, File){
 
 /*
 	Function: ScrollCell
-			  Scrolls current cell into view
+			  Scrolls current cell into view.
   */
 SS_ScrollCell(hCtrl) {
 	static SPRM_SCROLLCELL=0x492
@@ -709,10 +709,10 @@ SS_ScrollCell(hCtrl) {
 
 /*
 	Function:	SetCellString
-				Set the text of the cell
+				Set the text of the selected cell.
 	
 	Parameters:
-				Txt -  Text to set, by default empty
+				Txt -  Text to set, by default empty.
 				Type - Type. If omited current cell type will be used.	
   */
 SS_SetCellString(hCtrl, Txt="", Type=""){
@@ -725,10 +725,10 @@ SS_SetCellString(hCtrl, Txt="", Type=""){
 
 /*
 	Function:	SetCellData
-				Set the data of the cell
+				Set the data of the cell.
 	
 	Parameters:
-				Data - Data to set
+				Data - Data to set.
 				Col,Row - Cell coordinates. If omited current cell will be used.
   */
 SS_SetCellData(hCtrl, Data, Col="", Row="") {
