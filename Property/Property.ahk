@@ -122,19 +122,19 @@ Handler(hCtrl, event, name, value, param){
 
 /*
   Title:		Properties GUI
-			Settings/Properties control editor/viewer.
+				Settings/Properties control editor/viewer.
  */
 
 /*
 
  Function:		Add
-				Creates property window.
+				Creates property control.
 
  Parameters:
 				hGui	- Handle of the parent
-				x-h		- Control coordinates
-				style   - White space separated list of style names.
-				handler - Notification handler
+				X .. H	- Control coordinates
+				Style   - White space separated list of style names.
+				Handler - Notification handler
  
  Handler:
 
@@ -142,7 +142,7 @@ Handler(hCtrl, event, name, value, param){
 				Control handle
 
  */
-Property_Add(hGui, x=0, y=0, w=200, h=100, style="", Handler="") {
+Property_Add(hGui, X=0, Y=0, W=200, H=100, Style="", Handler="") {
 	hCtrl := SS_Add(hGui, x, y, w, h, "GRIDMODE CELLEDIT COLSIZE ROWSELECT " style, "Property_Handler")
 	Property_initSheet(hCtrl)
 	if IsFunc(Handler)
@@ -155,17 +155,16 @@ Property_Add(hGui, x=0, y=0, w=200, h=100, style="", Handler="") {
 				Add properties from file
 
  Parameters:
-				FileName - File from which to import properties. The file contains property definition list
-				ParseIni - Set to TRUE if file is Ini file.
+				FileName - File from which to import properties. The file contains property definition list.
+				ParseIni - Set to TRUE if file is an INI file.
 
  Remarks:
 				<Insert> function doesn't tolerate `r symbol. If you are manually loading text from a file, make sure you replace `r`n with `n
-				or use *t option with FileRead
+				or use *t option with FileRead.
 
  */
 Property_AddFromFile( hCtrl, FileName, ParseIni = false ) {
 	FileRead, txt, *t %FileName%
-
 	ifEqual, ParseIni, 0, return Property_Insert( hCtrl, txt )
 
 	oldTrim := A_AutoTrim
@@ -200,7 +199,7 @@ Property_AddFromFile( hCtrl, FileName, ParseIni = false ) {
 
 /*
  Function:		Clear
-				Clear Property window
+				Clear Property control.
  */
 Property_Clear(hCtrl){
 	SS_NewSheet(hCtrl), Property_initSheet(hCtrl), 	SS_Focus(hCtrl)
@@ -250,11 +249,17 @@ Property_Define(hCtrl) {
 	return SubStr(s, 1, -2)
 }
 
-/*
-	Returns row of the given property
+/*	Function:	Find
+				Returns index of the given property.
+
+	Parameters:
+				Name	- Name of the property.
+				StartAt	- Index from which to start searching, by default 0.
+	
+	Returns:
+				Positive number or 0 if property by that name is not found.
  */
 Property_Find(hCtrl, Name, StartAt=0) {
-
 	cnt := SS_GetRowCount(hCtrl)
 	loop, % cnt - StartAt
 		if SS_GetCellText(hCtrl, 1, startAt + A_Index) = Name
@@ -264,10 +269,10 @@ Property_Find(hCtrl, Name, StartAt=0) {
 
 /*
  Function:		GetValue
-				Get property value
+				Get the property value.
 
  Parameters:
-				Name	- Property name for which to get value
+				Name	- Property name for which to get value.
 
  Returns:
 				Value
@@ -280,20 +285,21 @@ Property_GetValue( hCtrl, Name ) {
 
 /*
   Function:		Insert
-				Insert property in the list on a given postion
+				Insert properties in the list on a given position.
 
   Parameters:
-				Properties	- Property Defintion List. Definition is a multiline string containing 1 property attribute per line.
-							  Definition List is the list of such definitions, separated by one blank line.
+				Properties	- Property Definition List. Definition is a multiline string containing 1 property attribute per line.
+							  Definition List is the list of such definitions, separated by at least one blank line.
 				Position	- Position in the list (1 based) at which to insert properties from the Definition List. 
 							  0 (default) means that properties will be appended to the list. Insertion is very slow operation compared to appending.
 
   Definition:
-				Name		- Name of the property to be displayed in first column
+				Name		- Name of the property to be displayed in the first column.
 				Type		- Type of the property. Currently supported types are:
-							  Text, Button, WideButton, CheckBox, ComboBox, Integer, Hyperlink, Separator. If not specified, Text is used by default.
-				Value		- Value of the property. For ComboBox item this contains pipe delimited list of items.
-				Param		- Parameter. Index of selected item for ComboBox, 1|0 for Checkbox.
+							  Text, Button, WideButton, CheckBox, ComboBox, Integer, Float, Hyperlink, Separator. If not specified, Text is used by default.
+				Value		- Value of the property. For ComboBox item this contains pipe delimited list of items. In the case of Separator, you can put its desired height as value.
+							  If omited, notification handler will be called in time of population, so you can handle the ComboBox the way you want.
+				Param		- Index of the selected item (ComboBox), 1|0 (Checkbox).
 
   Remarks:
 				The fastest way to add properties into the list is to craft property definition list and append it into the control with one call to this function.
@@ -451,7 +457,13 @@ Property_SetFont(hCtrl, Element, Font) {
 	return SS_SetFont(hCtrl, idx, font)
 }
 
-Property_SetRowHeight(hCtrl, val) {
+/*
+	Function:	SetRowHeight
+				Set row height.
+	
+ */
+
+Property_SetRowHeight(hCtrl, Val) {
     c := Property_Count(hCtrl)
 	SS_SetGlobalFields(hCtrl, "gcellht", val)
 	if !c
@@ -517,7 +529,7 @@ Property_initSheet(hCtrl){
 			  
 	
 	Parameters:
-			  var		- Variable name to retreive. To get up to 5 variables at once, omit this parameter
+			  var		- Variable name to retreive. To get up to 5 variables at once, omit this parameter.
 			  value		- Optional variable value to set. If var is empty value contains list of vars to retreive with optional prefix
 			  o1 .. o5	- If present, reference to variables to receive values.
 	
