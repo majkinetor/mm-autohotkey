@@ -77,7 +77,7 @@ F1::
 return
 
 F2::
-	Property_SetValue(hCtrl, "Digit", 5)
+	Property_SetValue(hCtrl, "My CheckBox", "", 1)
 return
 
 
@@ -298,12 +298,39 @@ Property_GetValue( hCtrl, Name ) {
 	return SS_GetCellText(hCtrl, 2, Property_Find( hCtrl, Name))
 }
 
-Property_SetValue( hCtrl, Name, Value ) {
-	ifEqual Name,,return	
-	i := Property_Find( hCtrl, Name)
-	return SS_SetCell(hCtrl, 2, i, "txt=" Value)
+/*
+ Function:		Set
+				Set property value and parameter.
+
+ Parameters:
+				Name	- Property name for which to get the value, or its index in the list
+				Value	- Property value.
+				Param	- Optional property parameter.
+ */
+Property_Set( hCtrl, Name, Value, Param="") {
+	ifEqual Name,,return A_ThisFunc "> Name can't be empty"	
+	if Name is not integer
+		 i := Property_Find( hCtrl, Name)
+	else i := Name
+	return SS_SetCell(hCtrl, 2, i, "data=" Param, Value != "" ? "txt=" Value : "")
 }
 
+/*
+ Function:		SetParam
+				Set property parameter.
+
+ Parameters:
+				Name	- Property name for which to get the value, or its index in the list
+				Param	- Property parameter.
+ */
+Property_SetParam( hCtrl, Name, Param) {
+	ifEqual Name,,return A_ThisFunc "> Name can't be empty"
+
+	if Name is not integer
+		 i := Property_Find( hCtrl, Name)
+	else i := Name
+	return SS_SetCell(hCtrl, 2, i, "data=" Param)
+}
 
 
 /*
