@@ -279,7 +279,7 @@ SS_GetCell(hCtrl, Col, Row, pQ, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=
 			else if (type=FLOAT)
 				 v := SS_getCellFloat(hCtrl, col, row)
 			else if (type=COMBOBOX)
-				 v := NumGet(pData+4)
+				 v := NumGet(pData)
 			else v := SS_strAtAdr(pData + (type=CHECKBOX ? 4 : 0))
 		} 
 
@@ -799,11 +799,11 @@ SS_SetDateFormat(hCtrl, Format) {
 			  Set content of the cell
 
 	Parameters:
-			  Col, Row	- Cell coordinates. If omited current cell will be used.
+			  Col, Row	- Cell coordinates.
 			  o1 .. o11	- Named parameters.
 	
 	Named Parameters:
-			  type		- Type of the cell. See bellow.
+			  type		- Type of the cell. See bellow for list of types. You will generally use type when setting up cells initially and omit it when changing existing cells.
 			  w, h	    - Width, height of the cell
 			  bg, fg	- Background, foreground color
 			  state		- Cell state
@@ -845,13 +845,14 @@ SS_SetDateFormat(hCtrl, Format) {
 			GLOBAL	- If you omit aligment attribute, this one will be used. 
   */
 SS_SetCell(hCtrl, Col="", Row="", o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o9="", o10="", o11=""){
-	static SPRM_SETCELLDATA=0x483
+	static SPRM_SETCELLDATA=0x483, SPRM_GETCELLDATA=0x482, SPRM_GETCELLTYPE=0x48F
 	static EMPTY=0, COLHDR=1, ROWHDR=2, WINHDR=3, TEXT=4, TEXTMULTILINE=5, INTEGER=6, FLOAT=7, FORMULA=8, GRAPH=9, HYPERLINK=10, CHECKBOX=11, COMBOBOX=12, OWNERDRAWBLOB=13, OWNERDRAWINTEGER=14, BUTTON=16, WIDEBUTTON=0x20, DATE=0x30, FORCETEXT=0x44, FORCETYPE=0x40, FIXEDSIZE=0x80
 	static SPRIF_TYPE=0x40,SPRIF_DATA=0x200,SPRIF_WIDTH=0x80,SPRIF_BACKCOLOR=1,SPRIF_TEXTCOLOR=2,SPRIF_TEXTALIGN=4,SPRIF_HEIGHT=0x100,SPRIF_STATE=0x20,SPRIF_FONT=0x10,SPRIF_IMAGEALIGN=8,SPRIF_COMPILE=0x80000000, SPRIF_DOUBLE=0x400, SPRIF_SINGLE=0x800
 	static TOP=0, LEFT=0x10, CENTER=0x20, RIGHT=0x30, MIDDLE=0x40, BOTTOM=0x80, GLOBAL=0xF0, ALL=13, SCI=14		;aligments																
 	static LOCKED=1, HIDDEN=2, REDRAW=8
 
   ;named parameters:  txt, data, w, h, bg, fg, type, state, txtal, imgal, fnt
+	txt := "~`a "
 	loop, 10 {
 		ifEqual, o%A_Index%,,break
 		j := InStr( o%A_index%, "=" ), 	prop := SubStr(	o%A_index%, 1, j-1 ), %prop% := SubStr( o%A_index%, j+1, StrLen(o%A_Index%))
@@ -864,44 +865,56 @@ SS_SetCell(hCtrl, Col="", Row="", o1="", o2="", o3="", o4="", o5="", o6="", o7="
 				else %p% |= %A_LOOPFIELD%
 		}	
 	}
-	flag := 0
-	flag |= (data!="" || txt!="") ? SPRIF_DATA	: 0
-	flag |= (type!="")		? SPRIF_TYPE		: 0
-	flag |= (w != "")		? SPRIF_WIDTH		: 0
-	flag |= (h != "")		? SPRIF_HEIGHT		: 0
-	flag |= (bg!= "")		? SPRIF_BACKCOLOR	: 0
-	flag |= (fg!= "")		? SPRIF_TEXTCOLOR	: 0
-	flag |= (state !="")	? SPRIF_STATE		: 0
-	flag |= (txtal != "")	? SPRIF_TEXTALIGN	: 0
-	flag |= (imgal != "")	? SPRIF_IMAGEALIGN	: 0
-	flag |= (fnt != "")		? SPRIF_FONT		: 0
+    flag := 0
+	 ,flag |= (data!="" || txt!="") ? SPRIF_DATA	: 0
+	 ,flag |= (type!="")	? SPRIF_TYPE		: 0
+	 ,flag |= (w != "")		? SPRIF_WIDTH		: 0
+	 ,flag |= (h != "")		? SPRIF_HEIGHT		: 0
+	 ,flag |= (bg!= "")		? SPRIF_BACKCOLOR	: 0
+	 ,flag |= (fg!= "")		? SPRIF_TEXTCOLOR	: 0
+	 ,flag |= (state !="")	? SPRIF_STATE		: 0
+	 ,flag |= (txtal != "")	? SPRIF_TEXTALIGN	: 0
+	 ,flag |= (imgal != "")	? SPRIF_IMAGEALIGN	: 0
+	 ,flag |= (fnt != "")	? SPRIF_FONT		: 0
 
-	type := hType & ~0xF0								;get base type
-
+	VarSetCapacity(ITEM, 40, 0), NumPut(Col, ITEM, 4),  NumPut(Row, ITEM, 8)
+	if type =					;user is changing the cell
+	{	
+		bChange := true
+		SendMessage,SPRM_GETCELLTYPE,Col,Row,, ahk_id %hCtrl%
+		hType := ErrorLevel
+	}
+	
+	type := hType & ~0xF0		;get the base type
 	if type in %FORMULA%,%GRAPH%
 		flag |= SPRIF_COMPILE
-
-	if type in %COMBOBOX%,%INTEGER%						;combobox keeps combo handle in txt.
-		NumPut(txt,txt)
 	
-	if type = %COMBOBOX%
-		ifEqual, data,,SetEnv, data, 0					;select 1st item, if user didn't
-
 	if type = %FLOAT%
 		flag |= SPRIF_SINGLE,  NumPut(txt, txt, 0, "Float")
 
-	if (data != "") 									;data for now keep indices only, so it is byte before text
-		txt := "1234" txt,   NumPut(data, txt)			;make the room for data and insert index
-		
+	if type = %INTEGER%					
+		NumPut(txt,txt)
 	
-	VarSetCapacity(ITEM, 40, 0)
-	NumPut(flag, ITEM, 0)				
-	NumPut(col,	 ITEM, 4)				
-	NumPut(row,	 ITEM, 8)				
+	if type in %COMBOBOX%,%CHECKBOX%
+	{
+		; in this case both txt and data must be set at the same time, so if user didn't provide one, get it.
+		if (bChange && (txt="~`a " || data=""))
+		{
+			NumPut(SPRIF_DATA, ITEM)
+			SendMessage,SPRM_GETCELLDATA,,&ITEM,, ahk_id %hCtrl%
+			pData := NumGet(ITEM, 36)
+			if (data != "") 
+				 txt := type=COMBOBOX ? NumGet(pData+4) : SS_strAtAdr(pData + 4)
+			else data := NumGet(pData,36)
+		}	
+		if (type = COMBOBOX) 
+			NumPut(txt,txt)		;put combobox handle as txt
+		txt := "1234" txt,   NumPut(data, txt)			;make the room for the data and insert index
+	}
 	
-	NumPut(hState,ITEM, 14)				
-
-	;FORMAT struct						                                           
+	NumPut(flag,  ITEM)
+	NumPut(hState,ITEM, 14)
+	;FORMAT struct
 	NumPut(bg,	  ITEM, 16)				  
 	NumPut(fg,	  ITEM, 20)				  
 	NumPut(htxtal,ITEM, 24,"UChar")		  
@@ -959,7 +972,7 @@ SS_SetFont(hCtrl, idx, pFont) {
         face := RegExReplace( face, "S)(^\s*)|(\s*$)")      ;trim 
 
 	VarSetCapacity(FONT,48,0 )			;FONT struct       
-	DllCall("RtlMoveMemory", "uint", &FONT+4, "str", face, "uint", StrLen(face))
+	DllCall("RtlMoveMemory", "uint", &FONT, "str", face, "uint", StrLen(face))
 
 	NumPut(height,	  FONT, 40)				;	ht			40	dd ?					;Height       
 	NumPut(bold,	  FONT, 44,"UChar")		;	bold		44	db ?					;Bold   
@@ -1051,7 +1064,7 @@ SS_SetGlobal(hCtrl, g, cell="", colhdr="", rowhdr="", winhdr="") {
 			himgal |= %A_LOOPFIELD%
 
 		NumPut( %p%_bg	, GLOBAL, N+0 )								
-		NumPut( %p%_fg	, GLOBAL, N+4 )
+		NumPut( %p%_fg	, GLOBAL, N )
 		NumPut( htxtal,   GLOBAL, N+8, "UChar" )	
 		NumPut( himgal,   GLOBAL, N+9, "UChar")	
 		NumPut( %p%_fnt	, GLOBAL, N+10,"UChar" )	
@@ -1213,7 +1226,7 @@ SS_onNotify(wparam, lparam, msg, hwnd){
 	static SS_MODULEID := 260609, oldNotify="*"
 	static SPRN_SELCHANGE=1, SPRN_BEFOREEDIT=2, SPRN_AFTEREDIT=3, SPRN_BEFOREUPDATE=4, SPRN_AFTERUPDATE=5, SPRN_HYPERLINKENTER=6, SPRN_HYPERLINKLEAVE=7, SPRN_HYPERLINKCLICK=8, SPRN_BUTTONCLICK=9
 
-	if (NumGet(lparam+4) != SS_MODULEID){
+	if (NumGet(lparam) != SS_MODULEID){
 		ifEqual, oldNotify, *, SetEnv, ooldNotify, % SS("OldNotify")		
 		ifNotEqual, oldNotify,,return DllCall(OldNotify, "uint", wparam, "uint", lparam, "uint", msg, "uint", hwnd)		
 		return
@@ -1229,7 +1242,7 @@ SS_onNotify(wparam, lparam, msg, hwnd){
 		return NumPut(r, lparam+24)		;hm... fcancel doesn't work for some reason like it should
 	}
 
-	spri := NumGet(lparam+12), col := NumGet(spri+4), row := NumGet(spri+8)
+	spri := NumGet(lparam+12), col := NumGet(spri), row := NumGet(spri+8)
 
 	if (code = SPRN_HYPERLINKCLICK)
 		return %handler%(hw, "C", "H", col, row)
@@ -1616,7 +1629,7 @@ return
 	o Cell cursor disapears in expanded cells.
 	o Multiselect scrolling by mouse is too fast.
 	o Scroll-locked area does not work well with splitts.
-	o Float to ascii does not work on numbers > 1e+4000 or < 1e-4000
+	o Float to ascii does not work on numbers > 1e000 or < 1e-4000
 */
 
 /* Group: About

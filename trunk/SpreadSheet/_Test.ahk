@@ -18,17 +18,22 @@ CoordMode, tooltip, screen
 	SS_SetGlobalFields(hCtrl, "gcellht", 20)
 
 	hCombo := SS_CreateCombo(hCtrl, "item0|item1|item2|item3|item4|item5|item6|item7|item8|item9|item10", 150)
+	SS_SetCell(hCtrl, 2, 2, "type=COMBOBOX FIXEDSIZE", "txt=" hCombo, "fnt=1", "data=2", "imgal=MIDDLE RIGHT")
+	SS_SetCell(hCtrl, 2, 4, "type=CHECKBOX FIXEDSIZE", "txt=visible?", "data=0", "imgal=MIDDLE RIGHT", "fnt=1")
+;	gui, show, w500 h300
+;	return		
+
 	SS_SetCell(hCtrl, 1, 1, "type=FLOAT", "txt=14.123456", "txtal=4 RIGHT", "state=LOCKED")
 
 	SS_SetCell(hCtrl, 1, 0, "txt=hello", "")
 	SS_SetCell(hCtrl, 0, 1, "txtal=BOTTOM RIGHT")
+
 	
 	SS_SetDateFormat(hCtrl, "dd.MM.yyyy")
 	SS_SetCell(hCtrl, 3, 1, "type=INTEGER DATE", "txt=" i := SS_ConvertDate(hCtrl, "10.11.1976"), "w=100")
 	SS_SetCell(hCtrl, 4, 1, "type=INTEGER", "txt=" i)	
-
 	SS_SetCell(hCtrl, 2, 1, "type=TEXTMULTILINE FORCETYPE", "txt=Some`nMultiline Text", "fnt=1")
-	SS_SetCell(hCtrl, 2, 2, "type=COMBOBOX FIXEDSIZE", "txt=" hCombo, "fnt=1", "data=2", "imgal=MIDDLE RIGHT")
+
 
 	SS_SetCell(hCtrl, 1, 2, "type=TEXT", "txt=Style", "bg=0xFF", "fg=0xFFFFFF", "state=LOCKED")
 		
@@ -36,7 +41,7 @@ CoordMode, tooltip, screen
 	SS_SetCell(hCtrl, 2, 3, "type=BUTTON FORCETEXT FIXEDSIZE", "txt=w0.5 h", "imgal=MIDDLE RIGHT", "fnt=1")
 
 	SS_SetCell(hCtrl, 1, 4, "type=TEXT", "txt=Visible", "bg=0xFF", "fg=0xFFFFFF")
-	SS_SetCell(hCtrl, 2, 4, "type=CHECKBOX FIXEDSIZE", "txt=visible?", "data=1", "imgal=MIDDLE RIGHT", "fnt=1")
+
 
 	SS_SetCell(hCtrl, 1, 6, "type=TEXT", "txt=Help", "bg=0xFFFF", "fg=-1")
 	SS_SetCell(hCtrl, 2, 6, "type=HYPERLINK", "txt=autohotkey.com", "w=150", "fnt=2")
@@ -66,6 +71,10 @@ CoordMode, tooltip, screen
 
 	SS_SetGlobalFields(hCtrl, "cell_txtal", "RIGHT MIDDLE")
 	Gui, Show, w%w% h%h%, SpreadSheet
+return
+
+F2::
+	SS_SetCell(hCtrl, 2,4, "txt=ahaaaaaa", "data=1")
 return
 
 Handler(hwnd, Event, EArg, Col, Row) {
