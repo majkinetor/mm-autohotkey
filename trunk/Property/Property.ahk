@@ -15,6 +15,11 @@ SetBatchLines, -1
 	{
 	  p = 
 		(LTrim
+		Name=My Checkbox
+		Type=CheckBox
+		Value=is that ok ?
+		Param=0
+
 		Name=My Separator
 		Type=Separator
 		Value=25
@@ -31,11 +36,6 @@ SetBatchLines, -1
 		Type=Separator
 		Value=55
 	
-		Name=My Checkbox
-		Type=CheckBox
-		Value=is that ok ?
-		Param=0
-
  		Name=My HyperLink
 		Type=HyperLink
 		Value=www.autohotkey.com
@@ -77,7 +77,8 @@ F1::
 return
 
 F2::
-	Property_SetValue(hCtrl, "My CheckBox", "", 1)
+	Property_SetParam(hCtrl, "My CheckBox", 1)
+	SS_Focus(hctrl)
 return
 
 
@@ -157,7 +158,7 @@ Handler(hCtrl, event, name, value, param){
 
  */
 Property_Add(hGui, X=0, Y=0, W=200, H=100, Style="", Handler="") {
-	hCtrl := SS_Add(hGui, x, y, w, h, "GRIDMODE CELLEDIT COLSIZE ROWSELECT " style, "Property_Handler")
+	hCtrl := SS_Add(hGui, x, y, w, h, "GRIDMODE CELLEDIT COLSIZE ROWSELECT " style, "Property_handler")
 	Property_initSheet(hCtrl)
 	if IsFunc(Handler)
 		Property(hCtrl "_handler", Handler)
@@ -439,7 +440,8 @@ Property_Insert(hCtrl, Properties, Position=0){
 				,"fnt=" fnt2, "state=" state, InStr("CheckBox,Combobox", type) ? "data=" Param : "")
 
 	}
-
+	if !nrows
+		SS_SetCurrentCell(hCtrl, 2,1)
 	sleep, -1
 }
 
@@ -525,12 +527,11 @@ Property_SetRowHeight(hCtrl, Val) {
 Property_handler(hCtrl, event, earg, col, row){
 	static last
 
-	handler := Property(hctrl "_handler")
-	ifEqual, handler, ,return
-
-	if (event = "S") and col=1 
+	if (event = "S") and (col=1) 
 		SetTimer, Property_Timer, -1					;if user selects first column, switch to 2nd so he can use shortcuts on combobox, checkbox etc...	
 
+	handler := Property(hctrl "_handler")
+	ifEqual, handler, ,return
 
 	t := SS_GetCellType(hCtrl, col, row, 2)				;return base type of the cell
 	if t in 11,12										;checkbox, combobox
