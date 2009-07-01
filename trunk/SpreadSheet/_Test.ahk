@@ -18,6 +18,7 @@ CoordMode, tooltip, screen
 	SS_SetGlobalFields(hCtrl, "gcellht", 20)
 
 	hCombo := SS_CreateCombo(hCtrl, "item0|item1|item2|item3|item4|item5|item6|item7|item8|item9|item10", 150)
+	hCombo2 := SS_CreateCombo(hCtrl, "abc|def", 150)
 	SS_SetCell(hCtrl, 2, 2, "type=COMBOBOX FIXEDSIZE", "txt=" hCombo, "fnt=1", "data=2", "imgal=MIDDLE RIGHT")
 	SS_SetCell(hCtrl, 2, 4, "type=CHECKBOX FIXEDSIZE", "txt=visible?", "data=0", "imgal=MIDDLE RIGHT", "fnt=1")
 ;	gui, show, w500 h300
@@ -71,10 +72,6 @@ CoordMode, tooltip, screen
 
 	SS_SetGlobalFields(hCtrl, "cell_txtal", "RIGHT MIDDLE")
 	Gui, Show, w%w% h%h%, SpreadSheet
-return
-
-F2::
-	SS_SetCell(hCtrl, 2,4, "txt=ahaaaaaa", "data=1")
 return
 
 Handler(hwnd, Event, EArg, Col, Row) {
