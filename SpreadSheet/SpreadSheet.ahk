@@ -1646,6 +1646,7 @@ return
 /*
 	B:
 		Graph background color stays the same even when you change global cell background.
+		When u enter edit on type FLOAT with SPRIF_SINGLE (or double), extra digits of precision are shown, those that are probably artifacts of conversion.		
 
 	Q: 
 		ComboBox selected item isn't selected in the combobox list when you open it.
