@@ -1,3 +1,5 @@
+SetWinDelay, -1
+DetectHiddenWindows, on
 #SingleInstance, force
 SetBatchLines, -1
 	Gui, +LastFound
@@ -77,7 +79,7 @@ F1::
 return
 
 F2::
-	Property_SetParam(hCtrl, "My CheckBox", 1)
+	Property_Set(hCtrl, 1, "HEEEJ", 1)
 	SS_Focus(hctrl)
 return
 
@@ -95,9 +97,18 @@ Btn:
 return
 
 Handler(hCtrl, event, name, value, param){
+	static mycombo
+
 	tooltip %event% %name% %value% %param%, 0, 0
 	if event in EB,S
 		return
+
+	if event = P
+	{
+		if mycombo = 
+			return mycombo := SS_CreateCombo(hCtrl, Name, 100)
+		return mycombo
+	}
 
 	;do some stupid checks
 	if (name="My Button") 
@@ -151,7 +162,14 @@ Handler(hCtrl, event, name, value, param){
 				Value	- Value of the selected property. If event is EA, this argument contains user input.
 				Param	- Parameter of the selected property.  If event is EA, this argument contains user input.
 				Result	- Return 1 to prevent selection (S) or to prevent user changing the value (EA).
-				
+
+ Events:		
+				S - Select
+				EB	- Edit before. 
+				EA	- Edit after. Value contains user input. Return 1 to prevent change of value / param.
+				P	- Populate. <Insert> fires this event when it encounters ComboBox type without value.
+					  In that case you should populate the combo yourself and return its handle. 
+					  The combo must have some items. See SS_CreateCombo function for details.
 
  Retunrs:
 				Control's handle.
@@ -239,7 +257,7 @@ Property_Define(hCtrl) {
 		
 		s = %s%Name=%p%`nType=
 		if type=EXPANDED
-			s .= "Separator"
+			s .= "Separator", v := SS_GetCell(hCtrl, 2, A_Index, "h")
 		else if type contains BUTTON
 			s .= "Button"
 		else if type contains WIDEBUTTON
@@ -259,6 +277,8 @@ Property_Define(hCtrl) {
 		else s .= "Text"
 
 		if type != EXPANDED
+			s .= "`nValue=" v 
+		else if v 
 			s .= "`nValue=" v 
 
 		s .= "`n`n"
@@ -388,12 +408,11 @@ Property_Insert(hCtrl, Properties, Position=0){
 		else i := nrows + k++
 		
 	 ;initialize
-		Name := Value := Param := "", Type := "Text"
+		name := value := param := "", type := "Text"
 		state:="Default", fnt1=0, fnt2=1, txtal:="RIGHT MIDDLE", imgal="MIDDLE RIGHT", txtal2="MIDDLE LEFT"
 		PB := _PB,  PF := _PF  ,VF := _VF,  VB := _VB
 
 	 ;parse property into local variables
-
 		loop, parse, p, `n
 		{
 			ifEqual, A_LoopField,, continue
@@ -407,37 +426,41 @@ Property_Insert(hCtrl, Properties, Position=0){
 		
 		tpe := type " FORCETYPE"
 
-		if (Type="HyperLink")
-			tpe := "HYPERLINK", fnt2 := 3
+		if (type="HyperLink")
+			fnt2 := 3
 
-		if (type="ComboBox")
-	 		tpe := "COMBOBOX FIXEDSIZE", Value := SS_CreateCombo(hCtrl, Value), Data := Param
-		
-
-		if (Type="Button")		
+		if (type="ComboBox") 
+		{
+	 		tpe := "COMBOBOX FIXEDSIZE"
+			if value =
+				 handler := Property(hctrl "_handler"),  value := %handler%(hCtrl, "P", name, "", "")
+			else value := SS_CreateCombo(hCtrl, value)
+			data := Param
+		}		
+		if (type="Button")		
 			tpe := "BUTTON FORCETEXT FIXEDSIZE"
 
-		if (Type="WideButton")	
+		if (type="WideButton")	
 			 tpe := "WIDEBUTTON FORCETEXT", txtal2="CENTER MIDDLE"
 		
 		if (Type="CheckBox")
 			tpe := "CHECKBOX FIXEDSIZE"
-
+		
 	 ;set row
 		SS_SetCell(	hCtrl, 1, i
-					,"type=TEXT", "txt=" Name
+					,"type=TEXT", "txt=" name
 					,"bg=" PB, "fg=" PF
-					,"state=LOCKED", "txtal=" txtal, "fnt=" fnt1, bSeparator ? "h=" Value : "")
+					,"state=LOCKED", "txtal=" txtal, "fnt=" fnt1, bSeparator ? "h=" value : "")
 
 		if (bSeparator)
 			SS_ExpandCell( hCtrl, 1, i, 2, i )
 		else
 			SS_SetCell( hCtrl, 2, i
-				,"type=" Tpe 
-				,"txt="  Value
+				,"type=" tpe 
+				,"txt="  value
 				,"bg=" VB, "fg=" VF
 				,"txtal=" txtal2, "imgal=" imgal
-				,"fnt=" fnt2, "state=" state, InStr("CheckBox,Combobox", type) ? "data=" Param : "")
+				,"fnt=" fnt2, "state=" state, InStr("CheckBox,Combobox", type) ? "data=" param : "")
 
 	}
 	if !nrows
