@@ -14,10 +14,12 @@ CoordMode, tooltip, screen
 	Gui, Add, Button,x+10 yp hp 0x8000 gOnReload, reload
 	Gui, Add, Button,x+10 yp hp 0x8000 gOnAbout, ?
 	
-	OnMessage(WM_PAINT := 0x0F, "MyFun")
+	OnMessage(WM_DRAWITEM := 0x02B, "MyFun")
 
-	hCtrl := SS_Add(hwnd, 0, hdr, w, h-hdr, "WINSIZE VSCROLL HSCROLL CELLEDIT ROWSIZE COLSIZE STATUS MULTISELECT", "Handler")
+	hCtrl := SS_Add(hwnd, 0, 0, w, h-hdr, "WINSIZE VSCROLL HSCROLL CELLEDIT ROWSIZE COLSIZE STATUS MULTISELECT", "Handler")
 	SS_SetCell(hCtrl, 1, 1, "type=OWNERDRAWINTEGER", "txt=3")
+	SS_SetRowHeight(hCtrl,0,0)
+	SS_SetColWidth(hCtrl,0,0)
 	gui, show, w500 h300
 	SS_Focus(hCtrl)
 	return		
@@ -74,12 +76,61 @@ CoordMode, tooltip, screen
 return
 
 MyFun(wParam, lParam, msg, hwnd) {
-	global
-	if hwnd != hctrl
-		return
-
-	
+   ;wparam=moduleid ;  lParam=DRAWITEMSTRUCT
+   lpspri := NumGet(lparam+44)
+   t := NumGet(lpspri+27,0, "UChar")
+  
+	hdc := NumGet(Lpspri+24)
+	left	:= NumGet(lparam+28)
+	top		:= NumGet(lparam+32)
+	right	:= NumGet(lparam+36)
+	bottom	:= NumGet(lparam+40)
+	m(left, top, right, bottom)
 }
+   
+
+;http://msdn.microsoft.com/en-us/library/bb775802(VS.85).aspx
+;typedef struct tagDRAWITEMSTRUCT {   
+;0    UINT CtlType;
+;4    UINT CtlID;
+;8    UINT itemID;
+;12    UINT itemAction;
+;16    UINT itemState;
+;20    HWND hwndItem;
+;24    HDC hDC;
+;28    RECT rcItem;
+;44  ULONG_PTR itemData;
+;} DRAWITEMSTRUCT;
+
+;.elseif eax==WM_DRAWITEM
+;		push	ebx
+;		mov		ebx,lParam
+;		mov		edx,[ebx].DRAWITEMSTRUCT.itemData
+;		.if [edx].SPR_ITEM.fmt.tpe==TPE_OWNERDRAWBLOB
+;			mov		edx,[edx].SPR_ITEM.lpdta
+;			movzx	eax,word ptr [edx]
+;			add		edx,2
+;			invoke TextOut,[ebx].DRAWITEMSTRUCT.hdc,[ebx].DRAWITEMSTRUCT.rcItem.left,[ebx].DRAWITEMSTRUCT.rcItem.top,edx,eax
+;		.else
+;			mov		eax,[ebx].DRAWITEMSTRUCT.rcItem.right
+;			sub		eax,[ebx].DRAWITEMSTRUCT.rcItem.left		width
+;			shr		eax,1
+;			sub		eax,16
+;			add		[ebx].DRAWITEMSTRUCT.rcItem.left,eax
+;			mov		eax,[ebx].DRAWITEMSTRUCT.rcItem.bottom
+;			sub		eax,[ebx].DRAWITEMSTRUCT.rcItem.top
+;			shr		eax,1
+;			sub		eax,16
+;			add		[ebx].DRAWITEMSTRUCT.rcItem.top,eax
+;			mov		eax,[edx].SPR_ITEM.lpdta
+;			mov		eax,[eax]
+;			invoke LoadIcon,hInstance,eax
+;			push	eax
+;			invoke DrawIcon,[ebx].DRAWITEMSTRUCT.hdc,[ebx].DRAWITEMSTRUCT.rcItem.left,[ebx].DRAWITEMSTRUCT.rcItem.top,eax
+;			pop		eax
+;			invoke DestroyIcon,eax
+;		.endif
+
 
 Handler(hwnd, Event, EArg, Col, Row) {
 	static s
