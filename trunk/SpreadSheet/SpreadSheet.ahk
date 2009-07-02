@@ -1528,8 +1528,7 @@ return
 
 Get Cell Information:
 (start code)
-      SS_GetCurrentCell(hCtrl, col, row)	;get current column and row into col and row variables
-      SS_GetCell(hCtrl, col, row, "cell")	;"cell" is the base name of variable holding the data 
+      SS_GetCellArray(hCtrl, "cell")	;"cell" name of pseudo array holding the data, use selected cell
       msg = 
       (LTrim 
          Text	= %cell_txt% 
