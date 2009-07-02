@@ -263,7 +263,7 @@ SS_GetCell(hCtrl, Col, Row, pQ, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=
 	}
 
 	VarSetCapacity(ITEM, 40, 0),  pItem := &ITEM
-	NumPut(flag, ITEM, 0),  NumPut(Col, ITEM, 4),   NumPut(Row,ITEM, 8)
+	NumPut(flag, ITEM),  NumPut(Col, ITEM, 4),   NumPut(Row,ITEM, 8)
 	SendMessage,SPRM_GETCELLDATA,,&ITEM,, ahk_id %hCtrl%
 	
 	type  := NumGet(pITEM+27, 0, "UChar") & ~0xF0	;get base type
