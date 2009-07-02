@@ -759,7 +759,7 @@ SS_ScrollCell(hCtrl) {
 			GLOBAL	- If you omit aligment attribute, this one will be used. 
   */
 SS_SetCell(hCtrl, Col="", Row="", o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o9="", o10="", o11=""){
-	static SPRM_SETCELLDATA=0x483, SPRM_GETCELLDATA=0x482, SPRM_GETCELLTYPE=0x48F
+	static SPRM_SETCELLDATA=0x483, SPRM_GETCELLDATA=0x482, SPRM_GETCELLTYPE=0x48F, WM_DRAWITEM := 0x02B
 	static EMPTY=0, COLHDR=1, ROWHDR=2, WINHDR=3, TEXT=4, TEXTMULTILINE=5, INTEGER=6, FLOAT=7, FORMULA=8, GRAPH=9, HYPERLINK=10, CHECKBOX=11, COMBOBOX=12, OWNERDRAWBLOB=13, OWNERDRAWINTEGER=14, BUTTON=16, WIDEBUTTON=0x20, DATE=0x30, FORCETEXT=0x44, FORCETYPE=0x40, FIXEDSIZE=0x80
 	static SPRIF_TYPE=0x40,SPRIF_DATA=0x200,SPRIF_WIDTH=0x80,SPRIF_BACKCOLOR=1,SPRIF_TEXTCOLOR=2,SPRIF_TEXTALIGN=4,SPRIF_HEIGHT=0x100,SPRIF_STATE=0x20,SPRIF_FONT=0x10,SPRIF_IMAGEALIGN=8,SPRIF_COMPILE=0x80000000, SPRIF_DOUBLE=0x400, SPRIF_SINGLE=0x800
 	static TOP=0, LEFT=0x10, CENTER=0x20, RIGHT=0x30, MIDDLE=0x40, BOTTOM=0x80, GLOBAL=0xF0, ALL=13, SCI=14		;aligments																
@@ -808,7 +808,15 @@ SS_SetCell(hCtrl, Col="", Row="", o1="", o2="", o3="", o4="", o5="", o6="", o7="
 
 	if type in %INTEGER%,%OWNERDRAWINTEGER%
 		NumPut(txt,txt)
+
+	if type in %OWNERDRAWINTEGER%,%OWNERDRAWBLOB%
+	{
+		old := OnMessage(WM_DRAWITEM, "SS_onDrawItem")
+		if old != SS_onDrawItem
+			SS("oldDrawItem", RegisterCallback(old))
+	}
 	
+
 	if type in %COMBOBOX%,%CHECKBOX%
 	{
 		; in this case both txt and data must be set at the same time, so if user didn't provide one, get it.
@@ -1275,6 +1283,32 @@ SS_onNotify(wparam, lparam, msg, hwnd){
 	if (code = SPRN_HYPERLINKLEAVE)
 		return %handler%(hw, "hyperlink", "leave", col, row)
 */
+}
+
+SS_onDrawItem(wParam, lParam, msg, hwnd) {
+	static SS_MODULEID := 260609, oldDrawItem="*", OWNERDRAWBLOB=13, OWNERDRAWINTEGER=14
+
+	if (wparam != SS_MODULEID){
+		ifEqual, oldDrawItem, *, SetEnv, oldDrawItem, % SS("oldDrawItem")		
+		ifNotEqual, oldDrawItem,,return DllCall(oldDrawItem, "uint", wparam, "uint", lparam, "uint", msg, "uint", hwnd)		
+		return
+	}
+	hw := NumGet(lparam+20),																;struct tagDRAWITEMSTRUCT  
+	handler := SS(hw "Handler")																;00    UINT CtlType;       
+	ifEqual, handler,, return																;04    UINT CtlID;         
+																							;08    UINT itemID;        
+   ;wparam=moduleid   lParam=DRAWITEMSTRUCT													;12    UINT itemAction;    
+	lpspri := NumGet(lparam+44)																;16    UINT itemState;     
+	 , col := NumGet(lpspri+4), row := NumGet(lpspri+8)											;20    HWND hwndItem;      
+	 ,type := NumGet(lpspri+27,0, "UChar"),	data := NumGet(lpspri+36)						;24    HDC hDC;            
+	%handler%(hw, "D", lparam, col, row)				;28    RECT rcItem;        
+																							;44	   ULONG_PTR itemData; 
+														                                    
+;	hdc := NumGet(lparam+24)								                                    		
+;	left	:= NumGet(lparam+28)							                                    
+;	top		:= NumGet(lparam+32)							                                    
+;	right	:= NumGet(lparam+36)							                                    
+;	bottom	:= NumGet(lparam+40)	
 }
 
 ; return textual or numeric definition of type, depending on input
