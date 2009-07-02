@@ -1492,7 +1492,6 @@ ss(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRe
 	Gui, +LastFound +ToolWindow
 	hwnd := WinExist()
 
-	Gui, Add, ListBox, x0 y0 w0 HWNDhList, MyButton||
 	hCtrl := SS_Add(hwnd, 0, 0, 300, 400, "VSCROLL  GRIDMODE CELLEDIT ROWSIZE COLSIZE ROWSELECT")
 	SS_SetRowHeight(hCtrl)
 
