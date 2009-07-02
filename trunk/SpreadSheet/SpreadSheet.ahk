@@ -247,7 +247,7 @@ SS_GetCell(hCtrl, Col, Row, pQ, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=
 	static SPRIF_TYPE=0x40,SPRIF_DATA=0x200,SPRIF_WIDTH=0x80,SPRIF_BACKCOLOR=1,SPRIF_TEXTCOLOR=2,SPRIF_TEXTALIGN=4,SPRIF_HEIGHT=0x100,SPRIF_STATE=0x20,SPRIF_FONT=0x10,SPRIF_IMAGEALIGN=8,SPRIF_COMPILE=0x80000000, SPRIF_DOUBLE=0x400, SPRIF_SINGLE=0x800
 	static data="DATA", txt="DATA", w="WIDTH", h="HEIGHT", bg="BACKCOLOR", fg="TEXTCOLOR", state="STATE", txtal="TEXTALIGN", imgal="IMAGEALIGN", font="FONT", type="TYPE"
 	static EMPTY=0, COLHDR=1, ROWHDR=2, WINHDR=3, TEXT=4, TEXTMULTILINE=5, INTEGER=6, FLOAT=7, FORMULA=8, GRAPH=9, HYPERLINK=10, CHECKBOX=11, COMBOBOX=12, OWNERDRAWBLOB=13, OWNERDRAWINTEGER=14, EXPANDED=15, BUTTON=16, WIDEBUTTON=0x20, DATE=0x30, FORCETEXT=0x44, FORCETYPE=0x40, FIXEDSIZE=0x80
-	static _state=14.1,_bg=16,_fg=20,_txtal=24.1,_imgal=25.1,_fnt=26.1,_type=27.1, _txt=36,_data=36
+	static _state=14.1,_bg=16,_fg=20,_txtal=24.1,_imgal=25.1,_fnt=26.1,_type=27.1, _txt=36,_data=36, _w=28, _h=32
 
  ;use col="-1" internally to pass ITEM pointer via row param if I have it already via different means (for instance onNotify)
 	if Col=
@@ -279,7 +279,7 @@ SS_GetCell(hCtrl, Col, Row, pQ, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=
 			else if (type=FLOAT)
 				 v := SS_getCellFloat(hCtrl, col, row)
 			else if (type=COMBOBOX)
-				 v := NumGet(pData)
+				 v := NumGet(pData+4)
 			else v := SS_strAtAdr(pData + (type=CHECKBOX ? 4 : 0))
 		} 
 
