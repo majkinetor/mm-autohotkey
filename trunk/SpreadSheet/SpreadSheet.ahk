@@ -1506,7 +1506,7 @@ ss(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRe
 	hCombo := SS_CreateCombo(hCtrl, "item1|item2|item3|item4")
 
 	SS_SetCell(hCtrl, 1, 1, "type=TEXT", "txt=Caption", "bg=0xFF", "fg=0xFFFFFF")
-	SS_SetCell(hCtrl, 2, 1, "type=TEXT", "txt= ")
+	SS_SetCell(hCtrl, 2, 1, "type=FORCETEXT")
 
 	SS_SetCell(hCtrl, 1, 2, "type=TEXT", "txt=Style", "bg=0xFF", "fg=0xFFFFFF")
 	SS_SetCell(hCtrl, 2, 2, "type=COMBOBOX", "txt=" hCombo, "data=1", "imgal=RIGHT",  "txtal=CENTER")	;select 2nd item
