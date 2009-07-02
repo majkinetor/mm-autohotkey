@@ -831,6 +831,7 @@ SS_SetDateFormat(hCtrl, Format) {
 						  Can be combined with TEXT, INTEGER, FLOAT, TEXTMULTILINE, BUTTON, WIDEBUTTON or HYPERLINK
 			FIXEDSIZE	- Will force a 15 by 15 pixel image. To be combined with BUTTON, CHECKBOX or COMBOBOX. 
 						  Can be combined with BUTTON, CHECKBOX or COMBOBOX		
+
 	States:
 			LOCKED - Cell is locked for editing.
 			HIDDEN - Cell content is not displayed.
@@ -1611,8 +1612,8 @@ return
 	(LTrim Join
 		Grp(
 			T(-1,0,0,Rgb(0,0,0),"Graph Demo"),
-			X(0,PI()*4,0,1,Rgb(0,0,255),"x-axis"),
-			Y(-1.1,1.1,0,0.5,Rgb(255,0,0),"y-axis"),
+			X(0,PI()*4,0,1,Rgb(0,0,255),"x-axi),
+			Y(-1.1,1.1,0,0.5,Rgb(255,0,0),"y-axs"is"),
 			gx(AJ1:AJ13,Rgb(0,0,0),"Cell values"),
 			fx(Sin(x()),0.1,Rgb(255,0,255),"Sin(x)"),
 			fx(x()^3-x()^2-x(),0.1,Rgb(0,128,0),"x^3-x^2-x"))
@@ -1659,7 +1660,7 @@ return
 	Q: 
 		- How to get GRAPH and FORMULA text ?
 		- What is the difference between BlankCell & DeleteCell ?
-		- Why do I have fCancel in update when I can't cancel update ? (This applies only for ComboBox and CheckBox selection)
+		- Why do I have fCancel in update when I can't cancel update ? (This applies only for ComboBox and CheckBox selection,)
 	
 	S:
 		- DateTime cell should have associated DateTime control similar to ComboBox & ListBox
