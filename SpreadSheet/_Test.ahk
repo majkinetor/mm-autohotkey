@@ -13,10 +13,13 @@ CoordMode, tooltip, screen
 	Gui, Add, Button,x+10 h25 0x8000 gOnButton, exec   F1
 	Gui, Add, Button,x+10 yp hp 0x8000 gOnReload, reload
 	Gui, Add, Button,x+10 yp hp 0x8000 gOnAbout, ?
+	
+	OnMessage(WM_PAINT := 0x0F, "MyFun")
 
 	hCtrl := SS_Add(hwnd, 0, hdr, w, h-hdr, "WINSIZE VSCROLL HSCROLL CELLEDIT ROWSIZE COLSIZE STATUS MULTISELECT", "Handler")
 	SS_SetCell(hCtrl, 1, 1, "type=OWNERDRAWINTEGER", "txt=3")
 	gui, show, w500 h300
+	SS_Focus(hCtrl)
 	return		
 
 	SS_SetCell(hCtrl, 1, 1, "type=FLOAT", "txt=14.123456", "txtal=4 RIGHT", "state=LOCKED")
@@ -24,7 +27,7 @@ CoordMode, tooltip, screen
 	SS_SetCell(hCtrl, 1, 0, "txt=hello", "")
 	SS_SetCell(hCtrl, 0, 1, "txtal=BOTTOM RIGHT")
 
-	
+
 	SS_SetDateFormat(hCtrl, "dd.MM.yyyy")
 	SS_SetCell(hCtrl, 3, 1, "type=INTEGER DATE", "txt=" i := SS_ConvertDate(hCtrl, "10.11.1976"), "w=100")
 	SS_SetCell(hCtrl, 4, 1, "type=INTEGER", "txt=" i)	
@@ -67,7 +70,16 @@ CoordMode, tooltip, screen
 
 	SS_SetGlobalFields(hCtrl, "cell_txtal", "RIGHT MIDDLE")
 	Gui, Show, w%w% h%h%, SpreadSheet
+	SS_Focus(hCtrl)		;refresh
 return
+
+MyFun(wParam, lParam, msg, hwnd) {
+	global
+	if hwnd != hctrl
+		return
+
+	
+}
 
 Handler(hwnd, Event, EArg, Col, Row) {
 	static s
