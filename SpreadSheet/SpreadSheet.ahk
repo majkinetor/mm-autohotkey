@@ -23,7 +23,7 @@
 >			result := Handler(hWnd, Event, EArg, Col, Row)
 
 			hWnd	- Handle of the speradsheet control that sends notification
-			Event	- Event that ocured. Can be S (select), E (before edit), EA (after edit), UB (before update), UA (after update), C (click)
+			Event	- Event that ocured. Can be S (select), EB (before edit), EA (after edit), UB (before update), UA (after update), C (click)
 			EArg    - Event argument. Depends on event. See below.
 			Col		- Column of the associated cell.
 			Row		- Row of the associated cell.
