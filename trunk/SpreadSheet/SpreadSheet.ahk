@@ -1583,7 +1583,7 @@ Get Cell Information:
 	Gui, +LastFound
 	hwnd := WinExist()
 
-	hCtrl := SS_Add(hwnd, 0, 25, 552, 477, "WINSIZE VSCROLL HSCROLL CELLEDIT ROWSIZE COLSIZE STATUS MULTISELECT")
+	hCtrl := SS_Add(hwnd, 0, 25, 552, 477, "CELLEDIT STATUS")
 	
 	SS_SetCell(hCTrl, 1, 1, "txt= x  =", "type=TEXT", "txtal=CENTER", "fnt=1") 
 	SS_SetCell(hCTrl, 1, 2, "txt= y  =", "type=TEXT", "txtal=CENTER", "fnt=1") 
@@ -1604,7 +1604,7 @@ return
 	Gui, +LastFound
 	hwnd := WinExist()
 
-	hCtrl := SS_Add(hwnd, 0, 25, 552, 477, "WINSIZE VSCROLL HSCROLL CELLEDIT ROWSIZE COLSIZE STATUS MULTISELECT")
+	hCtrl := SS_Add(hwnd, 0, 25, 552, 477)
 
 	graph =
 	(LTrim Join
