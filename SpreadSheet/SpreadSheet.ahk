@@ -806,7 +806,7 @@ SS_SetCell(hCtrl, Col="", Row="", o1="", o2="", o3="", o4="", o5="", o6="", o7="
 	if type = %FLOAT%
 		flag |= SPRIF_SINGLE,  NumPut(txt, txt, 0, "Float")
 
-	if type = %INTEGER%					
+	if type = %INTEGER%,%OWNERDRAWINTEGER%				
 		NumPut(txt,txt)
 	
 	if type in %COMBOBOX%,%CHECKBOX%
@@ -1246,7 +1246,7 @@ SS_onNotify(wparam, lparam, msg, hwnd){
 		return NumPut(r, lparam+24)		;hm... fcancel doesn't work for some reason like it should
 	}
 
-	spri := NumGet(lparam+12), col := NumGet(spri+0), row := NumGet(spri+8)
+	spri := NumGet(lparam+12), col := NumGet(spri+4), row := NumGet(spri+8)
 
 	if (code = SPRN_HYPERLINKCLICK)
 		return %handler%(hw, "C", "H", col, row)
@@ -1280,7 +1280,7 @@ SS_onNotify(wparam, lparam, msg, hwnd){
 ; return textual or numeric definition of type, depending on input
 SS_getType( pType ) {
 	static EMPTY =0, COLHDR=1, ROWHDR=2, WINHDR=3, TEXT=4, TEXTMULTILINE=5, INTEGER=6, FLOAT=7, FORMULA=8, GRAPH=9, HYPERLINK=10, CHECKBOX=11, COMBOBOX=12, OWNERDRAWBLOB=13, OWNERDRAWINTEGER=14, EXPANDED=15, BUTTON=0x10, WIDEBUTTON=0x20, DATE=0x30, FORCETYPE=0x40, FORCETEXT=0x44, FIXEDSIZE=0x80
-	static 0="EMPTY",1="COLHDR",2="ROWHDR",3="WINHDR",4="TEXT",5="TEXTMULTILINE",6="INTEGER",7="FLOAT",8="FORMULA",9="GRAPH",10="HYPERLINK",11="CHECKBOX",12="COMBOBOX",15="EXPANDED"
+	static 0="EMPTY",1="COLHDR",2="ROWHDR",3="WINHDR",4="TEXT",5="TEXTMULTILINE",6="INTEGER",7="FLOAT",8="FORMULA",9="GRAPH",10="HYPERLINK",11="CHECKBOX",12="COMBOBOX", 13="OWNERDRAWBLOB", 14="OWNERDRAWINTEGER", 15="EXPANDED"
 	static mods = "FORCETYPE,DATE,BUTTON,WIDEBUTTON,FIXEDSIZE", TYPEMASK=0xF0
 	if pType is integer
 	{
@@ -1288,7 +1288,6 @@ SS_getType( pType ) {
 		loop, parse, mods, `,
 			if (pType & %A_LoopField% = %A_LoopField%)
 				v .= A_LoopFIeld " ", pType &= ~%A_LoopField%
-;		StringReplace, v, v,BUTTON WIDEBUTTON,DATE
 		pType &= ~TYPEMASK
 		return %pType% (v ? " " v : "")
 	}
