@@ -806,7 +806,7 @@ SS_SetCell(hCtrl, Col="", Row="", o1="", o2="", o3="", o4="", o5="", o6="", o7="
 	if type = %FLOAT%
 		flag |= SPRIF_SINGLE,  NumPut(txt, txt, 0, "Float")
 
-	if type = %INTEGER%,%OWNERDRAWINTEGER%				
+	if type in %INTEGER%,%OWNERDRAWINTEGER%
 		NumPut(txt,txt)
 	
 	if type in %COMBOBOX%,%CHECKBOX%
@@ -839,7 +839,7 @@ SS_SetCell(hCtrl, Col="", Row="", o1="", o2="", o3="", o4="", o5="", o6="", o7="
 	NumPut(hType, ITEM, 27,"UChar")		  
 	NumPut(w,	  ITEM, 28)
 	NumPut(h,	  ITEM, 32)
-	NumPut(&txt,  ITEM, 36) 			
+	NumPut(&txt,  ITEM, 36)
 
 	SendMessage,SPRM_SETCELLDATA,,&ITEM,, ahk_id %hCtrl% 
 	return ErrorLevel 
@@ -1642,35 +1642,3 @@ return
 
 ;HexView Structure
 ;[ITEM:|flag D|col D|row D|expx B|expy B|state B|dummy B|fmt.bckcol D|fmt.txtcol D|fmt.txtal B|fmt.imgal B|fmt.fnt B|fmt.tpe B|wt D|ht D|lpdta D
-
-
-/*
-	B:
-		- Visible item isn't selected in the ListBox when you open it.
-		- Graph background color stays the same even when you change global cell background.
-		- When u enter edit on type FLOAT with SPRIF_SINGLE (or double), extra digits of precision are shown, those that are probably artifacts of conversion.		
-		- Multiline text editing doesn't allow for entireing new lines. ENTER should work normaly in such case, with modifier CTRL used to exit the editing.
-		- If I have 2 integers, and set formula A11/A12 with A12=0, I don't get DIV0 error but the Formula displays A11.
-		- Row header doesn't account for Y text alignment. So if you resize height, #1 symbol (splitt no) will be stay in center and row header can't be set to follow.
-		- It is very hard to adjust row height. Movement cursor dissapears to easily.
-
-	Q: 
-		- How to get GRAPH and FORMULA text ?
-		- What is the difference between BlankCell & DeleteCell ?
-		- Why do I have fCancel in update when I can't cancel update ? (This applies only for ComboBox and CheckBox selection,)
-	
-	S:
-		- DateTime cell should have associated DateTime control similar to ComboBox & ListBox
-		- DeleteCell should be used to actually delete the cell/ This means that cell's row or column need to be adjusted.
-		  The wparam could set axis of adjustment (x or y - col or row) and lparam direction of adjustment (x - left/right, y - up/down).
-		  This naturaly extends to DeleteMultiSel that may have exactly the same API doing its magic for block of cells.
-		- Editable ComboBox type .
-		- If you choose to set fCancel to 1 in select notification for particualr row, later that row can't be skipped with arrows. 
-		  When control encounters such row, it simply stucks there while it should skip it. This can be set up in handler tho (but it shouldn't be necessary).
-		- Scrolling needs update. 
-		  Horizontal scrolling is happening on selection or click even when column widths are correctly adjusted if VSCROLL flag is present.
-		  Previous columns will get out of the view altho there is no need for it. 
-		  Moving mouse wheel always scrolls the last row to be on the top of the control, even if all rows are visible.
-		  New creation style could also be used, to prevent user V or H scrolling for making fixed look dialogs or fix to scrolling problems mentioned above. 
-		  For instance, imagine scenario in which I have 30 rows in the sheet but I want only to show 10 in a view without user moving from that view.
- */

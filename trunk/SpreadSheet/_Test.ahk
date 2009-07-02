@@ -17,8 +17,7 @@ CoordMode, tooltip, screen
 	OnMessage(WM_DRAWITEM := 0x02B, "MyFun")
 
 	hCtrl := SS_Add(hwnd, 0, 0, w, h-hdr, "WINSIZE VSCROLL HSCROLL CELLEDIT ROWSIZE COLSIZE STATUS MULTISELECT", "Handler")
-	SS_SetCell(hCtrl, 2, 2, "type=OWNERDRAWINTEGER", "txt=3")
-
+	SS_SetCell(hCtrl, 2, 2, "type=OWNERDRAWINTEGER", "txt=3", "state=LOCKED")
 	gui, show, w500 h300
 	SS_Focus(hCtrl)
 	return		
@@ -84,9 +83,15 @@ MyFun(wParam, lParam, msg, hwnd) {
 	top		:= NumGet(lparam+32)
 	right	:= NumGet(lparam+36)
 	bottom	:= NumGet(lparam+40)
+
+;	HexView(lpsri, 40)
+	int		:= NumGet(lpspri+36)
+	int := NumGet(int+0)
+;	s := SS_strAtAdr(NumGet(lpspri+36))
 	w := 64
 	hIcon := LoadIcon("home.ico", w)
-	API_DrawIconEx( hDC, left, top, hIcon, w, w, 0, 0, 3)
+	DllCall("TextOut", "uint", hDC, "uint", left, "uint", top, "str", int, "uint", StrLen(int))
+	API_DrawIconEx( hDC, left, top+25, hIcon, w, w, 0, 0, 3)
 	API_DestroyIcon(hIcon)
 }
 
