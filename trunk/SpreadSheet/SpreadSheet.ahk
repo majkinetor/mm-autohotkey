@@ -708,93 +708,6 @@ SS_ScrollCell(hCtrl) {
 }
 
 /*
-	Function:	SetCellString
-				Set the text of the selected cell.
-	
-	Parameters:
-				Txt -  Text to set, by default empty.
-				Type - Type. If omited current cell type will be used.	
-  */
-SS_SetCellString(hCtrl, Txt="", Type=""){
-	static SPRM_SETCELLSTRING=0x47D		; wParam=type, lParam=pointer to string.
-	if Type=
-		Type := SS_GetCellType(hCtrl, "", "", 1)
-	SendMessage,SPRM_SETCELLSTRING,Type,&txt,, ahk_id %hCtrl%
-	return ERRORLEVEL
-}
-
-/*
-	Function:	SetCellData
-				Set the data of the cell.
-	
-	Parameters:
-				Data - Data to set.
-				Col,Row - Cell coordinates. If omited current cell will be used.
-  */
-SS_SetCellData(hCtrl, Data, Col="", Row="") {
-	static SPRM_SETCELLDATA=0x483, SPRM_GETCELLDATA=0x482, SPRIF_DATA=0x200, init
-	if !init
-		init++, VarSetCapacity(ITEM, 40, 0), NumPut(SPRIF_DATA, ITEM) 
-	if Col=
-		SS_GetCurrentCell(hCtrl, Col, Row)
-
-	NumPut(Col, ITEM, 4),  NumPut(Row, ITEM, 8)
-	SendMessage,SPRM_GETCELLDATA,,&ITEM,, ahk_id %hCtrl%
-	NumPut( Data, NumGet(ITEM, 36)+0)
-	SendMessage,SPRM_SETCELLDATA,,&ITEM,, ahk_id %hCtrl%
-}
-
-/*
-	Function: SetColWidth
-			  Set column width
-  */
-SS_SetColWidth(hCtrl, col, width){
-	static SPRM_SETCOLWIDTH=0x47F	
-	SendMessage,SPRM_SETCOLWIDTH,col,width,, ahk_id %hCtrl%
-	return ERRORLEVEL
-}
-
-/*
-	Function: SetCurrentCell
-	Set current cell in active window
-
-	Parameters:
-			col, row	- Coordinates of the cell to select
-  */
-SS_SetCurrentCell(hCtrl, col, row) {
-	static SPRM_SETCURRENTCELL=0x47B		;wParam=col, lParam=row
-	SendMessage,SPRM_SETCURRENTCELL,col,row,, ahk_id %hCtrl%
-	return ErrorLevel 
-}
-
-/*
-	Function:	SetCurrentWin
-				Set active splitt window
-	
-	Parameters:
-				nWin	- Window number (0-7)
-  */
-SS_SetCurrentWin(hCtrl, nWin){
-	static	SPRM_SETCURRENTWIN=0x479		;wParam=0, lParam=nWin (0-7)
-	SendMessage,SPRM_SETCURRENTWIN,,nWin,, ahk_id %hCtrl%
-	return ERRORLEVEL
-}
-
-
-/*
-	Function: SetDateFormat
-			  Set date format
-	
-	Parameters:
-			  Format - Date format. See Date Formats section in FormatTime AHK documentation for details.
-  */
-SS_SetDateFormat(hCtrl, Format) {
-	static SPRM_SETDATEFORMAT=0x495		;Sets date format string. wParam=0, lParam=lpDateFormat (yyyy-MM-dd)
-	SendMessage,SPRM_SETDATEFORMAT,,&Format,, ahk_id %hCtrl%
-	return ErrorLevel
-}
-
-/*
 	Function: SetCell
 			  Set content of the cell
 
@@ -930,6 +843,93 @@ SS_SetCell(hCtrl, Col="", Row="", o1="", o2="", o3="", o4="", o5="", o6="", o7="
 
 	SendMessage,SPRM_SETCELLDATA,,&ITEM,, ahk_id %hCtrl% 
 	return ErrorLevel 
+}
+
+/*
+	Function:	SetCellData
+				Set the data of the cell.
+	
+	Parameters:
+				Data - Data to set.
+				Col,Row - Cell coordinates. If omited current cell will be used.
+  */
+SS_SetCellData(hCtrl, Data, Col="", Row="") {
+	static SPRM_SETCELLDATA=0x483, SPRM_GETCELLDATA=0x482, SPRIF_DATA=0x200, init
+	if !init
+		init++, VarSetCapacity(ITEM, 40, 0), NumPut(SPRIF_DATA, ITEM) 
+	if Col=
+		SS_GetCurrentCell(hCtrl, Col, Row)
+
+	NumPut(Col, ITEM, 4),  NumPut(Row, ITEM, 8)
+	SendMessage,SPRM_GETCELLDATA,,&ITEM,, ahk_id %hCtrl%
+	NumPut( Data, NumGet(ITEM, 36)+0)
+	SendMessage,SPRM_SETCELLDATA,,&ITEM,, ahk_id %hCtrl%
+}
+
+/*
+	Function:	SetCellString
+				Set the text of the selected cell.
+	
+	Parameters:
+				Txt -  Text to set, by default empty.
+				Type - Type. If omited current cell type will be used.	
+  */
+SS_SetCellString(hCtrl, Txt="", Type=""){
+	static SPRM_SETCELLSTRING=0x47D		; wParam=type, lParam=pointer to string.
+	if Type=
+		Type := SS_GetCellType(hCtrl, "", "", 1)
+	SendMessage,SPRM_SETCELLSTRING,Type,&txt,, ahk_id %hCtrl%
+	return ERRORLEVEL
+}
+
+/*
+	Function: SetColWidth
+			  Set column width
+  */
+SS_SetColWidth(hCtrl, col, width){
+	static SPRM_SETCOLWIDTH=0x47F	
+	SendMessage,SPRM_SETCOLWIDTH,col,width,, ahk_id %hCtrl%
+	return ERRORLEVEL
+}
+
+/*
+	Function: SetCurrentCell
+	Set current cell in active window
+
+	Parameters:
+			col, row	- Coordinates of the cell to select
+  */
+SS_SetCurrentCell(hCtrl, col, row) {
+	static SPRM_SETCURRENTCELL=0x47B		;wParam=col, lParam=row
+	SendMessage,SPRM_SETCURRENTCELL,col,row,, ahk_id %hCtrl%
+	return ErrorLevel 
+}
+
+/*
+	Function:	SetCurrentWin
+				Set active splitt window
+	
+	Parameters:
+				nWin	- Window number (0-7)
+  */
+SS_SetCurrentWin(hCtrl, nWin){
+	static	SPRM_SETCURRENTWIN=0x479		;wParam=0, lParam=nWin (0-7)
+	SendMessage,SPRM_SETCURRENTWIN,,nWin,, ahk_id %hCtrl%
+	return ERRORLEVEL
+}
+
+
+/*
+	Function: SetDateFormat
+			  Set date format
+	
+	Parameters:
+			  Format - Date format. See Date Formats section in FormatTime AHK documentation for details.
+  */
+SS_SetDateFormat(hCtrl, Format) {
+	static SPRM_SETDATEFORMAT=0x495		;Sets date format string. wParam=0, lParam=lpDateFormat (yyyy-MM-dd)
+	SendMessage,SPRM_SETDATEFORMAT,,&Format,, ahk_id %hCtrl%
+	return ErrorLevel
 }
 
 /*
