@@ -17,9 +17,8 @@ CoordMode, tooltip, screen
 	OnMessage(WM_DRAWITEM := 0x02B, "MyFun")
 
 	hCtrl := SS_Add(hwnd, 0, 0, w, h-hdr, "WINSIZE VSCROLL HSCROLL CELLEDIT ROWSIZE COLSIZE STATUS MULTISELECT", "Handler")
-	SS_SetCell(hCtrl, 1, 1, "type=OWNERDRAWINTEGER", "txt=3")
-	SS_SetRowHeight(hCtrl,0,0)
-	SS_SetColWidth(hCtrl,0,0)
+	SS_SetCell(hCtrl, 2, 2, "type=OWNERDRAWINTEGER", "txt=3")
+
 	gui, show, w500 h300
 	SS_Focus(hCtrl)
 	return		
@@ -77,17 +76,23 @@ return
 
 MyFun(wParam, lParam, msg, hwnd) {
    ;wparam=moduleid ;  lParam=DRAWITEMSTRUCT
-   lpspri := NumGet(lparam+44)
-   t := NumGet(lpspri+27,0, "UChar")
-  
-	hdc := NumGet(Lpspri+24)
+	lpspri := NumGet(lparam+44)
+	t := NumGet(lpspri+27,0, "UChar")
+	
+	hdc := NumGet(lparam+24)
 	left	:= NumGet(lparam+28)
 	top		:= NumGet(lparam+32)
 	right	:= NumGet(lparam+36)
 	bottom	:= NumGet(lparam+40)
-	m(left, top, right, bottom)
+	w := 64
+	hIcon := LoadIcon("home.ico", w)
+	API_DrawIconEx( hDC, left, top, hIcon, w, w, 0, 0, 3)
+	API_DestroyIcon(hIcon)
 }
-   
+
+LoadIcon2(){
+	return DllCall("LoadIcon", "uint", 0, "uint", 32512)
+}  
 
 ;http://msdn.microsoft.com/en-us/library/bb775802(VS.85).aspx
 ;typedef struct tagDRAWITEMSTRUCT {   
@@ -134,11 +139,11 @@ MyFun(wParam, lParam, msg, hwnd) {
 
 Handler(hwnd, Event, EArg, Col, Row) {
 	static s
-
+	return
 	text := SS_GetCellText(hwnd, Col, Row)
 	StringReplace, text, text, `n, \n, A
 	s .= "cell: " col "," row "," SS_GetCellType(hwnd,col,row)  "    event: " event " (earg: " earg ")  Text: " text "`n" 
-	tooltip, %s%, 0, 0
+;	tooltip, %s%, 0, 0
 	if StrLen(s) > 500 
 		s =
 }
@@ -353,3 +358,41 @@ OnAbout:
 return
 
 #include SpreadSheet.ahk
+
+
+API_DrawIcon( hDC, xLeft, yTop, hIcon)
+{
+    return DllCall("DrawIcon"
+            ,"uint", hDC
+            ,"uint", xLeft
+            ,"uint", yTop
+            ,"uint", hIcon)
+}
+
+API_DrawIconEx( hDC, xLeft, yTop, hIcon, cxWidth, cyWidth, istepIfAniCur, hbrFlickerFreeDraw, diFlags)
+{
+    return DllCall("DrawIconEx"
+            ,"uint", hDC
+            ,"uint", xLeft
+            ,"uint", yTop
+            ,"uint", hIcon
+            ,"int",  cxWidth
+            ,"int",  cyWidth
+            ,"uint", istepIfAniCur
+            ,"uint", hbrFlickerFreeDraw
+            ,"uint", diFlags )
+}
+LoadIcon(pPath, pSize=32){
+	j := InStr(pPath, ":", 0, 0), idx := 1
+	if j > 2 
+		 idx := Substr( pPath, j+1), pPath := SubStr( pPath, 1, j-1)
+
+	DllCall("PrivateExtractIcons"
+            ,"str",pPath,"int",idx-1,"int",pSize,"int", pSize
+            ,"uint*",hIcon,"uint*",0,"uint",1,"uint",0,"int")
+
+	return hIcon
+}
+API_DestroyIcon(hIcon) {
+	return,	DllCall("DestroyIcon", "uint", hIcon)
+}
