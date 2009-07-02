@@ -15,14 +15,9 @@ CoordMode, tooltip, screen
 	Gui, Add, Button,x+10 yp hp 0x8000 gOnAbout, ?
 
 	hCtrl := SS_Add(hwnd, 0, hdr, w, h-hdr, "WINSIZE VSCROLL HSCROLL CELLEDIT ROWSIZE COLSIZE STATUS MULTISELECT", "Handler")
-	SS_SetGlobalFields(hCtrl, "gcellht", 20)
-
-	hCombo := SS_CreateCombo(hCtrl, "item0|item1|item2|item3|item4|item5|item6|item7|item8|item9|item10", 150)
-	hCombo2 := SS_CreateCombo(hCtrl, "abc|def", 150)
-	SS_SetCell(hCtrl, 2, 2, "type=COMBOBOX FIXEDSIZE", "txt=" hCombo, "fnt=1", "data=2", "imgal=MIDDLE RIGHT")
-	SS_SetCell(hCtrl, 2, 4, "type=CHECKBOX FIXEDSIZE", "txt=visible?", "data=0", "imgal=MIDDLE RIGHT", "fnt=1")
-;	gui, show, w500 h300
-;	return		
+	SS_SetCell(hCtrl, 1, 1, "type=OWNERDRAWINTEGER", "txt=3")
+	gui, show, w500 h300
+	return		
 
 	SS_SetCell(hCtrl, 1, 1, "type=FLOAT", "txt=14.123456", "txtal=4 RIGHT", "state=LOCKED")
 
