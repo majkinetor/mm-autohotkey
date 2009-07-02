@@ -1,21 +1,20 @@
-SetWinDelay, -1
 DetectHiddenWindows, on
 #SingleInstance, force
 SetBatchLines, -1
 	Gui, +LastFound
 	hGui := WinExist()
-	w := 330,  h := 400
+	w := 340,  h := 400
 
-	Gui, Add, Button, gBtn w100, Save
-	Gui, Add, Button, gBtn w100 x+10, Reload
+	Gui, Add, Button, gBtn w60, Save
+	Gui, Add, Button, gBtn w60 x+10, Reload
+	Gui, Add, Button, gBtn w60 x+10, Reset
+	Gui, Add, Button, gBtn w60 x+10, Stress
 
 	hCtrl := Property_Add( hGui, 0, 40, w, h-40, "", "Handler")
 	Property_SetColors(hCtrl, "pbAAEEAA sbaaeeaa sffff")
 	Property_SetFont(hCtrl, "Separator", "bold s9, verdana")
 
-	If !FileExist("properties")
-	{
-	  p = 
+	p = 
 		(LTrim
 		Name=My Checkbox
 		Type=CheckBox
@@ -50,15 +49,20 @@ SetBatchLines, -1
 		Type=Integer
 		Value=3
 
-		Name=My ComboBox
+		Name=My Combo
 		Type=ComboBox
-)
-		Property_Insert(hCtrl, p)
-	}
+
+		Name=My Combo 2
+		Type=ComboBox
+		Value=item1|item2|item3
+	)
+
+	If !FileExist("properties")
+		 Property_Insert(hCtrl, p)
 	else Property_AddFromFile(hCtrl, "properties")
 
 	Property_SetRowHeight(hCtrl, 25)
-	Gui, show, w%w% h%h%
+	Gui, Show, w%w% h%h%
 return
 
 Stress(p, k=7){
@@ -77,11 +81,7 @@ return
 F1::
 	msgbox % Property_Count(hctrl)
 return
-
-F2::
-	Property_Set(hCtrl, 1, "HEEEJ", 1)
-	SS_Focus(hctrl)
-return
+F2:: m(Property_Define(hCtrl, true))
 
 
 GuiClose:
@@ -92,8 +92,29 @@ Btn:
 	if A_GuiControl = Reload
 		Reload
 
+	if A_GuiControl = Reset
+	{
+		FileDelete, Properties
+		Reload
+	}
+
 	if A_GuiControl = Save
-		Property_Save(hCtrl, "Properties")
+	{
+		Control, Disable, ,Button1,A
+		Property_Save(hCtrl, "Properties", true)
+		Control, Enable, ,Button1,A
+	}
+
+	if A_GuiControl = Stress
+	{		
+		Control, Disable, ,Button3,A
+		StartTime := A_TickCount
+		Property_Insert(hCtrl, Stress(p, 10)), 
+		time := A_TickCount - StartTime
+		SS_Focus(hCtrl)
+		Control, Enable, ,Button1,A
+		Msgbox % "Number of Rows: " Property_Count(hCtrl) "`nTime: " time "ms"
+	}
 return
 
 Handler(hCtrl, event, name, value, param){
@@ -103,11 +124,13 @@ Handler(hCtrl, event, name, value, param){
 	if event in EB,S
 		return
 
-	if event = P
-	{
-		if mycombo = 
-			return mycombo := SS_CreateCombo(hCtrl, Name, 100)
-		return mycombo
+	if (event = "CB") {
+		if param = Insert
+			if mycombo = 
+				 return mycombo := SS_CreateCombo(hCtrl, "dynamic item 1|dynamic item 2|dynamic item 3", 100)
+			else return mycombo
+		if param = Define
+			 return Name="My Combo" ? "" : "*"
 	}
 
 	;do some stupid checks
@@ -149,37 +172,36 @@ Handler(hCtrl, event, name, value, param){
 
  Parameters:
 				hGui	- Handle of the parent.
-				X .. H	- Control coordinates.
-				Style   - White space separated list of style names.
+				X..H	- Control coordinates.
+				Style   - White space separated list of style names. Currently any SS style can be added.
 				Handler - Notification handler.
  
  Handler:
  >			Result : Handler(hCtrl, Event, Name, Value, Param)
 
 				hCtrl	- Handle of the control that sends notification.
-				Event	- Event name. Can be S (Select) EB (Edit Before) and EA (Edit After)
+				Event	- Event name. Can be S (Select) EB (Edit Before), EA (Edit After) and CB (ComboBox).
 				Name	- Name of the selected property.
 				Value	- Value of the selected property. If event is EA, this argument contains user input.
 				Param	- Parameter of the selected property.  If event is EA, this argument contains user input.
-				Result	- Return 1 to prevent selection (S) or to prevent user changing the value (EA).
+				Result	- Return 1 to prevent selection (S) or to prevent user changing the value (EA). For details about CB, see <Insert> and <Define>.
 
  Events:		
 				S - Select
 				EB	- Edit before. 
 				EA	- Edit after. Value contains user input. Return 1 to prevent change of value / param.
-				P	- Populate. <Insert> fires this event when it encounters ComboBox type without value.
-					  In that case you should populate the combo yourself and return its handle. 
-					  The combo must have some items. See SS_CreateCombo function for details.
+				CB	- ComboBox event. <Insert> & <Define> fire up this event when they encounter ComboBox type (and so, functions using them, <AddFromFile> & <Save>). 
+					  Insert fires it up automatically when it encounters ComboBox without Value. Define requires this event to be explicitly enabled.
 
  Retunrs:
 				Control's handle.
 
  */
 Property_Add(hGui, X=0, Y=0, W=200, H=100, Style="", Handler="") {
-	hCtrl := SS_Add(hGui, x, y, w, h, "GRIDMODE CELLEDIT COLSIZE ROWSELECT " style, "Property_handler")
+	hCtrl := SS_Add(hGui, x, y, w, h, "GRIDMODE CELLEDIT ROWSELECT " style, "Property_handler")
 	Property_initSheet(hCtrl)
 	if IsFunc(Handler)
-		Property(hCtrl "_handler", Handler)
+		Property(hCtrl "handler", Handler)
 	return hCtrl
 }
 
@@ -243,11 +265,16 @@ Property_Count(hCtrl) {
 }
 
 /*
- Function:		Define
-				Export the propety definition list from the control.
+	Function:		Define
+					Export the propety definition list from the control.
+
+	Parameters:
+					ComboEvent	- Set to TRUE to generate combobox event (CB). 
+								  From the handler, return text you want to put in the Value parameter or "*" to let the function automatically set it up. 
+								  Value holds the handle of the ListBox.
 
  */
-Property_Define(hCtrl) {
+Property_Define(hCtrl, ComboEvent=false) {
 	n := SS_GetRowCount(hCtrl)
 	loop, %n%
 	{
@@ -268,12 +295,19 @@ Property_Define(hCtrl) {
 			s .= "HyperLink"
 		else if type contains CHECKBOX,COMBOBOX
 		{
-			s .= InStr(type, "CHECKBOX") ? "CheckBox" : "ComboBox"
+			s .= (cb := InStr(type, "CHECKBOX")) ? "CheckBox" : "ComboBox"
 			s .= "`nParam=" SS_GetCellData(hCtrl, 2, A_Index) 
-
+			if (!cb && ComboEvent)
+			{				
+				handler := Property(hCtrl "handler")
+				v1 := %handler%(hCtrl, "CB", p, hList := SS_GetCell(hCtrl, 2, A_Index, "txt"), "Define")
+				ifNotEqual, v1, *, SetEnv, v, %v1%
+				else {
+					ControlGet, v1, List,, ,ahk_id %hList%
+					StringReplace, v, v1, `n, |, A
+				}
+			}
 		}
-		else if type contains COMBOBOX
-			s .= "ComboBox"
 		else s .= "Text"
 
 		if type != EXPANDED
@@ -305,54 +339,40 @@ Property_Find(hCtrl, Name, StartAt=0) {
 }
 
 /*
+ Function:		GetParam
+				Get the property parameter.
+
+ Parameters:
+				Name	- Property name or index for which to get the value.
+
+ Returns:
+				Parameter
+ */
+Property_GetParam(hCtrl, Name) {
+	ifEqual Name,,return	
+	if Name is not integer
+		 i := Property_Find( hCtrl, Name)
+	else i := Name
+	return SS_GetCellData(hCtrl, 2, i)
+}
+
+/*
  Function:		GetValue
 				Get the property value.
 
  Parameters:
-				Name	- Property name for which to get the value.
+				Name	- Property name or index for which to get the value.
 
  Returns:
 				Value
  */
 Property_GetValue( hCtrl, Name ) {
 	ifEqual Name,,return	
-	return SS_GetCellText(hCtrl, 2, Property_Find( hCtrl, Name))
-}
-
-/*
- Function:		Set
-				Set property value and parameter.
-
- Parameters:
-				Name	- Property name for which to get the value, or its index in the list
-				Value	- Property value.
-				Param	- Optional property parameter.
- */
-Property_Set( hCtrl, Name, Value, Param="") {
-	ifEqual Name,,return A_ThisFunc "> Name can't be empty"	
 	if Name is not integer
 		 i := Property_Find( hCtrl, Name)
 	else i := Name
-	return SS_SetCell(hCtrl, 2, i, "data=" Param, Value != "" ? "txt=" Value : "")
+	return SS_GetCellText(hCtrl, 2, i)
 }
-
-/*
- Function:		SetParam
-				Set property parameter.
-
- Parameters:
-				Name	- Property name for which to get the value, or its index in the list
-				Param	- Property parameter.
- */
-Property_SetParam( hCtrl, Name, Param) {
-	ifEqual Name,,return A_ThisFunc "> Name can't be empty"
-
-	if Name is not integer
-		 i := Property_Find( hCtrl, Name)
-	else i := Name
-	return SS_SetCell(hCtrl, 2, i, "data=" Param)
-}
-
 
 /*
   Function:		Insert
@@ -369,7 +389,7 @@ Property_SetParam( hCtrl, Name, Param) {
 				Type		- Type of the property. Currently supported types are:
 							  Text, Button, WideButton, CheckBox, ComboBox, Integer, Float, Hyperlink, Separator. If not specified, Text is used by default.
 				Value		- Value of the property. For ComboBox item this contains pipe delimited list of items. In the case of Separator, you can put its desired height as value.
-							  If omited, notification handler will be called in time of population, so you can handle the ComboBox the way you want.
+							  If omited, notification handler will be called in time of population with CE event, and Param="Insert", so you can handle the ComboBox the way you want.
 				Param		- Index of the selected item (ComboBox), 1|0 (Checkbox).
 
   Remarks:
@@ -433,7 +453,7 @@ Property_Insert(hCtrl, Properties, Position=0){
 		{
 	 		tpe := "COMBOBOX FIXEDSIZE"
 			if value =
-				 handler := Property(hctrl "_handler"),  value := %handler%(hCtrl, "P", name, "", "")
+				 handler := Property(hctrl "handler"),  value := %handler%(hCtrl, "CB", name, "", "Insert")
 			else value := SS_CreateCombo(hCtrl, value)
 			data := Param
 		}		
@@ -474,15 +494,34 @@ Property_Insert(hCtrl, Properties, Position=0){
 
  Parameters:
 				FileName	- File to save to. If exists, it will be first deleted (without confirmation).
+				ComboEvent	- Set to TRUE to generate combobox event (CB). See <Define> for more details.
  
  Returns:
-				FALSE if there was a problem saving file, TRUE otherwise
+				FALSE if there was a problem saving file, TRUE otherwise.
 
  */
-Property_Save(hCtrl, FileName) {
+Property_Save(hCtrl, FileName, ComboEvent=false) {
 	FileDelete, %FileName%
-	FileAppend, % Property_Define(hCtrl) , %FileName%
+	FileAppend, % Property_Define(hCtrl, ComboEvent) , %FileName%
 	return ErrorLevel
+}
+
+
+/*
+ Function:		Set
+				Set property value and parameter.
+
+ Parameters:
+				Name	- Property name for which to get the value, or its index in the list
+				Value	- Property value.
+				Param	- Optional property parameter.
+ */
+Property_Set( hCtrl, Name, Value, Param="") {
+	ifEqual Name,,return A_ThisFunc "> Name can't be empty"	
+	if Name is not integer
+		 i := Property_Find( hCtrl, Name)
+	else i := Name
+	return SS_SetCell(hCtrl, 2, i, "data=" Param, Value != "" ? "txt=" Value : "")
 }
 
 /*
@@ -534,14 +573,31 @@ Property_SetFont(hCtrl, Element, Font) {
 }
 
 /*
+ Function:		SetParam
+				Set property parameter.
+
+ Parameters:
+				Name	- Property name for which to get the value, or its index in the list
+				Param	- Property parameter.
+ */
+Property_SetParam( hCtrl, Name, Param) {
+	ifEqual Name,,return A_ThisFunc "> Name can't be empty"
+
+	if Name is not integer
+		 i := Property_Find( hCtrl, Name)
+	else i := Name
+	return SS_SetCell(hCtrl, 2, i, "data=" Param)
+}
+
+/*
 	Function:	SetRowHeight
 				Set row height.
 	
  */
 
-Property_SetRowHeight(hCtrl, Val) {
+Property_SetRowHeight(hCtrl, Height) {
     c := Property_Count(hCtrl)
-	SS_SetGlobalFields(hCtrl, "gcellht", val)
+	SS_SetGlobalFields(hCtrl, "gcellht", Height)
 	if !c
 		SS_DeleteRow(hCtrl, 1)
 	SS_SetRowHeight(hCtrl, 0, 0)
@@ -551,14 +607,17 @@ Property_handler(hCtrl, event, earg, col, row){
 	static last
 
 	if (event = "S") and (col=1) 
-		SetTimer, Property_Timer, -1					;if user selects first column, switch to 2nd so he can use shortcuts on combobox, checkbox etc...	
+		SetTimer, Property_timer, -1					;if user selects first column, switch to 2nd so he can use shortcuts on combobox, checkbox etc...	
 
-	handler := Property(hctrl "_handler")
+	handler := Property(hctrl "handler")
 	ifEqual, handler, ,return
 
 	t := SS_GetCellType(hCtrl, col, row, 2)				;return base type of the cell
 	if t in 11,12										;checkbox, combobox
 		param := SS_GetCellData(hCtrl, col, row)		; get their data
+
+	if (t = 15)
+		
 	
 	name  := SS_GetCellText(hCtrl, 1, row)
 	value := event = "EA" ? earg : SS_GetCellText(hCtrl, 2, row)
@@ -581,22 +640,19 @@ Property_handler(hCtrl, event, earg, col, row){
 	return r
 }
 
-Property_Timer:
+Property_timer:
 	SS_SetCurrentCell(hCtrl, 2, SS_GetCurrentRow(hCtrl))
 return
 
-Property_initSheet(hCtrl){
+Property_initSheet(hCtrl, c=120){
 	static b
+	ifEqual, b, ,SysGet, b, 46	;get 3d border dim
 	ControlGetPos, ,,w,h,,ahk_id %hCtrl%
-
-	if !b
-		SysGet, b, 46
-
-	SS_SetColWidth(hCtrl, 1, 100)
-	SS_SetColWidth(hCtrl, 2, w-100-2*b)
-	SS_SetColCount(hCtrl, 2)
-	SS_SetRowCount(hCtrl, 0)
-	SS_SetRowHeight(hCtrl, 0, 0)
+	SS_SetColWidth(hCtrl, 1, c-b)
+	 , SS_SetColWidth(hCtrl, 2, w-c-b)
+	 , SS_SetColCount(hCtrl, 2)
+	 , SS_SetRowCount(hCtrl, 0)
+	 , SS_SetRowHeight(hCtrl, 0, 0)
 }
 
 /*
@@ -614,11 +670,12 @@ Property_initSheet(hCtrl){
 			  o if _var_ is empty, function accepts list of variables in _value_ and returns values of those varaiables in o1 .. o5
 
 	Examples:
-			
- >			v(x)	 - return value of x
- >			v(x, v)  - set value of x to v and return previous value
- >			v("", "x y z", x, y, z)  - get values of x, y and z into x, y and z
- >			v("", "preffix_)x y z", x, y, z) - get values of preffix_x, preffix_y and preffix_z into x, y and z
+	(start code)			
+ 			v(x)	 - return value of x
+ 			v(x, v)  - set value of x to v and return previous value
+ 			v("", "x y z", x, y, z)  - get values of x, y and z into x, y and z
+ 			v("", "preffix_)x y z", x, y, z) - get values of preffix_x, preffix_y and preffix_z into x, y and z
+	(end code)
 			
 */
 Property(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
