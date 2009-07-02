@@ -77,7 +77,7 @@ return
 Handler(hwnd, Event, EArg, Col, Row) {
 	static s
 
-	text := SS_GetCellText(hwnd, col, row)
+	text := SS_GetCellText(hwnd, Col, Row)
 	StringReplace, text, text, `n, \n, A
 	s .= "cell: " col "," row "," SS_GetCellType(hwnd,col,row)  "    event: " event " (earg: " earg ")  Text: " text "`n" 
 	tooltip, %s%, 0, 0

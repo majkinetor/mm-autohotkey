@@ -367,7 +367,7 @@ SS_GetCellData(hCtrl, Col="", Row="") {
 
 	NumPut(Col, ITEM, 4),  NumPut(Row, ITEM, 8)
 	SendMessage,SPRM_GETCELLDATA,,&ITEM,, ahk_id %hCtrl%
-	return NumGet( NumGet(ITEM, 36) + 0 )
+	return NumGet( NumGet(ITEM, 36) )
 }
 
 
@@ -415,8 +415,8 @@ SS_GetCellText(hCtrl, Col="", Row=""){
 
 	NumPut(Col,	ITEM, 4), NumPut(Row, ITEM, 8)					
 	SendMessage,SPRM_GETCELLDATA,,&ITEM,, ahk_id %hCtrl%
-	type := NumGet(ITEM, 27, "UChar") & ~0xF0	;get base type
 
+	type := NumGet(ITEM, 27, "UChar") & ~0xF0	;get base type
 	if type in %TEXT%,%TEXTMULTILINE%,%HYPERLINK%,%CHECKBOX%		;GRAPH and FORMULA don't return text, I don't know how to get their text.
 		return SS_strAtAdr( NumGet(ITEM, 36) + (type=CHECKBOX ? 4 : 0))
 
@@ -1225,12 +1225,13 @@ SS_SplittSync(hCtrl, Flag=1 ) {	;. wParam=0, lParam=TRUE/FALSE
 SS_onNotify(wparam, lparam, msg, hwnd){
 	static SS_MODULEID := 260609, oldNotify="*"
 	static SPRN_SELCHANGE=1, SPRN_BEFOREEDIT=2, SPRN_AFTEREDIT=3, SPRN_BEFOREUPDATE=4, SPRN_AFTERUPDATE=5, SPRN_HYPERLINKENTER=6, SPRN_HYPERLINKLEAVE=7, SPRN_HYPERLINKCLICK=8, SPRN_BUTTONCLICK=9
-	
+
 	if ((NumGet(lparam+4)) != SS_MODULEID){
 		ifEqual, oldNotify, *, SetEnv, ooldNotify, % SS("OldNotify")		
 		ifNotEqual, oldNotify,,return DllCall(OldNotify, "uint", wparam, "uint", lparam, "uint", msg, "uint", hwnd)		
 		return
 	}
+
 	hw := NumGet(lparam+0),  code := NumGet(lparam+8)
 
 	handler := SS(hw "Handler")
@@ -1242,7 +1243,7 @@ SS_onNotify(wparam, lparam, msg, hwnd){
 		return NumPut(r, lparam+24)		;hm... fcancel doesn't work for some reason like it should
 	}
 
-	spri := NumGet(lparam+12), col := NumGet(spri), row := NumGet(spri+8)
+	spri := NumGet(lparam+12), col := NumGet(spri+0), row := NumGet(spri+8)
 
 	if (code = SPRN_HYPERLINKCLICK)
 		return %handler%(hw, "C", "H", col, row)
@@ -1363,7 +1364,7 @@ SS_getCellFloat(hCtrl, col, row) {
 		
 	NumPut(col,	ITEM, 4), NumPut(row, ITEM, 8)					
 	SendMessage,SPRM_GETCELLDATA,,&ITEM,, ahk_id %hCtrl%
-	return NumGet( NumGet(ITEM, 36)+0, 0, "Float")
+	return NumGet( NumGet(ITEM, 36), 0, "Float")
 }
 
 SS_strAtAdr(adr) { 
