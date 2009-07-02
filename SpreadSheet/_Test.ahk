@@ -1,5 +1,6 @@
 version = 2.1
 #singleinstance, force
+#MaxThreads, 255
 SetBatchLines, -1
 CoordMode, tooltip, screen
 
@@ -8,17 +9,20 @@ CoordMode, tooltip, screen
 	Gui, Font, s11, Courier
 	w := 650, h := 500, hdr:=40
 
-	Gui, Add, Text, y10 x5, Choose Action
-	Gui, Add, DDL,  x+10 w200 y5 0x8000 vC gOnChange, Load|Save| |New Sheet|Blank Cell|Delete Cell|Current Cell| |Delete Col|Delete Row|Insert Col|Insert Row| |Get Multisel|Set Multisel|Expand cell| |Set Global| |No Row Header|No Col Header|Scroll Lock|Get Cell Rect| |Split Ver|Split Hor|Split Close|Split Sync|Get Cell||Get Cell Text|Get Cell Data| |Set Cell String|Set Cell Data to 0
-	Gui, Add, Button,x+10 h25 0x8000 gOnButton, exec   F1
-	Gui, Add, Button,x+10 yp hp 0x8000 gOnReload, reload
-	Gui, Add, Button,x+10 yp hp 0x8000 gOnAbout, ?
+;	Gui, Add, Text, y10 x5, Choose Action
+;	Gui, Add, DDL,  x+10 w200 y5 0x8000 vC gOnChange, Load|Save| |New Sheet|Blank Cell|Delete Cell|Current Cell| |Delete Col|Delete Row|Insert Col|Insert Row| |Get Multisel|Set Multisel|Expand cell| |Set Global| |No Row Header|No Col Header|Scroll Lock|Get Cell Rect| |Split Ver|Split Hor|Split Close|Split Sync|Get Cell||Get Cell Text|Get Cell Data| |Set Cell String|Set Cell Data to 0
+;	Gui, Add, Button,x+10 h25 0x8000 gOnButton, exec   F1
+;	Gui, Add, Button,x+10 yp hp 0x8000 gOnReload, reload
+;	Gui, Add, Button,x+10 yp hp 0x8000 gOnAbout, ?
 	
-	OnMessage(WM_DRAWITEM := 0x02B, "MyFun")
+;	OnMessage(WM_DRAWITEM := 0x02B, "MyFun")
 
 	hCtrl := SS_Add(hwnd, 0, 0, w, h-hdr, "WINSIZE VSCROLL HSCROLL CELLEDIT ROWSIZE COLSIZE STATUS MULTISELECT", "Handler")
-	SS_SetCell(hCtrl, 2, 2, "type=OWNERDRAWINTEGER", "txt=3", "state=LOCKED")
-	gui, show, w500 h300
+	loop, 20
+	SS_SetCell(hCtrl, A_Index, 2, "type=OWNERDRAWINTEGER", "txt=" A_Index, "state=LOCKED")
+
+
+	gui, show, w500 h600
 	SS_Focus(hCtrl)
 	return		
 
@@ -95,9 +99,39 @@ MyFun(wParam, lParam, msg, hwnd) {
 	API_DestroyIcon(hIcon)
 }
 
-LoadIcon2(){
-	return DllCall("LoadIcon", "uint", 0, "uint", 32512)
-}  
+Handler(hwnd, Event, EArg, Col, Row) {
+	static s
+	if Event=D
+	{
+		lparam := EArg
+		lpspri := NumGet(lparam+44)
+		t := NumGet(lpspri+27,0, "UChar")
+		
+		hdc := NumGet(lparam+24)
+		left	:= NumGet(lparam+28)
+		top		:= NumGet(lparam+32)
+		right	:= NumGet(lparam+36)
+		bottom	:= NumGet(lparam+40)
+
+	
+		int		:= NumGet(lpspri+36)
+		int := NumGet(int+0)
+	;	s := SS_strAtAdr(NumGet(lpspri+36))
+		w := 64
+		hIcon := LoadIcon("home.ico", w)
+		DllCall("TextOut", "uint", hDC, "uint", left, "uint", top, "str", int, "uint", StrLen(int))
+		API_DrawIconEx( hDC, left, top+25, hIcon, w, w, 0, 0, 3)
+		API_DestroyIcon(hIcon)
+	}
+
+;	text := SS_GetCellText(hwnd, Col, Row)
+;	StringReplace, text, text, `n, \n, A
+;	s .= "cell: " col "," row "," SS_GetCellType(hwnd,col,row)  "    event: " event " (earg: " earg ")  Text: " text "`n" 
+;	tooltip, %s%, 0, 0
+;	if StrLen(s) > 500 
+;		s =
+}
+
 
 ;http://msdn.microsoft.com/en-us/library/bb775802(VS.85).aspx
 ;typedef struct tagDRAWITEMSTRUCT {   
@@ -142,16 +176,6 @@ LoadIcon2(){
 ;		.endif
 
 
-Handler(hwnd, Event, EArg, Col, Row) {
-	static s
-	return
-	text := SS_GetCellText(hwnd, Col, Row)
-	StringReplace, text, text, `n, \n, A
-	s .= "cell: " col "," row "," SS_GetCellType(hwnd,col,row)  "    event: " event " (earg: " earg ")  Text: " text "`n" 
-;	tooltip, %s%, 0, 0
-	if StrLen(s) > 500 
-		s =
-}
 
 SetGlobalSettings(){
 	global
