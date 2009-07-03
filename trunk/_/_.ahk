@@ -3,13 +3,24 @@
  */
 
 /*	
-	Function: _
-			  StdLib loader
+	Function:	_
+				StdLib loader.
+	
+	Parameters:
+				k	- Script speed, by default -1
+				h	- DetectHiddenWindows on/off, by default 0.
+	
+	Remarks:
+				Includes #NoEnv and #SingleInstance force.
  */
 
-_() {
+_(k=-1, h=0) {
+	#NoEnv
+	#Singleinstance, force
+	DetectHiddenWindows, % h ? "on" : "off"
+	SetBatchLines, %k%
 }
-
+	
 /*	
 	Function: m
 			  MsgBox function
@@ -132,7 +143,7 @@ S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",B
 
 /*
 	Function:	v
-				Storage functions, designed to use as stdlib or copy and enhance.
+				Storage function.
 			  	
 	Parameters:
 			  var		- Variable name to retrieve. To get up several variables at once (up to 6), omit this parameter.
@@ -145,7 +156,7 @@ S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",B
 			  o if _var_ is empty, function accepts list of variables in _value_ and returns values of those variables in o1 .. o5
 
     Remarks:
-			  To use multiple storages, copy *v* function and change its name. 
+			  The function is designed to use as stdlib or copy and enhance. To use multiple storages, copy function and change its name.
 			  			  
 			  You can choose to initialize storage from additional ahk script containing only list of assigments to storage variables,
 			  to do it internaly by adding the values to the end of the your own copy of the function, or to do both, by accepting user values on startup,
@@ -165,7 +176,7 @@ S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",B
 */
 v(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
 	static
-	ifEqual,___, ,gosub %A_ThisFunc%
+	ifEqual,___, ,gosub ___
 
 	if (var = "" ){
 		if ( _ := InStr(value, ")") )
@@ -176,7 +187,7 @@ v(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRe
 	} else _ := %var%
 	ifNotEqual, value,~`a , SetEnv, %var%, %value%
 	return _
-v:
+___:
 	;Initialize externally, try several places
 	   #include *i %A_ScriptDir%\v.ahk
 	   #include *i %A_ScriptDir%\inc\v.ahk
@@ -188,6 +199,25 @@ v:
 	___ := 1
 return
 }
+
+/*
+	Function:	t
+				Timer function.
+			  	
+	Parameters:
+				v - Reference to output variable. Omit to reset timer while returning the difference.
+	
+	Returns:
+				v
+			
+ */
+t(ByRef v="~`a "){
+	static t
+	ifEqual, v, ~`a ,SetEnv, t, %A_TickCount%
+	return v := A_TickCount - t
+}
+
+
 
 /* Group: Examples
 	Storage:
@@ -203,7 +233,25 @@ return
 	first time vi is called. For instance, the v.ahk script can contain only
   > x : = 5
     in which case first call to v("x") will return 5 instead of empty string.
+
+	Timer:
+	(start code)
+	t()
+	loop, 10000
+		fun1()
+	t(p)
+
+	t()
+	loop, 10000
+		fun2()
+	t(q)
+
+	m(p, q)
+	(end code)
 */
+
+
+
 
 /* Group: About
 	o 0.2 by majkinetor
