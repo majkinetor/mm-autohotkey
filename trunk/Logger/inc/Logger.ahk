@@ -64,9 +64,9 @@
  */
 Log_Add(hGui, x, y, w, h, Handler=""){
 	global Log_hwnd
-	Log_Store("*", "bg style saveHour logDir", bg, style, saveHour, logDir)
+	Logger("*", "bg style saveHour logDir", bg, style, saveHour, logDir)
 
-	Log_Store("handler", Handler)
+	Logger("handler", Handler)
 	Log_hwnd := WebControl_Add(hGui, "<html><body bgcolor='" bg "'>", x, y, w, h, style, "Log_Handler")
 
 	if (saveHour != "")
@@ -146,7 +146,7 @@ Log_Auto(txt, category="", link="") {
 	static error_kw, warning_kw
 
 	if (error_kw = "")
-		Log_store("*", "error_kw warning_kw", error_kw, warning_kw)
+		Logger("*", "error_kw warning_kw", error_kw, warning_kw)
 
 	loop, parse, error_kw, %A_Space%
 		if InStr(txt, A_LoopField)
@@ -166,7 +166,7 @@ Log_Auto(txt, category="", link="") {
 Log_Clear(){
 	global Log_hwnd
 	ControlSetText, , , ahk_id %Log_hwnd%
-	WebControl_AddHtml(Log_hwnd, "<html><body bgcolor='" Log_Store("bg") "'>")
+	WebControl_AddHtml(Log_hwnd, "<html><body bgcolor='" Logger("bg") "'>")
 
 }
 
@@ -206,9 +206,9 @@ Log_Save(FileName, bAppend = false){
 						 To disable real time file saving, omit this parameter. Its disabled by default.
  */
 Log_SetSaveFile(FileName="") {
-	file := Log_store("save")
+	file := Logger("save")
 	ifNotEqual, file, ,FileAppend, </body></html>, %file%
-	Log_store("save", FileName)
+	Logger("save", FileName)
 }
 
 ;===========================================================================================
@@ -228,12 +228,12 @@ Log_addHTML( txt, type, category="", link="") {
 		 category := (j := InStr(category, "_")) = -1 ? SubStr(category, 2) : SubStr(category, 2, j-2)
 
 	 if !init {
-		 imaxsize	:= Log_Store("imaxsize")+5
-		 catwidth	:= Log_Store("catwidth")
-		 tcategory  := Log_store("tcategory")
-		 catalign	:= Log_Store("catalign")
-		 icongroup	:= Log_Store("icongroup")
- 		 separator	:= Log_Store("separator")
+		 imaxsize	:= Logger("imaxsize")+5
+		 catwidth	:= Logger("catwidth")
+		 tcategory  := Logger("tcategory")
+		 catalign	:= Logger("catalign")
+		 icongroup	:= Logger("icongroup")
+ 		 separator	:= Logger("separator")
 
 		 if bTypeSep := (SubStr(separator, 1, 1) = "*")
 			separator := SubStr(separator, 2)
@@ -242,7 +242,7 @@ Log_addHTML( txt, type, category="", link="") {
 		 init := 1
 	 }
 
-	 Log_Store("*" type "_", "bg fg isize fsize catfg", bg,fg,isize,fsize,catfg)
+	 Logger("*" type "_", "bg fg isize fsize catfg", bg,fg,isize,fsize,catfg)
 
 	 %type%_no +=1
 	 no := %type%_no
@@ -275,7 +275,7 @@ Log_addHTML( txt, type, category="", link="") {
 	 ) 
 	
 	WebControl_AddHtml(Log_hwnd, html)
-	if save := Log_Store("save")	
+	if save := Logger("save")	
 		FileAppend, %html%, %save%
 
 	last_category := category
@@ -293,9 +293,9 @@ Log_addHTML( txt, type, category="", link="") {
 		store("*preffix_", "x y z", x, y, z) - get values of preffix_x, preffix_y and preffix_z into x, y and z
 
  */
-Log_store(var, value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="") { 
+Logger(var, value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="") { 
 	static
-	ifEqual, init, , gosub Log_storeInit
+	ifEqual, init, , gosub Logger
 
 	c := SubStr(var,1,1)
 	if (c = "*" ){
@@ -310,7 +310,7 @@ Log_store(var, value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", 
 
 	return (value !="~`a") ? %var% := value : %var%
 
- Log_storeInit:
+ Logger:
 	#include *i Logger_Config.ahk
 	#include *i inc\Logger_Config.ahk
 
@@ -357,7 +357,7 @@ Log_derefernce(txt) {
 Log_saveTimer( init = false ) {
 	static saveHour, lastSave, b, logdir, timeformat
 	if (saveHour = "")
-		Log_Store("*", "saveHour logdir timeFormat", saveHour, logdir, timeformat),  lastSave := A_Now,   b := SubStr(saveHour, 1, 1) = "*",   saveHour := b ? SubStr(saveHour,2) : saveHour
+		Logger("*", "saveHour logdir timeFormat", saveHour, logdir, timeformat),  lastSave := A_Now,   b := SubStr(saveHour, 1, 1) = "*",   saveHour := b ? SubStr(saveHour,2) : saveHour
 	
 	if !init	
 	{
@@ -383,7 +383,7 @@ Log_handler(hLogger, Type, Id) {
 	static handler=0
 	
 	if handler = 0
-		handler := Log_Store("handler")
+		handler := Logger("handler")
 	
 	RegExMatch(Id, "(.+?)([0-9]+)", out)
 
