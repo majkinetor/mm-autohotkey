@@ -151,7 +151,7 @@ S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",B
 			  You can choose to initialize from additional ahk script  containing only list of assigments to storage variables, 
 			  to do it internally by adding the values to the end of the function, or to do both, by accepting user values on startup, 
 			  and checking them afterwards.
-  			  If you use stdlib module without including it directly, just make vi_init.ahk script and put variable definitions there.
+  			  If you use stdlib module without including it directly, just make vi.ahk script and put variable definitions there.
 
 			  Don't use storage variables that consist only of _ character as those are used to regulate inner working of function.
 
@@ -193,8 +193,8 @@ vi(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByR
 	return _
 vi:
 	;Initialize externally from multiple places
-	   #include *i vi_init.ahk
-	;  #include *i inc\vi_init.ahk				;contains list of assigments to storage variabless. 
+	   #include *i %A_ScriptDir%\vi.ahk
+	   #include *i %A_ScriptDir%\inc\vi.ahk
 	;   ...
 	;
 	;AND/OR initialize internally:
@@ -204,8 +204,23 @@ vi:
 return
 }
 
+/* Group: Examples
+	Storage:
+	Storage is simply used this way :
+	(start code)
+			_()					;load stdlib
+
+			m(vi("x", 10))	    ;set x to 10, return previous value (empty string if there is no vi.ahk)
+			m(vi("x", 5))		;set x to 5, returns 10
+			m(vi("x"))			;returns 5
+	(end code)
+	Next, if you create script vi.ahk in your script dir or in its \inc folder, the output will change as x will already have value 
+	first time vi is called. For instance, the vi.ahk script can contain only
+  > x : = 5
+    in which case first call to vi("x") will return 5 instead of empty string.
+*/
 
 /* Group: About
-	o 0.1 by majkinetor
+	o 0.2 by majkinetor
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
  */
