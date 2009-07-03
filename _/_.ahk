@@ -33,7 +33,8 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 
 /*
 	Function: S
-			  Struct function
+			  Struct function. With S, you define structure, then you can put or get values from it.
+			  It also allows you to create your own library of structures that can be included at the start of the program.
 	
 	Define:
 			  S - Dummy, not used but must be set.
