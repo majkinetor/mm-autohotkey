@@ -1294,6 +1294,7 @@ SS_onNotify(wparam, lparam, msg, hwnd){
 
 SS_onDrawItem(wParam, lParam, msg, hwnd) {
 	static SS_MODULEID := 260609, oldDrawItem="*", OWNERDRAWBLOB=13, OWNERDRAWINTEGER=14
+	critical, 100
 
 	if (wparam != SS_MODULEID){
 		ifEqual, oldDrawItem, *, SetEnv, oldDrawItem, % SS("oldDrawItem")		
@@ -1306,8 +1307,9 @@ SS_onDrawItem(wParam, lParam, msg, hwnd) {
    ;wparam=moduleid   lParam=DRAWITEMSTRUCT													
 	lpspri := NumGet(lparam+44)																
 	 ,col := NumGet(lpspri+4), row := NumGet(lpspri+8)										
-	 ,type := NumGet(lpspri+27,0, "UChar"),	data := NumGet(lpspri+36)						
-	 ,%handler%(hw, "D", lparam, col, row)																																					                                  	
+	 ,type := NumGet(lpspri+27,0, "UChar"),	data := NumGet(lpspri+36)
+	
+	return %handler%(hw, "D", lparam, col, row)																														                                  	
 }
 
 ; return textual or numeric definition of type, depending on input
