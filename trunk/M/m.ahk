@@ -123,8 +123,8 @@ S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",B
 }
 
 /*
-	Function:	v
-				Storage function
+	Function:	v / vi
+				Storage functions, designed to use/copy.
 			  	
 	Parameters:
 			  var		- Variable name to retrieve. To get up several variables at once (up to 6), omit this parameter.
@@ -135,6 +135,18 @@ S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",B
 			  o	if _value_ is omitted, function returns the current value of _var_
 			  o	if _value_ is set, function sets the _var_ to _value_ and returns previous value of the _var_
 			  o if _var_ is empty, function accepts list of variables in _value_ and returns values of those variables in o1 .. o5
+
+    Remarks:
+			  To use multiple storages, copy *v* function and change its name. 
+			  
+			  
+			  To initialize storage values use/copy *vi* function, change its name and subroutine name and adjust commented part.
+			  You can choose to initialize from additional ahk script
+			  containing only list of assigments to storage variables, to do it internally by adding the values to the end of the function,
+			  or to do both, by accepting user values on startup, and checking them afterwards.
+
+
+			  Don't use storage variables that consist only of _ character as those are used to regulate inner working of function.
 
 	Examples:
 	(start code)			
@@ -147,6 +159,7 @@ S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",B
 */
 v(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
 	static
+
 	if (var = "" ){
 		if ( _ := InStr(value, ")") )
 			__ := SubStr(value, 1, _-1), value := SubStr(value, _+1)
@@ -156,6 +169,32 @@ v(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRe
 	} else _ := %var%
 	ifNotEqual, value,~`a , SetEnv, %var%, %value%
 	return _
+}
+
+vi(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
+	static
+	ifEqual,___, ,gosub %A_ThisFunc%
+
+	if (var = "" ){
+		if ( _ := InStr(value, ")") )
+			__ := SubStr(value, 1, _-1), value := SubStr(value, _+1)
+		loop, parse, value, %A_Space%
+			_ := %__%%A_LoopField%,  o%A_Index% := _ != "" ? _ : %A_LoopField%
+		return
+	} else _ := %var%
+	ifNotEqual, value,~`a , SetEnv, %var%, %value%
+	return _
+vi:
+	;Initialize externally from multiple places
+	   #include *i vi_init.ahk
+	;  #include *i inc\vi_init.ahk				;contains list of assigments to storage variabless. 
+	;   ...
+	;
+	;AND/OR initialize internally:
+	;		var1 .= var1 != "" ? "" : 1			;if user set it externally, dont change it
+	;		var2 .= value						;initialize always
+	___ := 1
+return
 }
 
 
