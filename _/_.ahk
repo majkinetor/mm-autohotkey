@@ -21,7 +21,6 @@ _() {
 			  o1.
 
 	Examples:
-	>		 m()				; Load library so you can use other functions defined in m.ahk
 	>		 if (x - m(y) = z)	; Use m inside expressions for debugging.
 */
 m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a") {
