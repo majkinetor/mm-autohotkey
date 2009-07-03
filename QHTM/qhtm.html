@@ -1,0 +1,862 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+
+<html><head><title>QHTM Control</title><style>/*
+   IMPORTANT: If you're editing this file in the output directory of one of
+   your projects, your changes will be overwritten the next time you run
+   Natural Docs.  Instead, copy this file to your project directory, make your
+   changes, and you can use it with -s.  Even better would be to make a CSS
+   file in your project directory with only your changes, which you can then
+   use with -s [original style] [your changes].
+
+   On the other hand, if you're editing this file in the Natural Docs styles
+   directory, the changes will automatically be applied to all your projects
+   that use this style the next time Natural Docs is run on them.
+
+   This file is part of Natural Docs, which is Copyright (C) 2003-2008 Greg Valure
+   Natural Docs is licensed under the GPL
+*/
+
+body {
+    font: 10pt Verdana, Arial, sans-serif;
+    color: #000000;
+    margin: 0; padding: 0;
+    }
+
+.ContentPage,
+.IndexPage,
+.FramedMenuPage {
+    background-color: #E8E8E8;
+    }
+.FramedContentPage,
+.FramedIndexPage,
+.FramedSearchResultsPage,
+.PopupSearchResultsPage {
+    background-color: #FFFFFF;
+    }
+
+
+a:link,
+a:visited { color: #900000; text-decoration: none }
+a:hover { color: #900000; text-decoration: underline }
+a:active { color: #FF0000; text-decoration: underline }
+
+td {
+    vertical-align: top }
+
+img { border: 0;  }
+
+
+/*
+    Comment out this line to use web-style paragraphs (blank line between
+    paragraphs, no indent) instead of print-style paragraphs (no blank line,
+    indented.)
+*/
+p {
+    text-indent: 5ex; margin: 0 }
+
+
+/*  Opera doesn't break with just wbr, but will if you add this.  */
+.Opera wbr:after {
+	content: "\00200B";
+	}
+
+
+/*  Blockquotes are used as containers for things that may need to scroll.  */
+blockquote {
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+    }
+
+
+.Firefox1 blockquote {
+    padding-bottom: .5em;
+    }
+
+/*  Turn off scrolling when printing.  */
+@media print {
+    blockquote {
+        overflow: visible;
+        }
+    .IE blockquote {
+        width: auto;
+        }
+    }
+
+
+
+#Menu {
+    font-size: 9pt;
+    padding: 10px 0 0 0;
+    }
+.ContentPage #Menu,
+.IndexPage #Menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 31ex;
+    overflow: hidden;
+    }
+.ContentPage .Firefox #Menu,
+.IndexPage .Firefox #Menu {
+    width: 27ex;
+    }
+
+
+    .MTitle {
+        font-size: 16pt; font-weight: bold; font-variant: small-caps;
+        text-align: center;
+        padding: 5px 10px 15px 10px;
+        border-bottom: 1px dotted #000000;
+        margin-bottom: 15px }
+
+    .MSubTitle {
+        font-size: 9pt; font-weight: normal; font-variant: normal;
+        margin-top: 1ex; margin-bottom: 5px }
+
+
+    .MEntry a:link,
+    .MEntry a:hover,
+    .MEntry a:visited { color: #606060; margin-right: 0 }
+    .MEntry a:active { color: #A00000; margin-right: 0 }
+
+
+    .MGroup {
+        font-variant: small-caps; font-weight: bold;
+        margin: 1em 0 1em 10px;
+        }
+
+    .MGroupContent {
+        font-variant: normal; font-weight: normal }
+
+    .MGroup a:link,
+    .MGroup a:hover,
+    .MGroup a:visited { color: #545454; margin-right: 10px }
+    .MGroup a:active { color: #A00000; margin-right: 10px }
+
+
+    .MFile,
+    .MText,
+    .MLink,
+    .MIndex {
+        padding: 1px 17px 2px 10px;
+        margin: .25em 0 .25em 0;
+        }
+
+    .MText {
+        font-size: 8pt; font-style: italic }
+
+    .MLink {
+        font-style: italic }
+
+    #MSelected {
+        color: #000000; background-color: #FFFFFF;
+        /*  Replace padding with border.  */
+        padding: 0 10px 0 10px;
+        border-width: 1px 2px 2px 0; border-style: solid; border-color: #000000;
+        margin-right: 5px;
+        }
+
+    /*  Close off the left side when its in a group.  */
+    .MGroup #MSelected {
+        padding-left: 9px; border-left-width: 1px }
+
+    /*  A treat for Mozilla users.  Blatantly non-standard.  Will be replaced with CSS 3 attributes when finalized/supported.  */
+    .Firefox #MSelected {
+        -moz-border-radius-topright: 10px;
+        -moz-border-radius-bottomright: 10px }
+    .Firefox .MGroup #MSelected {
+        -moz-border-radius-topleft: 10px;
+        -moz-border-radius-bottomleft: 10px }
+
+
+    #MSearchPanel {
+        padding: 0px 6px;
+        margin: .25em 0;
+        }
+
+
+    #MSearchField {
+        font: italic 9pt Verdana, sans-serif;
+        color: #606060;
+        background-color: #E8E8E8;
+        border: none;
+        padding: 2px 4px;
+        width: 100%;
+        }
+    /* Only Opera gets it right. */
+    .Firefox #MSearchField,
+    .IE #MSearchField,
+    .Safari #MSearchField {
+        width: 94%;
+        }
+    .Opera9 #MSearchField,
+    .Konqueror #MSearchField {
+        width: 97%;
+        }
+    .FramedMenuPage .Firefox #MSearchField,
+    .FramedMenuPage .Safari #MSearchField,
+    .FramedMenuPage .Konqueror #MSearchField {
+        width: 98%;
+        }
+
+    /* Firefox doesn't do this right in frames without #MSearchPanel added on.
+        It's presence doesn't hurt anything other browsers. */
+    #MSearchPanel.MSearchPanelInactive:hover #MSearchField {
+        background-color: #FFFFFF;
+        border: 1px solid #C0C0C0;
+        padding: 1px 3px;
+        }
+    .MSearchPanelActive #MSearchField {
+        background-color: #FFFFFF;
+        border: 1px solid #C0C0C0;
+        font-style: normal;
+        padding: 1px 3px;
+        }
+
+    #MSearchType {
+        visibility: hidden;
+        font: 8pt Verdana, sans-serif;
+        width: 98%;
+        padding: 0;
+        border: 1px solid #C0C0C0;
+        }
+    .MSearchPanelActive #MSearchType,
+    /*  As mentioned above, Firefox doesn't do this right in frames without #MSearchPanel added on. */
+    #MSearchPanel.MSearchPanelInactive:hover #MSearchType,
+    #MSearchType:focus {
+        visibility: visible;
+        color: #606060;
+        }
+    #MSearchType option#MSearchEverything {
+        font-weight: bold;
+        }
+
+    .Opera8 .MSearchPanelInactive:hover,
+    .Opera8 .MSearchPanelActive {
+        margin-left: -1px;
+        }
+
+
+    iframe#MSearchResults {
+        width: 60ex;
+        height: 15em;
+        }
+    #MSearchResultsWindow {
+        display: none;
+        position: absolute;
+        left: 0; top: 0;
+        border: 1px solid #000000;
+        background-color: #E8E8E8;
+        }
+    #MSearchResultsWindowClose {
+        font-weight: bold;
+        font-size: 8pt;
+        display: block;
+        padding: 2px 5px;
+        }
+    #MSearchResultsWindowClose:link,
+    #MSearchResultsWindowClose:visited {
+        color: #000000;
+        text-decoration: none;
+        }
+    #MSearchResultsWindowClose:active,
+    #MSearchResultsWindowClose:hover {
+        color: #800000;
+        text-decoration: none;
+        background-color: #F4F4F4;
+        }
+
+
+
+
+#Content {
+    padding-bottom: 15px;
+    }
+
+.ContentPage #Content {
+    border-width: 0 0 1px 1px;
+    border-style: solid;
+    border-color: #000000;
+    background-color: #FFFFFF;
+    font-size: 9pt;  /* To make 31ex match the menu's 31ex. */
+    
+    }
+.ContentPage .Firefox #Content {
+    margin-left: 27ex;
+    }
+
+
+
+    .CTopic {
+        font-size: 10pt;
+        margin-bottom: 3em;
+        }
+
+
+    .CTitle {
+        font-size: 12pt; font-weight: bold;
+        border-width: 0 0 1px 0; border-style: solid; border-color: #A0A0A0;
+        margin: 0 15px .5em 15px }
+
+    .CGroup .CTitle {
+        font-size: 16pt; font-variant: small-caps;
+        padding-left: 15px; padding-right: 15px;
+        border-width: 0 0 2px 0; border-color: #000000;
+        margin-left: 0; margin-right: 0 }
+
+    .CClass .CTitle,
+    .CInterface .CTitle,
+    .CDatabase .CTitle,
+    .CDatabaseTable .CTitle,
+    .CSection .CTitle {
+        font-size: 18pt;
+        color: #FFFFFF; background-color: #A0A0A0;
+        padding: 10px 15px 10px 15px;
+        border-width: 2px 0; border-color: #000000;
+        margin-left: 0; margin-right: 0 }
+
+    #MainTopic .CTitle {
+        font-size: 20pt;
+        color: #FFFFFF; background-color: #7070C0;
+        padding: 10px 15px 10px 15px;
+        border-width: 0 0 3px 0; border-color: #000000;
+        margin-left: 0; margin-right: 0 }
+
+    .CBody {
+        margin-left: 15px; margin-right: 15px }
+
+
+    .CToolTip {
+        position: absolute; visibility: hidden;
+        left: 0; top: 0;
+        background-color: #FFFFE0;
+        padding: 5px;
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #000000;
+        font-size: 8pt;
+        }
+
+    .Opera .CToolTip {
+        max-width: 98%;
+        }
+
+    /*  Scrollbars would be useless.  */
+    .CToolTip blockquote {
+        overflow: hidden;
+        }
+    .IE6 .CToolTip blockquote {
+        overflow: visible;
+        }
+
+    .CHeading {
+        font-weight: bold; font-size: 10pt;
+        margin: 1.5em 0 .5em 0;
+        }
+
+    .CBody pre {
+        font: 10pt "Courier New", Courier, monospace;
+        margin: 1em 0;
+        }
+
+    .CBody ul {
+        /*  I don't know why CBody's margin doesn't apply, but it's consistent across browsers so whatever.
+             Reapply it here as padding.  */
+        padding-left: 15px; padding-right: 15px;
+        margin: .5em 5ex .5em 5ex;
+        }
+
+    .CDescriptionList {
+        margin: .5em 5ex 0 5ex }
+
+        .CDLEntry {
+            font: 10pt "Courier New", Courier, monospace; color: #808080;
+            padding-bottom: .25em;
+            white-space: nowrap }
+
+        .CDLDescription {
+            font-size: 10pt;  /*  For browsers that don't inherit correctly, like Opera 5.  */
+            padding-bottom: .5em; padding-left: 5ex }
+
+
+    .CTopic img {
+        text-align: center;
+        display: block;
+        margin: 1em auto;
+        }
+    .CImageCaption {
+        font-variant: small-caps;
+        font-size: 8pt;
+        color: #808080;
+        text-align: center;
+        position: relative;
+        top: 1em;
+        }
+
+    .CImageLink {
+        color: #808080;
+        font-style: italic;
+        }
+    a.CImageLink:link,
+    a.CImageLink:visited,
+    a.CImageLink:hover { color: #808080 }
+
+
+
+
+
+.Prototype {
+    font: 10pt "Courier New", Courier, monospace;
+    padding: 5px 3ex;
+    border-width: 1px; border-style: solid;
+    margin: 0 5ex 1.5em 5ex;
+    }
+
+    .Prototype td {
+        font-size: 10pt;
+        }
+
+    .PDefaultValue,
+    .PDefaultValuePrefix,
+    .PTypePrefix {
+        color: #8F8F8F;
+        }
+    .PTypePrefix {
+        text-align: right;
+        }
+    .PAfterParameters {
+        vertical-align: bottom;
+        }
+
+    .IE .Prototype table {
+        padding: 0;
+        }
+
+    .CFunction .Prototype {
+        background-color: #F4F4F4; border-color: #D0D0D0 }
+    .CProperty .Prototype {
+        background-color: #F4F4FF; border-color: #C0C0E8 }
+    .CVariable .Prototype {
+        background-color: #FFFFF0; border-color: #E0E0A0 }
+
+    .CClass .Prototype {
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #A0A0A0;
+        background-color: #F4F4F4;
+        }
+    .CInterface .Prototype {
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #A0A0D0;
+        background-color: #F4F4FF;
+        }
+
+    .CDatabaseIndex .Prototype,
+    .CConstant .Prototype {
+        background-color: #D0D0D0; border-color: #000000 }
+    .CType .Prototype,
+    .CEnumeration .Prototype {
+        background-color: #FAF0F0; border-color: #E0B0B0;
+        }
+    .CDatabaseTrigger .Prototype,
+    .CEvent .Prototype,
+    .CDelegate .Prototype {
+        background-color: #F0FCF0; border-color: #B8E4B8 }
+
+    .CToolTip .Prototype {
+        margin: 0 0 .5em 0;
+        white-space: nowrap;
+        }
+
+
+
+
+
+.Summary {
+    margin: 1.5em 5ex 0 5ex }
+
+    .STitle {
+        font-size: 12pt; font-weight: bold;
+        margin-bottom: .5em }
+
+
+    .SBorder {
+        background-color: #FFFFF0;
+        padding: 15px;
+        border: 1px solid #C0C060 }
+
+    /* In a frame IE 6 will make them too long unless you set the width to 100%.  Without frames it will be correct without a width
+        or slightly too long (but not enough to scroll) with a width.  This arbitrary weirdness simply astounds me.  IE 7 has the same
+        problem with frames, haven't tested it without.  */
+    .FramedContentPage .IE .SBorder {
+        width: 100% }
+
+    /*  A treat for Mozilla users.  Blatantly non-standard.  Will be replaced with CSS 3 attributes when finalized/supported.  */
+    .Firefox .SBorder {
+        -moz-border-radius: 20px }
+
+
+    .STable {
+        font-size: 9pt; width: 100% }
+
+    .SEntry {
+        width: 30% }
+    .SDescription {
+        width: 70% }
+
+
+    .SMarked {
+        background-color: #F8F8D8 }
+
+    .SDescription { padding-left: 2ex }
+    .SIndent1 .SEntry { padding-left: 1.5ex }   .SIndent1 .SDescription { padding-left: 3.5ex }
+    .SIndent2 .SEntry { padding-left: 3.0ex }   .SIndent2 .SDescription { padding-left: 5.0ex }
+    .SIndent3 .SEntry { padding-left: 4.5ex }   .SIndent3 .SDescription { padding-left: 6.5ex }
+    .SIndent4 .SEntry { padding-left: 6.0ex }   .SIndent4 .SDescription { padding-left: 8.0ex }
+    .SIndent5 .SEntry { padding-left: 7.5ex }   .SIndent5 .SDescription { padding-left: 9.5ex }
+
+    .SDescription a { color: #800000}
+    .SDescription a:active { color: #A00000 }
+
+    .SGroup td {
+        padding-top: .5em; padding-bottom: .25em }
+
+    .SGroup .SEntry {
+        font-weight: bold; font-variant: small-caps }
+
+    .SGroup .SEntry a { color: #800000 }
+    .SGroup .SEntry a:active { color: #F00000 }
+
+
+    .SMain td,
+    .SClass td,
+    .SDatabase td,
+    .SDatabaseTable td,
+    .SSection td {
+        font-size: 10pt;
+        padding-bottom: .25em }
+
+    .SClass td,
+    .SDatabase td,
+    .SDatabaseTable td,
+    .SSection td {
+        padding-top: 1em }
+
+    .SMain .SEntry,
+    .SClass .SEntry,
+    .SDatabase .SEntry,
+    .SDatabaseTable .SEntry,
+    .SSection .SEntry {
+        font-weight: bold;
+        }
+
+    .SMain .SEntry a,
+    .SClass .SEntry a,
+    .SDatabase .SEntry a,
+    .SDatabaseTable .SEntry a,
+    .SSection .SEntry a { color: #000000 }
+
+    .SMain .SEntry a:active,
+    .SClass .SEntry a:active,
+    .SDatabase .SEntry a:active,
+    .SDatabaseTable .SEntry a:active,
+    .SSection .SEntry a:active { color: #A00000 }
+
+
+
+
+
+.ClassHierarchy {
+    margin: 0 15px 1em 15px }
+
+    .CHEntry {
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #A0A0A0;
+        margin-bottom: 3px;
+        padding: 2px 2ex;
+        font-size: 10pt;
+        background-color: #F4F4F4; color: #606060;
+        }
+
+    .Firefox .CHEntry {
+        -moz-border-radius: 4px;
+        }
+
+    .CHCurrent .CHEntry {
+        font-weight: bold;
+        border-color: #000000;
+        color: #000000;
+        }
+
+    .CHChildNote .CHEntry {
+        font-style: italic;
+        font-size: 8pt;
+        }
+
+    .CHIndent {
+        margin-left: 3ex;
+        }
+
+    .CHEntry a:link,
+    .CHEntry a:visited,
+    .CHEntry a:hover {
+        color: #606060;
+        }
+    .CHEntry a:active {
+        color: #800000;
+        }
+
+
+
+
+
+#Index {
+    background-color: #FFFFFF;
+    }
+
+/*  As opposed to .PopupSearchResultsPage #Index  */
+.IndexPage #Index,
+.FramedIndexPage #Index,
+.FramedSearchResultsPage #Index {
+    padding: 15px;
+    }
+
+.IndexPage #Index {
+    border-width: 0 0 1px 1px;
+    border-style: solid;
+    border-color: #000000;
+    font-size: 9pt;  /* To make 27ex match the menu's 27ex. */
+    margin-left: 27ex;
+    }
+
+
+    .IPageTitle {
+        font-size: 20pt; font-weight: bold;
+        color: #FFFFFF; background-color: #7070C0;
+        padding: 10px 15px 10px 15px;
+        border-width: 0 0 3px 0; border-color: #000000; border-style: solid;
+        margin: -15px -15px 0 -15px }
+
+    .FramedSearchResultsPage .IPageTitle {
+        margin-bottom: 15px;
+        }
+
+    .INavigationBar {
+        font-size: 10pt;
+        text-align: center;
+        background-color: #FFFFF0;
+        padding: 5px;
+        border-bottom: solid 1px black;
+        margin: 0 -15px 15px -15px;
+        }
+
+    .INavigationBar a {
+        font-weight: bold }
+
+    .IHeading {
+        font-size: 16pt; font-weight: bold;
+        padding: 2.5em 0 .5em 0;
+        text-align: center;
+        width: 3.5ex;
+        }
+    #IFirstHeading {
+        padding-top: 0;
+        }
+
+    .IEntry {
+        font-size: 10pt;
+        padding-left: 1ex;
+        }
+    .PopupSearchResultsPage .IEntry {
+        font-size: 8pt;
+        padding: 1px 5px;
+        }
+    .PopupSearchResultsPage .Opera9 .IEntry,
+    .FramedSearchResultsPage .Opera9 .IEntry {
+        text-align: left;
+        }
+    .FramedSearchResultsPage .IEntry {
+        padding: 0;
+        }
+
+    .ISubIndex {
+        padding-left: 3ex; padding-bottom: .5em }
+    .PopupSearchResultsPage .ISubIndex {
+        display: none;
+        }
+
+    /*  While it may cause some entries to look like links when they aren't, I found it's much easier to read the
+         index if everything's the same color.  */
+    .ISymbol {
+        font-weight: bold; color: #900000  }
+
+    .IndexPage .ISymbolPrefix,
+    .FramedIndexPage .ISymbolPrefix {
+        font-size: 10pt;
+        text-align: right;
+        color: #C47C7C;
+        background-color: #F8F8F8;
+        border-right: 3px solid #E0E0E0;
+        border-left: 1px solid #E0E0E0;
+        padding: 0 1px 0 2px;
+        }
+    .PopupSearchResultsPage .ISymbolPrefix,
+    .FramedSearchResultsPage .ISymbolPrefix {
+        color: #900000;
+        }
+    .PopupSearchResultsPage .ISymbolPrefix {
+        font-size: 8pt;
+        }
+
+    .IndexPage #IFirstSymbolPrefix,
+    .FramedIndexPage #IFirstSymbolPrefix {
+        border-top: 1px solid #E0E0E0;
+        }
+    .IndexPage #ILastSymbolPrefix,
+    .FramedIndexPage #ILastSymbolPrefix {
+        border-bottom: 1px solid #E0E0E0;
+        }
+    .IndexPage #IOnlySymbolPrefix,
+    .FramedIndexPage #IOnlySymbolPrefix {
+        border-top: 1px solid #E0E0E0;
+        border-bottom: 1px solid #E0E0E0;
+        }
+
+    a.IParent,
+    a.IFile {
+        display: block;
+        }
+
+    .PopupSearchResultsPage .SRStatus {
+        padding: 2px 5px;
+        font-size: 8pt;
+        font-style: italic;
+        }
+    .FramedSearchResultsPage .SRStatus {
+        font-size: 10pt;
+        font-style: italic;
+        }
+
+    .SRResult {
+        display: none;
+        }
+
+
+
+#Footer {
+    font-size: 8pt;
+    color: #989898;
+    text-align: right;
+    }
+
+#Footer p {
+    text-indent: 0;
+    margin-bottom: .5em;
+    }
+
+.ContentPage #Footer,
+.IndexPage #Footer {
+    text-align: right;
+    margin: 2px;
+    }
+
+.FramedMenuPage #Footer {
+    text-align: center;
+    margin: 5em 10px 10px 10px;
+    padding-top: 1em;
+    border-top: 1px solid #C8C8C8;
+    }
+
+    #Footer a:link,
+    #Footer a:hover,
+    #Footer a:visited { color: #989898 }
+    #Footer a:active { color: #A00000 }
+
+</style><script language=JavaScript src="../javascript/main.js"></script><script language=JavaScript src="../javascript/searchdata.js"></script></head><body class="ContentPage" onLoad="NDOnLoad()"><script language=JavaScript><!--
+if (browserType) {document.write("<div class=" + browserType + ">");if (browserVer) {document.write("<div class=" + browserVer + ">"); }}// --></script>
+
+<!--  Generated by Natural Docs, version 1.4 -->
+<!--  http://www.naturaldocs.org  -->
+
+<!-- saved from url=(0026)http://www.naturaldocs.org -->
+
+
+
+
+<div id=Content><div class="CSection"><div class=CTopic id=MainTopic><h1 class=CTitle><a name="QHTM_Control"></a>QHTM Control</h1><div class=CBody><p><b>Ultra small Win32 HTML control</b></p><blockquote><pre></pre></blockquote><p>Using QHTM you can place HTML content on any window, any device context, on a report, on a button or even in a tooltip.&nbsp; QHTM is written entirely in C++ and does not rely on MFC, nor does it need IE installed.&nbsp; Instead QHTM uses direct Win32 API calls which makes it very fast and very light.</p><blockquote><pre></pre></blockquote><p>The control also provides ability to display QHTM Button, Tooltip or ListBox.&nbsp; Cool Tooltips are enabled by default.</p><!--START_ND_SUMMARY--><div class=Summary><div class=STitle>Summary</div><div class=SBorder><table border=0 cellspacing=0 cellpadding=0 class=STable><tr class="SMain"><td class=SEntry><a href="#QHTM_Control" >QHTM Control</a></td><td class=SDescription><b>Ultra small Win32 HTML control</b></td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#Add" id=link1 onMouseOver="ShowTip(event, 'tt1', 'link1')" onMouseOut="HideTip('tt1')">Add</a></td><td class=SDescription>Add QHTM control</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#AddHtml" id=link2 onMouseOver="ShowTip(event, 'tt2', 'link2')" onMouseOut="HideTip('tt2')">AddHtml</a></td><td class=SDescription>Add HTML to the current document. </td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#AdjustControl" id=link3 onMouseOver="ShowTip(event, 'tt3', 'link3')" onMouseOut="HideTip('tt3')">AdjustControl</a></td><td class=SDescription>Adjust control&rsquo;s height to fit HTML.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#FormReset" id=link4 onMouseOver="ShowTip(event, 'tt4', 'link4')" onMouseOut="HideTip('tt4')">FormReset</a></td><td class=SDescription>Resets the form</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#FormSubmit" id=link5 onMouseOver="ShowTip(event, 'tt5', 'link5')" onMouseOut="HideTip('tt5')">FormSubmit</a></td><td class=SDescription>Submits the form</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#FormSetSubmitCallback" id=link6 onMouseOver="ShowTip(event, 'tt6', 'link6')" onMouseOut="HideTip('tt6')">FormSetSubmitCallback</a></td><td class=SDescription>Set the function to call when submitting a form via POST</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetDrawnSize" id=link7 onMouseOver="ShowTip(event, 'tt7', 'link7')" onMouseOut="HideTip('tt7')">GetDrawnSize</a></td><td class=SDescription>Get the width and height of the HTML</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GetHTMLHeight" id=link8 onMouseOver="ShowTip(event, 'tt8', 'link8')" onMouseOut="HideTip('tt8')">GetHTMLHeight</a></td><td class=SDescription>Given a width determine the height of some HTML.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetHTML" id=link9 onMouseOver="ShowTip(event, 'tt9', 'link9')" onMouseOut="HideTip('tt9')">GetHTML</a></td><td class=SDescription>Return HTML rendered by the control</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GotoLink" id=link10 onMouseOver="ShowTip(event, 'tt10', 'link10')" onMouseOut="HideTip('tt10')">GotoLink</a></td><td class=SDescription>Force the HTML control to scroll to a named linked within a document. </td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#Init" id=link11 onMouseOver="ShowTip(event, 'tt11', 'link11')" onMouseOut="HideTip('tt11')">Init</a></td><td class=SDescription>Initialise the QHTM module.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#LoadFromFile" id=link12 onMouseOver="ShowTip(event, 'tt12', 'link12')" onMouseOut="HideTip('tt12')">LoadFromFile</a></td><td class=SDescription>Load HTML into QHTM passing a valid filename.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#LoadFromResource" id=link13 onMouseOver="ShowTip(event, 'tt13', 'link13')" onMouseOut="HideTip('tt13')">LoadFromResource</a></td><td class=SDescription>Load HTML into QHTM from a resource</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#MsgBox" id=link14 onMouseOver="ShowTip(event, 'tt14', 'link14')" onMouseOut="HideTip('tt14')">MsgBox</a></td><td class=SDescription>MsgBox replacement</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#PrintCreateContext" id=link15 onMouseOver="ShowTip(event, 'tt15', 'link15')" onMouseOut="HideTip('tt15')">PrintCreateContext</a></td><td class=SDescription>Create and return a print context. </td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#PrintDestroyContext" id=link16 onMouseOver="ShowTip(event, 'tt16', 'link16')" onMouseOut="HideTip('tt16')">PrintDestroyContext</a></td><td class=SDescription>Destroy a valid QHTMCONTEXT.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#PrintSetText" id=link17 onMouseOver="ShowTip(event, 'tt17', 'link17')" onMouseOut="HideTip('tt17')">PrintSetText</a></td><td class=SDescription>Set the HTML for the given print context.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#PrintSetTextFile" id=link18 onMouseOver="ShowTip(event, 'tt18', 'link18')" onMouseOut="HideTip('tt18')">PrintSetTextFile</a></td><td class=SDescription>Set the HTML for the given print context using a file.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#PrintLayout" id=link19 onMouseOver="ShowTip(event, 'tt19', 'link19')" onMouseOut="HideTip('tt19')">PrintLayout</a></td><td class=SDescription>Layout the HTML, using the HDC passed, to determine the number of pages.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#PrintPage" id=link20 onMouseOver="ShowTip(event, 'tt20', 'link20')" onMouseOut="HideTip('tt20')">PrintPage</a></td><td class=SDescription>Print a page</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#PrintGetHTMLHeight" id=link21 onMouseOver="ShowTip(event, 'tt21', 'link21')" onMouseOut="HideTip('tt21')">PrintGetHTMLHeight</a></td><td class=SDescription>Given a fixed width it returns the rendered height of the HTML. </td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#RenderHTML" id=link22 onMouseOver="ShowTip(event, 'tt22', 'link22')" onMouseOut="HideTip('tt22')">RenderHTML</a></td><td class=SDescription>Render HTML onto a device context.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#RenderHTMLRect" id=link23 onMouseOver="ShowTip(event, 'tt23', 'link23')" onMouseOut="HideTip('tt23')">RenderHTMLRect</a></td><td class=SDescription>Render HTML onto a device context and confined within a rectangle.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SetHTMLButton" id=link24 onMouseOver="ShowTip(event, 'tt24', 'link24')" onMouseOut="HideTip('tt24')">SetHTMLButton</a></td><td class=SDescription>Change a button so that it can contain HTML as it&rsquo;s text instead of plain text.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#SetHTMLListbox" id=link25 onMouseOver="ShowTip(event, 'tt25', 'link25')" onMouseOut="HideTip('tt25')">SetHTMLListbox</a></td><td class=SDescription>Change a listbox so that it&rsquo;s items can use HTML instead of plain text.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#ShowScrollbars" id=link26 onMouseOver="ShowTip(event, 'tt26', 'link26')" onMouseOut="HideTip('tt26')">ShowScrollbars</a></td><td class=SDescription>Set whether or not QHTM will display scrollbars. </td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#Zoom" id=link27 onMouseOver="ShowTip(event, 'tt27', 'link27')" onMouseOut="HideTip('tt27')">Zoom</a></td><td class=SDescription>Zoom the HTML in or out</td></tr><tr class="SGroup SIndent1"><td class=SEntry><a href="#Links" >Links</a></td><td class=SDescription></td></tr><tr class="SGroup SIndent1"><td class=SEntry><a href="#About" >About</a></td><td class=SDescription></td></tr></table></div></div><!--END_ND_SUMMARY--></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="Add"></a>Add</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_Add(</td><td class=PParameter nowrap>Hwnd,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Text,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>X,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Y,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>W,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>H,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Style</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Fun</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Add QHTM control</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Hwnd</td><td class=CDLDescription>Handle of the parent</td></tr><tr><td class=CDLEntry>Text</td><td class=CDLDescription>HTML to display</td></tr><tr><td class=CDLEntry>X-H</td><td class=CDLDescription>Control coordinates</td></tr><tr><td class=CDLEntry>Style</td><td class=CDLDescription>List of control styles</td></tr><tr><td class=CDLEntry>Fun</td><td class=CDLDescription>Notification function, optional</td></tr></table><h4 class=CHeading>Styles</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Border</td><td class=CDLDescription>Add border arond the control</td></tr><tr><td class=CDLEntry>Transparent</td><td class=CDLDescription>Make HTML control transparent</td></tr></table><h4 class=CHeading>Returns</h4><p>Control handle or error message</p><h4 class=CHeading>Notification function</h4><blockquote><pre>OnNotify(Hwnd, Link, Id)</pre></blockquote><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Result</td><td class=CDLDescription>Return 1 to open the link in system default editor.</td></tr><tr><td class=CDLEntry>Hwnd</td><td class=CDLDescription>Handle of the control</td></tr><tr><td class=CDLEntry>Link</td><td class=CDLDescription>Link text</td></tr><tr><td class=CDLEntry>ID</td><td class=CDLDescription>HTML link ID</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="AddHtml"></a>AddHtml</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_AddHtml(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>HTML,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>bScroll</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>false</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Add HTML to the current document.&nbsp; If there is no document then one is created.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>HTML</td><td class=CDLDescription>QHTML to add to the control</td></tr><tr><td class=CDLEntry>bScroll</td><td class=CDLDescription>Set to TRUE to scroll to the end, by default false</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="AdjustControl"></a>AdjustControl</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_AdjustControl(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Adjust control&rsquo;s height to fit HTML.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>hCtrl</td><td class=CDLDescription>Control</td></tr></table><h4 class=CHeading>Remarks</h4><p>This function is to be used in combination with <a href="#SetHTMLButton" class=LFunction id=link28 onMouseOver="ShowTip(event, 'tt24', 'link28')" onMouseOut="HideTip('tt24')">SetHTMLButton</a> or &lt;SetHTMLListBox&gt;.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="FormReset"></a>FormReset</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_FormReset(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>FormName</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Resets the form</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>FormName</td><td class=CDLDescription>Name of the HTML form</td></tr></table><h4 class=CHeading>Returns</h4><p>Non-zero if the form is found and reset</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="FormSubmit"></a>FormSubmit</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_FormSubmit(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>FormName</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Submits the form</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>FormName</td><td class=CDLDescription>Name of the HTML form</td></tr></table><h4 class=CHeading>Returns</h4><p>Non-zero if the form is found and submitted</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="FormSetSubmitCallback"></a>FormSetSubmitCallback</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_FormSetSubmitCallback(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>Fun</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set the function to call when submitting a form via POST</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Fun</td><td class=CDLDescription>Function to be called</td></tr></table><h4 class=CHeading>Callback function</h4><blockquote><pre>OnQHtmForm(FormName, Method, FieldCount, Fields)</pre></blockquote><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>FormName</td><td class=CDLDescription>Name of the form that was submited</td></tr><tr><td class=CDLEntry>Action</td><td class=CDLDescription>Action of the form</td></tr><tr><td class=CDLEntry>FieldCount</td><td class=CDLDescription>Number of fields in the form</td></tr><tr><td class=CDLEntry>Fields</td><td class=CDLDescription>New line separated list of filed names and values.</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetDrawnSize"></a>GetDrawnSize</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_GetDrawnSize(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>w,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>h</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get the width and height of the HTML</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>w, h</td><td class=CDLDescription>Reference to variables to receive width and height</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetHTMLHeight"></a>GetHTMLHeight</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_GetHTMLHeight(</td><td class=PParameter nowrap>DC,</td></tr><tr><td></td><td class=PParameter nowrap>HTML,</td></tr><tr><td></td><td class=PParameter nowrap>Width</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Given a width determine the height of some HTML.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>DC</td><td class=CDLDescription>Device context use for measuring.</td></tr><tr><td class=CDLEntry>HTML</td><td class=CDLDescription>HTML content.</td></tr><tr><td class=CDLEntry>Width</td><td class=CDLDescription>Constraining width.</td></tr></table><h4 class=CHeading>Returns</h4><p>Measured height of the HTML.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetHTML"></a>GetHTML</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_GetHTML(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Return HTML rendered by the control</p><h4 class=CHeading>Returns</h4><p>HTML</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GotoLink"></a>GotoLink</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_GotoLink(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>LinkName</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Force the HTML control to scroll to a named linked within a document.&nbsp; Useful if you have a large document and want to bring a particular section to the users attention.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>LinkName</td><td class=CDLDescription>Sname of the link you wish to navigate to</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="Init"></a>Init</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_Init(</td><td class=PParameter nowrap>DllPath</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;qhtm.dll&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Initialise the QHTM module.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>DllPath</td><td class=CDLDescription>Path to the qhtml dll.</td></tr></table><h4 class=CHeading>Remarks</h4><p>You generally don&rsquo;t need to call this function, unless dll is not in the standard place.</p><h4 class=CHeading>Returns</h4><p>TRUE on success or FALSE otherwise.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="LoadFromFile"></a>LoadFromFile</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_LoadFromFile(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>FileName</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Load HTML into QHTM passing a valid filename.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>FileName</td><td class=CDLDescription>Name of the file with QHTML</td></tr></table><h4 class=CHeading>Returns</h4><p>Non-zero if it succeeds.</p><h4 class=CHeading>Remarks</h4><p>QHTML can include other files with the following directive inside html comment:</p><blockquote><pre>&lt;!-- #include virtual=&quot;path&quot;--&gt;</pre></blockquote></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="LoadFromResource"></a>LoadFromResource</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_LoadFromResource(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Name,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Resource</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Load HTML into QHTM from a resource</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Name</td><td class=CDLDescription>Resource name or number.</td></tr><tr><td class=CDLEntry>Resource</td><td class=CDLDescription>Resource file, leave empty for compiled scripts to use its exe.</td></tr></table><h4 class=CHeading>Remarks</h4><p>In order to use this feasture you must add resources manually using Resource Hacker or some other resource editor.</p><h4 class=CHeading>Examples</h4><blockquote><pre>QHTM_LoadFromResource(hQhtm, 1)     ;load resource with ID=1 from compiled script
+QHTM_LoadFromResource(hQhtm, &quot;ABOUT.HTML&quot;, &quot;res.dll&quot;) ; load resource by name from dll</pre></blockquote></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="MsgBox"></a>MsgBox</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_MsgBox(</td><td class=PParameter nowrap>HTML,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Caption</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Type</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>HGui</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%> 0</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>MsgBox replacement</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>HTML</td><td class=CDLDescription>Text to be shown in html format</td></tr><tr><td class=CDLEntry>Caption</td><td class=CDLDescription>Optional window caption</td></tr><tr><td class=CDLEntry>Type</td><td class=CDLDescription>Space separated list of MessageBox types: ABORTRETRYIGNORE CANCELTRYCONTINUE COMPOSITE DEFAULT_DESKTOP_ONLY DEFBUTTON1 DEFBUTTON2 DEFBUTTON3 DEFBUTTON4 ERR_INVALID_CHARS DEFMASK FUNC HELP ICONASTERISK ICONHAND ICONEXCLAMATION ICONMASK ICONQUESTION MISCMASK MODEMASK NOFOCUS OK PRECOMPOSED OKCANCEL RETRYCANCEL RIGHT RTLREADING SETFOREGROUND SYSTEMMODAL TASKMODAL YESNO YESNOCANCEL USERICON USEGLYPHCHARS TYPEMASK TOPMOST ICONWARNING</td></tr><tr><td class=CDLEntry>HGui</td><td class=CDLDescription>GUI handle (optional)</td></tr></table><h4 class=CHeading>Returns</h4><p>Non-zero if it succeeds.</p><h4 class=CHeading>Example</h4><p>QHTM_MessageBox(&ldquo;Do you &lt;b&gt;really&lt;/b&gt; want to format drive C ?&rdquo;, &ldquo;Format&rdquo;, &ldquo;YESNOCANCEL ICONWARNING DEFBUTTON3&rdquo;, hGui)</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="PrintCreateContext"></a>PrintCreateContext</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td>QHTM_PrintCreateContext()</td></tr></table></blockquote><p>Create and return a print context.&nbsp; The first function called when printing.&nbsp; Creates and initialises internal structures for printing.</p><h4 class=CHeading>Returns</h4><p>A valid print context, 0 if an error occurs.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="PrintDestroyContext"></a>PrintDestroyContext</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_PrintDestroyContext(</td><td class=PParameter nowrap>Context</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Destroy a valid QHTMCONTEXT.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Context</td><td class=CDLDescription>The print context to destroy.</td></tr></table><h4 class=CHeading>Returns</h4><p>Non-zero if no error.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="PrintSetText"></a>PrintSetText</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_PrintSetText(</td><td class=PParameter nowrap>Context,</td></tr><tr><td></td><td class=PParameter nowrap>HTML</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set the HTML for the given print context.</p><h4 class=CHeading>Parameters</h4><p>Context- The print context.&nbsp; HTML - HTML document to print.</p><h4 class=CHeading>Returns</h4><p>Non-zero if it succeeds.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="PrintSetTextFile"></a>PrintSetTextFile</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_PrintSetTextFile(</td><td class=PParameter nowrap>Context,</td></tr><tr><td></td><td class=PParameter nowrap>FileName</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set the HTML for the given print context using a file.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Context</td><td class=CDLDescription>The print context.</td></tr><tr><td class=CDLEntry>Filename</td><td class=CDLDescription>Filename to the HTML document.</td></tr></table><h4 class=CHeading>Returns</h4><p>Non-zero if it succeeds.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="PrintLayout"></a>PrintLayout</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_PrintLayout(</td><td class=PParameter nowrap>Context,</td></tr><tr><td></td><td class=PParameter nowrap>DC,</td></tr><tr><td></td><td class=PParameter nowrap>PRECT</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Layout the HTML, using the HDC passed, to determine the number of pages.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Context</td><td class=CDLDescription>The print context.</td></tr><tr><td class=CDLEntry>DC</td><td class=CDLDescription>The device context used to print.</td></tr><tr><td class=CDLEntry>PRECT</td><td class=CDLDescription>Pointer to the rectangle on the page that the HTML will be restricted to.</td></tr></table><h4 class=CHeading>Returns</h4><p>Number of pages</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="PrintPage"></a>PrintPage</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_PrintPage(</td><td class=PParameter nowrap>Context,</td></tr><tr><td></td><td class=PParameter nowrap>DC,</td></tr><tr><td></td><td class=PParameter nowrap>PageNum,</td></tr><tr><td></td><td class=PParameter nowrap>PRECT</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Print a page</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Context</td><td class=CDLDescription>The print context.</td></tr><tr><td class=CDLEntry>DC</td><td class=CDLDescription>The device context used to print.</td></tr><tr><td class=CDLEntry>PageNum</td><td class=CDLDescription>The page number to print.</td></tr><tr><td class=CDLEntry>PRECT</td><td class=CDLDescription>Pointer to the rectangle on the page that the HTML will be restricted to.</td></tr></table><h4 class=CHeading>Returns</h4><p>Non-zero if it succeeds.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="PrintGetHTMLHeight"></a>PrintGetHTMLHeight</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_PrintGetHTMLHeight(</td><td class=PParameter nowrap>DC,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>HTML,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>PrintWidth,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>ZoomLevel</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>2</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Given a fixed width it returns the rendered height of the HTML.&nbsp; Used to determine how much HTML will fit on a single page or within a particular bounding width.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>DC</td><td class=CDLDescription>The device context used to measure the HTML document.</td></tr><tr><td class=CDLEntry>HTML</td><td class=CDLDescription>HTML document to measure</td></tr><tr><td class=CDLEntry>PrintWidth</td><td class=CDLDescription>in pixels, of the area that the HTML document will be restricted to.</td></tr><tr><td class=CDLEntry>ZoomLevel</td><td class=CDLDescription>The zoom level to print at.&nbsp; Can be between 0 and 4.</td></tr></table><h4 class=CHeading>Return value</h4><p>The height of the HTML given a width.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="RenderHTML"></a>RenderHTML</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_RenderHTML(</td><td class=PParameter nowrap>DC,</td></tr><tr><td></td><td class=PParameter nowrap>HTML,</td></tr><tr><td></td><td class=PParameter nowrap>Width</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Render HTML onto a device context.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>DC</td><td class=CDLDescription>Handle of the device context.</td></tr><tr><td class=CDLEntry>HTML</td><td class=CDLDescription>HTML to render.</td></tr><tr><td class=CDLEntry>Width</td><td class=CDLDescription>Constraining width.</td></tr></table><h4 class=CHeading>Returns</h4><p>Non-zero if it succeeds.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="RenderHTMLRect"></a>RenderHTMLRect</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_RenderHTMLRect(</td><td class=PParameter nowrap>DC,</td></tr><tr><td></td><td class=PParameter nowrap>HTML,</td></tr><tr><td></td><td class=PParameter nowrap>PRECT</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Render HTML onto a device context and confined within a rectangle.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>DC</td><td class=CDLDescription>Handle of the device context</td></tr><tr><td class=CDLEntry>HTML</td><td class=CDLDescription>HTML to render</td></tr><tr><td class=CDLEntry>PRECT</td><td class=CDLDescription>Pointer to RECT</td></tr></table><h4 class=CHeading>Returns</h4><p>Non-zero if it succeeds.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetHTMLButton"></a>SetHTMLButton</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_SetHTMLButton(</td><td class=PParameter nowrap>hButton,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Adjust</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>false</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Change a button so that it can contain HTML as it&rsquo;s text instead of plain text.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>hButton</td><td class=CDLDescription>Handle of the button.</td></tr><tr><td class=CDLEntry>Adjust</td><td class=CDLDescription>Set to TRUE to adjust controls height after HTML is drawn.</td></tr></table><h4 class=CHeading>Returns</h4><p>TRUE on success</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetHTMLListbox"></a>SetHTMLListbox</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_SetHTMLListbox(</td><td class=PParameter nowrap>hListbox,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Adjust</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%> true</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Change a listbox so that it&rsquo;s items can use HTML instead of plain text.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>hListbox</td><td class=CDLDescription>Handle of the ListBox</td></tr></table><h4 class=CHeading>Returns</h4><p>TRUE on success</p><h4 class=CHeading>Remarks</h4><p>Currently, this function shouldn&rsquo;t be used as it produces side-effects on painting routine of Main Window and some other side effects.&nbsp; Also, in order to work ListBox must be created with one of the LBS_OWNERDRAW styles (0x10 0x20)</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="ShowScrollbars"></a>ShowScrollbars</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_ShowScrollbars(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>bShow</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set whether or not QHTM will display scrollbars.&nbsp; This overrides QHTM&rsquo;s ability to automatically display scrollbars where needed.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>bShow</td><td class=CDLDescription>Set to TRUE to show scrollbars or FALSE to hide them</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="Zoom"></a>Zoom</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_Zoom(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Level</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>2</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Zoom the HTML in or out</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Level</td><td class=CDLDescription>Zoom level, from 0 to 4.&nbsp; 2 represents actual size.</td></tr></table><h4 class=CHeading>Returns</h4><p>Non-zero on success</p></div></div></div>
+
+<div class="CGroup"><div class=CTopic><h3 class=CTitle><a name="Links"></a>Links</h3><div class=CBody><ul><li>Supported HTML tags: <a href="http://www.gipsysoft.com/qhtm/doc/html.shtml" class=LURL target=_top>http://www.gipsysoft.com/qhtm/doc/html.shtml</a></li><li>Quick API Reference and user guide: <a href="http://www.gipsysoft.com/qhtm/doc/" class=LURL target=_top>http://www.gipsysoft.com/qhtm/doc/</a></li></ul></div></div></div>
+
+<div class="CGroup"><div class=CTopic><h3 class=CTitle><a name="About"></a>About</h3><div class=CBody><ul><li>QHTML copyright © GipsySoft.&nbsp; See <a href="http://www.gipsysoft.com/qhtm/" class=LURL target=_top>http://www.gipsysoft.com/qhtm/</a></li><li>AHK wrapper ver 1.01 by majkinetor.</li><li>Licenced under Creative Commons Attribution-Noncommercial <a href="http://creativecommons.org/licenses/by-nc/3.0/" class=LURL target=_top>http://creativecommons.org/licenses/by-nc/3.0/</a>.</li></ul></div></div></div>
+
+</div><!--Content-->
+
+
+<div id=Footer><a href="http://www.naturaldocs.org">Generated by Natural Docs</a></div><!--Footer-->
+
+
+
+
+
+
+<!--START_ND_TOOLTIPS-->
+<div class=CToolTip id="tt1"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_Add(</td><td class=PParameter nowrap>Hwnd,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Text,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>X,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Y,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>W,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>H,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Style</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Fun</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Add QHTM control</div></div><div class=CToolTip id="tt2"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_AddHtml(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>HTML,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>bScroll</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>false</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Add HTML to the current document. </div></div><div class=CToolTip id="tt3"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_AdjustControl(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Adjust control&rsquo;s height to fit HTML.</div></div><div class=CToolTip id="tt4"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_FormReset(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>FormName</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Resets the form</div></div><div class=CToolTip id="tt5"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_FormSubmit(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>FormName</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Submits the form</div></div><div class=CToolTip id="tt6"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_FormSetSubmitCallback(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>Fun</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set the function to call when submitting a form via POST</div></div><div class=CToolTip id="tt7"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_GetDrawnSize(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>w,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>h</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get the width and height of the HTML</div></div><div class=CToolTip id="tt8"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_GetHTMLHeight(</td><td class=PParameter nowrap>DC,</td></tr><tr><td></td><td class=PParameter nowrap>HTML,</td></tr><tr><td></td><td class=PParameter nowrap>Width</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Given a width determine the height of some HTML.</div></div><div class=CToolTip id="tt9"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_GetHTML(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Return HTML rendered by the control</div></div><div class=CToolTip id="tt10"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_GotoLink(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>LinkName</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Force the HTML control to scroll to a named linked within a document. </div></div><div class=CToolTip id="tt11"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_Init(</td><td class=PParameter nowrap>DllPath</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;qhtm.dll&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Initialise the QHTM module.</div></div><div class=CToolTip id="tt12"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_LoadFromFile(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>FileName</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Load HTML into QHTM passing a valid filename.</div></div><div class=CToolTip id="tt13"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_LoadFromResource(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Name,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Resource</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Load HTML into QHTM from a resource</div></div><div class=CToolTip id="tt14"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_MsgBox(</td><td class=PParameter nowrap>HTML,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Caption</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Type</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>HGui</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%> 0</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>MsgBox replacement</div></div><div class=CToolTip id="tt15"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td>QHTM_PrintCreateContext()</td></tr></table></blockquote>Create and return a print context. </div></div><div class=CToolTip id="tt16"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_PrintDestroyContext(</td><td class=PParameter nowrap>Context</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Destroy a valid QHTMCONTEXT.</div></div><div class=CToolTip id="tt17"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_PrintSetText(</td><td class=PParameter nowrap>Context,</td></tr><tr><td></td><td class=PParameter nowrap>HTML</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set the HTML for the given print context.</div></div><div class=CToolTip id="tt18"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_PrintSetTextFile(</td><td class=PParameter nowrap>Context,</td></tr><tr><td></td><td class=PParameter nowrap>FileName</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set the HTML for the given print context using a file.</div></div><div class=CToolTip id="tt19"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_PrintLayout(</td><td class=PParameter nowrap>Context,</td></tr><tr><td></td><td class=PParameter nowrap>DC,</td></tr><tr><td></td><td class=PParameter nowrap>PRECT</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Layout the HTML, using the HDC passed, to determine the number of pages.</div></div><div class=CToolTip id="tt20"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_PrintPage(</td><td class=PParameter nowrap>Context,</td></tr><tr><td></td><td class=PParameter nowrap>DC,</td></tr><tr><td></td><td class=PParameter nowrap>PageNum,</td></tr><tr><td></td><td class=PParameter nowrap>PRECT</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Print a page</div></div><div class=CToolTip id="tt21"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_PrintGetHTMLHeight(</td><td class=PParameter nowrap>DC,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>HTML,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>PrintWidth,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>ZoomLevel</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>2</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Given a fixed width it returns the rendered height of the HTML. </div></div><div class=CToolTip id="tt22"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_RenderHTML(</td><td class=PParameter nowrap>DC,</td></tr><tr><td></td><td class=PParameter nowrap>HTML,</td></tr><tr><td></td><td class=PParameter nowrap>Width</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Render HTML onto a device context.</div></div><div class=CToolTip id="tt23"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_RenderHTMLRect(</td><td class=PParameter nowrap>DC,</td></tr><tr><td></td><td class=PParameter nowrap>HTML,</td></tr><tr><td></td><td class=PParameter nowrap>PRECT</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Render HTML onto a device context and confined within a rectangle.</div></div><div class=CToolTip id="tt24"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_SetHTMLButton(</td><td class=PParameter nowrap>hButton,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Adjust</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>false</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Change a button so that it can contain HTML as it&rsquo;s text instead of plain text.</div></div><div class=CToolTip id="tt25"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_SetHTMLListbox(</td><td class=PParameter nowrap>hListbox,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Adjust</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%> true</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Change a listbox so that it&rsquo;s items can use HTML instead of plain text.</div></div><div class=CToolTip id="tt26"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_ShowScrollbars(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>bShow</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set whether or not QHTM will display scrollbars. </div></div><div class=CToolTip id="tt27"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>QHTM_Zoom(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Level</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>2</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Zoom the HTML in or out</div></div><!--END_ND_TOOLTIPS-->
+
+
+
+
+<div id=MSearchResultsWindow><iframe src="" frameborder=0 name=MSearchResults id=MSearchResults></iframe><a href="javascript:searchPanel.CloseResultsWindow()" id=MSearchResultsWindowClose>Close</a></div>
+
+
+<script language=JavaScript><!--
+if (browserType) {if (browserVer) {document.write("</div>"); }document.write("</div>");}// --></script></body></html>
