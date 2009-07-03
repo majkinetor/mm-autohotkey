@@ -131,8 +131,8 @@ S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",B
 }
 
 /*
-	Function:	v / vi
-				Storage functions, designed to use/copy.
+	Function:	v
+				Storage functions, designed to use as stdlib or copy and enhance.
 			  	
 	Parameters:
 			  var		- Variable name to retrieve. To get up several variables at once (up to 6), omit this parameter.
@@ -147,11 +147,10 @@ S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",B
     Remarks:
 			  To use multiple storages, copy *v* function and change its name. 
 			  			  
-			  To initialize storage values use/copy *vi* function, change its name and subroutine name and adjust commented part.
-			  You can choose to initialize from additional ahk script  containing only list of assigments to storage variables, 
-			  to do it internally by adding the values to the end of the function, or to do both, by accepting user values on startup, 
+			  You can choose to initialize storage from additional ahk script containing only list of assigments to storage variables,
+			  to do it internaly by adding the values to the end of the your own copy of the function, or to do both, by accepting user values on startup,
 			  and checking them afterwards.
-  			  If you use stdlib module without including it directly, just make vi.ahk script and put variable definitions there.
+  			  If you use stdlib module without including it directly, just make v.ahk script and put variable definitions there.
 
 			  Don't use storage variables that consist only of _ character as those are used to regulate inner working of function.
 
@@ -166,20 +165,6 @@ S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",B
 */
 v(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
 	static
-
-	if (var = "" ){
-		if ( _ := InStr(value, ")") )
-			__ := SubStr(value, 1, _-1), value := SubStr(value, _+1)
-		loop, parse, value, %A_Space%
-			_ := %__%%A_LoopField%,  o%A_Index% := _ != "" ? _ : %A_LoopField%
-		return
-	} else _ := %var%
-	ifNotEqual, value,~`a , SetEnv, %var%, %value%
-	return _
-}
-
-vi(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
-	static
 	ifEqual,___, ,gosub %A_ThisFunc%
 
 	if (var = "" ){
@@ -191,15 +176,15 @@ vi(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByR
 	} else _ := %var%
 	ifNotEqual, value,~`a , SetEnv, %var%, %value%
 	return _
-vi:
-	;Initialize externally from multiple places
-	   #include *i %A_ScriptDir%\vi.ahk
-	   #include *i %A_ScriptDir%\inc\vi.ahk
+v:
+	;Initialize externally, try several places
+	   #include *i %A_ScriptDir%\v.ahk
+	   #include *i %A_ScriptDir%\inc\v.ahk
 	;   ...
 	;
 	;AND/OR initialize internally:
 	;		var1 .= var1 != "" ? "" : 1			;if user set it externally, dont change it
-	;		var2 .= value						;initialize always
+	;		var2 := value						;initialize always
 	___ := 1
 return
 }
@@ -210,14 +195,14 @@ return
 	(start code)
 			_()					;load stdlib
 
-			m(vi("x", 10))	    ;set x to 10, return previous value (empty string if there is no vi.ahk)
-			m(vi("x", 5))		;set x to 5, returns 10
-			m(vi("x"))			;returns 5
+			m( v("x", 10) )	    ;set x to 10, return previous value (empty string if there is no v.ahk in script's dir)
+			m( v("x", 5) )		;set x to 5, returns 10
+			m( v("x") )			;returns 5
 	(end code)
 	Next, if you create script vi.ahk in your script dir or in its \inc folder, the output will change as x will already have value 
-	first time vi is called. For instance, the vi.ahk script can contain only
+	first time vi is called. For instance, the v.ahk script can contain only
   > x : = 5
-    in which case first call to vi("x") will return 5 instead of empty string.
+    in which case first call to v("x") will return 5 instead of empty string.
 */
 
 /* Group: About
