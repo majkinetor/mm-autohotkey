@@ -23,7 +23,7 @@
 >			result := Handler(hWnd, Event, EArg, Col, Row)
 
 			hWnd	- Handle of the speradsheet control that sends notification
-			Event	- Event that ocured. Can be S (select), EB (before edit), EA (after edit), UB (before update), UA (after update), C (click)
+			Event	- Event that ocured. Can be *S* (select), *EB* (before edit), *EA* (after edit), *UB* (before update), *UA* (after update), *C* (click) and *D* (draw)
 			EArg    - Event argument. Depends on event. See below.
 			Col		- Column of the associated cell.
 			Row		- Row of the associated cell.
@@ -38,9 +38,16 @@
 			EA	- User input. Return 1 to discard user input.
 			C	- B (Button) or H (Hyperlink). Return value isn't used.
 			EB,UB,UB - Empty (argument isn't used). Return value isn't used.
+			D	- Pointer to DRAWITEMSTRUCT. See http://msdn.microsoft.com/en-us/library/bb775802(VS.85).aspx
 
 	Returns:
 			Control's handle
+
+	Remarks:
+			Although overdrawn items are supported, keep in mind that creating at least one of such items will instantiate message handler for WM_DRAWITEM message,
+			which will get called by the control very frequently. Depending on number of such cell's and individual cell attributes, handler might be called even 1000 times per sec,
+			especially when user is resizing columns and rows. If you need to use overdrawn types, try to keep the amount of work in Handler at minimum.
+
   */
 SS_Add(hGui,X=0,Y=0,W=200,H=100, Style="VSCROLL HSCROLL", Handler="", DllPath="SprSht.dll"){
 	static SS_MODULEID
@@ -1293,22 +1300,14 @@ SS_onDrawItem(wParam, lParam, msg, hwnd) {
 		ifNotEqual, oldDrawItem,,return DllCall(oldDrawItem, "uint", wparam, "uint", lparam, "uint", msg, "uint", hwnd)		
 		return
 	}
-	hw := NumGet(lparam+20),																;struct tagDRAWITEMSTRUCT  
-	handler := SS(hw "Handler")																;00    UINT CtlType;       
-	ifEqual, handler,, return																;04    UINT CtlID;         
-																							;08    UINT itemID;        
-   ;wparam=moduleid   lParam=DRAWITEMSTRUCT													;12    UINT itemAction;    
-	lpspri := NumGet(lparam+44)																;16    UINT itemState;     
-	 , col := NumGet(lpspri+4), row := NumGet(lpspri+8)											;20    HWND hwndItem;      
-	 ,type := NumGet(lpspri+27,0, "UChar"),	data := NumGet(lpspri+36)						;24    HDC hDC;            
-	%handler%(hw, "D", lparam, col, row)				;28    RECT rcItem;        
-																							;44	   ULONG_PTR itemData; 
-														                                    
-;	hdc := NumGet(lparam+24)								                                    		
-;	left	:= NumGet(lparam+28)							                                    
-;	top		:= NumGet(lparam+32)							                                    
-;	right	:= NumGet(lparam+36)							                                    
-;	bottom	:= NumGet(lparam+40)	
+	hw := NumGet(lparam+20),   handler := SS(hw "Handler")																
+	ifEqual, handler,, return																
+																							
+   ;wparam=moduleid   lParam=DRAWITEMSTRUCT													
+	lpspri := NumGet(lparam+44)																
+	 ,col := NumGet(lpspri+4), row := NumGet(lpspri+8)										
+	 ,type := NumGet(lpspri+27,0, "UChar"),	data := NumGet(lpspri+36)						
+	 ,%handler%(hw, "D", lparam, col, row)																																					                                  	
 }
 
 ; return textual or numeric definition of type, depending on input
