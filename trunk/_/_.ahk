@@ -159,9 +159,9 @@ S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",B
 			  The function is designed to use as stdlib or copy and enhance. To use multiple storages, copy function and change its name.
 			  			  
 			  You can choose to initialize storage from additional ahk script containing only list of assigments to storage variables,
-			  to do it internaly by adding the values to the end of the your own copy of the function, or to do both, by accepting user values on startup,
-			  and checking them afterwards.
-  			  If you use stdlib module without including it directly, just make v.ahk script and put variable definitions there.
+			  to do it internaly by adding the values to your copy of the function, or to do both - accept user values on startup
+			  and check them up afterwards.
+  			  Just make v.ahk script and put storage variable definitions there.
 
 			  Don't use storage variables that consist only of _ character as those are used to regulate inner working of function.
 
@@ -229,8 +229,8 @@ t(ByRef v="~`a "){
 			m( v("x", 5) )		;set x to 5, returns 10
 			m( v("x") )			;returns 5
 	(end code)
-	Next, if you create script vi.ahk in your script dir or in its \inc folder, the output will change as x will already have value 
-	first time vi is called. For instance, the v.ahk script can contain only
+	Next, if you create script v.ahk in your script dir or in its \inc folder, the output will change as x will already have value 
+	first time v() is called. For instance, the v.ahk script can contain only
   > x : = 5
     in which case first call to v("x") will return 5 instead of empty string.
 
