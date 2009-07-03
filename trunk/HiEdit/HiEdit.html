@@ -1,0 +1,644 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+
+<html><head><title>HiEdit</title><style>/*
+   IMPORTANT: If you're editing this file in the output directory of one of
+   your projects, your changes will be overwritten the next time you run
+   Natural Docs.  Instead, copy this file to your project directory, make your
+   changes, and you can use it with -s.  Even better would be to make a CSS
+   file in your project directory with only your changes, which you can then
+   use with -s [original style] [your changes].
+
+   On the other hand, if you're editing this file in the Natural Docs styles
+   directory, the changes will automatically be applied to all your projects
+   that use this style the next time Natural Docs is run on them.
+
+   This file is part of Natural Docs, which is Copyright (C) 2003-2005 Greg Valure
+   Natural Docs is licensed under the GPL
+*/
+
+body {
+    font-family: Verdana, Arial, sans-serif;
+    color: #000000;
+    margin: 0px; padding: 0px }
+
+body.UnframedPage {
+    background-color: #E8E8E8 }
+
+
+a:link,
+a:visited { color: #900000; text-decoration: none }
+a:hover { color: #900000; text-decoration: underline }
+a:active { color: #FF0000; text-decoration: underline }
+
+td {
+    vertical-align: top }
+
+/*
+    Comment out this line to use web-style paragraphs (blank line between
+    paragraphs, no indent) instead of print-style paragraphs (no blank line,
+    indented.)
+*/
+p {
+    text-indent: 5ex; margin: 0 }
+
+
+/*  Can't use something like display: none or it won't break.  */
+.HB {
+    font-size: 1px;
+    visibility: hidden;
+    }
+
+/*  Blockquotes are used as containers for things that may need to scroll.  */
+blockquote {
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+    }
+/*  This will be fixed in JavaScript.  We just need a default if it's turned off.  */
+.IE blockquote {
+    width: 400px;  }
+
+.Gecko blockquote {
+    padding-bottom: .5em;
+    }
+
+/*  Turn off scrolling when printing.  */
+@media print {
+    blockquote {
+        overflow: visible;
+        }
+    .IE blockquote {
+        width: auto;
+        }
+    }
+
+
+
+body.FramedMenuPage,
+.MenuSection {
+    font-size: 9pt;
+    background-color: #E8E8E8;
+    padding: 10px 0 0 0 }
+
+.MenuSection {
+    width: 27ex }
+
+
+    .MTitle {
+        font-size: 16pt; font-weight: bold; font-variant: small-caps;
+        text-align: center;
+        padding: 5px 10px 15px 10px;
+        border-bottom: 1px dotted #000000;
+        margin-bottom: 15px }
+
+    .MSubTitle {
+        font-size: 9pt; font-weight: normal; font-variant: normal;
+        margin-top: 1ex; margin-bottom: 5px }
+
+
+    .MEntry a:link,
+    .MEntry a:hover,
+    .MEntry a:visited { color: #606060; margin-right: 0 }
+    .MEntry a:active { color: #A00000; margin-right: 0 }
+
+
+    .MGroup {
+        font-variant: small-caps; font-weight: bold;
+        margin: 1em 0 1em 10px }
+
+    /*  Konqueror just can't do margins.  */
+    .KHTML .MGroup {
+        margin-bottom: 0; padding-bottom: 1em }
+
+    .MGroupContent {
+        font-variant: normal; font-weight: normal }
+
+    .MGroup a:link,
+    .MGroup a:hover,
+    .MGroup a:visited { color: #545454; margin-right: 10px }
+    .MGroup a:active { color: #A00000; margin-right: 10px }
+
+
+    .MFile,
+    .MText,
+    .MLink,
+    .MIndex {
+        padding: 1px 17px 2px 10px;
+        margin: .25em 0 .25em 0 }
+
+    .MText {
+        font-size: 8pt; font-style: italic }
+
+    .MLink {
+        font-style: italic }
+
+    #MSelected {
+        color: #000000; background-color: #FFFFFF;
+        /*  Replace padding with border.  */
+        padding: 0 10px 0 10px;
+        border-width: 1px 2px 2px 0; border-style: solid; border-color: #000000;
+        margin-right: 5px }
+
+    /*  Close off the left side when its in a group.  */
+    .MGroup #MSelected {
+        padding-left: 9px; border-left-width: 1px }
+
+    /*  A treat for Mozilla users.  Blatantly non-standard.  Will be replaced with CSS 3 attributes when finalized/supported.  */
+    .Gecko #MSelected {
+        -moz-border-radius-topright: 10px;
+        -moz-border-radius-bottomright: 10px }
+    .Gecko .MGroup #MSelected {
+        -moz-border-radius-topleft: 10px;
+        -moz-border-radius-bottomleft: 10px }
+
+
+
+
+body.FramedContentPage,
+.ContentSection {
+    background-color: #FFFFFF;
+    padding-bottom: 15px }
+
+.ContentSection {
+    border-width: 0 0 1px 1px; border-style: solid; border-color: #000000 }
+
+
+    .CTopic {
+        font-size: 10pt;
+        /*  This should be a margin but Konq 3.1.1 sucks.  */
+        padding-bottom: 3em }
+
+
+    .CTitle {
+        font-size: 12pt; font-weight: bold;
+        border-width: 0 0 1px 0; border-style: solid; border-color: #A0A0A0;
+        margin: 0 15px .5em 15px }
+
+    .CGroup .CTitle {
+        font-size: 16pt; font-variant: small-caps;
+        padding-left: 15px; padding-right: 15px;
+        border-width: 0 0 2px 0; border-color: #000000;
+        margin-left: 0; margin-right: 0 }
+
+    .CClass .CTitle,
+    .CInterface .CTitle,
+    .CDatabase .CTitle,
+    .CDatabaseTable .CTitle,
+    .CSection .CTitle {
+        font-size: 18pt;
+        color: #FFFFFF; background-color: #A0A0A0;
+        padding: 10px 15px 10px 15px;
+        border-width: 2px 0; border-color: #000000;
+        margin-left: 0; margin-right: 0 }
+
+    #MainTopic .CTitle {
+        font-size: 20pt;
+        color: #FFFFFF; background-color: #7070C0;
+        padding: 10px 15px 10px 15px;
+        border-width: 0 0 3px 0; border-color: #000000;
+        margin-left: 0; margin-right: 0 }
+
+    .CBody {
+        margin-left: 15px; margin-right: 15px }
+
+
+    .CToolTip {
+        position: absolute; visibility: hidden;
+        left: 0; top: 0; max-width: 50%;
+        background-color: #FFFFE0;
+        padding: 5px;
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #000000;
+        font-size: 8pt }
+
+    /*  Opera 6 gives it a huge height otherwise.  */
+    .Opera6 .CTooltip, .Opera5 .CTooltip {
+        max-width: 100% }
+
+    /*  Scrollbars would be useless.  */
+    .CToolTip blockquote {
+        overflow: hidden;
+        }
+
+    .CHeading {
+        font-weight: bold; font-size: 10pt;
+        margin-top: 1.5em; margin-bottom: .5em }
+
+    .CCode {
+        font: 10pt "Courier New", Courier, monospace;
+        }
+
+    .CBulletList {
+        /*  I don't know why CBody's margin doesn't apply, but it's consistent across browsers so whatever.
+             Reapply it here as padding.  */
+        padding-left: 15px; padding-right: 15px;
+        margin: .5em 5ex .5em 5ex;
+        }
+
+    .CDescriptionList {
+        margin: .5em 5ex 0 5ex }
+
+    /* IE 4 and Konqueror always makes it too long.  */
+    .IE4 .CDescriptionList,
+    .KHTML .CDescriptionList {
+        width: 85% }
+
+        .CDLEntry {
+            font: 10pt "Courier New", Courier, monospace; color: #808080;
+            padding-bottom: .25em;
+            white-space: nowrap }
+
+        .CDLDescription {
+            font-size: 10pt;  /*  For browsers that don't inherit correctly, like Opera 5.  */
+            padding-bottom: .5em; padding-left: 5ex }
+
+
+
+
+.Prototype {
+    font: 10pt "Courier New", Courier, monospace;
+    padding: 5px 3ex;
+    border-width: 1px; border-style: solid;
+    margin: 0 5ex 1.5em 5ex;
+    }
+
+    .Prototype td {
+        font-size: 10pt;
+        }
+
+    .PDefaultValue,
+    .PDefaultValuePrefix,
+    .PTypePrefix {
+        color: #8F8F8F;
+        }
+    .PTypePrefix {
+        text-align: right;
+        }
+    .PAfterParameters {
+        vertical-align: bottom;
+        }
+
+    .IE .Prototype table {
+        padding: 0;
+        }
+
+    .CFunction .Prototype {
+        background-color: #F4F4F4; border-color: #D0D0D0 }
+    .CProperty .Prototype {
+        background-color: #F4F4FF; border-color: #C0C0E8 }
+    .CVariable .Prototype {
+        background-color: #FFFFF0; border-color: #E0E0A0 }
+
+    .CDatabaseIndex .Prototype,
+    .CConstant .Prototype {
+        background-color: #D0D0D0; border-color: #000000 }
+    .CType .Prototype {
+        background-color: #FFF8F8; border-color: #E8C8C8 }
+    .CDatabaseTrigger .Prototype,
+    .CEvent .Prototype,
+    .CDelegate .Prototype {
+        background-color: #F0FCF0; border-color: #B8E4B8 }
+
+    .CToolTip .Prototype {
+        margin: 0 0 .5em 0;
+        white-space: nowrap;
+        }
+
+
+
+
+
+.Summary {
+    margin: 1.5em 5ex 0 5ex }
+
+    .STitle {
+        font-size: 12pt; font-weight: bold;
+        margin-bottom: .5em }
+
+
+    .SBorder {
+        background-color: #FFFFF0;
+        padding: 15px;
+        border: 1px solid #C0C060 }
+
+    /* Let's observe the evolution of IE's brokeness, shall we?
+        IE 4 always makes them too long, there's no way around it.  */
+    .IE4 .SBorder {
+        width: 85% }
+    /* IE 5 will make them too long unless you set the width to 100%.  Isn't this implied for a div?  */
+    .IE5 .SBorder {
+        width: 100% }
+    /* IE 6 behaves like 5 when it's in a frame, but without frames it will be correct without a width or slightly too long
+        (but not enough to scroll) with a width.  This arbitrary weirdness simply astounds me.  */
+    body.FramedContentPage .IE6 .SBorder {
+        width: 100% }
+
+    /*  A treat for Mozilla users.  Blatantly non-standard.  Will be replaced with CSS 3 attributes when finalized/supported.  */
+    .Gecko .SBorder {
+        -moz-border-radius: 20px }
+
+
+    .STable {
+        font-size: 9pt; width: 100% }
+
+    .SEntrySize {
+        width: 30% }
+    .SDescriptionSize {
+        width: 70% }
+
+
+    .SMarked {
+        background-color: #F8F8D8 }
+
+
+    .SEntry .SIndent1 {
+        margin-left: 1.5ex }
+    .SEntry .SIndent2 {
+        margin-left: 3ex }
+    .SEntry .SIndent3 {
+        margin-left: 4.5ex }
+    .SEntry .SIndent4 {
+        margin-left: 6ex }
+    .SEntry .SIndent5 {
+        margin-left: 7.5ex }
+
+    .SDescription {
+        padding-left: 3ex }
+
+    .SDescription a { color: #800000}
+    .SDescription a:active { color: #A00000 }
+
+
+    .SGroup {
+        margin-top: .5em; margin-bottom: .25em }
+
+    .SGroup .SEntry {
+        font-weight: bold; font-variant: small-caps }
+
+    .SGroup .SEntry a { color: #800000 }
+    .SGroup .SEntry a:active { color: #F00000 }
+
+
+    .SMain .SEntry,
+    .SClass .SEntry,
+    .SDatabase .SEntry,
+    .SDatabaseTable .SEntry,
+    .SSection .SEntry {
+        font-weight: bold; font-size: 10pt;
+        margin-bottom: .25em }
+
+    .SClass,
+    .SDatabase,
+    .SDatabaseTable,
+    .SSection {
+        margin-top: 1em }
+
+    .SMain .SEntry a,
+    .SClass .SEntry a,
+    .SDatabase .SEntry a,
+    .SDatabaseTable .SEntry a,
+    .SSection .SEntry a { color: #000000 }
+
+    .SMain .SEntry a:active,
+    .SClass .SEntry a:active,
+    .SDatabase .SEntry a:active,
+    .SDatabaseTable .SEntry a:active,
+    .SSection .SEntry a:active { color: #A00000 }
+
+
+
+
+
+.ClassHierarchy {
+    margin: 0 15px 1em 15px }
+
+    .CHEntry {
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #A0A0A0;
+        margin-bottom: 3px;
+        padding: 2px 2ex;
+        font-size: 10pt;
+        background-color: #F4F4F4; color: #606060;
+        }
+
+    .Gecko .CHEntry {
+        -moz-border-radius: 4px;
+        }
+
+    .CHCurrent .CHEntry {
+        font-weight: bold;
+        border-color: #000000;
+        color: #000000;
+        }
+
+    .CHChildNote .CHEntry {
+        font-style: italic;
+        font-size: 8pt;
+        }
+
+    .CHIndent {
+        margin-left: 3ex;
+        }
+
+    .CHEntry a:link,
+    .CHEntry a:visited,
+    .CHEntry a:hover {
+        color: #606060;
+        }
+    .CHEntry a:active {
+        color: #800000;
+        }
+
+
+
+
+
+body.FramedIndexPage,
+.IndexSection {
+    background-color: #FFFFFF;
+    font-size: 10pt;
+    padding: 15px }
+
+.IndexSection {
+    border-width: 0 0 1px 1px; border-style: solid; border-color: #000000 }
+
+    .IPageTitle {
+        font-size: 20pt; font-weight: bold;
+        color: #FFFFFF; background-color: #7070C0;
+        padding: 10px 15px 10px 15px;
+        border-width: 0 0 3px 0; border-color: #000000; border-style: solid;
+        margin: -15px -15px 0 -15px }
+
+    .INavigationBar {
+        text-align: center;
+        background-color: #FFFFF0;
+        padding: 5px;
+        border-bottom: solid 1px black;
+        margin: 0 -15px 15px -15px }
+
+    .INavigationBar a {
+        font-weight: bold }
+
+    .IHeading {
+        font-size: 16pt; font-weight: bold;
+        padding: 2.5em 0 .5em 0;
+        text-align: center;
+        width: 3.5ex;
+        }
+    #IFirstHeading {
+        padding-top: 0;
+        }
+
+    .IEntry {
+        padding-left: 1ex;  }
+
+    .ISubIndex {
+        padding-left: 3ex; padding-bottom: .5em }
+
+    /*  While it may cause some entries to look like links when they aren't, I found it's much easier to read the
+         index if everything's the same color.  */
+    .ISymbol {
+        font-weight: bold; color: #900000  }
+
+    .ISymbolPrefix {
+        text-align: right;
+        color: #C47C7C;
+        background-color: #F8F8F8;
+        border-right: 3px solid #E0E0E0;
+        border-left: 1px solid #E0E0E0;
+        padding: 0 1px 0 2px;
+        }
+    #IFirstSymbolPrefix {
+        border-top: 1px solid #E0E0E0;
+        }
+    #ILastSymbolPrefix {
+        border-bottom: 1px solid #E0E0E0;
+        }
+    #IOnlySymbolPrefix {
+        border-top: 1px solid #E0E0E0;
+        border-bottom: 1px solid #E0E0E0;
+        }
+
+    a.IParent,
+    a.IFile {
+        display: block;
+        }
+
+
+
+
+.Footer {
+    font-size: 8pt; color: #909090 }
+
+body.UnframedPage .Footer {
+    text-align: right;
+    margin: 2px }
+
+body.FramedMenuPage .Footer {
+    text-align: center;
+    margin: 5em 10px 0 10px}
+
+    .Footer a:link,
+    .Footer a:hover,
+    .Footer a:visited { color: #909090 }
+    .Footer a:active { color: #A00000 }
+</style><script language=JavaScript src="../javascript/main.js"></script></head><body class=UnframedPage onLoad="NDOnLoad()"><script language=JavaScript><!--
+if (browserType) {document.write("<div class=" + browserType + ">");if (browserVer) {document.write("<div class=" + browserVer + ">"); }}// --></script>
+
+<!--  Generated by Natural Docs, version 1.35 -->
+<!--  http://www.naturaldocs.org  -->
+
+<!-- saved from url=(0026)http://www.naturaldocs.org -->
+
+<table border=0 cellspacing=0 cellpadding=0 width=100%><tr>
+
+<td class=ContentSection valign=top><div class=CSection id=MainTopic><div class=CTopic><h1 class=CTitle><a name="HiEdit"></a>HiEdit</h1><div class=CBody><p class=CParagraph>HiEdit is a multitabbed, ultra fast, large file edit control consuming very little memory.&nbsp; It can display non-printable characters in a readable format and can be used for any general purpose editing of text and birary files.</p><!--START_ND_SUMMARY--><div class=Summary><div class=STitle>Summary</div><div class=SBorder><table border=0 cellspacing=0 cellpadding=0 class=STable><tr><td class=SEntrySize><div class=SMain><div class=SEntry><a href="#HiEdit" >HiEdit</a></div></div></td><td class=SDescriptionSize><div class=SMain><div class=SDescription>HiEdit is a multitabbed, ultra fast, large file edit control consuming very little memory. </div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#Add" id=link1 onMouseOver="ShowTip(event, 'tt1', 'link1')" onMouseOut="HideTip('tt1')">Add</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Add control to the GUI.</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#AutoIndent" id=link2 onMouseOver="ShowTip(event, 'tt2', 'link2')" onMouseOut="HideTip('tt2')">AutoIndent</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Sets the autoindent state</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#CloseFile" id=link3 onMouseOver="ShowTip(event, 'tt3', 'link3')" onMouseOut="HideTip('tt3')">CloseFile</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Close file or all files</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#ConvertCase" id=link4 onMouseOver="ShowTip(event, 'tt4', 'link4')" onMouseOut="HideTip('tt4')">ConvertCase</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Convert case of selected text</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#FindText" id=link5 onMouseOver="ShowTip(event, 'tt5', 'link5')" onMouseOut="HideTip('tt5')">FindText</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Find desired text in the control</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#GetColors" id=link6 onMouseOver="ShowTip(event, 'tt6', 'link6')" onMouseOut="HideTip('tt6')">GetColors</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Get the control colors</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#GetCurrentFile" id=link7 onMouseOver="ShowTip(event, 'tt7', 'link7')" onMouseOut="HideTip('tt7')">GetCurrentFile</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Get the index of the current file</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#GetFileCount" id=link8 onMouseOver="ShowTip(event, 'tt8', 'link8')" onMouseOut="HideTip('tt8')">GetFileCount</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Returns count of open files.</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#GetFileName" id=link9 onMouseOver="ShowTip(event, 'tt9', 'link9')" onMouseOut="HideTip('tt9')">GetFileName</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Get the file path.</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#GetFirstVisibleLine" id=link10 onMouseOver="ShowTip(event, 'tt10', 'link10')" onMouseOut="HideTip('tt10')">GetFirstVisibleLine</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Returns the zero-based index of the uppermost visible line.</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#GetLine" id=link11 onMouseOver="ShowTip(event, 'tt11', 'link11')" onMouseOut="HideTip('tt11')">GetLine</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Get the text of the desired line from the control</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#GetLineCount" id=link12 onMouseOver="ShowTip(event, 'tt12', 'link12')" onMouseOut="HideTip('tt12')">GetLineCount</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Returns an integer specifying the number of lines in the HiEdit control. </div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#GetRedoData" id=link13 onMouseOver="ShowTip(event, 'tt13', 'link13')" onMouseOut="HideTip('tt13')">GetRedoData</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Returns redo type and/or data for desired redo level. </div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#GetSel" id=link14 onMouseOver="ShowTip(event, 'tt14', 'link14')" onMouseOut="HideTip('tt14')">GetSel</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Get letfmost and/or rightmost character positions of the selection</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#GetSelText" id=link15 onMouseOver="ShowTip(event, 'tt15', 'link15')" onMouseOut="HideTip('tt15')">GetSelText</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Returns selected text</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#GetTextLenght" id=link16 onMouseOver="ShowTip(event, 'tt16', 'link16')" onMouseOut="HideTip('tt16')">GetTextLenght</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Returns the length of text, in characters.</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#GetTextRange" id=link17 onMouseOver="ShowTip(event, 'tt17', 'link17')" onMouseOut="HideTip('tt17')">GetTextRange</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Get range of characters from the control</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#GetUndoData" id=link18 onMouseOver="ShowTip(event, 'tt18', 'link18')" onMouseOut="HideTip('tt18')">GetUndoData</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Returns undo type and/or data for desired undo level.</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#LineFromChar" id=link19 onMouseOver="ShowTip(event, 'tt19', 'link19')" onMouseOut="HideTip('tt19')">LineFromChar</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Returns line number of the line containing specific character index.</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#LineIndex" id=link20 onMouseOver="ShowTip(event, 'tt20', 'link20')" onMouseOut="HideTip('tt20')">LineIndex</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Returns the character index of the line.</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#LineLength" id=link21 onMouseOver="ShowTip(event, 'tt21', 'link21')" onMouseOut="HideTip('tt21')">LineLength</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Returns the lenght of the line.</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#LineNumbersBar" id=link22 onMouseOver="ShowTip(event, 'tt22', 'link22')" onMouseOut="HideTip('tt22')">LineNumbersBar</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Sets the line numbers bar state and looks.</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#NewFile" id=link23 onMouseOver="ShowTip(event, 'tt23', 'link23')" onMouseOut="HideTip('tt23')">NewFile</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Opens new tab.</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#OpenFile" id=link24 onMouseOver="ShowTip(event, 'tt24', 'link24')" onMouseOut="HideTip('tt24')">OpenFile</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Open file in new tab</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#Redo" id=link25 onMouseOver="ShowTip(event, 'tt25', 'link25')" onMouseOut="HideTip('tt25')">Redo</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Do redo operation</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#ReloadFile" id=link26 onMouseOver="ShowTip(event, 'tt26', 'link26')" onMouseOut="HideTip('tt26')">ReloadFile</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Reload file</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#ReplaceSel" id=link27 onMouseOver="ShowTip(event, 'tt27', 'link27')" onMouseOut="HideTip('tt27')">ReplaceSel</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Replace selection with desired text</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#SaveFile" id=link28 onMouseOver="ShowTip(event, 'tt28', 'link28')" onMouseOut="HideTip('tt28')">SaveFile</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Save file to disk</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#ScrollCaret" id=link29 onMouseOver="ShowTip(event, 'tt29', 'link29')" onMouseOut="HideTip('tt29')">ScrollCaret</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Scroll content of control until caret is visible.</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#SetColors" id=link30 onMouseOver="ShowTip(event, 'tt30', 'link30')" onMouseOut="HideTip('tt30')">SetColors</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Set the control colors</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#SetCurrentFile" id=link31 onMouseOver="ShowTip(event, 'tt31', 'link31')" onMouseOut="HideTip('tt31')">SetCurrentFile</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Set the the current file</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#SetEvents" id=link32 onMouseOver="ShowTip(event, 'tt32', 'link32')" onMouseOut="HideTip('tt32')">SetEvents</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Set notification events</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#SetFont" id=link33 onMouseOver="ShowTip(event, 'tt33', 'link33')" onMouseOut="HideTip('tt33')">SetFont</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Sets the control font</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#SetKeywordFile" id=link34 onMouseOver="ShowTip(event, 'tt34', 'link34')" onMouseOut="HideTip('tt34')">SetKeywordFile</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Set syntax highlighting.</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#SetSel" id=link35 onMouseOver="ShowTip(event, 'tt35', 'link35')" onMouseOut="HideTip('tt35')">SetSel</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Set the selection</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#SetTabWidth" id=link36 onMouseOver="ShowTip(event, 'tt36', 'link36')" onMouseOut="HideTip('tt36')">SetTabWidth</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Sets the tab width</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#SetTabsImageList" id=link37 onMouseOver="ShowTip(event, 'tt37', 'link37')" onMouseOut="HideTip('tt37')">SetTabsImageList</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Sets the image list of the tab navigation toolbar</div></div></div></td></tr><tr><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#ShowFileList" id=link38 onMouseOver="ShowTip(event, 'tt38', 'link38')" onMouseOut="HideTip('tt38')">ShowFileList</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Show popup menu containg list of open files.</div></div></div></td></tr><tr class=SMarked><td><div class=SFunction><div class=SEntry><div class=SIndent1><a href="#Undo" id=link39 onMouseOver="ShowTip(event, 'tt39', 'link39')" onMouseOut="HideTip('tt39')">Undo</a></div></div></div></td><td><div class=SFunction><div class=SDescription><div class=SIndent1>Do undo operation</div></div></div></td></tr><tr><td><div class=SGroup><div class=SEntry><div class=SIndent1><a href="#Example" >Example</a></div></div></div></td><td><div class=SGroup><div class=SDescription><div class=SIndent1></div></div></div></td></tr><tr><td><div class=SGroup><div class=SEntry><div class=SIndent1><a href="#About" >About</a></div></div></div></td><td><div class=SGroup><div class=SDescription><div class=SIndent1></div></div></div></td></tr></table></div></div><!--END_ND_SUMMARY--></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="Add"></a>Add</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_Add(</td><td class=PParameter nowrap>hwnd,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>x,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>y,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>w,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>h,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>style</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;HSCROLL VSCROLL&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>dllPath</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;HiEdit.dll&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Add control to the GUI.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>x,y,w,h</td><td class=CDLDescription>Position of the control</td></tr><tr><td class=CDLEntry>style</td><td class=CDLDescription>Space separated list of control styles, by default both scroll bars are visible.&nbsp; You can use numbers or style strings.</td></tr><tr><td class=CDLEntry>dllPath</td><td class=CDLDescription>Path of the control dll, by default control is searched in the current folder.</td></tr></table><h4 class=CHeading>Styles</h4><p class=CParagraph>HSCROLL, VSCROLL, TABBED, HILIGHT, TABBEDBTOP, TABBEDHRZSB, TABBEDBOTTOM</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="AutoIndent"></a>AutoIndent</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_AutoIndent(</td><td class=PParameter nowrap>hEdit,</td></tr><tr><td></td><td class=PParameter nowrap>pState</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Sets the autoindent state</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pState</td><td class=CDLDescription>TRUE or FALSE</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="CloseFile"></a>CloseFile</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_CloseFile(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Close file or all files</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>idx</td><td class=CDLDescription>Index of the file to close.&nbsp; -2 to close ALL opened files, -1 to close current file (default)</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="ConvertCase"></a>ConvertCase</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_ConvertCase(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>case</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;toggle&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Convert case of selected text</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>case</td><td class=CDLDescription>can be &ldquo;upper&rdquo;, &ldquo;lower&rdquo;, &ldquo;toggle&rdquo; (default), &ldquo;capitalize&rdquo;.</td></tr></table><h4 class=CHeading>Returns</h4><p class=CParagraph>Returns TRUE if successful, FALSE otherwise</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="FindText"></a>FindText</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_FindText(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>sText,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>cpMin</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0,</td></tr><tr><td></td><td class=PParameter nowrap>cpMax</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1,</td></tr><tr><td></td><td class=PParameter nowrap>flags</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Find desired text in the control</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>sText</td><td class=CDLDescription>Text to be searched for.</td></tr><tr><td class=CDLEntry>cpMin</td><td class=CDLDescription>Start searching at this character position.&nbsp; By default 0.</td></tr><tr><td class=CDLEntry>cpMax</td><td class=CDLDescription>End searching at this character position.&nbsp; By default -1.</td></tr><tr><td class=CDLEntry>flags</td><td class=CDLDescription>Space separated combination of search flags: &ldquo;WHOLEWORD&rdquo; &ldquo;MATCHCASE&rdquo;</td></tr></table><h4 class=CHeading>Returns</h4><p class=CParagraph>The zero-based character position of the next match, or -1 if there are no more matches.</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="GetColors"></a>GetColors</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetColors(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Get the control colors</p><h4 class=CHeading>Returns</h4><p class=CParagraph>Colors in INI format.&nbsp; See <a href="#SetColors" class=LFunction id=link40 onMouseOver="ShowTip(event, 'tt30', 'link40')" onMouseOut="HideTip('tt30')">SetColors</a> for details.</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="GetCurrentFile"></a>GetCurrentFile</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetCurrentFile(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Get the index of the current file</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="GetFileCount"></a>GetFileCount</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetFileCount(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Returns count of open files.</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="GetFileName"></a>GetFileName</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetFileName(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Get the file path.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>idx</td><td class=CDLDescription>Index of the file.&nbsp; -1 to get file path of the current file (default)</td></tr></table><h4 class=CHeading>Returns</h4><p class=CParagraph>TRUE if successful, FALSE otherwise</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="GetFirstVisibleLine"></a>GetFirstVisibleLine</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetFirstVisibleLine(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Returns the zero-based index of the uppermost visible line.</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="GetLine"></a>GetLine</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetLine(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Get the text of the desired line from the control</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>idx</td><td class=CDLDescription>Zero-based index of the line.&nbsp; -1 means current line.</td></tr></table><h4 class=CHeading>Returns</h4><p class=CParagraph>The return value is the number of characters copied.&nbsp; The return value is empty string if the line number specified by the line parameter is greater than the number of lines in the HiEdit control</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="GetLineCount"></a>GetLineCount</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetLineCount(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Returns an integer specifying the number of lines in the HiEdit control.&nbsp; If no text is in the HiEdit control, the return value is 1.</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="GetRedoData"></a>GetRedoData</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetRedoData(</td><td class=PParameter nowrap>hEdit,</td></tr><tr><td></td><td class=PParameter nowrap>level</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Returns redo type and/or data for desired redo level.&nbsp; The same rules as in <a href="#GetUndoData" class=LFunction id=link41 onMouseOver="ShowTip(event, 'tt18', 'link41')" onMouseOut="HideTip('tt18')">GetUndoData</a></p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="GetSel"></a>GetSel</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetSel(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>start_pos</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;@&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>end_pos</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;@&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Get letfmost and/or rightmost character positions of the selection</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>start_pos</td><td class=CDLDescription>Optional starting position of the selection.</td></tr><tr><td class=CDLEntry>end_pos</td><td class=CDLDescription>Optional ending position of the selection.</td></tr></table><h4 class=CHeading>Returns</h4><p class=CParagraph>Starting position.</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="GetSelText"></a>GetSelText</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetSelText(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Returns selected text</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="GetTextLenght"></a>GetTextLenght</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetTextLenght(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Returns the length of text, in characters.</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="GetTextRange"></a>GetTextRange</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetTextRange(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>min</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0,</td></tr><tr><td></td><td class=PParameter nowrap>max</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Get range of characters from the control</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>min</td><td class=CDLDescription>Index of leftmost characther of the range.&nbsp; By default 0.</td></tr><tr><td class=CDLEntry>max</td><td class=CDLDescription>Index of rightmost characther of the range.&nbsp; -1 means last character in the control.</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="GetUndoData"></a>GetUndoData</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetUndoData(</td><td class=PParameter nowrap>hEdit,</td></tr><tr><td></td><td class=PParameter nowrap>level</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Returns undo type and/or data for desired undo level.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>level</td><td class=CDLDescription>Undo level</td></tr></table><h4 class=CHeading>Types</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>UNKNOWN</td><td class=CDLDescription>The type of undo action is unknown.</td></tr><tr><td class=CDLEntry>TYPING</td><td class=CDLDescription>Typing operation.</td></tr><tr><td class=CDLEntry>DELETE</td><td class=CDLDescription>Delete operation.</td></tr><tr><td class=CDLEntry>DRAGDROP</td><td class=CDLDescription>Drag-and-drop operation.</td></tr><tr><td class=CDLEntry>CUT</td><td class=CDLDescription>Cut operation.</td></tr><tr><td class=CDLEntry>PASTE</td><td class=CDLDescription>Paste operation.</td></tr><tr><td class=CDLEntry>SETTEXT</td><td class=CDLDescription>WM_SETTEXT message was used to set the control text</td></tr><tr><td class=CDLEntry>REPLACESEL</td><td class=CDLDescription>EM_REPLACESEL message was used to insert text</td></tr><tr><td class=CDLEntry>CLEAR</td><td class=CDLDescription>Delete selected text</td></tr><tr><td class=CDLEntry>BACKSPACE</td><td class=CDLDescription>Back Space Operation</td></tr><tr><td class=CDLEntry>INDENT</td><td class=CDLDescription>Increase Indent</td></tr><tr><td class=CDLEntry>OUTDENT</td><td class=CDLDescription>Decrease Indent</td></tr><tr><td class=CDLEntry>CODEPAGE</td><td class=CDLDescription>Convert codepage</td></tr><tr><td class=CDLEntry>CASE</td><td class=CDLDescription>Convert case</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="LineFromChar"></a>LineFromChar</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_LineFromChar(</td><td class=PParameter nowrap>hEdit,</td></tr><tr><td></td><td class=PParameter nowrap>ich</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Returns line number of the line containing specific character index.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>ich</td><td class=CDLDescription>The character index of the character contained in the line whose number is to be retrieved.&nbsp; If the ich parameter is -1, either the line number of the current line (the line containing the caret) is retrieved or, if there is a selection, the line number of the line containing the beginning of the selection is retrieved.</td></tr></table><h4 class=CHeading>Returns</h4><p class=CParagraph>The zero-based line number of the line containing the character index specified by ich.</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="LineIndex"></a>LineIndex</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_LineIndex(</td><td class=PParameter nowrap>hedit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Returns the character index of the line.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>idx</td><td class=CDLDescription>Line number for which to retreive character index.&nbsp; -1 (default) means current line.</td></tr></table><h4 class=CHeading>Returns</h4><p class=CParagraph>The character index of the line specified in the idx parameter, or -1 if the specified line number is greater than the number of lines.</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="LineLength"></a>LineLength</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_LineLength(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Returns the lenght of the line.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>idx</td><td class=CDLDescription>Line number for which to retreive line length.&nbsp; -1 (default) means current line.</td></tr></table><h4 class=CHeading>Returns</h4><p class=CParagraph>the length, in characters, of the line</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="LineNumbersBar"></a>LineNumbersBar</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_LineNumbersBar(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>state</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;show&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>linw</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>40,</td></tr><tr><td></td><td class=PParameter nowrap>selw</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>10</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Sets the line numbers bar state and looks.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>state</td><td class=CDLDescription>Can be &ldquo;show&rdquo;, &ldquo;hide&rdquo;, &ldquo;automaxsize&rdquo;, &ldquo;autosize&rdquo;</td></tr><tr><td class=CDLEntry>linw</td><td class=CDLDescription>Line numbers width (by default 40)</td></tr><tr><td class=CDLEntry>selw</td><td class=CDLDescription>Selection bar width (by default 10)</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="NewFile"></a>NewFile</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_NewFile(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Opens new tab.</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="OpenFile"></a>OpenFile</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_OpenFile(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td></tr><tr><td></td><td class=PParameter nowrap>pFileName,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td></tr><tr><td></td><td class=PParameter nowrap>flag</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Open file in new tab</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pFileName</td><td class=CDLDescription>Path of the file to be opened</td></tr><tr><td class=CDLEntry>flag</td><td class=CDLDescription>Set to TRUE to create new file if pFileName doesn&rsquo;t exist.&nbsp; If set to FALSE, function fails if the file doesn&rsquo;t exist (default).&nbsp; Returns: TRUE if successful/FALSE otherwise</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="Redo"></a>Redo</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_Redo(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Do redo operation</p><h4 class=CHeading>Returns</h4><p class=CParagraph>TRUE if the Redo operation succeeds, FALSE otherwise</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="ReloadFile"></a>ReloadFile</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_ReloadFile(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Reload file</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>idx</td><td class=CDLDescription>Index of the file to reload.&nbsp; -1 to reload current file (default)</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="ReplaceSel"></a>ReplaceSel</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_ReplaceSel(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>text</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Replace selection with desired text</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>text</td><td class=CDLDescription>Text to replace selection with.</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="SaveFile"></a>SaveFile</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SaveFile(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pFileName,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Save file to disk</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pFileName</td><td class=CDLDescription>File name.</td></tr><tr><td class=CDLEntry>idx</td><td class=CDLDescription>Index of the file to save.&nbsp; -1 to save current file (default)</td></tr></table><h4 class=CHeading>Returns</h4><p class=CParagraph>TRUE if successful, FALSE otherwise</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="ScrollCaret"></a>ScrollCaret</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_ScrollCaret(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Scroll content of control until caret is visible.</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="SetColors"></a>SetColors</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetColors(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>colors,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>fRedraw</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>true</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Set the control colors</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>colors</td><td class=CDLDescription>Any subset of available color options in INI format (array of NAME=COLOR lines).&nbsp; Skiped colors will be set to 0.</td></tr><tr><td class=CDLEntry>fRdraw</td><td class=CDLDescription>Set to TRUE to redraw control</td></tr></table><h4 class=CHeading>Colors</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Text</td><td class=CDLDescription>Normal Text Color</td></tr><tr><td class=CDLEntry>Back</td><td class=CDLDescription>Editor Back Color</td></tr><tr><td class=CDLEntry>SelText</td><td class=CDLDescription>Selected Text Color</td></tr><tr><td class=CDLEntry>ActSelBack</td><td class=CDLDescription>Active Selection Back Color</td></tr><tr><td class=CDLEntry>InSelBack</td><td class=CDLDescription>Inactive Selection Back Color</td></tr><tr><td class=CDLEntry>LineNumber</td><td class=CDLDescription>Line Numbers Color</td></tr><tr><td class=CDLEntry>SelBarBack</td><td class=CDLDescription>Selection Bar Back Color</td></tr><tr><td class=CDLEntry>NonPrintableBack</td><td class=CDLDescription>0 - 31 special non printable chars</td></tr><tr><td class=CDLEntry>Number</td><td class=CDLDescription>Number Color</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="SetCurrentFile"></a>SetCurrentFile</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetCurrentFile(</td><td class=PParameter nowrap>hEdit,</td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Set the the current file</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>idx</td><td class=CDLDescription>New file index to set as current.</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="SetEvents"></a>SetEvents</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetEvents(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>func,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>e</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;selchange&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Set notification events</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>func</td><td class=CDLDescription>Subroutine that will be called on events.</td></tr><tr><td class=CDLEntry>e</td><td class=CDLDescription>White space separated list of events to monitor (by default &ldquo;selchange&rdquo;).</td></tr></table><h4 class=CHeading>Globals</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>HE_EVENT</td><td class=CDLDescription>Specifies event that occurred.&nbsp; Event must be registered to be able to monitor them.&nbsp; Events &ldquo;tabmclick&rdquo; and &ldquo;filechange&rdquo; are registered automatically.</td></tr><tr><td class=CDLEntry>HE_INFO</td><td class=CDLDescription>String specifying event info.</td></tr></table><h4 class=CHeading>Events &amp; Infos</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>SelChange</td><td class=CDLDescription>S&lt;start_char_idx&gt; E&lt;end_char_idx&gt; L&lt;line_num&gt; [t|*] (t if tab changed, * if text changed)</td></tr><tr><td class=CDLEntry>Key</td><td class=CDLDescription>key pressed</td></tr><tr><td class=CDLEntry>Mouse</td><td class=CDLDescription>x&lt;mouse_x&gt; y&lt;mouse_y&gt; v&lt;virtual_key_code&gt;</td></tr><tr><td class=CDLEntry>Scroll</td><td class=CDLDescription>&rdquo;&rdquo;</td></tr><tr><td class=CDLEntry>ContextMenu</td><td class=CDLDescription>&rdquo;&rdquo;</td></tr><tr><td class=CDLEntry>FileChange</td><td class=CDLDescription>&lt;file_index&gt;  (file is changed outside of the application)</td></tr><tr><td class=CDLEntry>Tabmclick</td><td class=CDLDescription>&rdquo;&rdquo;            (middle button click over tab)</td></tr></table><h4 class=CHeading>Returns</h4><p class=CParagraph>&rdquo;OK&rdquo; if succesiful, error string otherwise</p></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="SetFont"></a>SetFont</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetFont(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pFont</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Sets the control font</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pFont</td><td class=CDLDescription>AHK font definition: &ldquo;Style, FontName&rdquo;</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="SetKeywordFile"></a>SetKeywordFile</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetKeywordFile(</td><td class=PParameter nowrap>pFile</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Set syntax highlighting.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pFile</td><td class=CDLDescription>Path to .hes file</td></tr></table><h4 class=CHeading>Keyword File</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>[ext1,ext2,...,extN]</td><td class=CDLDescription>Each keyword definiton block starts with list of extensions in angular brackets.</td></tr><tr><td class=CDLEntry>0xSSRRGGBB=word1 word2 ... wordN</td><td class=CDLDescription>Color keywords on this line with RRGGBB color.&nbsp; SS is 00 by default.</td></tr><tr><td class=CDLEntry>delimiters</td><td class=CDLDescription>High byte in the color (0x01xxxxxx) refers to delimiters.&nbsp; Delimiters are added from ALL sections for a file extension.</td></tr><tr><td class=CDLEntry>string chars</td><td class=CDLDescription>A &amp; at the end of keyword specifies a string char.&nbsp; For ex.&nbsp; &ldquo;&amp; means that everything enclosed in two &ldquo; is a string</td></tr><tr><td class=CDLEntry>comments keyword</td><td class=CDLDescription>A + at the end of keyword specifies a comment char/keyword.&nbsp; For ex.&nbsp; //+ means that everything that follows is a comment.&nbsp; Multiline comments are not supported yet.&nbsp; A &ldquo;-&rdquo; at the end of keyword specifies that ALL text up to the end of line will be painted using the color specified UNLESS a comment indicator is found.</td></tr><tr><td class=CDLEntry>;</td><td class=CDLDescription>Line comment</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="SetSel"></a>SetSel</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetSel(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>nStart</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0,</td></tr><tr><td></td><td class=PParameter nowrap>nEnd</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Set the selection</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>nStart</td><td class=CDLDescription>Starting character position of the selection.&nbsp; Set -1 to remov current selection.</td></tr><tr><td class=CDLEntry>nEnd</td><td class=CDLDescription>Ending character position of the selection.&nbsp; Set -1 to use position of the last character in the control.</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="SetTabWidth"></a>SetTabWidth</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetTabWidth(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pWidth,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pRedraw</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>true</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Sets the tab width</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pWidth</td><td class=CDLDescription>Tab width in characters</td></tr><tr><td class=CDLEntry>pRedraw</td><td class=CDLDescription>Set to true to redraw control (default)</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="SetTabsImageList"></a>SetTabsImageList</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetTabsImageList(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pImg</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Sets the image list of the tab navigation toolbar</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pImg</td><td class=CDLDescription>.BMP file with image list.&nbsp; Omit this parameter to use default image list.</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="ShowFileList"></a>ShowFileList</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_ShowFileList(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>x</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0,</td></tr><tr><td></td><td class=PParameter nowrap>y</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Show popup menu containg list of open files.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>x, y</td><td class=CDLDescription>Position of popup window</td></tr></table></div></div></div>
+
+<div class=CFunction><div class=CTopic><h3 class=CTitle><a name="Undo"></a>Undo</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_Undo(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p class=CParagraph>Do undo operation</p><h4 class=CHeading>Returns</h4><p class=CParagraph>TRUE if the Undo operation succeeds, FALSE otherwise</p></div></div></div>
+
+<div class=CGroup><div class=CTopic><h3 class=CTitle><a name="Example"></a>Example</h3><div class=CBody><blockquote><pre class=CCode>Gui, +LastFound<br>hwnd := WinExist()<br><br>hEdit := HE_Add(hwnd,0,0,600,500)<br>Gui, SHow, w600 h500<br><br>#include HiEdit.ahk</pre></blockquote></div></div></div>
+
+<div class=CGroup><div class=CTopic><h3 class=CTitle><a name="About"></a>About</h3><div class=CBody><ul class=CBulletList><li>HiEdit control is copyright of Antonis Kyprianou (aka akyprian).&nbsp; See <a href="http://www.winasm.net" class=LURL>http://www.winasm.net</a></li><li>AHK wrapper ver 3.0.0.1-2 is copyright of Miodrag Milic (aka majkinetor).&nbsp; See <a href="http://www.autohotkey.com/forum/topic17230.html" class=LURL>http://www.autohotkey.com/forum/topic17230.html</a></li><li>Licenced under GNU GPL <a href="http://creativecommons.org/licenses/GPL/2.0/" class=LURL>http://creativecommons.org/licenses/GPL/2.0/</a>.</li></ul></div></div></div>
+
+</td>
+
+</tr></table><div class=Footer><!--START_ND_FOOTER-->Generated by <a href="http://www.naturaldocs.org">Natural Docs</a><!--END_ND_FOOTER--></div>
+<!--START_ND_TOOLTIPS-->
+<div class=CToolTip id="tt1"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_Add(</td><td class=PParameter nowrap>hwnd,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>x,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>y,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>w,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>h,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>style</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;HSCROLL VSCROLL&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>dllPath</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;HiEdit.dll&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Add control to the GUI.</div></div><div class=CToolTip id="tt2"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_AutoIndent(</td><td class=PParameter nowrap>hEdit,</td></tr><tr><td></td><td class=PParameter nowrap>pState</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Sets the autoindent state</div></div><div class=CToolTip id="tt3"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_CloseFile(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Close file or all files</div></div><div class=CToolTip id="tt4"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_ConvertCase(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>case</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;toggle&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Convert case of selected text</div></div><div class=CToolTip id="tt5"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_FindText(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>sText,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>cpMin</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0,</td></tr><tr><td></td><td class=PParameter nowrap>cpMax</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1,</td></tr><tr><td></td><td class=PParameter nowrap>flags</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Find desired text in the control</div></div><div class=CToolTip id="tt6"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetColors(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get the control colors</div></div><div class=CToolTip id="tt7"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetCurrentFile(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get the index of the current file</div></div><div class=CToolTip id="tt8"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetFileCount(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Returns count of open files.</div></div><div class=CToolTip id="tt9"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetFileName(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get the file path.</div></div><div class=CToolTip id="tt10"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetFirstVisibleLine(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Returns the zero-based index of the uppermost visible line.</div></div><div class=CToolTip id="tt11"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetLine(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get the text of the desired line from the control</div></div><div class=CToolTip id="tt12"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetLineCount(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Returns an integer specifying the number of lines in the HiEdit control. </div></div><div class=CToolTip id="tt13"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetRedoData(</td><td class=PParameter nowrap>hEdit,</td></tr><tr><td></td><td class=PParameter nowrap>level</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Returns redo type and/or data for desired redo level. </div></div><div class=CToolTip id="tt14"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetSel(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>start_pos</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;@&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>end_pos</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;@&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get letfmost and/or rightmost character positions of the selection</div></div><div class=CToolTip id="tt15"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetSelText(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Returns selected text</div></div><div class=CToolTip id="tt16"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetTextLenght(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Returns the length of text, in characters.</div></div><div class=CToolTip id="tt17"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetTextRange(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>min</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0,</td></tr><tr><td></td><td class=PParameter nowrap>max</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get range of characters from the control</div></div><div class=CToolTip id="tt18"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_GetUndoData(</td><td class=PParameter nowrap>hEdit,</td></tr><tr><td></td><td class=PParameter nowrap>level</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Returns undo type and/or data for desired undo level.</div></div><div class=CToolTip id="tt19"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_LineFromChar(</td><td class=PParameter nowrap>hEdit,</td></tr><tr><td></td><td class=PParameter nowrap>ich</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Returns line number of the line containing specific character index.</div></div><div class=CToolTip id="tt20"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_LineIndex(</td><td class=PParameter nowrap>hedit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Returns the character index of the line.</div></div><div class=CToolTip id="tt21"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_LineLength(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Returns the lenght of the line.</div></div><div class=CToolTip id="tt22"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_LineNumbersBar(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>state</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;show&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>linw</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>40,</td></tr><tr><td></td><td class=PParameter nowrap>selw</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>10</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Sets the line numbers bar state and looks.</div></div><div class=CToolTip id="tt23"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_NewFile(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Opens new tab.</div></div><div class=CToolTip id="tt24"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_OpenFile(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td></tr><tr><td></td><td class=PParameter nowrap>pFileName,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td></tr><tr><td></td><td class=PParameter nowrap>flag</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Open file in new tab</div></div><div class=CToolTip id="tt25"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_Redo(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Do redo operation</div></div><div class=CToolTip id="tt26"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_ReloadFile(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Reload file</div></div><div class=CToolTip id="tt27"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_ReplaceSel(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>text</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Replace selection with desired text</div></div><div class=CToolTip id="tt28"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SaveFile(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pFileName,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Save file to disk</div></div><div class=CToolTip id="tt29"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_ScrollCaret(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Scroll content of control until caret is visible.</div></div><div class=CToolTip id="tt30"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetColors(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>colors,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>fRedraw</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>true</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set the control colors</div></div><div class=CToolTip id="tt31"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetCurrentFile(</td><td class=PParameter nowrap>hEdit,</td></tr><tr><td></td><td class=PParameter nowrap>idx</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set the the current file</div></div><div class=CToolTip id="tt32"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetEvents(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>func,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>e</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;selchange&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set notification events</div></div><div class=CToolTip id="tt33"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetFont(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pFont</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Sets the control font</div></div><div class=CToolTip id="tt34"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetKeywordFile(</td><td class=PParameter nowrap>pFile</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set syntax highlighting.</div></div><div class=CToolTip id="tt35"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetSel(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>nStart</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0,</td></tr><tr><td></td><td class=PParameter nowrap>nEnd</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set the selection</div></div><div class=CToolTip id="tt36"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetTabWidth(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pWidth,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pRedraw</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>true</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Sets the tab width</div></div><div class=CToolTip id="tt37"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_SetTabsImageList(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pImg</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Sets the image list of the tab navigation toolbar</div></div><div class=CToolTip id="tt38"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_ShowFileList(</td><td class=PParameter nowrap>hEdit,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>x</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0,</td></tr><tr><td></td><td class=PParameter nowrap>y</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Show popup menu containg list of open files.</div></div><div class=CToolTip id="tt39"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>HE_Undo(</td><td class=PParameter nowrap>hEdit</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Do undo operation</div></div><!--END_ND_TOOLTIPS-->
+
+<script language=JavaScript><!--
+if (browserType) {if (browserVer) {document.write("</div>"); }document.write("</div>");}// --></script></body></html>
