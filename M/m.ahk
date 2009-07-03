@@ -1,12 +1,12 @@
 /* Title:	M
-			Set of useful stdlib functions. m
+			Useful stdlib functions. m
  */
 
 /*	
 	Function: m
 			  MsgBox function
 	
-	Paramters:
+	Parameters:
 			  o1..o8	- Arguments to display. Use this function without any arguments to load library.
 
 	Returns: 
@@ -30,27 +30,27 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 	
 	Define:
 			  S - Dummy, not used but must be set.
-			  pQ - Struct definition. First word is struct name followed by : and a space, then comes the space separted list of field definitions.
-				   Field definiton consist of field name, = sign, and decimal represinting offset and type description. For instance, "left=4.1" means that field name 
-				   is "left", field offset is 4 bytes and field type is 1 (UChar). You can omit field decimal in which case "Uint" is used for type
-				   and offset is calculated from previous one (or it defaults to 0 if it is first field in the list).
-				   Presed type number with 0 to make it without "U" or with 00 to make it Float/Double. For instance, .01 is "Char" and .004 is Float. 
-				   Struct name can also be followed by = and size, or just = in which case function will try to automatically calculate the struct size based on input fields.
-				   Later, you can pass ! in Put mode to make the function initialize the structure for you.
-	Syntax:
- >			pQ :: StructName[=[Size]]: field1 field2 ... fieldN	
- >			fieldN :: name[=[offset[=.type]]]
- >			type :: offset.[0][0]size
- >			size  :: [0]1 | [0]2 | [0]4 | [0]8 | 004 | 008
+			  pQ - Struct definition. First word is struct name followed by : and a space, followed by space separated list of field definitions.
+				   Field definition consists of field *name*, optionally followed by = sign and decimal number representation of *offset* and *type*. 
+				   For instance, "left=4.1" means that field name is "left", field offset is 4 bytes and field type is 1 (UChar). 
+				   You can omit field decimal in which case "Uint" is used as default type and offset is calculated from previous one (or it defaults to 0 if it is first field in the list).
+				   Precede type number with 0 to make it *signed type* or with 00 to make it *Float* or *Double*. For instance, .01 is "Char" and .004 is Float. 
+				   Struct name can also be followed by = and *size*, or just = in which case function will try to automatically calculate the struct size based on input fields.
 
-	Get and Put:
+	Define Syntax:
+ >			pQ		 :: StructName[=[Size]]: FieldDef1 FieldDef2 ... FieldDefN	
+ >			FieldDef :: FieldName[=[Def]
+ >			Def		 :: offset.[0][0]Type
+ >			Type	 :: [0]1 | [0]2 | [0]4 | [0]8 | 004 | 008
+
+	Put & Get:
 			  S		 - Reference to struct data.
 			  pQ	 - Query parameter. First word is struct name followed by : and a space, then comes the space separated list of field names.
 					   If the first char after struct name is "<" function will work in Put mode, if char is ">" it works in "Get" mode.
 					   If char is "!" function works in IPut mode (Initialize & Put), but only if struct is defined so that its size is known.
 			  o1..o8 - Reference to output variables (Get) or input variables (Put)
 
-	Syntax:
+	Put & Get Syntax:
  >			pQ :: StructName[>|<|!]: FieldName1 FieldName2 ... FieldNameN
 
 	Returns:
@@ -62,20 +62,20 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 	Examples:
 	(start code)
 	Define Examples
-			S(s, "RECT=16: left=0.4 top=0.4 right=0.4 bottom=0.4")			;Define RECT explicitelly.
-			S(s, "RECT=: left top right bottom")	;Define RECT struct with auto struct size and auto offset increment. Returns 16. The same as above
+			S(s, "RECT=16: left=0.4 top=0.4 right=0.4 bottom=0.4")			;Define RECT explicitly.
+			S(s, "RECT=: left top right bottom")	;Define RECT struct with auto struct size and auto offset increment. Returns 16. The same as above.
 			S(s, "RECT: right=8 bottom")			;Define only 2 fields of RECT struct. Returns nothing. RECT must be initialized before accessing it.
-			S(s, "R: x=.1 y=.02 k z=28.004")		;Define R size don't care. R.x is UChar at 0, r.y is Short at 1, R.k is Uint at 3 and  R.z is Float at 28.
+			S(s, "R: x=.1 y=.02 k z=28.004")		;Define R, size don't care. R.x is UChar at 0, R.y is Short at 1, R.k is Uint at 3 and  R.z is Float at 28.
 			S(s, "R=: x=.1 y=.02 k z=28.004")		;The same but calculate struct size. Returns 32.
 
 	Get & Put Examples
-			S(b, "RECT< left right", x, y)			;b.left := x, b.right := y
-			S(b, "RECT> left, right")				;x := b.left, y := b.right
+			S(b, "RECT< left right", x, y)			;b.left := x, b.right := y (b must be initialized)
+			S(b, "RECT> left right", x, y)			;x := b.left, y := b.right
 			S(b, "RECT> right")						;Returns b.right
-			S(b, "RECT! left right")				;VarSetCapacity(b, SizeOf(RECT)), b.left = x, b.right=y
+			S(b, "RECT! left right", x, y)			;VarSetCapacity(b, SizeOf(RECT)), b.left = x, b.right=y
 	(end code)
  */
-S(ByRef S, pQ="",ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",ByRef  o6="",ByRef o7="",ByRef  o8=""){
+S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",ByRef  o6="",ByRef o7="",ByRef  o8=""){
 	static
 	static 1="UChar", 2="UShort", 4="Uint", 004="Float", 8="Uint64", 008="Double", 01="Char", 02="Short", 04="Int", 08="Int64"
 	local last_offset:=-4, last_type := 4, i, j, R
@@ -127,25 +127,25 @@ S(ByRef S, pQ="",ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="
 				Storage function
 			  	
 	Parameters:
-			  var		- Variable name to retreive. To get up to 5 variables at once, omit this parameter.
-			  value		- Optional variable value to set. If var is empty value contains list of vars to retreive with optional prefix
-			  o1 .. o5	- If present, reference to variables to receive values.
+			  var		- Variable name to retrieve. To get up several variables at once (up to 6), omit this parameter.
+			  value		- Optional variable value to set. If var is empty value contains list of vars to retrieve with optional prefix
+			  o1 .. o6	- If present, reference to variables to receive values.
 	
 	Returns:
-			  o	if _value_ is omited, function returns the current value of _var_
+			  o	if _value_ is omitted, function returns the current value of _var_
 			  o	if _value_ is set, function sets the _var_ to _value_ and returns previous value of the _var_
-			  o if _var_ is empty, function accepts list of variables in _value_ and returns values of those varaiables in o1 .. o5
+			  o if _var_ is empty, function accepts list of variables in _value_ and returns values of those variables in o1 .. o5
 
 	Examples:
 	(start code)			
- 			v(x)	 - return value of x
- 			v(x, v)  - set value of x to v and return previous value
- 			v("", "x y z", x, y, z)  - get values of x, y and z into x, y and z
- 			v("", "preffix_)x y z", x, y, z) - get values of preffix_x, preffix_y and preffix_z into x, y and z
+ 			v(x)		; returns value of x
+ 			v(x, v)		; set value of x to v and return previous value
+ 			v("", "x y z", x, y, z)				; get values of x, y and z into x, y and z
+ 			v("", "prefix_)x y z", x, y, z)	; get values of prefix_x, prefix_y and prefix_z into x, y and z
 	(end code)
 			
 */
-v(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
+v(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
 	static
 	if (var = "" ){
 		if ( _ := InStr(value, ")") )
@@ -154,6 +154,12 @@ v(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef
 			_ := %__%%A_LoopField%,  o%A_Index% := _ != "" ? _ : %A_LoopField%
 		return
 	} else _ := %var%
-	ifNotEqual, value, ~`a, SetEnv, %var%, %value%
+	ifNotEqual, value,~`a , SetEnv, %var%, %value%
 	return _
 }
+
+
+/* Group: About
+	o 0.1 by majkinetor
+	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
+ */
