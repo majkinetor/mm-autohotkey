@@ -68,8 +68,8 @@ CoordMode, tooltip, screen
 	SS_ExpandCell(hCtrl, 1, 14, 4, 20)
 	SS_ReCalc(hCtrl)
 
-	SS_SetCell(hCtrl, 5, 3, "type=OWNERDRAWINTEGER", "txt=101", "state=LOCKED", "h=45"), hIcon := LoadIcon()
-
+;	SS_SetCell(hCtrl, 5, 3, "type=OWNERDRAWINTEGER", "txt=101", "state=LOCKED", "h=45"), hIcon := LoadIcon()
+	SS_SetCell(hCtrl, 5, 3, "type=OWNERDRAWBLOB", "txt=test asdf 123123123123 aaaab", "h=45", "state=LOCKED"), hIcon := LoadIcon()
 	tooltip, % &buf
 
 
@@ -85,10 +85,10 @@ Handler(hwnd, Event, EArg, Col, Row) {
 	if Event=D
 	{
 		S(k:=eArg, "DRAWITEMSTRUCT) hDc left top", hdc, left, top)
-		int := SS_GetCellText(hwnd, col, row)
+		d := SS_GetCellText(hwnd, col, row)
 	    DllCall("DrawIcon","uint", hDC,"uint", left ,"uint", top,"uint", hIcon)
-		DllCall("TextOut", "uint", hDC, "uint", left+12, "uint", top+8, "str", "Icon " int, "uint", StrLen(int)+5)
-		return
+		DllCall("TextOut", "uint", hDC, "uint", left+12, "uint", top+8, "str", "Icon " d, "uint", StrLen(d)+5)		
+		return	
 	}
 
 	text := SS_GetCellText(hwnd, Col, Row)

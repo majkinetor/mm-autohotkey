@@ -282,7 +282,7 @@ SS_GetCell(hCtrl, Col, Row, pQ, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=
 
 		if (field="txt"){
 			if type in %INTEGER%,%OWNERDRAWINTEGER%
-				 v := NumGet(pData+0)
+				 v := NumGet(pData+0)		
 			else if type in %FLOAT%,%FORMULA%
 				 v := SS_getCellFloat(hCtrl, col, row)
 			else if (type=COMBOBOX)
@@ -291,7 +291,7 @@ SS_GetCell(hCtrl, Col, Row, pQ, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=
 		} 
 
 		if (field="data")
-			if type in %CHECKBOX%,%COMBOBOX%
+			if type in %CHECKBOX%,%COMBOBOX%,%OWNERDRAWBLOB%
 				v := NumGet(pData+0)
 
 		if SubStr(field, -1) = "al"
@@ -424,10 +424,10 @@ SS_GetCellText(hCtrl, Col="", Row=""){
 	SendMessage,SPRM_GETCELLDATA,,&ITEM,, ahk_id %hCtrl%
 
 	type := NumGet(ITEM, 27, "UChar") & ~0xF0	;get base type
-	if type in %TEXT%,%TEXTMULTILINE%,%HYPERLINK%,%CHECKBOX%		;GRAPH and FORMULA don't return text, I don't know how to get their text.
-		return SS_strAtAdr( NumGet(ITEM, 36) + (type=CHECKBOX ? 4 : 0))
+	if type in %TEXT%,%TEXTMULTILINE%,%HYPERLINK%,%CHECKBOX%,%OWNERDRAWBLOB%		;GRAPH and FORMULA don't return text, I don't know how to get their text.
+		return SS_strAtAdr( NumGet(ITEM, 36) + (type=CHECKBOX || type=OWNERDRAWBLOB ? 4 : 0))
 
-	if type in %INTEGER%,%COMBOBOX%,%OWNERDRAWINTEGER%,%OWNERDRAWBLOB%
+	if type in %INTEGER%,%COMBOBOX%,%OWNERDRAWINTEGER%
 	{
 		pData := NumGet(ITEM, 36), txt := NumGet( pData+0 )
 		if (type=COMBOBOX)		;combobox, get the item from the listbox
@@ -816,15 +816,20 @@ SS_SetCell(hCtrl, Col="", Row="", o1="", o2="", o3="", o4="", o5="", o6="", o7="
 	if type in %INTEGER%,%OWNERDRAWINTEGER%
 		NumPut(txt,txt)
 
-	if type in %OWNERDRAWINTEGER%
+	if type in %OWNERDRAWINTEGER%,%OWNERDRAWBLOB%
+	{
 		if !initOverDraw
 		{
 			old := OnMessage(WM_DRAWITEM, "SS_onDrawItem")
 			if old != SS_onDrawItem
 				SS("oldDrawItem", RegisterCallback(old))
 		}
+
+		if type=%OWNERDRAWBLOB%
+			data := StrLen(txt)+3			;first word is size of the blob + 1 for \0 of txt.
+	}
 	
-	if type in %COMBOBOX%,%CHECKBOX%
+	if type in %COMBOBOX%,%CHECKBOX%,%OWNERDRAWBLOB%
 	{
 		; in this case both txt and data must be set at the same time, so if user didn't provide one, get it.
 		if (bChange && (txt="~`a " || data=""))
@@ -838,7 +843,7 @@ SS_SetCell(hCtrl, Col="", Row="", o1="", o2="", o3="", o4="", o5="", o6="", o7="
 		}	
 		ifEqual, txt, ~`a , SetEnv, txt
 
-		if (type = COMBOBOX) 
+		if (type = COMBOBOX)
 			NumPut(txt,txt)		;put combobox handle as txt
 		txt := "1234" txt,   NumPut(data, txt)			;make the room for the data and insert index
 	}
