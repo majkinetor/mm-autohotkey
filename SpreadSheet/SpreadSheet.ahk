@@ -281,9 +281,9 @@ SS_GetCell(hCtrl, Col, Row, pQ, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=
 		v := NumGet(pITEM + floor(offset), 0, t = ".1" ? "UChar" : "Uint")  
 
 		if (field="txt"){
-			if (type=INTEGER)	
+			if type in %INTEGER%,%OWNERDRAWINTEGER%
 				 v := NumGet(pData+0)
-			else if (type=FLOAT)
+			else if type in %FLOAT%,%FORMULA%
 				 v := SS_getCellFloat(hCtrl, col, row)
 			else if (type=COMBOBOX)
 				 v := NumGet(pData+4)
@@ -427,7 +427,7 @@ SS_GetCellText(hCtrl, Col="", Row=""){
 	if type in %TEXT%,%TEXTMULTILINE%,%HYPERLINK%,%CHECKBOX%		;GRAPH and FORMULA don't return text, I don't know how to get their text.
 		return SS_strAtAdr( NumGet(ITEM, 36) + (type=CHECKBOX ? 4 : 0))
 
-	if type in %INTEGER%,%COMBOBOX%
+	if type in %INTEGER%,%COMBOBOX%,%OWNERDRAWINTEGER%,%OWNERDRAWBLOB%
 	{
 		pData := NumGet(ITEM, 36), txt := NumGet( pData+0 )
 		if (type=COMBOBOX)		;combobox, get the item from the listbox
@@ -737,10 +737,10 @@ SS_ScrollCell(hCtrl) {
 
 	Types:
 			o TEXT TEXTMULTILINE INTEGER(32b) FLOAT(32b-80b) HYPERLINK CHECKBOX COMBOBOX FORMULA GRAPH
-			o OWNERDRAWBLOB OWNERDRAWINTEGER - Owner drawn blob (first word is lenght of blob) and owner drawn integer
-			o EMPTY	- The cell contains formatting only
-			o COLHDR ROWHDR WINHDR	- Column, row and window (splitt) header
-			o EXPANDED - Part of expanded cell, internally used 
+			o OWNERDRAWINTEGER - Ownerdrawn integer. You can implement D (draw) event.
+			o EMPTY	- The cell contains formatting only.
+			o COLHDR ROWHDR WINHDR	- Column, row and window (splitt) header.
+			o EXPANDED - Part of expanded cell, internally used.
 
 	Type Modifiers:
 	
@@ -766,7 +766,7 @@ SS_ScrollCell(hCtrl) {
 			GLOBAL	- If you omit aligment attribute, this one will be used. 
   */
 SS_SetCell(hCtrl, Col="", Row="", o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o9="", o10="", o11=""){
-	static SPRM_SETCELLDATA=0x483, SPRM_GETCELLDATA=0x482, SPRM_GETCELLTYPE=0x48F, WM_DRAWITEM := 0x02B
+	static SPRM_SETCELLDATA=0x483, SPRM_GETCELLDATA=0x482, SPRM_GETCELLTYPE=0x48F, WM_DRAWITEM := 0x02B, initOverDraw
 	static EMPTY=0, COLHDR=1, ROWHDR=2, WINHDR=3, TEXT=4, TEXTMULTILINE=5, INTEGER=6, FLOAT=7, FORMULA=8, GRAPH=9, HYPERLINK=10, CHECKBOX=11, COMBOBOX=12, OWNERDRAWBLOB=13, OWNERDRAWINTEGER=14, BUTTON=16, WIDEBUTTON=0x20, DATE=0x30, FORCETEXT=0x44, FORCETYPE=0x40, FIXEDSIZE=0x80
 	static SPRIF_TYPE=0x40,SPRIF_DATA=0x200,SPRIF_WIDTH=0x80,SPRIF_BACKCOLOR=1,SPRIF_TEXTCOLOR=2,SPRIF_TEXTALIGN=4,SPRIF_HEIGHT=0x100,SPRIF_STATE=0x20,SPRIF_FONT=0x10,SPRIF_IMAGEALIGN=8,SPRIF_COMPILE=0x80000000, SPRIF_DOUBLE=0x400, SPRIF_SINGLE=0x800
 	static TOP=0, LEFT=0x10, CENTER=0x20, RIGHT=0x30, MIDDLE=0x40, BOTTOM=0x80, GLOBAL=0xF0, ALL=13, SCI=14		;aligments																
@@ -816,14 +816,14 @@ SS_SetCell(hCtrl, Col="", Row="", o1="", o2="", o3="", o4="", o5="", o6="", o7="
 	if type in %INTEGER%,%OWNERDRAWINTEGER%
 		NumPut(txt,txt)
 
-	if type in %OWNERDRAWINTEGER%,%OWNERDRAWBLOB%
-	{
-		old := OnMessage(WM_DRAWITEM, "SS_onDrawItem")
-		if old != SS_onDrawItem
-			SS("oldDrawItem", RegisterCallback(old))
-	}
+	if type in %OWNERDRAWINTEGER%
+		if !initOverDraw
+		{
+			old := OnMessage(WM_DRAWITEM, "SS_onDrawItem")
+			if old != SS_onDrawItem
+				SS("oldDrawItem", RegisterCallback(old))
+		}
 	
-
 	if type in %COMBOBOX%,%CHECKBOX%
 	{
 		; in this case both txt and data must be set at the same time, so if user didn't provide one, get it.
