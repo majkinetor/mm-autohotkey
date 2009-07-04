@@ -48,8 +48,7 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 			  It also allows you to create your own library of structures that can be included at the start of the program.
 	
 	Define:
-			  S - Dummy, not used but must be set.
-			  pQ - Struct definition. First word is struct name followed by : and a space, followed by space separated list of field definitions.
+			  S	- Struct definition. First word is struct name followed by : and a space, followed by space separated list of field definitions.
 				   Field definition consists of field *name*, optionally followed by = sign and decimal number representation of *offset* and *type*. 
 				   For instance, "left=4.1" means that field name is "left", field offset is 4 bytes and field type is 1 (UChar). 
 				   You can omit field decimal in which case "Uint" is used as default type and offset is calculated from previous one (or it defaults to 0 if it is first field in the list).
@@ -63,14 +62,14 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
  >			Type	 :: [0]1 | [0]2 | [0]4 | [0]8 | 004 | 008
 
 	Put & Get:
-			  S		 - Reference to struct data.
+			  S		 - Pointer to struct data.
 			  pQ	 - Query parameter. First word is struct name followed by : and a space, then comes the space separated list of field names.
 					   If the first char after struct name is "<" function will work in Put mode, if char is ">" it works in "Get" mode.
 					   If char is "!" function works in IPut mode (Initialize & Put), but only if struct is defined so that its size is known.
 			  o1..o8 - Reference to output variables (Get) or input variables (Put)
 
 	Put & Get Syntax:
- >			pQ :: StructName[>|<|!]: FieldName1 FieldName2 ... FieldNameN
+ >			pQ :: StructName><][!: FieldName1 FieldName2 ... FieldNameN
 
 	Returns:
 			 o In Define mode, function returns struct size for automatically calculated size, or nothing
@@ -81,26 +80,27 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 	Examples:
 	(start code)
 	Define Examples
-			S(s, "RECT=16: left=0.4 top=0.4 right=0.4 bottom=0.4")			;Define RECT explicitly.
-			S(s, "RECT=: left top right bottom")	;Define RECT struct with auto struct size and auto offset increment. Returns 16. The same as above.
-			S(s, "RECT: right=8 bottom")			;Define only 2 fields of RECT struct. Returns nothing. RECT must be initialized before accessing it.
-			S(s, "R: x=.1 y=.02 k z=28.004")		;Define R, size don't care. R.x is UChar at 0, R.y is Short at 1, R.k is Uint at 3 and  R.z is Float at 28.
-			S(s, "R=: x=.1 y=.02 k z=28.004")		;The same but calculate struct size. Returns 32.
+			S("RECT=16: left=0.4 top=0.4 right=0.4 bottom=0.4")			;Define RECT explicitly.
+			S("RECT: left top right bottom")	;Define RECT struct with auto struct size and auto offset increment. Returns 16. The same as above.
+			S("RECT: right=8 bottom")			;Define only 2 fields of RECT struct. Returns nothing. RECT must be initialized before accessing it.
+			S("R: x=.1 y=.02 k z=28.004")		;Define R, size don't care. R.x is UChar at 0, R.y is Short at 1, R.k is Uint at 3 and  R.z is Float at 28.
+			S("R=32: x=.1 y=.02 k z=28.004")	;The same but override struct size. Returns user size (32 in this case).
 
 	Get & Put Examples
-			S(b, "RECT< left right", x, y)			;b.left := x, b.right := y (b must be initialized)
-			S(b, "RECT> left right", x, y)			;x := b.left, y := b.right
-			S(b, "RECT> right")						;Returns b.right
-			S(b, "RECT! left right", x, y)			;VarSetCapacity(b, SizeOf(RECT)), b.left = x, b.right=y
+			S(b, "RECT< left right", x, y)		;b.left := x, b.right := y (b must be initialized)
+			S(b, "RECT> left right", x, y)		;x := b.left, y := b.right
+			S(b, "RECT! left right", x, y)		;VarSetCapacity(b, SizeOf(RECT)), b.left = x, b.right=y
+			S(b := &buf, "RECT) left right", x, y)	; *b.left = x, *b.right=y
+			S(b := &buf, "RECT( left right", x, y)	; x := *b.left , y := *b.right
 	(end code)
  */
-S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",ByRef  o6="",ByRef o7="",ByRef  o8=""){
+S(ByRef S,pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",ByRef  o6="",ByRef o7="",ByRef  o8=""){
 	static
 	static 1="UChar", 2="UShort", 4="Uint", 004="Float", 8="Uint64", 008="Double", 01="Char", 02="Short", 04="Int", 08="Int64"
 	local last_offset:=-4, last_type := 4, i, j, R
 
-	if (o1="~`a ")
-	{
+	if (o1 = "~`a ")
+	{		
 		j := InStr(pQ, ":"), R := SubStr(pQ, 1, j-1), pQ := SubStr(pQ, j+2)
 		if i := InStr(R, "=")
 			_ := SubStr(R, 1, i-1), _%_% := SubStr(R, i+1, j-i), R:=_		
@@ -121,29 +121,26 @@ S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",B
 
 			%R%_%field% := offset "." type,  last_offset := offset,  last_type := type
 		}
-		return i && _%_%="" ? _%_% := last_offset + last_type : ""
+		return _%R%!="" ? _%R% : _%R% := last_offset + last_type
 	}
-	;"STRi field
 	j := InStr(pQ, A_Space)-1,  i := SubStr(pQ, j, 1), R := SubStr(pQ, 1, j-1), pQ := SubStr(pQ, j+2)
 	IfEqual, R,, return A_ThisFunc "> Struct name can't be empty"
 	if (i = "!") 
-		if j := _%R%
-			 VarSetCapacity(s, j)
-		else return  A_ThisFunc "> In order to use !, define struct with size"	
+		 VarSetCapacity(s, _%R%)
 	loop, parse, pQ, %A_Space%, %A_Space%
 	{	
 		field := A_LoopField, data := %R%_%field%, offset := floor(data), type := SubStr(data, StrLen(offset)+2), type := %type%
 		ifEqual, data, , return A_ThisFunc "> Field or struct isn't recognised :  " R "." field 
-		if (i = ">")
-			  o%A_Index% := NumGet(S, offset, type)
-		else  NumPut(o%A_Index%, S, offset, type)
+		if i in >,)
+			  o%A_Index% := NumGet(i=")" ? S+0 : &S+0, offset,type)
+		else  NumPut(o%A_Index%, i=")" ? S : &S+0, offset,type)
 	}
 	return o1	
 }
 
 /*
 	Function:	v
-				Storage function.
+				Storage functions, designed to use as stdlib or copy and enhance.
 			  	
 	Parameters:
 			  var		- Variable name to retrieve. To get up several variables at once (up to 6), omit this parameter.
@@ -156,12 +153,12 @@ S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",B
 			  o if _var_ is empty, function accepts list of variables in _value_ and returns values of those variables in o1 .. o5
 
     Remarks:
-			  The function is designed to use as stdlib or copy and enhance. To use multiple storages, copy function and change its name.
+			  To use multiple storages, copy *v* function and change its name. 
 			  			  
 			  You can choose to initialize storage from additional ahk script containing only list of assigments to storage variables,
-			  to do it internaly by adding the values to your copy of the function, or to do both - accept user values on startup
-			  and check them up afterwards.
-  			  Just make v.ahk script and put storage variable definitions there.
+			  to do it internaly by adding the values to the end of the your own copy of the function, or to do both, by accepting user values on startup,
+			  and checking them afterwards.
+  			  If you use stdlib module without including it directly, just make v.ahk script and put variable definitions there.
 
 			  Don't use storage variables that consist only of _ character as those are used to regulate inner working of function.
 
@@ -176,7 +173,7 @@ S(ByRef S, pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",B
 */
 v(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
 	static
-	ifEqual,___, ,gosub ___
+	ifEqual,___, ,gosub %A_ThisFunc%
 
 	if (var = "" ){
 		if ( _ := InStr(value, ")") )
@@ -187,7 +184,7 @@ v(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRe
 	} else _ := %var%
 	ifNotEqual, value,~`a , SetEnv, %var%, %value%
 	return _
-___:
+v:
 	;Initialize externally, try several places
 	   #include *i %A_ScriptDir%\v.ahk
 	   #include *i %A_ScriptDir%\inc\v.ahk
@@ -202,10 +199,10 @@ return
 
 /*
 	Function:	t
-				Timer function.
+				Timer
 			  	
 	Parameters:
-				v - Reference to output variable. Omit to reset timer while returning the difference.
+				v - Reference to output variable. Omit to reset timer.
 	
 	Returns:
 				v
@@ -229,25 +226,10 @@ t(ByRef v="~`a "){
 			m( v("x", 5) )		;set x to 5, returns 10
 			m( v("x") )			;returns 5
 	(end code)
-	Next, if you create script v.ahk in your script dir or in its \inc folder, the output will change as x will already have value 
-	first time v() is called. For instance, the v.ahk script can contain only
+	Next, if you create script vi.ahk in your script dir or in its \inc folder, the output will change as x will already have value 
+	first time vi is called. For instance, the v.ahk script can contain only
   > x : = 5
     in which case first call to v("x") will return 5 instead of empty string.
-
-	Timer:
-	(start code)
-	t()
-	loop, 10000
-		fun1()
-	t(p)
-
-	t()
-	loop, 10000
-		fun2()
-	t(q)
-
-	m(p, q)
-	(end code)
 */
 
 
