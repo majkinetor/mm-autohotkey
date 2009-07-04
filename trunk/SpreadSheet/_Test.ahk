@@ -1,7 +1,5 @@
 _()
 S(s, "DRAWITEMSTRUCT: CtlType CtlID itemID itemAction itemState hwndItem hDC left top right bottom itemData")
-
-hIcon := LoadIcon("home.ico", 64)
 version = 2.1
 #singleinstance, force
 #MaxThreads, 255
@@ -21,11 +19,7 @@ CoordMode, tooltip, screen
 	
 
 	hCtrl := SS_Add(hwnd, 0, hdr, w, h-hdr, "WINSIZE VSCROLL HSCROLL CELLEDIT ROWSIZE COLSIZE STATUS MULTISELECT", "Handler")
-	loop, 10
-		SS_SetCell(hCtrl, A_Index, 1, "type=OWNERDRAWINTEGER", "txt=" A_Index)
-	gui, show, w%w% h%h%
-	return
-
+	
 	SS_SetCell(hCtrl, 3, 1, "type=INTEGER DATE", "txt=" i := SS_ConvertDate(hCtrl, "10.11.1976"), "w=100")
 
 	SS_SetCell(hCtrl, 1, 1, "type=FLOAT", "txt=14.123456", "txtal=4 RIGHT", "state=LOCKED")
@@ -74,6 +68,11 @@ CoordMode, tooltip, screen
 	SS_ExpandCell(hCtrl, 1, 14, 4, 20)
 	SS_ReCalc(hCtrl)
 
+	SS_SetCell(hCtrl, 5, 3, "type=OWNERDRAWINTEGER", "txt=101", "state=LOCKED", "h=45"), hIcon := LoadIcon()
+
+	tooltip, % &buf
+
+
 	SS_SetGlobalFields(hCtrl, "cell_txtal", "RIGHT MIDDLE")
 	Gui, Show, w%w% h%h%, SpreadSheet
 	SS_Focus(hCtrl)		;refresh
@@ -86,9 +85,10 @@ Handler(hwnd, Event, EArg, Col, Row) {
 	if Event=D
 	{
 		S(k:=eArg, "DRAWITEMSTRUCT) hDc left top", hdc, left, top)
-		int := SS_GetCellData(hwnd, col, row)
-		DllCall("TextOut", "uint", hDC, "uint", left, "uint", top, "str", int, "uint", StrLen(int))
-		API_DrawIconEx( hDC, left, top+25, hIcon, 128, 128, 0, 0, 3)
+		int := SS_GetCellText(hwnd, col, row)
+	    DllCall("DrawIcon","uint", hDC,"uint", left ,"uint", top,"uint", hIcon)
+		DllCall("TextOut", "uint", hDC, "uint", left+12, "uint", top+8, "str", "Icon " int, "uint", StrLen(int)+5)
+		return
 	}
 
 	text := SS_GetCellText(hwnd, Col, Row)
@@ -312,41 +312,8 @@ return
 #include SpreadSheet.ahk
 
 
-API_DrawIcon( hDC, xLeft, yTop, hIcon)
+LoadIcon()
 {
-    return DllCall("DrawIcon"
-            ,"uint", hDC
-            ,"uint", xLeft
-            ,"uint", yTop
-            ,"uint", hIcon)
+	return DllCall("LoadIcon", "uint", hInstance, "uint", 32512)
+
 }
-
-API_DrawIconEx( hDC, xLeft, yTop, hIcon, cxWidth, cyWidth, istepIfAniCur, hbrFlickerFreeDraw, diFlags)
-{
-    return DllCall("DrawIconEx"
-            ,"uint", hDC
-            ,"uint", xLeft
-            ,"uint", yTop
-            ,"uint", hIcon
-            ,"int",  cxWidth
-            ,"int",  cyWidth
-            ,"uint", istepIfAniCur
-            ,"uint", hbrFlickerFreeDraw
-            ,"uint", diFlags )
-}
-LoadIcon(pPath, pSize=32){
-	j := InStr(pPath, ":", 0, 0), idx := 1
-	if j > 2 
-		 idx := Substr( pPath, j+1), pPath := SubStr( pPath, 1, j-1)
-
-	DllCall("PrivateExtractIcons"
-            ,"str",pPath,"int",idx-1,"int",pSize,"int", pSize
-            ,"uint*",hIcon,"uint*",0,"uint",1,"uint",0,"int")
-
-	return hIcon
-}
-API_DestroyIcon(hIcon) {
-	return,	DllCall("DestroyIcon", "uint", hIcon)
-}
-
-
