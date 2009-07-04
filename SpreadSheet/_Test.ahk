@@ -68,10 +68,8 @@ CoordMode, tooltip, screen
 	SS_ExpandCell(hCtrl, 1, 14, 4, 20)
 	SS_ReCalc(hCtrl)
 
-;	SS_SetCell(hCtrl, 5, 3, "type=OWNERDRAWINTEGER", "txt=101", "state=LOCKED", "h=45"), hIcon := LoadIcon()
-	SS_SetCell(hCtrl, 5, 3, "type=OWNERDRAWBLOB", "txt=test asdf 123123123123 aaaab", "h=45", "state=LOCKED"), hIcon := LoadIcon()
-	tooltip, % &buf
-
+	SS_SetCell(hCtrl, 5, 3, "type=OWNERDRAWINTEGER", "txt=101", "state=LOCKED", "h=45", "w=90"), hIcon := LoadIcon()
+	SS_SetCell(hCtrl, 6, 3, "type=OWNERDRAWBLOB", "txt=test", "state=LOCKED"), hIcon := LoadIcon()
 
 	SS_SetGlobalFields(hCtrl, "cell_txtal", "RIGHT MIDDLE")
 	Gui, Show, w%w% h%h%, SpreadSheet
@@ -84,8 +82,8 @@ Handler(hwnd, Event, EArg, Col, Row) {
 	GLOBAL hicon
 	if Event=D
 	{
-		S(k:=eArg, "DRAWITEMSTRUCT) hDc left top", hdc, left, top)
-		d := SS_GetCellText(hwnd, col, row)
+		S(_:=EArg, "DRAWITEMSTRUCT) hDc left top", hdc, left, top)
+		d := SS_GetCell(hwnd, col, row, "txt")
 	    DllCall("DrawIcon","uint", hDC,"uint", left ,"uint", top,"uint", hIcon)
 		DllCall("TextOut", "uint", hDC, "uint", left+12, "uint", top+8, "str", "Icon " d, "uint", StrLen(d)+5)		
 		return	
