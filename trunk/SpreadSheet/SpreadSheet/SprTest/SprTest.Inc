@@ -40,7 +40,8 @@ CellData1			dd 1
 CellData2			dd 1
 CellData3			dd 2
 blob				dw 4
-					db 'Test'
+				db 'Test'
+
 Float1				tbyte 1.5
 
 szOpen				db 'Open',0
