@@ -21,7 +21,8 @@ CoordMode, tooltip, screen
 	
 
 	hCtrl := SS_Add(hwnd, 0, hdr, w, h-hdr, "WINSIZE VSCROLL HSCROLL CELLEDIT ROWSIZE COLSIZE STATUS MULTISELECT", "Handler")
-	SS_SetCell(hCtrl, 5, 1, "type=OWNERDRAWINTEGER", "txt=1")
+	loop, 10
+		SS_SetCell(hCtrl, A_Index, 1, "type=OWNERDRAWINTEGER", "txt=" A_Index)
 	gui, show, w%w% h%h%
 	return
 
@@ -82,11 +83,9 @@ return
 Handler(hwnd, Event, EArg, Col, Row) {
 	static s
 	GLOBAL hicon
-
-
 	if Event=D
 	{
-		S(k:=eArg, "DRAWITEMSTRUCT] hDc left top", hdc, left, top)
+		S(k:=eArg, "DRAWITEMSTRUCT) hDc left top", hdc, left, top)
 		int := SS_GetCellData(hwnd, col, row)
 		DllCall("TextOut", "uint", hDC, "uint", left, "uint", top, "str", int, "uint", StrLen(int))
 		API_DrawIconEx( hDC, left, top+25, hIcon, 128, 128, 0, 0, 3)
