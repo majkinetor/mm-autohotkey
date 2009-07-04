@@ -287,7 +287,7 @@ SS_GetCell(hCtrl, Col, Row, pQ, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=
 				 v := SS_getCellFloat(hCtrl, col, row)
 			else if (type=COMBOBOX)
 				 v := NumGet(pData+4)
-			else v := SS_strAtAdr(pData + (type=CHECKBOX ? 4 : 0))
+			else v := SS_strAtAdr(pData + (type=CHECKBOX || type=OWNERDRAWBLOB ? 4 : 0))
 		} 
 
 		if (field="data")
