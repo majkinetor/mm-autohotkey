@@ -20,6 +20,63 @@ _(k=-1, h=0) {
 	DetectHiddenWindows, % h ? "on" : "off"
 	SetBatchLines, %k%
 }
+
+/*	
+	Function:	d
+				Delay function.
+
+	Parameters:
+				fun		- Function name
+				delay	- Delay after which to execute function
+				o1, o2	- Function parameters.
+	
+	Remarks:
+				d executes functions after specified period of time (plus run time of function that were executed in the preceding chain).
+				It remembers function parameters per function and delay time.
+
+	Example:
+	>			d("f1", 1000)						;execute f1 after 1s without args
+	>			d("f2", 500,  "2")					; but f2 will first execute with first arg 2
+	>			d("f1", 4000, "data1", "data2")		; then f1 again.
+ */
+
+d(fun, delay=1, o1="", o2="") {	
+	static 
+		
+	dv(fun delay "o1", o1),  dv(fun delay "o2", o2)
+	 ,list := dv("list", dv("list") "," delay "_" fun),
+	 , t := SubStr(list, 2, InStr(list, "_")-2)
+
+	SetTimer, d, -%t%
+	return
+d:	
+	list := dv("list")
+	, j := InStr(list, "_"),  i := InStr(list "," , ",", 0, j)
+	, f := SubStr(list, j+1, i-j-1),  t := SubStr(list, 2,j-2)
+	, list := SubStr(list, i),  j := InStr(list, "_"), nt := SubStr(list, 2,j-2)
+	, nt -= t
+
+	if nt < 0
+		 SetTimer, d, off
+	else SetTimer, d, -%nt%
+	dv("list",list,0), %f%(dv(f t "o1"), dv(f t "o2"))
+return
+}
+
+;d storage with autosorted list
+dv(var="", value="~`a ", bSort=1) { 
+	static
+	_ := %var%
+	if (value != "~`a "){
+		 SetEnv, %var%, %value%
+		 if (var = "list") && bSort
+		 {
+			Sort,list,N D,
+			_ := list
+		 }
+	}
+	return _
+}
 	
 /*	
 	Function: m
@@ -169,13 +226,12 @@ S(ByRef S,pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",By
 
 	Examples:
 	(start code)			
- 			v(x)		; returns value of x
+ 			v(x)		; returns value of x or value of x from v.ahk inside scripts dir.
  			v(x, v)		; set value of x to v and return previous value
  			v("", "x y z", x, y, z)				; get values of x, y and z into x, y and z
  			v("", "prefix_)x y z", x, y, z)	; get values of prefix_x, prefix_y and prefix_z into x, y and z
 	(end code)
-			
-*/
+ */
 v(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
 	static
 	ifEqual,___, ,gosub %A_ThisFunc%
@@ -211,6 +267,19 @@ return
 	
 	Returns:
 				v
+	
+	Example:
+			(start code)
+				t()
+				loop, 10000
+					f1()
+				p := t()
+
+				loop, 10000
+					f2()
+				t(k)
+				m(p, k)
+			(end code)
 			
  */
 t(ByRef v="~`a "){
@@ -218,25 +287,6 @@ t(ByRef v="~`a "){
 	ifEqual, v, ~`a ,SetEnv, t, %A_TickCount%
 	return v := A_TickCount - t
 }
-
-
-
-/* Group: Examples
-	Storage:
-	Storage is simply used this way :
-	(start code)
-			_()					;load stdlib
-
-			m( v("x", 10) )	    ;set x to 10, return previous value (empty string if there is no v.ahk in script's dir)
-			m( v("x", 5) )		;set x to 5, returns 10
-			m( v("x") )			;returns 5
-	(end code)
-	Next, if you create script v.ahk in your script dir or in its \inc folder, the output will change as x will already have value 
-	first time v is called. For instance, the v.ahk script can contain only
-  > x : = 5
-    in which case first call to v("x") will return 5 instead of empty string.
-*/
-
 
 
 
