@@ -63,35 +63,40 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 
 	Put & Get:
 			  S		 - Pointer to struct data.
-			  pQ	 - Query parameter. First word is struct name followed by : and a space, then comes the space separated list of field names.
-					   If the first char after struct name is "<" function will work in Put mode, if char is ">" it works in "Get" mode.
-					   If char is "!" function works in IPut mode (Initialize & Put), but only if struct is defined so that its size is known.
+			  pQ	 - Query parameter. First word is struct name followed by the *mode char* and a space, followed by the space separated list of field names.
+					   If the first char after struct name is "<" or ")" function will work in Put mode, if char is ">" or ")" it works in "Get" mode.
+					   If char is "!" function works in IPut mode (Initialize & Put). For ! to work, you must define entire struct, not just part of it.
+					   The difference bewteen < and ( is that < works on binary data contained in S, while ( works on binary data pointed to by S. 
+					   The same difference applies to > and ) modes.
+
 			  o1..o8 - Reference to output variables (Get) or input variables (Put)
 
 	Put & Get Syntax:
- >			pQ :: StructName><][!: FieldName1 FieldName2 ... FieldNameN
+ >			pQ :: StructName[>)<(!]: FieldName1 FieldName2 ... FieldNameN
 
 	Returns:
-			 o In Define mode, function returns struct size for automatically calculated size, or nothing
-			 o In Get/Put function returns o1.
+			 o In Define mode function returns struct size.
+			 o In Get/Put mode function returns o1.
 
 			 Otherwise the result contains description of the error.
 	
 	Examples:
 	(start code)
-	Define Examples
-			S("RECT=16: left=0.4 top=0.4 right=0.4 bottom=0.4")			;Define RECT explicitly.
-			S("RECT: left top right bottom")	;Define RECT struct with auto struct size and auto offset increment. Returns 16. The same as above.
-			S("RECT: right=8 bottom")			;Define only 2 fields of RECT struct. Returns nothing. RECT must be initialized before accessing it.
-			S("R: x=.1 y=.02 k z=28.004")		;Define R, size don't care. R.x is UChar at 0, R.y is Short at 1, R.k is Uint at 3 and  R.z is Float at 28.
-			S("R=32: x=.1 y=.02 k z=28.004")	;The same but override struct size. Returns user size (32 in this case).
-
-	Get & Put Examples
-			S(b, "RECT< left right", x, y)		;b.left := x, b.right := y (b must be initialized)
-			S(b, "RECT> left right", x, y)		;x := b.left, y := b.right
-			S(b, "RECT! left right", x, y)		;VarSetCapacity(b, SizeOf(RECT)), b.left = x, b.right=y
-			S(b := &buf, "RECT) left right", x, y)	; *b.left = x, *b.right=y
-			S(b := &buf, "RECT( left right", x, y)	; x := *b.left , y := *b.right
+	Define Examples:
+			S("RECT=16: left=0.4 top=0.4 right=0.4 bottom=0.4")		;Define RECT explicitly.
+			S("RECT: left top right bottom")	; Define RECT struct with auto struct size and auto offset increment. Returns 16. The same as above.
+			S("RECT: right=8 bottom")			; Define only 2 fields of RECT struct. Since the fields are last one, ! can be used afterwards. Returns 16.
+			S("RECT: top=4)					    ; Defines only 1 field of the RECT. Returns 8, so ! can't be used.
+			S("RECT=16: top=4)					; Defines only 1 field of the RECT and overrides size. Returns 16, so ! can be used.
+			S("R: x=.1 y=.02 k z=28.004")		; Define R, size don't care. R.x is UChar at 0, R.y is Short at 1, R.k is Uint at 3 and  R.z is Float at 28.
+			S("R=32: x=.1 y=.02 k z=28.004")	; The same but override struct size. Returns user size (32 in this case).
+			
+	Get & Put Examples:
+			S(b, "RECT< left right", x,y)		; b.left := x, b.right := y (b must be initialized)
+			S(b, "RECT> left right", x,y)		; x := b.left, y := b.right
+			S(b, "RECT! left right", x,y)		; VarSetCapacity(b, SizeOf(RECT)), b.left = x, b.right=y
+			S(b:=&buf,"RECT) left right", x,y)	; *b.left = x, *b.right=y
+			S(b:=&buf,"RECT( left right", x,y)	; x := *b.left , y := *b.right
 	(end code)
  */
 S(ByRef S,pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",ByRef  o6="",ByRef o7="",ByRef  o8=""){
@@ -226,8 +231,8 @@ t(ByRef v="~`a "){
 			m( v("x", 5) )		;set x to 5, returns 10
 			m( v("x") )			;returns 5
 	(end code)
-	Next, if you create script vi.ahk in your script dir or in its \inc folder, the output will change as x will already have value 
-	first time vi is called. For instance, the v.ahk script can contain only
+	Next, if you create script v.ahk in your script dir or in its \inc folder, the output will change as x will already have value 
+	first time v is called. For instance, the v.ahk script can contain only
   > x : = 5
     in which case first call to v("x") will return 5 instead of empty string.
 */
