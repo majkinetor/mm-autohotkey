@@ -1,164 +1,3 @@
-DetectHiddenWindows, on
-#SingleInstance, force
-SetBatchLines, -1
-	Gui, +LastFound
-	hGui := WinExist()
-	w := 340,  h := 400
-
-	Gui, Add, Button, gBtn w60, Save
-	Gui, Add, Button, gBtn w60 x+10, Reload
-	Gui, Add, Button, gBtn w60 x+10, Reset
-	Gui, Add, Button, gBtn w60 x+10, Stress
-
-	hCtrl := Property_Add( hGui, 0, 40, w, h-40, "", "Handler")
-	Property_SetColors(hCtrl, "pbAAEEAA sbaaeeaa sffff")
-	Property_SetFont(hCtrl, "Separator", "bold s9, verdana")
-
-	p = 
-		(LTrim
-		Name=My Checkbox
-		Type=CheckBox
-		Value=is that ok ?
-		Param=0
-
-		Name=My Separator
-		Type=Separator
-		Value=25
-		
-		Name=My Button
-		Type=Button
-		Value=click me
-
-		Name=My Text
-		Type=Text
-		Value=default text
-
-		Name=Some longer fat separator
-		Type=Separator
-		Value=55
-	
- 		Name=My HyperLink
-		Type=HyperLink
-		Value=www.autohotkey.com
-
-		Name=My WideButton
-		Type=WideButton
-		Value=click me
-
- 		Name=Digit
-		Type=Integer
-		Value=3
-
-		Name=My Combo
-		Type=ComboBox
-
-		Name=My Combo 2
-		Type=ComboBox
-		Value=item1|item2|item3
-	)
-
-	If !FileExist("properties")
-		 Property_Insert(hCtrl, p)
-	else Property_AddFromFile(hCtrl, "properties")
-
-	Property_SetRowHeight(hCtrl, 25)
-	Gui, Show, w%w% h%h%
-return
-
-Stress(p, k=7){
-	loop, %k%
-		p .= "`n`n" p
-	return p
-}
-
-
-~ESC:: 
-	ControlGetFocus, out, A
-	if !InStr(out, "Edit")
-		Exitapp
-return
-
-F1::
-	msgbox % Property_Count(hctrl)
-return
-F2:: m(Property_Define(hCtrl, true))
-
-
-GuiClose:
-	ExitApp
-return
-
-Btn:
-	if A_GuiControl = Reload
-		Reload
-
-	if A_GuiControl = Reset
-	{
-		FileDelete, Properties
-		Reload
-	}
-
-	if A_GuiControl = Save
-	{
-		Control, Disable, ,Button1,A
-		Property_Save(hCtrl, "Properties", true)
-		Control, Enable, ,Button1,A
-	}
-
-	if A_GuiControl = Stress
-	{		
-		Control, Disable, ,Button3,A
-		StartTime := A_TickCount
-		Property_Insert(hCtrl, Stress(p, 10)), 
-		time := A_TickCount - StartTime
-		SS_Focus(hCtrl)
-		Control, Enable, ,Button1,A
-		Msgbox % "Number of Rows: " Property_Count(hCtrl) "`nTime: " time "ms"
-	}
-return
-
-Handler(hCtrl, event, name, value, param){
-	static mycombo
-
-	tooltip %event% %name% %value% %param%, 0, 0
-	if event in EB,S
-		return
-
-	if (event = "CB") {
-		if param = Insert
-			if mycombo = 
-				 return mycombo := SS_CreateCombo(hCtrl, "dynamic item 1|dynamic item 2|dynamic item 3", 100)
-			else return mycombo
-		if param = Define
-			 return Name="My Combo" ? "" : "*"
-	}
-
-	;do some stupid checks
-	if (name="My Button") 
-		if (Value = "") {
-			MsgBox Stupid check: can't be empty
-			return 1
-		}			
-
-	if (name="My Checkbox") 
-		if (Param = 1) {
-			MsgBox Stupid check: can't be 1, only 0 atm.
-			return 1
-		}			
-
-	if (name="My WideButton") 
-		if (Value = "click me") && event != "C"
-			MsgBox Stupid check: Change the value, please :S
-
-	if (name="Digit") 
-		if Value not between 0 and 9
-		{
-			MsgBox Stupid check:   %value% is not a digit
-			return 1
-		}
-
-}
-
 
 /*
   Title:		Property
@@ -257,7 +96,7 @@ Property_AddFromFile( hCtrl, FileName, ParseIni = false ) {
 				Clear Property control.
  */
 Property_Clear(hCtrl){
-	SS_NewSheet(hCtrl), Property_initSheet(hCtrl), 	SS_Focus(hCtrl)
+	SS_NewSheet(hCtrl), Property_initSheet(hCtrl), 	SS_Redraw(hCtrl)
 }
 
 Property_Count(hCtrl) {
@@ -395,6 +234,8 @@ Property_GetValue( hCtrl, Name ) {
   Remarks:
 				The fastest way to add properties into the list is to craft property definition list and append it into the control with one call to this function.
 				Using this function in a loop in many iterations will lead to seriously degraded performance (especially with Position option) with very large number of properties ( around 1K  )
+
+				Property defintion list can contain comments - lines that start with ";" char.
  */
 Property_Insert(hCtrl, Properties, Position=0){
 
@@ -421,7 +262,7 @@ Property_Insert(hCtrl, Properties, Position=0){
 	loop, %a0%
 	{
 		p := a%A_Index%
-		ifEqual, p,, continue
+		ifEqual, p, ,continue
 
 		if Position != -1
 			 i := Position + k++
@@ -616,9 +457,6 @@ Property_handler(hCtrl, event, earg, col, row){
 	if t in 11,12										;checkbox, combobox
 		param := SS_GetCellData(hCtrl, col, row)		; get their data
 
-	if (t = 15)
-		
-	
 	name  := SS_GetCellText(hCtrl, 1, row)
 	value := event = "EA" ? earg : SS_GetCellText(hCtrl, 2, row)
 
@@ -636,7 +474,7 @@ Property_handler(hCtrl, event, earg, col, row){
 	;tooltip %etype% %event%,300, 300, 4
 	r := %handler%(hCtrl, event, name, value, param)
 	if (r && event="EA" && param != "")	; checkbox & combobox don't have EDIT, but only UPDATE notification and in that case you can't prevent change.
-		SS_SetCellData(hCtrl, last, col, row)
+		SS_SetCellData(hCtrl, last, col, row), SS_Redraw(hCtrl)
 	return r
 }
 
@@ -691,4 +529,12 @@ Property(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 	return _
 }
 
-#include ..\SpreadSheet\SpreadSheet.ahk
+/* Group: About
+	o Module ver 0.9 by majkinetor
+	o SpreadSheet control Version: 0.0.2.1 by KetilO <http://www.masm32.com/board/index.php?topic=6913.0>
+	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
+
+ */
+
+#include SpreadSheet.ahk
+

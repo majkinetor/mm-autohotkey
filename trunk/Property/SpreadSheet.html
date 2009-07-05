@@ -1,0 +1,1079 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+
+<html><head><title>SpreadSheet</title><style>/*
+   IMPORTANT: If you're editing this file in the output directory of one of
+   your projects, your changes will be overwritten the next time you run
+   Natural Docs.  Instead, copy this file to your project directory, make your
+   changes, and you can use it with -s.  Even better would be to make a CSS
+   file in your project directory with only your changes, which you can then
+   use with -s [original style] [your changes].
+
+   On the other hand, if you're editing this file in the Natural Docs styles
+   directory, the changes will automatically be applied to all your projects
+   that use this style the next time Natural Docs is run on them.
+
+   This file is part of Natural Docs, which is Copyright (C) 2003-2008 Greg Valure
+   Natural Docs is licensed under the GPL
+*/
+
+body {
+    font: 10pt Verdana, Arial, sans-serif;
+    color: #000000;
+    margin: 0; padding: 0;
+    }
+
+.ContentPage,
+.IndexPage,
+.FramedMenuPage {
+    background-color: #E8E8E8;
+    }
+.FramedContentPage,
+.FramedIndexPage,
+.FramedSearchResultsPage,
+.PopupSearchResultsPage {
+    background-color: #FFFFFF;
+    }
+
+
+a:link,
+a:visited { color: #900000; text-decoration: none }
+a:hover { color: #900000; text-decoration: underline }
+a:active { color: #FF0000; text-decoration: underline }
+
+td {
+    vertical-align: top }
+
+img { border: 0;  }
+
+
+/*
+    Comment out this line to use web-style paragraphs (blank line between
+    paragraphs, no indent) instead of print-style paragraphs (no blank line,
+    indented.)
+*/
+p {
+    text-indent: 5ex; margin: 0 }
+
+
+/*  Opera doesn't break with just wbr, but will if you add this.  */
+.Opera wbr:after {
+	content: "\00200B";
+	}
+
+
+/*  Blockquotes are used as containers for things that may need to scroll.  */
+blockquote {
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+    }
+
+
+.Firefox1 blockquote {
+    padding-bottom: .5em;
+    }
+
+/*  Turn off scrolling when printing.  */
+@media print {
+    blockquote {
+        overflow: visible;
+        }
+    .IE blockquote {
+        width: auto;
+        }
+    }
+
+
+
+#Menu {
+    font-size: 9pt;
+    padding: 10px 0 0 0;
+    }
+.ContentPage #Menu,
+.IndexPage #Menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 31ex;
+    overflow: hidden;
+    }
+.ContentPage .Firefox #Menu,
+.IndexPage .Firefox #Menu {
+    width: 27ex;
+    }
+
+
+    .MTitle {
+        font-size: 16pt; font-weight: bold; font-variant: small-caps;
+        text-align: center;
+        padding: 5px 10px 15px 10px;
+        border-bottom: 1px dotted #000000;
+        margin-bottom: 15px }
+
+    .MSubTitle {
+        font-size: 9pt; font-weight: normal; font-variant: normal;
+        margin-top: 1ex; margin-bottom: 5px }
+
+
+    .MEntry a:link,
+    .MEntry a:hover,
+    .MEntry a:visited { color: #606060; margin-right: 0 }
+    .MEntry a:active { color: #A00000; margin-right: 0 }
+
+
+    .MGroup {
+        font-variant: small-caps; font-weight: bold;
+        margin: 1em 0 1em 10px;
+        }
+
+    .MGroupContent {
+        font-variant: normal; font-weight: normal }
+
+    .MGroup a:link,
+    .MGroup a:hover,
+    .MGroup a:visited { color: #545454; margin-right: 10px }
+    .MGroup a:active { color: #A00000; margin-right: 10px }
+
+
+    .MFile,
+    .MText,
+    .MLink,
+    .MIndex {
+        padding: 1px 17px 2px 10px;
+        margin: .25em 0 .25em 0;
+        }
+
+    .MText {
+        font-size: 8pt; font-style: italic }
+
+    .MLink {
+        font-style: italic }
+
+    #MSelected {
+        color: #000000; background-color: #FFFFFF;
+        /*  Replace padding with border.  */
+        padding: 0 10px 0 10px;
+        border-width: 1px 2px 2px 0; border-style: solid; border-color: #000000;
+        margin-right: 5px;
+        }
+
+    /*  Close off the left side when its in a group.  */
+    .MGroup #MSelected {
+        padding-left: 9px; border-left-width: 1px }
+
+    /*  A treat for Mozilla users.  Blatantly non-standard.  Will be replaced with CSS 3 attributes when finalized/supported.  */
+    .Firefox #MSelected {
+        -moz-border-radius-topright: 10px;
+        -moz-border-radius-bottomright: 10px }
+    .Firefox .MGroup #MSelected {
+        -moz-border-radius-topleft: 10px;
+        -moz-border-radius-bottomleft: 10px }
+
+
+    #MSearchPanel {
+        padding: 0px 6px;
+        margin: .25em 0;
+        }
+
+
+    #MSearchField {
+        font: italic 9pt Verdana, sans-serif;
+        color: #606060;
+        background-color: #E8E8E8;
+        border: none;
+        padding: 2px 4px;
+        width: 100%;
+        }
+    /* Only Opera gets it right. */
+    .Firefox #MSearchField,
+    .IE #MSearchField,
+    .Safari #MSearchField {
+        width: 94%;
+        }
+    .Opera9 #MSearchField,
+    .Konqueror #MSearchField {
+        width: 97%;
+        }
+    .FramedMenuPage .Firefox #MSearchField,
+    .FramedMenuPage .Safari #MSearchField,
+    .FramedMenuPage .Konqueror #MSearchField {
+        width: 98%;
+        }
+
+    /* Firefox doesn't do this right in frames without #MSearchPanel added on.
+        It's presence doesn't hurt anything other browsers. */
+    #MSearchPanel.MSearchPanelInactive:hover #MSearchField {
+        background-color: #FFFFFF;
+        border: 1px solid #C0C0C0;
+        padding: 1px 3px;
+        }
+    .MSearchPanelActive #MSearchField {
+        background-color: #FFFFFF;
+        border: 1px solid #C0C0C0;
+        font-style: normal;
+        padding: 1px 3px;
+        }
+
+    #MSearchType {
+        visibility: hidden;
+        font: 8pt Verdana, sans-serif;
+        width: 98%;
+        padding: 0;
+        border: 1px solid #C0C0C0;
+        }
+    .MSearchPanelActive #MSearchType,
+    /*  As mentioned above, Firefox doesn't do this right in frames without #MSearchPanel added on. */
+    #MSearchPanel.MSearchPanelInactive:hover #MSearchType,
+    #MSearchType:focus {
+        visibility: visible;
+        color: #606060;
+        }
+    #MSearchType option#MSearchEverything {
+        font-weight: bold;
+        }
+
+    .Opera8 .MSearchPanelInactive:hover,
+    .Opera8 .MSearchPanelActive {
+        margin-left: -1px;
+        }
+
+
+    iframe#MSearchResults {
+        width: 60ex;
+        height: 15em;
+        }
+    #MSearchResultsWindow {
+        display: none;
+        position: absolute;
+        left: 0; top: 0;
+        border: 1px solid #000000;
+        background-color: #E8E8E8;
+        }
+    #MSearchResultsWindowClose {
+        font-weight: bold;
+        font-size: 8pt;
+        display: block;
+        padding: 2px 5px;
+        }
+    #MSearchResultsWindowClose:link,
+    #MSearchResultsWindowClose:visited {
+        color: #000000;
+        text-decoration: none;
+        }
+    #MSearchResultsWindowClose:active,
+    #MSearchResultsWindowClose:hover {
+        color: #800000;
+        text-decoration: none;
+        background-color: #F4F4F4;
+        }
+
+
+
+
+#Content {
+    padding-bottom: 15px;
+    }
+
+.ContentPage #Content {
+    border-width: 0 0 1px 1px;
+    border-style: solid;
+    border-color: #000000;
+    background-color: #FFFFFF;
+    font-size: 9pt;  /* To make 31ex match the menu's 31ex. */
+    
+    }
+.ContentPage .Firefox #Content {
+    margin-left: 27ex;
+    }
+
+
+
+    .CTopic {
+        font-size: 10pt;
+        margin-bottom: 3em;
+        }
+
+
+    .CTitle {
+        font-size: 12pt; font-weight: bold;
+        border-width: 0 0 1px 0; border-style: solid; border-color: #A0A0A0;
+        margin: 0 15px .5em 15px }
+
+    .CGroup .CTitle {
+        font-size: 16pt; font-variant: small-caps;
+        padding-left: 15px; padding-right: 15px;
+        border-width: 0 0 2px 0; border-color: #000000;
+        margin-left: 0; margin-right: 0 }
+
+    .CClass .CTitle,
+    .CInterface .CTitle,
+    .CDatabase .CTitle,
+    .CDatabaseTable .CTitle,
+    .CSection .CTitle {
+        font-size: 18pt;
+        color: #FFFFFF; background-color: #A0A0A0;
+        padding: 10px 15px 10px 15px;
+        border-width: 2px 0; border-color: #000000;
+        margin-left: 0; margin-right: 0 }
+
+    #MainTopic .CTitle {
+        font-size: 20pt;
+        color: #FFFFFF; background-color: #7070C0;
+        padding: 10px 15px 10px 15px;
+        border-width: 0 0 3px 0; border-color: #000000;
+        margin-left: 0; margin-right: 0 }
+
+    .CBody {
+        margin-left: 15px; margin-right: 15px }
+
+
+    .CToolTip {
+        position: absolute; visibility: hidden;
+        left: 0; top: 0;
+        background-color: #FFFFE0;
+        padding: 5px;
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #000000;
+        font-size: 8pt;
+        }
+
+    .Opera .CToolTip {
+        max-width: 98%;
+        }
+
+    /*  Scrollbars would be useless.  */
+    .CToolTip blockquote {
+        overflow: hidden;
+        }
+    .IE6 .CToolTip blockquote {
+        overflow: visible;
+        }
+
+    .CHeading {
+        font-weight: bold; font-size: 10pt;
+        margin: 1.5em 0 .5em 0;
+        }
+
+    .CBody pre {
+        font: 10pt "Courier New", Courier, monospace;
+        margin: 1em 0;
+        }
+
+    .CBody ul {
+        /*  I don't know why CBody's margin doesn't apply, but it's consistent across browsers so whatever.
+             Reapply it here as padding.  */
+        padding-left: 15px; padding-right: 15px;
+        margin: .5em 5ex .5em 5ex;
+        }
+
+    .CDescriptionList {
+        margin: .5em 5ex 0 5ex }
+
+        .CDLEntry {
+            font: 10pt "Courier New", Courier, monospace; color: #808080;
+            padding-bottom: .25em;
+            white-space: nowrap }
+
+        .CDLDescription {
+            font-size: 10pt;  /*  For browsers that don't inherit correctly, like Opera 5.  */
+            padding-bottom: .5em; padding-left: 5ex }
+
+
+    .CTopic img {
+        text-align: center;
+        display: block;
+        margin: 1em auto;
+        }
+    .CImageCaption {
+        font-variant: small-caps;
+        font-size: 8pt;
+        color: #808080;
+        text-align: center;
+        position: relative;
+        top: 1em;
+        }
+
+    .CImageLink {
+        color: #808080;
+        font-style: italic;
+        }
+    a.CImageLink:link,
+    a.CImageLink:visited,
+    a.CImageLink:hover { color: #808080 }
+
+
+
+
+
+.Prototype {
+    font: 10pt "Courier New", Courier, monospace;
+    padding: 5px 3ex;
+    border-width: 1px; border-style: solid;
+    margin: 0 5ex 1.5em 5ex;
+    }
+
+    .Prototype td {
+        font-size: 10pt;
+        }
+
+    .PDefaultValue,
+    .PDefaultValuePrefix,
+    .PTypePrefix {
+        color: #8F8F8F;
+        }
+    .PTypePrefix {
+        text-align: right;
+        }
+    .PAfterParameters {
+        vertical-align: bottom;
+        }
+
+    .IE .Prototype table {
+        padding: 0;
+        }
+
+    .CFunction .Prototype {
+        background-color: #F4F4F4; border-color: #D0D0D0 }
+    .CProperty .Prototype {
+        background-color: #F4F4FF; border-color: #C0C0E8 }
+    .CVariable .Prototype {
+        background-color: #FFFFF0; border-color: #E0E0A0 }
+
+    .CClass .Prototype {
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #A0A0A0;
+        background-color: #F4F4F4;
+        }
+    .CInterface .Prototype {
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #A0A0D0;
+        background-color: #F4F4FF;
+        }
+
+    .CDatabaseIndex .Prototype,
+    .CConstant .Prototype {
+        background-color: #D0D0D0; border-color: #000000 }
+    .CType .Prototype,
+    .CEnumeration .Prototype {
+        background-color: #FAF0F0; border-color: #E0B0B0;
+        }
+    .CDatabaseTrigger .Prototype,
+    .CEvent .Prototype,
+    .CDelegate .Prototype {
+        background-color: #F0FCF0; border-color: #B8E4B8 }
+
+    .CToolTip .Prototype {
+        margin: 0 0 .5em 0;
+        white-space: nowrap;
+        }
+
+
+
+
+
+.Summary {
+    margin: 1.5em 5ex 0 5ex }
+
+    .STitle {
+        font-size: 12pt; font-weight: bold;
+        margin-bottom: .5em }
+
+
+    .SBorder {
+        background-color: #FFFFF0;
+        padding: 15px;
+        border: 1px solid #C0C060 }
+
+    /* In a frame IE 6 will make them too long unless you set the width to 100%.  Without frames it will be correct without a width
+        or slightly too long (but not enough to scroll) with a width.  This arbitrary weirdness simply astounds me.  IE 7 has the same
+        problem with frames, haven't tested it without.  */
+    .FramedContentPage .IE .SBorder {
+        width: 100% }
+
+    /*  A treat for Mozilla users.  Blatantly non-standard.  Will be replaced with CSS 3 attributes when finalized/supported.  */
+    .Firefox .SBorder {
+        -moz-border-radius: 20px }
+
+
+    .STable {
+        font-size: 9pt; width: 100% }
+
+    .SEntry {
+        width: 30% }
+    .SDescription {
+        width: 70% }
+
+
+    .SMarked {
+        background-color: #F8F8D8 }
+
+    .SDescription { padding-left: 2ex }
+    .SIndent1 .SEntry { padding-left: 1.5ex }   .SIndent1 .SDescription { padding-left: 3.5ex }
+    .SIndent2 .SEntry { padding-left: 3.0ex }   .SIndent2 .SDescription { padding-left: 5.0ex }
+    .SIndent3 .SEntry { padding-left: 4.5ex }   .SIndent3 .SDescription { padding-left: 6.5ex }
+    .SIndent4 .SEntry { padding-left: 6.0ex }   .SIndent4 .SDescription { padding-left: 8.0ex }
+    .SIndent5 .SEntry { padding-left: 7.5ex }   .SIndent5 .SDescription { padding-left: 9.5ex }
+
+    .SDescription a { color: #800000}
+    .SDescription a:active { color: #A00000 }
+
+    .SGroup td {
+        padding-top: .5em; padding-bottom: .25em }
+
+    .SGroup .SEntry {
+        font-weight: bold; font-variant: small-caps }
+
+    .SGroup .SEntry a { color: #800000 }
+    .SGroup .SEntry a:active { color: #F00000 }
+
+
+    .SMain td,
+    .SClass td,
+    .SDatabase td,
+    .SDatabaseTable td,
+    .SSection td {
+        font-size: 10pt;
+        padding-bottom: .25em }
+
+    .SClass td,
+    .SDatabase td,
+    .SDatabaseTable td,
+    .SSection td {
+        padding-top: 1em }
+
+    .SMain .SEntry,
+    .SClass .SEntry,
+    .SDatabase .SEntry,
+    .SDatabaseTable .SEntry,
+    .SSection .SEntry {
+        font-weight: bold;
+        }
+
+    .SMain .SEntry a,
+    .SClass .SEntry a,
+    .SDatabase .SEntry a,
+    .SDatabaseTable .SEntry a,
+    .SSection .SEntry a { color: #000000 }
+
+    .SMain .SEntry a:active,
+    .SClass .SEntry a:active,
+    .SDatabase .SEntry a:active,
+    .SDatabaseTable .SEntry a:active,
+    .SSection .SEntry a:active { color: #A00000 }
+
+
+
+
+
+.ClassHierarchy {
+    margin: 0 15px 1em 15px }
+
+    .CHEntry {
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #A0A0A0;
+        margin-bottom: 3px;
+        padding: 2px 2ex;
+        font-size: 10pt;
+        background-color: #F4F4F4; color: #606060;
+        }
+
+    .Firefox .CHEntry {
+        -moz-border-radius: 4px;
+        }
+
+    .CHCurrent .CHEntry {
+        font-weight: bold;
+        border-color: #000000;
+        color: #000000;
+        }
+
+    .CHChildNote .CHEntry {
+        font-style: italic;
+        font-size: 8pt;
+        }
+
+    .CHIndent {
+        margin-left: 3ex;
+        }
+
+    .CHEntry a:link,
+    .CHEntry a:visited,
+    .CHEntry a:hover {
+        color: #606060;
+        }
+    .CHEntry a:active {
+        color: #800000;
+        }
+
+
+
+
+
+#Index {
+    background-color: #FFFFFF;
+    }
+
+/*  As opposed to .PopupSearchResultsPage #Index  */
+.IndexPage #Index,
+.FramedIndexPage #Index,
+.FramedSearchResultsPage #Index {
+    padding: 15px;
+    }
+
+.IndexPage #Index {
+    border-width: 0 0 1px 1px;
+    border-style: solid;
+    border-color: #000000;
+    font-size: 9pt;  /* To make 27ex match the menu's 27ex. */
+    margin-left: 27ex;
+    }
+
+
+    .IPageTitle {
+        font-size: 20pt; font-weight: bold;
+        color: #FFFFFF; background-color: #7070C0;
+        padding: 10px 15px 10px 15px;
+        border-width: 0 0 3px 0; border-color: #000000; border-style: solid;
+        margin: -15px -15px 0 -15px }
+
+    .FramedSearchResultsPage .IPageTitle {
+        margin-bottom: 15px;
+        }
+
+    .INavigationBar {
+        font-size: 10pt;
+        text-align: center;
+        background-color: #FFFFF0;
+        padding: 5px;
+        border-bottom: solid 1px black;
+        margin: 0 -15px 15px -15px;
+        }
+
+    .INavigationBar a {
+        font-weight: bold }
+
+    .IHeading {
+        font-size: 16pt; font-weight: bold;
+        padding: 2.5em 0 .5em 0;
+        text-align: center;
+        width: 3.5ex;
+        }
+    #IFirstHeading {
+        padding-top: 0;
+        }
+
+    .IEntry {
+        font-size: 10pt;
+        padding-left: 1ex;
+        }
+    .PopupSearchResultsPage .IEntry {
+        font-size: 8pt;
+        padding: 1px 5px;
+        }
+    .PopupSearchResultsPage .Opera9 .IEntry,
+    .FramedSearchResultsPage .Opera9 .IEntry {
+        text-align: left;
+        }
+    .FramedSearchResultsPage .IEntry {
+        padding: 0;
+        }
+
+    .ISubIndex {
+        padding-left: 3ex; padding-bottom: .5em }
+    .PopupSearchResultsPage .ISubIndex {
+        display: none;
+        }
+
+    /*  While it may cause some entries to look like links when they aren't, I found it's much easier to read the
+         index if everything's the same color.  */
+    .ISymbol {
+        font-weight: bold; color: #900000  }
+
+    .IndexPage .ISymbolPrefix,
+    .FramedIndexPage .ISymbolPrefix {
+        font-size: 10pt;
+        text-align: right;
+        color: #C47C7C;
+        background-color: #F8F8F8;
+        border-right: 3px solid #E0E0E0;
+        border-left: 1px solid #E0E0E0;
+        padding: 0 1px 0 2px;
+        }
+    .PopupSearchResultsPage .ISymbolPrefix,
+    .FramedSearchResultsPage .ISymbolPrefix {
+        color: #900000;
+        }
+    .PopupSearchResultsPage .ISymbolPrefix {
+        font-size: 8pt;
+        }
+
+    .IndexPage #IFirstSymbolPrefix,
+    .FramedIndexPage #IFirstSymbolPrefix {
+        border-top: 1px solid #E0E0E0;
+        }
+    .IndexPage #ILastSymbolPrefix,
+    .FramedIndexPage #ILastSymbolPrefix {
+        border-bottom: 1px solid #E0E0E0;
+        }
+    .IndexPage #IOnlySymbolPrefix,
+    .FramedIndexPage #IOnlySymbolPrefix {
+        border-top: 1px solid #E0E0E0;
+        border-bottom: 1px solid #E0E0E0;
+        }
+
+    a.IParent,
+    a.IFile {
+        display: block;
+        }
+
+    .PopupSearchResultsPage .SRStatus {
+        padding: 2px 5px;
+        font-size: 8pt;
+        font-style: italic;
+        }
+    .FramedSearchResultsPage .SRStatus {
+        font-size: 10pt;
+        font-style: italic;
+        }
+
+    .SRResult {
+        display: none;
+        }
+
+
+
+#Footer {
+    font-size: 8pt;
+    color: #989898;
+    text-align: right;
+    }
+
+#Footer p {
+    text-indent: 0;
+    margin-bottom: .5em;
+    }
+
+.ContentPage #Footer,
+.IndexPage #Footer {
+    text-align: right;
+    margin: 2px;
+    }
+
+.FramedMenuPage #Footer {
+    text-align: center;
+    margin: 5em 10px 10px 10px;
+    padding-top: 1em;
+    border-top: 1px solid #C8C8C8;
+    }
+
+    #Footer a:link,
+    #Footer a:hover,
+    #Footer a:visited { color: #989898 }
+    #Footer a:active { color: #A00000 }
+
+</style><script language=JavaScript src="../javascript/main.js"></script><script language=JavaScript src="../javascript/searchdata.js"></script></head><body class="ContentPage" onLoad="NDOnLoad()"><script language=JavaScript><!--
+if (browserType) {document.write("<div class=" + browserType + ">");if (browserVer) {document.write("<div class=" + browserVer + ">"); }}// --></script>
+
+<!--  Generated by Natural Docs, version 1.4 -->
+<!--  http://www.naturaldocs.org  -->
+
+<!-- saved from url=(0026)http://www.naturaldocs.org -->
+
+
+
+
+<div id=Content><div class="CSection"><div class=CTopic id=MainTopic><h1 class=CTitle><a name="SpreadSheet"></a>SpreadSheet</h1><div class=CBody><p><b>SpreadSheet control</b></p><p>SpreadSheet control is extremelly fast and small Excell like control, developed in Assembler.</p><!--START_ND_SUMMARY--><div class=Summary><div class=STitle>Summary</div><div class=SBorder><table border=0 cellspacing=0 cellpadding=0 class=STable><tr class="SMain"><td class=SEntry><a href="#SpreadSheet" >SpreadSheet</a></td><td class=SDescription><b>SpreadSheet control</b></td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#Add" id=link1 onMouseOver="ShowTip(event, 'tt1', 'link1')" onMouseOut="HideTip('tt1')">Add</a></td><td class=SDescription>Add control to the Gui</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#BlankCell" id=link2 onMouseOver="ShowTip(event, 'tt2', 'link2')" onMouseOut="HideTip('tt2')">BlankCell</a></td><td class=SDescription>Erase the cell</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#CreateCombo" id=link3 onMouseOver="ShowTip(event, 'tt3', 'link3')" onMouseOut="HideTip('tt3')">CreateCombo</a></td><td class=SDescription>Creates COMBOBOX cell type</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#ConvertDate" id=link4 onMouseOver="ShowTip(event, 'tt4', 'link4')" onMouseOut="HideTip('tt4')">ConvertDate</a></td><td class=SDescription>Converts date from / to integer</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#DeleteCell" id=link5 onMouseOver="ShowTip(event, 'tt5', 'link5')" onMouseOut="HideTip('tt5')">DeleteCell</a></td><td class=SDescription>Delete cell</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#DeleteCol" id=link6 onMouseOver="ShowTip(event, 'tt6', 'link6')" onMouseOut="HideTip('tt6')">DeleteCol</a></td><td class=SDescription>Delete column</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#ExpandCell" id=link7 onMouseOver="ShowTip(event, 'tt7', 'link7')" onMouseOut="HideTip('tt7')">ExpandCell</a></td><td class=SDescription>Expand a cell to cover more than one cell</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GetCell" id=link8 onMouseOver="ShowTip(event, 'tt8', 'link8')" onMouseOut="HideTip('tt8')">GetCell</a></td><td class=SDescription>Get the cell parameters.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetCellArray" id=link9 onMouseOver="ShowTip(event, 'tt9', 'link9')" onMouseOut="HideTip('tt9')">GetCellArray</a></td><td class=SDescription>Get all cell parameters into array.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GetCellBlob" >GetCellBlob</a></td><td class=SDescription>Returns pointer to the current cell BLOB.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetCellData" id=link10 onMouseOver="ShowTip(event, 'tt10', 'link10')" onMouseOut="HideTip('tt10')">GetCellData</a></td><td class=SDescription>Get the cell data.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GetCellRect" id=link11 onMouseOver="ShowTip(event, 'tt11', 'link11')" onMouseOut="HideTip('tt11')">GetCellRect</a></td><td class=SDescription>Get the current cells rect in active splitt.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetCellText" id=link12 onMouseOver="ShowTip(event, 'tt12', 'link12')" onMouseOut="HideTip('tt12')">GetCellText</a></td><td class=SDescription>Get cell text</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GetCellType" id=link13 onMouseOver="ShowTip(event, 'tt13', 'link13')" onMouseOut="HideTip('tt13')">GetCellType</a></td><td class=SDescription>Get cell data type</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetColCount" id=link14 onMouseOver="ShowTip(event, 'tt14', 'link14')" onMouseOut="HideTip('tt14')">GetColCount</a></td><td class=SDescription>Get number of columns</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GetColWidth" id=link15 onMouseOver="ShowTip(event, 'tt15', 'link15')" onMouseOut="HideTip('tt15')">GetColWidth</a></td><td class=SDescription>Get column width.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetCurrentCell" id=link16 onMouseOver="ShowTip(event, 'tt16', 'link16')" onMouseOut="HideTip('tt16')">GetCurrentCell</a></td><td class=SDescription>Get current col/row in active window</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GetCurrentCol" id=link17 onMouseOver="ShowTip(event, 'tt17', 'link17')" onMouseOut="HideTip('tt17')">GetCurrentCol</a></td><td class=SDescription>Get current column in active window.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetCurrentRow" id=link18 onMouseOver="ShowTip(event, 'tt18', 'link18')" onMouseOut="HideTip('tt18')">GetCurrentRow</a></td><td class=SDescription>Get current row in active window.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GetCurrentWin" id=link19 onMouseOver="ShowTip(event, 'tt19', 'link19')" onMouseOut="HideTip('tt19')">GetCurrentWin</a></td><td class=SDescription>Get active splitt window</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetDateFormat" id=link20 onMouseOver="ShowTip(event, 'tt20', 'link20')" onMouseOut="HideTip('tt20')">GetDateFormat</a></td><td class=SDescription>Get date format</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GetLockCol" id=link21 onMouseOver="ShowTip(event, 'tt21', 'link21')" onMouseOut="HideTip('tt21')">GetLockCol</a></td><td class=SDescription>Get lock cols in active splitt</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetLockRow" id=link22 onMouseOver="ShowTip(event, 'tt22', 'link22')" onMouseOut="HideTip('tt22')">GetLockRow</a></td><td class=SDescription>Get lock rows in active splitt.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GetMultiSel" id=link23 onMouseOver="ShowTip(event, 'tt23', 'link23')" onMouseOut="HideTip('tt23')">GetMultiSel</a></td><td class=SDescription>Get multiselection</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetRowCount" id=link24 onMouseOver="ShowTip(event, 'tt24', 'link24')" onMouseOut="HideTip('tt24')">GetRowCount</a></td><td class=SDescription>Get number of rows</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GetRowHeight" id=link25 onMouseOver="ShowTip(event, 'tt25', 'link25')" onMouseOut="HideTip('tt25')">GetRowHeight</a></td><td class=SDescription>Returns row height</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#ImportLine" id=link26 onMouseOver="ShowTip(event, 'tt26', 'link26')" onMouseOut="HideTip('tt26')">ImportLine</a></td><td class=SDescription>Import a line of data.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#InsertCol" id=link27 onMouseOver="ShowTip(event, 'tt27', 'link27')" onMouseOut="HideTip('tt27')">InsertCol</a></td><td class=SDescription>Insert column</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#InsertRow" id=link28 onMouseOver="ShowTip(event, 'tt28', 'link28')" onMouseOut="HideTip('tt28')">InsertRow</a></td><td class=SDescription>Insert row</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#LoadFile" id=link29 onMouseOver="ShowTip(event, 'tt29', 'link29')" onMouseOut="HideTip('tt29')">LoadFile</a></td><td class=SDescription>Load a file</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#NewSheet" id=link30 onMouseOver="ShowTip(event, 'tt30', 'link30')" onMouseOut="HideTip('tt30')">NewSheet</a></td><td class=SDescription>Clears the sheet.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#ReCalc" id=link31 onMouseOver="ShowTip(event, 'tt31', 'link31')" onMouseOut="HideTip('tt31')">ReCalc</a></td><td class=SDescription>Recalculates the sheet</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#ReCalc" >ReCalc</a></td><td class=SDescription>Redraw the control.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SaveFile" id=link32 onMouseOver="ShowTip(event, 'tt32', 'link32')" onMouseOut="HideTip('tt32')">SaveFile</a></td><td class=SDescription>Save a file</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#ScrollCell" id=link33 onMouseOver="ShowTip(event, 'tt33', 'link33')" onMouseOut="HideTip('tt33')">ScrollCell</a></td><td class=SDescription>Scrolls current cell into view.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SetCell" id=link34 onMouseOver="ShowTip(event, 'tt34', 'link34')" onMouseOut="HideTip('tt34')">SetCell</a></td><td class=SDescription>Set content of the cell</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#SetCellData" id=link35 onMouseOver="ShowTip(event, 'tt35', 'link35')" onMouseOut="HideTip('tt35')">SetCellData</a></td><td class=SDescription>Set the data of the cell.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SetCellBLOB" id=link36 onMouseOver="ShowTip(event, 'tt36', 'link36')" onMouseOut="HideTip('tt36')">SetCellBLOB</a></td><td class=SDescription>Set the cell binary data.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#SetCellString" id=link37 onMouseOver="ShowTip(event, 'tt37', 'link37')" onMouseOut="HideTip('tt37')">SetCellString</a></td><td class=SDescription>Set the text of the selected cell.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SetColWidth" id=link38 onMouseOver="ShowTip(event, 'tt38', 'link38')" onMouseOut="HideTip('tt38')">SetColWidth</a></td><td class=SDescription>Set column width</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#SetCurrentCell" id=link39 onMouseOver="ShowTip(event, 'tt39', 'link39')" onMouseOut="HideTip('tt39')">SetCurrentCell</a></td><td class=SDescription>Set current cell in active window</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SetCurrentWin" id=link40 onMouseOver="ShowTip(event, 'tt40', 'link40')" onMouseOut="HideTip('tt40')">SetCurrentWin</a></td><td class=SDescription>Set active splitt window</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#SetDateFormat" id=link41 onMouseOver="ShowTip(event, 'tt41', 'link41')" onMouseOut="HideTip('tt41')">SetDateFormat</a></td><td class=SDescription>Set date format</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SetColCount" id=link42 onMouseOver="ShowTip(event, 'tt42', 'link42')" onMouseOut="HideTip('tt42')">SetColCount</a></td><td class=SDescription>Set number of columns</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#SetFont" id=link43 onMouseOver="ShowTip(event, 'tt43', 'link43')" onMouseOut="HideTip('tt43')">SetFont</a></td><td class=SDescription>Set font</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SetGlobal" id=link44 onMouseOver="ShowTip(event, 'tt44', 'link44')" onMouseOut="HideTip('tt44')">SetGlobal</a></td><td class=SDescription>Set all global parameters for the control</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#SetGlobalFields" id=link45 onMouseOver="ShowTip(event, 'tt45', 'link45')" onMouseOut="HideTip('tt45')">SetGlobalFields</a></td><td class=SDescription>Set individual global parameters for the control</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SetLockCol" id=link46 onMouseOver="ShowTip(event, 'tt46', 'link46')" onMouseOut="HideTip('tt46')">SetLockCol</a></td><td class=SDescription>Lock columns in active split</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#SetLockRow" id=link47 onMouseOver="ShowTip(event, 'tt47', 'link47')" onMouseOut="HideTip('tt47')">SetLockRow</a></td><td class=SDescription>Lock rows in active split</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SetMultiSel" id=link48 onMouseOver="ShowTip(event, 'tt48', 'link48')" onMouseOut="HideTip('tt48')">SetMultiSel</a></td><td class=SDescription>Set multiselection</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#SetRowCount" id=link49 onMouseOver="ShowTip(event, 'tt49', 'link49')" onMouseOut="HideTip('tt49')">SetRowCount</a></td><td class=SDescription>Set number of rows</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SetRowHeight" id=link50 onMouseOver="ShowTip(event, 'tt50', 'link50')" onMouseOut="HideTip('tt50')">SetRowHeight</a></td><td class=SDescription>Set row height</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#SplittHor" id=link51 onMouseOver="ShowTip(event, 'tt51', 'link51')" onMouseOut="HideTip('tt51')">SplittHor</a></td><td class=SDescription>Create horizontal splitt in current splitt at current row.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SplittVer" id=link52 onMouseOver="ShowTip(event, 'tt52', 'link52')" onMouseOut="HideTip('tt52')">SplittVer</a></td><td class=SDescription>Create vertical splitt in current splitt at current col</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#SplittClose" id=link53 onMouseOver="ShowTip(event, 'tt53', 'link53')" onMouseOut="HideTip('tt53')">SplittClose</a></td><td class=SDescription>Close the current splitt</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SplittSync" id=link54 onMouseOver="ShowTip(event, 'tt54', 'link54')" onMouseOut="HideTip('tt54')">SplittSync</a></td><td class=SDescription>Synchronizes a splitt window with it&rsquo;s parent</td></tr><tr class="SGroup SIndent1"><td class=SEntry><a href="#Formulas" >Formulas</a></td><td class=SDescription></td></tr><tr class="SGroup SIndent1"><td class=SEntry><a href="#Graphs" >Graphs</a></td><td class=SDescription></td></tr><tr class="SGroup SIndent1"><td class=SEntry><a href="#Examples" >Examples</a></td><td class=SDescription></td></tr><tr class="SGroup SIndent1"><td class=SEntry><a href="#Known_Bugs" >Known Bugs</a></td><td class=SDescription></td></tr><tr class="SGroup SIndent1"><td class=SEntry><a href="#About" >About</a></td><td class=SDescription></td></tr></table></div></div><!--END_ND_SUMMARY--></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="Add"></a>Add</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_Add(</td><td class=PParameter nowrap>hGui,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>X</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0,</td></tr><tr><td></td><td class=PParameter nowrap>Y</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0,</td></tr><tr><td></td><td class=PParameter nowrap>W</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>200,</td></tr><tr><td></td><td class=PParameter nowrap>H</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>100,</td></tr><tr><td></td><td class=PParameter nowrap>Style</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;VSCROLL HSCROLL&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Handler</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>DllPath</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;SprSht.dll&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Add control to the Gui</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>hGui</td><td class=CDLDescription>Parent&rsquo;s hwnd</td></tr><tr><td class=CDLEntry>X-H</td><td class=CDLDescription>Control coordinates</td></tr><tr><td class=CDLEntry>Style</td><td class=CDLDescription>White separated list of control styles, by default VSCROLL HSCROLL</td></tr><tr><td class=CDLEntry>Handler</td><td class=CDLDescription>Notification handler, optional</td></tr><tr><td class=CDLEntry>DllPath</td><td class=CDLDescription>Path to the dll, by default look at the working folder.</td></tr></table><h4 class=CHeading>Styles</h4><p>VSCROLL  HSCROLL  STATUS  GRIDLINES  ROWSELECT  CELLEDIT  GRIDMODE  COLSIZE  ROWSIZE  WINSIZE  MULTISELECT</p><h4 class=CHeading>Handler</h4><blockquote><pre>result := Handler(hWnd, Event, EArg, Col, Row)</pre></blockquote><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>hWnd</td><td class=CDLDescription>Handle of the speradsheet control that sends notification</td></tr><tr><td class=CDLEntry>Event</td><td class=CDLDescription>Event that ocured.&nbsp; Can be <b>S</b> (select), <b>EB</b> (before edit), <b>EA</b> (after edit), <b>UB</b> (before update), <b>UA</b> (after update), <b>C</b> (click) and <b>D</b> (draw)</td></tr><tr><td class=CDLEntry>EArg</td><td class=CDLDescription>Event argument.&nbsp; Depends on event.&nbsp; See below.</td></tr><tr><td class=CDLEntry>Col</td><td class=CDLDescription>Column of the associated cell.</td></tr><tr><td class=CDLEntry>Row</td><td class=CDLDescription>Row of the associated cell.</td></tr><tr><td class=CDLEntry>result</td><td class=CDLDescription>Handler result, depends on event.&nbsp; See bellow</td></tr></table><h4 class=CHeading>Event types and returns</h4><p>Handler&rsquo;s <u>EArg</u> parameter is specific to each event:</p><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>S</td><td class=CDLDescription>Current splitt window number.&nbsp; Return 1 to prevent selection.</td></tr><tr><td class=CDLEntry>EA</td><td class=CDLDescription>User input.&nbsp; Return 1 to discard user input.</td></tr><tr><td class=CDLEntry>C</td><td class=CDLDescription>B (Button) or H (Hyperlink).&nbsp; Return value isn&rsquo;t used.</td></tr><tr><td class=CDLEntry>EB,UB,UB</td><td class=CDLDescription>Empty (argument isn&rsquo;t used).&nbsp; Return value isn&rsquo;t used.</td></tr><tr><td class=CDLEntry>D</td><td class=CDLDescription>Pointer to DRAWITEMSTRUCT.&nbsp; See <a href="http://msdn.microsoft.com/en-us/library/bb775802" class=LURL target=_top>http://msdn.microsoft.com/en-us/library/bb775802</a>(VS.85).aspx</td></tr></table><h4 class=CHeading>Returns</h4><p>Control&rsquo;s handle</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="BlankCell"></a>BlankCell</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_BlankCell(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Erase the cell</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="CreateCombo"></a>CreateCombo</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_CreateCombo(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Content,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Height</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>150</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Creates COMBOBOX cell type</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Content</td><td class=CDLDescription>| separated list of ComboBox items.</td></tr><tr><td class=CDLEntry>Height</td><td class=CDLDescription>Height of the combo box.</td></tr></table><h4 class=CHeading>Returns</h4><p>Handle of the ComboBox.&nbsp; Use it with <u>txt</u> parameter of the &lt;CetCell&gt; function.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="ConvertDate"></a>ConvertDate</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_ConvertDate(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Date,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>RefreshFormat</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>false</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Converts date from / to integer</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Date</td><td class=CDLDescription>Integer or textual representation of the date.</td></tr><tr><td class=CDLEntry>RefreshFormat</td><td class=CDLDescription>Set to TRUE to refresh control&rsquo;s date format that is stored internaly on first call.</td></tr></table><h4 class=CHeading>Returns</h4><p>If Date is integer the return value is the date string, otherwise the retun value is integer representation of the date.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="DeleteCell"></a>DeleteCell</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_DeleteCell(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Delete cell</p><h4 class=CHeading>Remarks</h4><p>Its misterious to me what is the difference between this one and <a href="#BlankCell" class=LFunction id=link55 onMouseOver="ShowTip(event, 'tt2', 'link55')" onMouseOut="HideTip('tt2')">BlankCell</a></p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="DeleteCol"></a>DeleteCol</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_DeleteCol(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Delete column</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Col</td><td class=CDLDescription>Column index.&nbsp; Of omited, current column is used.</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="ExpandCell"></a>ExpandCell</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_ExpandCell(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>Left,</td></tr><tr><td></td><td class=PParameter nowrap>Top,</td></tr><tr><td></td><td class=PParameter nowrap>Right,</td></tr><tr><td></td><td class=PParameter nowrap>Bottom</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Expand a cell to cover more than one cell</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Left, Top, Right, Bottom</td><td class=CDLDescription>Coordinates of the expanded cell</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetCell"></a>GetCell</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCell(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>Col,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>Row,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>pQ,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o1</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o3</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o4</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o5</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get the cell parameters.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Col, Row</td><td class=CDLDescription>Cell coordinates.&nbsp; If set to empty current cell coordinates will be used.</td></tr><tr><td class=CDLEntry>pQ</td><td class=CDLDescription>Query parameter.&nbsp; See <a href="#SetCell" class=LFunction id=link56 onMouseOver="ShowTip(event, 'tt34', 'link56')" onMouseOut="HideTip('tt34')">SetCell</a> for the list of possible cell parameters (txt, data, w, h, bg, fg, type, state, txtal, imgal, fnt)</td></tr><tr><td class=CDLEntry>o1 .. o5</td><td class=CDLDescription>Reference to variables to receive output in order specified in pQ parameter.</td></tr></table><h4 class=CHeading>Returns</h4><p>o1, so you don&rsquo;t need to use reference variables to grab only 1 field i.e. state := SS_GetCell(hctrl, 1,1, &ldquo;state&rdquo;)</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetCellArray"></a>GetCellArray</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCellArray(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>V,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get all cell parameters into array.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>V</td><td class=CDLDescription>Array prefix.&nbsp; The array is used to return data back.&nbsp; See <a href="#SetCell" class=LFunction id=link57 onMouseOver="ShowTip(event, 'tt34', 'link57')" onMouseOut="HideTip('tt34')">SetCell</a> for the list of possible cell parameters.</td></tr><tr><td class=CDLEntry>Col, Row</td><td class=CDLDescription>Cell coordinates.&nbsp; If omited current cell coordinates will be used.</td></tr></table><h4 class=CHeading>Remarks</h4><p>To get individual fields, its faster to use <a href="#GetCell" class=LFunction id=link58 onMouseOver="ShowTip(event, 'tt8', 'link58')" onMouseOut="HideTip('tt8')">GetCell</a>.&nbsp; Also, this function creates global variables.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetCellBlob"></a>GetCellBlob</h3><div class=CBody><p>Returns pointer to the current cell BLOB.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>EArg</td><td class=CDLDescription>D event handlers event argument (pointer to DRAWITEM struct).</td></tr><tr><td class=CDLEntry>GetText?</td><td class=CDLDescription>Set to true to return text instead of binary data.</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetCellData"></a>GetCellData</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCellData(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get the cell data.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Col, Row</td><td class=CDLDescription>Cell coordinates.&nbsp; If omited, current cell will be used.</td></tr></table><h4 class=CHeading>Remarks</h4><p>This funcion also returns data for OVERDRAWINTEGER type.&nbsp; Its faster to use to get the integer then other functions.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetCellRect"></a>GetCellRect</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCellRect(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>top,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>left,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>right,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>bottom</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get the current cells rect in active splitt.</p><h4 class=CHeading>Returns</h4><p>Handle of active splitt window.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetCellText"></a>GetCellText</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCellText(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get cell text</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Col, Row</td><td class=CDLDescription>Coordinates of the cell.&nbsp; If omited, current cell will be used.</td></tr></table><h4 class=CHeading>Remarks</h4><p>This function retrieves any kind of text from all types of cells, no matter the internal representation.&nbsp; For ComboBox selected item will be returned and for CheckBox 1 or 0.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetCellType"></a>GetCellType</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCellType(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Flag</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get cell data type</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Col, Row</td><td class=CDLDescription>Coordinates.&nbsp; If omited, current cell will be used</td></tr><tr><td class=CDLEntry>Flag</td><td class=CDLDescription>Used internaly.&nbsp; 1 to return numeric type, 2 to return numeric base type without modifiers Returns: Number (not text for now)</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetColCount"></a>GetColCount</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetColCount(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get number of columns</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetColWidth"></a>GetColWidth</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetColWidth(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>col</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get column width.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetCurrentCell"></a>GetCurrentCell</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCurrentCell(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>col,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>row</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get current col/row in active window</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>col, row</td><td class=CDLDescription>Reference to variables to receive output.</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetCurrentCol"></a>GetCurrentCol</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCurrentCol(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get current column in active window.</p><h4 class=CHeading>Returns</h4><p>Current column index</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetCurrentRow"></a>GetCurrentRow</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCurrentRow(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get current row in active window.</p><h4 class=CHeading>Returns</h4><p>Current row index</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetCurrentWin"></a>GetCurrentWin</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCurrentWin(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get active splitt window</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetDateFormat"></a>GetDateFormat</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetDateFormat(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get date format</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetLockCol"></a>GetLockCol</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetLockCol(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get lock cols in active splitt</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetLockRow"></a>GetLockRow</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetLockRow(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get lock rows in active splitt.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetMultiSel"></a>GetMultiSel</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetMultiSel(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>Top</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>Left</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>Right</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>Bottom</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get multiselection</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Top, Left, Right, Bottm</td><td class=CDLDescription>Reference to variables to receive the output.&nbsp; You can omit any you don&rsquo;t need.</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetRowCount"></a>GetRowCount</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetRowCount(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get number of rows</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetRowHeight"></a>GetRowHeight</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetRowHeight(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Returns row height</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="ImportLine"></a>ImportLine</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_ImportLine(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>DataLine,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>SepChar</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Import a line of data.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>DataLine</td><td class=CDLDescription>Text containing the data</td></tr><tr><td class=CDLEntry>SepChar</td><td class=CDLDescription>Data separator, by default &ldquo;;&rdquo;</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="InsertCol"></a>InsertCol</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_InsertCol(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Insert column</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Col</td><td class=CDLDescription>Column index after which to insert column.&nbsp; By deault -1 means to append it.</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="InsertRow"></a>InsertRow</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_InsertRow(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Insert row</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Row</td><td class=CDLDescription>Position after which to insert row.&nbsp; By deault -1 means to append it.</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="LoadFile"></a>LoadFile</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_LoadFile(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>File</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Load a file</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>File</td><td class=CDLDescription>File name</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="NewSheet"></a>NewSheet</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_NewSheet(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Clears the sheet.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="ReCalc"></a>ReCalc</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_ReCalc(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Recalculates the sheet</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="ReCalc"></a>ReCalc</h3><div class=CBody><p>Redraw the control.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SaveFile"></a>SaveFile</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SaveFile(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>File</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Save a file</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="ScrollCell"></a>ScrollCell</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_ScrollCell(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Scrolls current cell into view.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetCell"></a>SetCell</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetCell(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o1</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o3</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o4</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o5</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o6</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o7</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o8</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o9</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o10</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o11</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set content of the cell</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Col, Row</td><td class=CDLDescription>Cell coordinates.</td></tr><tr><td class=CDLEntry>o1 .. o11</td><td class=CDLDescription>Named parameters.</td></tr></table><h4 class=CHeading>Named Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>type</td><td class=CDLDescription>Type of the cell.&nbsp; See bellow for list of types.&nbsp; You will generally use type when setting up cells initially and omit it when changing existing cells.</td></tr><tr><td class=CDLEntry>w, h</td><td class=CDLDescription>Width, height of the cell</td></tr><tr><td class=CDLEntry>bg, fg</td><td class=CDLDescription>Background, foreground color</td></tr><tr><td class=CDLEntry>state</td><td class=CDLDescription>Cell state</td></tr><tr><td class=CDLEntry>txtal</td><td class=CDLDescription>Text alignment and decimals.&nbsp; See aligment section for list of kewords.&nbsp; Use number to set FLOAT precision (1-12, all, sci)</td></tr><tr><td class=CDLEntry>imgal</td><td class=CDLDescription>Image alignment  and imagelist/control index</td></tr><tr><td class=CDLEntry>fnt</td><td class=CDLDescription>Cell font index (0-15)</td></tr></table><h4 class=CHeading>Type Dependent Named Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>txt</td><td class=CDLDescription>String (TEXT,CHECKBOX,*HDR), Number (INTEGER), hwndCombo (COMBOBOX), Formula Definition (FORMULA), Graph Definition (GRAPH)</td></tr><tr><td class=CDLEntry>data</td><td class=CDLDescription>0-based selected index, 0 by default (COMBOBOX), 1|0 (CHECKBOX), size (OVERDRAWBLOB, return)</td></tr></table><h4 class=CHeading>Types</h4><ul><li>TEXT TEXTMULTILINE INTEGER(32b) FLOAT(32b-80b) HYPERLINK CHECKBOX COMBOBOX FORMULA GRAPH</li><li>OWNERDRAWINTEGER - Ownerdraw integer.&nbsp; You can implement D (draw) event.</li><li>OWNERDRAWBLOB - Ownerdraw BLOB.&nbsp; You can put any binary data as cell&rsquo;s BLOB content.&nbsp; There is special support for textual BLOBs.</li><li>EMPTY - The cell contains formatting only.</li><li>COLHDR ROWHDR WINHDR  - Column, row and window (splitt) header.</li><li>EXPANDED - Part of expanded cell, internally used.</li></ul><h4 class=CHeading>Type Modifiers</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>BUTTON</td><td class=CDLDescription>The cell contains button.&nbsp; Can be combined with TEXT or TEXTMULTILINE</td></tr><tr><td class=CDLEntry>WIDEBUTTON</td><td class=CDLDescription>The cell will be entirely covered by button.&nbsp; Can be combined with TEXT or TEXTMULTILINE</td></tr><tr><td class=CDLEntry>DATE</td><td class=CDLDescription>Can be combined with INTEGER.</td></tr><tr><td class=CDLEntry>FORCETYPE</td><td class=CDLDescription>The cell will preserve its type when edited.&nbsp; Can be combined with TEXT, INTEGER, FLOAT, TEXTMULTILINE, BUTTON, WIDEBUTTON or HYPERLINK</td></tr><tr><td class=CDLEntry>FIXEDSIZE</td><td class=CDLDescription>Will force a 15 by 15 pixel image.&nbsp; To be combined with BUTTON, CHECKBOX or COMBOBOX.&nbsp; Can be combined with BUTTON, CHECKBOX or COMBOBOX</td></tr></table><h4 class=CHeading>States</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>LOCKED</td><td class=CDLDescription>Cell is locked for editing.</td></tr><tr><td class=CDLEntry>HIDDEN</td><td class=CDLDescription>Cell content is not displayed.</td></tr><tr><td class=CDLEntry>REDRAW</td><td class=CDLDescription>Cell is being redrawn.</td></tr><tr><td class=CDLEntry>RECALC</td><td class=CDLDescription>Cell is being recalculated.</td></tr><tr><td class=CDLEntry>ERROR</td><td class=CDLDescription>There are 4 error states: ERROR DIV0 UNDERFLOW OVERFLOW</td></tr></table><h4 class=CHeading>Aligments</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>LEFT RIGHT MIDDLE</td><td class=CDLDescription>X aligments</td></tr><tr><td class=CDLEntry>TOP CENTER BOTTOM</td><td class=CDLDescription>Y aligments</td></tr><tr><td class=CDLEntry>AUTO</td><td class=CDLDescription>Text left middle, numbers right middle</td></tr><tr><td class=CDLEntry>GLOBAL</td><td class=CDLDescription>If you omit aligment attribute, this one will be used.</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetCellData"></a>SetCellData</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetCellData(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Data,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set the data of the cell.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Data</td><td class=CDLDescription>Data to set.</td></tr><tr><td class=CDLEntry>Col,Row</td><td class=CDLDescription>Cell coordinates.&nbsp; If omited current cell will be used.</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetCellBLOB"></a>SetCellBLOB</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetCellBLOB(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>BLOB,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set the cell binary data.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>BLOB</td><td class=CDLDescription>Reference to binary data to set.&nbsp; First word contains BLOB size.</td></tr><tr><td class=CDLEntry>Col, Row</td><td class=CDLDescription>Cell coordinates.&nbsp; If omited current cell coordinates will be used.</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetCellString"></a>SetCellString</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetCellString(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Txt</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Type</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set the text of the selected cell.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Txt</td><td class=CDLDescription>Text to set, by default empty.</td></tr><tr><td class=CDLEntry>Type</td><td class=CDLDescription>Type.&nbsp; If omited current cell type will be used.</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetColWidth"></a>SetColWidth</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetColWidth(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>col,</td></tr><tr><td></td><td class=PParameter nowrap>width</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set column width</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetCurrentCell"></a>SetCurrentCell</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetCurrentCell(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>col,</td></tr><tr><td></td><td class=PParameter nowrap>row</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set current cell in active window</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>col, row</td><td class=CDLDescription>Coordinates of the cell to select</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetCurrentWin"></a>SetCurrentWin</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetCurrentWin(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>nWin</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set active splitt window</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>nWin</td><td class=CDLDescription>Window number (0-7)</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetDateFormat"></a>SetDateFormat</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetDateFormat(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>Format</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set date format</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Format</td><td class=CDLDescription>Date format.&nbsp; See Date Formats section in FormatTime AHK documentation for details.</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetColCount"></a>SetColCount</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetColCount(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>nCols</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set number of columns</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetFont"></a>SetFont</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetFont(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>idx,</td></tr><tr><td></td><td class=PParameter nowrap>pFont</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set font</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>idx</td><td class=CDLDescription>Font index to set (0-15)</td></tr><tr><td class=CDLEntry>pFont</td><td class=CDLDescription>Font description in usual AHK format ( &ldquo;style, name&rdquo;)</td></tr></table><h4 class=CHeading>Returns</h4><p>Font handle</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetGlobal"></a>SetGlobal</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetGlobal(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>g,</td></tr><tr><td></td><td class=PParameter nowrap>cell,</td></tr><tr><td></td><td class=PParameter nowrap>colhdr,</td></tr><tr><td></td><td class=PParameter nowrap>rowhdr,</td></tr><tr><td></td><td class=PParameter nowrap>winhdr</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set all global parameters for the control</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>g</td><td class=CDLDescription>Global formating array base name.</td></tr><tr><td class=CDLEntry>cell</td><td class=CDLDescription>Cell formatting array base name.</td></tr><tr><td class=CDLEntry>colhdr</td><td class=CDLDescription>Column header formatting array base name.</td></tr><tr><td class=CDLEntry>rowhdr</td><td class=CDLDescription>Row header formatting array base name.</td></tr><tr><td class=CDLEntry>winhdr</td><td class=CDLDescription>Window header formatting array base name.</td></tr></table><h4 class=CHeading>Global array elements</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>colhdrbtn</td><td class=CDLDescription>Column header button</td></tr><tr><td class=CDLEntry>rowhdrbtn</td><td class=CDLDescription>Row header button</td></tr><tr><td class=CDLEntry>winhdrbtn</td><td class=CDLDescription>Win header button</td></tr><tr><td class=CDLEntry>lockcol</td><td class=CDLDescription>Back color of locked cell</td></tr><tr><td class=CDLEntry>hdrgrdcol</td><td class=CDLDescription>Header grid color</td></tr><tr><td class=CDLEntry>grdcol</td><td class=CDLDescription>Cell grid color</td></tr><tr><td class=CDLEntry>bcknfcol</td><td class=CDLDescription>Back color of active cell, lost focus</td></tr><tr><td class=CDLEntry>txtnfcol</td><td class=CDLDescription>Text color of active cell, lost focus</td></tr><tr><td class=CDLEntry>bckfocol</td><td class=CDLDescription>Back color of active cell, has focus</td></tr><tr><td class=CDLEntry>txtfocol</td><td class=CDLDescription>Text color of active cell, has focus</td></tr><tr><td class=CDLEntry>ncols</td><td class=CDLDescription>Number of columns,  0-600, by default 255</td></tr><tr><td class=CDLEntry>nrows</td><td class=CDLDescription>Number of rows, 0-65000, by default 255</td></tr><tr><td class=CDLEntry>ghdrwt</td><td class=CDLDescription>Header width</td></tr><tr><td class=CDLEntry>ghdrht</td><td class=CDLDescription>Header height</td></tr><tr><td class=CDLEntry>gcellw</td><td class=CDLDescription>Cell width</td></tr><tr><td class=CDLEntry>gcellht</td><td class=CDLDescription>Cell height</td></tr></table><h4 class=CHeading>Header and cell formating elements</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>bg</td><td class=CDLDescription>Background color</td></tr><tr><td class=CDLEntry>fg</td><td class=CDLDescription>Foreground color</td></tr><tr><td class=CDLEntry>imgal</td><td class=CDLDescription>Image align</td></tr><tr><td class=CDLEntry>txtal</td><td class=CDLDescription>Text align</td></tr><tr><td class=CDLEntry>fnt</td><td class=CDLDescription>Font index</td></tr><tr><td class=CDLEntry>tpe</td><td class=CDLDescription>Control type</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetGlobalFields"></a>SetGlobalFields</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetGlobalFields(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Fields,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>v1</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>v2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>v3</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>v4</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>v5</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>v6</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>v7</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set individual global parameters for the control</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>fields</td><td class=CDLDescription>White space separated list of field names to set</td></tr><tr><td class=CDLEntry>v1 .. v7</td><td class=CDLDescription>Field values, respecting the order of names in fields argument.</td></tr></table><h4 class=CHeading>Example</h4><blockquote><pre>SS_SetGlobalFields(hCtrl, &quot;nrows ncols&quot;, 2, 2)
+SS_SetGlobalFields(hCtrl, &quot;cell_txtal&quot;, &quot;RIGHT MIDDLE&quot;)</pre></blockquote></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetLockCol"></a>SetLockCol</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetLockCol(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Cols</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Lock columns in active split</p><h4 class=CHeading>Parameter</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Cols</td><td class=CDLDescription>Number of columns to lock</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetLockRow"></a>SetLockRow</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetLockRow(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Rows</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Lock rows in active split</p><h4 class=CHeading>Parameter</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Rows</td><td class=CDLDescription>Number of rows to lock</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetMultiSel"></a>SetMultiSel</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetMultiSel(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>Left,</td></tr><tr><td></td><td class=PParameter nowrap>Top,</td></tr><tr><td></td><td class=PParameter nowrap>Right,</td></tr><tr><td></td><td class=PParameter nowrap>Bottom</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set multiselection</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetRowCount"></a>SetRowCount</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetRowCount(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>nRows</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set number of rows</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetRowHeight"></a>SetRowHeight</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetRowHeight(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0,</td></tr><tr><td></td><td class=PParameter nowrap>Height</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set row height</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Row</td><td class=CDLDescription>Index of the row, by default 0 (header)</td></tr><tr><td class=CDLEntry>Height</td><td class=CDLDescription>Height of the row, by default 0.</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SplittHor"></a>SplittHor</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SplittHor(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Create horizontal splitt in current splitt at current row.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SplittVer"></a>SplittVer</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SplittVer(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Create vertical splitt in current splitt at current col</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SplittClose"></a>SplittClose</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SplittClose(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Close the current splitt</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SplittSync"></a>SplittSync</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SplittSync(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Flag</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Synchronizes a splitt window with it&rsquo;s parent</p></div></div></div>
+
+<div class="CGroup"><div class=CTopic><h3 class=CTitle><a name="Formulas"></a>Formulas</h3><div class=CBody><h4 class=CHeading>Functions</h4><blockquote><pre>Type                        Example                     Description
+---------------------------------------------------------------------------------------------------
+And, Or, Xor                AA1&gt;=0 And AA2&lt;=0           Logical operators
+&lt;, &lt;=, =, &gt;=, &gt;, &lt;&gt;         AA1&gt;=5.5                    Compare operators
++, -, *, /                  ((AA1+AA2)/2-3.5)*4         Basic math operators
+x^y                         AA1^3.5                     x to the power of y
+Sum(r1:r2)                  Sum(AA1:AC6)                Sum of all cells in an area
+Cnt(r1:r2)                  Cnt(AA1:AA5)                Number of cells in an area that contains a value
+Avg(r1:r2)                  Avg(AB1:AB6)                Average value of an area
+Min(r1:r2)                  Min(AA1:AA7)                Returns smallest number in an area
+Max(r1:r2)                  Max(AA1:AB3)                Returns largest number in an area
+Var(r1:r2)                  Var(AB1:AC6)                The variance of an area
+Std(r1:r2)                  Std(AB1:AB6)                The standard deviation of an area
+Sqt(num)                    Sqt(AA1+AA2)                Sqear root
+Sin(num)                    Sin(AA5)                    Sine of an angle in radians
+Cos(num)                    Cos(PI()/8)                 Cosine of an angle in radians
+Tan(num)                    Tan(Rad(45))                Tangent of an angle in radians
+Rad(num)                    Rad(45)                     Converts grades to radians
+PI()                        PI()/4                      Returns PI
+IIf(Cnd,TP,FP)              IIf(AA1=0,AA2,AA3)          IIf(Condition,TruePart,FalsePart)
+On(val,num[,num[,num...]])  On(AA1,AA2,AA3,AA4)         Depending on val, return num
+                                                            If val&lt;=0, return first num
+                                                            If val&gt;=number of num, return last num
+Abs(num)                    Abs(AA5-7)                  Absolute. Returns absolute value of num
+Sgn(num)                    Sgn(AA5)                    Sign. Returns -1, 0 or +1
+Int(num)                    Int(AA5)                    Integer. Returns integer value of num
+Log(num)                    Log(AA5)                    Logarithm to base 10
+Ln(num)                     Ln(e())                     Natural Logarithm
+e()                         e()^AA5                     Returns e
+Asin(num)                   Asin(AA4)                   Inverse Sine
+Acos(num)                   Acos(AA3)                   Inverse Cosine
+Atan(num)                   Atan(AA1)                   Inverse Tangent
+Grd(num)                    Grd(PI()/4)                 Converts radians to grades
+Rgb(num,num,num)            Rgb(255,0,0)                Converts red, green, blue to color
+x()                         Sin(x())                    x value used in calculating graphs fx() math functions
+@(rc,rr)                    @(-1,2)                     Relative cell reference
+CDate(str)                  CDate(&quot;2008-01-01&quot;)         Converts a date string to days since 1601-01-01</pre></blockquote><h4 class=CHeading>Error Conditions</h4><blockquote><pre>Type                        Dscription
+---------------------------------------------------------------------------------------------------
+####Ref                     Circular reference or reference to cell with error condition
+####Err                     Meaning depends on function
+####Div                     Division by zero
+####Ovf                     Overflow
+####Unf                     Underflow</pre></blockquote></div></div></div>
+
+<div class="CGroup"><div class=CTopic><h3 class=CTitle><a name="Graphs"></a>Graphs</h3><div class=CBody><h4 class=CHeading>Syntax</h4><blockquote><pre>Grp( [T], X, Y, fx1 | gx1, fx2 | gx2, ...)      ;no spaces allowed</pre></blockquote><h4 class=CHeading>Definition</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>T(xp,yp,Orientation,Color,&rdquo;Text&rdquo;    )</td><td class=CDLDescription>Text (max 16)</td></tr><tr><td class=CDLEntry>X,Y(xMin,xMax,xOrigo,xStep,Color,&rdquo;Text&rdquo;)</td><td class=CDLDescription>X and Y axis (max 1)</td></tr><tr><td class=CDLEntry>fx(function,xStep,Color,&rdquo;Text&rdquo;)</td><td class=CDLDescription>Graph from math function (max 16)</td></tr><tr><td class=CDLEntry>gx(r1:r2,Color,&rdquo;Text&rdquo;)</td><td class=CDLDescription>Graph from cell values (max 16)</td></tr></table><h4 class=CHeading>Note</h4><p>Bad graph definitions will burn CPU or crash application.&nbsp; Even single space more in Grp syntax will do that, and you will have to kill the AutoHotKey.exe using task manager.</p></div></div></div>
+
+<div class="CGroup"><div class=CTopic><h3 class=CTitle><a name="Examples"></a>Examples</h3><div class=CBody><h4 class=CHeading>First Sample</h4><blockquote><pre>#Singleinstance, force
+    Gui, +LastFound +ToolWindow
+    hwnd := WinExist()
+
+    hCtrl := SS_Add(hwnd, 0, 0, 300, 400, &quot;VSCROLL  GRIDMODE CELLEDIT ROWSIZE COLSIZE ROWSELECT&quot;)
+    SS_SetRowHeight(hCtrl)
+
+    SS_SetColCount(hCtrl, 2)
+    SS_SetRowCount(hCtrl, 8)
+
+    SS_SetColWidth(hCtrl, 1, 148)
+    SS_SetColWidth(hCtrl, 2, 145)
+
+    SS_SetGlobalFields(hCtrl, &quot;cell_txtal&quot;, &quot;CENTER MIDDLE&quot;)
+
+    hCombo := SS_CreateCombo(hCtrl, &quot;item1|item2|item3|item4&quot;)
+
+    SS_SetCell(hCtrl, 1, 1, &quot;type=TEXT&quot;, &quot;txt=Caption&quot;, &quot;bg=0xFF&quot;, &quot;fg=0xFFFFFF&quot;)
+    SS_SetCell(hCtrl, 2, 1, &quot;type=FORCETEXT&quot;)
+
+    SS_SetCell(hCtrl, 1, 2, &quot;type=TEXT&quot;, &quot;txt=Style&quot;, &quot;bg=0xFF&quot;, &quot;fg=0xFFFFFF&quot;)
+    SS_SetCell(hCtrl, 2, 2, &quot;type=COMBOBOX&quot;, &quot;txt=&quot; hCombo, &quot;data=1&quot;, &quot;imgal=RIGHT&quot;,  &quot;txtal=CENTER&quot;)   ;select 2nd item
+
+    SS_SetCell(hCtrl, 1, 3, &quot;type=TEXT&quot;, &quot;txt=Anchor&quot;, &quot;bg=0xFF&quot;, &quot;fg=0xFFFFFF&quot;)
+    SS_SetCell(hCtrl, 2, 3, &quot;type=BUTTON TEXT&quot;, &quot;txt=w0.5 h&quot;, &quot;imgal=RIGHT&quot;, &quot;txtal=CENTER&quot;)
+
+    SS_SetCell(hCtrl, 1, 4, &quot;type=TEXT&quot;, &quot;txt=Visible&quot;, &quot;bg=0xFF&quot;, &quot;fg=0xFFFFFF&quot;)
+    SS_SetCell(hCtrl, 2, 4, &quot;type=CHECKBOX&quot;, &quot;data=1&quot;, &quot;imgal=CENTER&quot;)
+
+    SS_SetCell(hCtrl, 1, 6, &quot;type=TEXT&quot;, &quot;txt=Help&quot;, &quot;bg=0xFFFF&quot;, &quot;fg=-1&quot;)
+    SS_SetCell(hCtrl, 2, 6, &quot;type=HYPERLINK&quot;, &quot;txt=www.autohotkey.com&quot;, &quot;txtal=CENTER&quot;)
+
+    SS_SetCell(hCtrl, 1, 8, &quot;type=WIDEBUTTON TEXT&quot;, &quot;Txt=Wide &amp;Button&quot;, &quot;txtal=CENTER&quot;)
+
+    Gui, Show, w300 h150
+return</pre></blockquote><h4 class=CHeading>Get Cell Information</h4><blockquote><pre>SS_GetCellArray(hCtrl, &quot;cell&quot;)    ;&quot;cell&quot; name of pseudo array holding the data, use selected cell
+msg =
+(LTrim
+   Text   = %cell_txt%
+   Data   = %cell_data%
+   State  = %cell_hState%
+
+   bg     = %cell_bg%
+   fg     = %cell_fg%
+   txtal  = %cell_htxtal%
+   imgal  = %cell_himgal%
+   fnt    = %cell_fnt%
+   type   = %cell_Type%
+)
+
+msgbox %msg%</pre></blockquote><h4 class=CHeading>Set All Global Data</h4><blockquote><pre>;header and cell defaults
+h_bg := c_bg   := 0xAAAAAA
+h_txtal := c_txtal := &quot;CENTER MIDDLE&quot;
+h_fg := 0xFF0000
+h_fnt := 2
+
+g_ncols     := 100           ;number of  columngs
+g_nrows     := 100           ;number of rows
+
+g_colhdrbtn := 0             ;button sytle col hdr
+g_rowhdrbtn := 0             ;button style row hdr
+g_winhdrbtn := 0             ;button style win hdr
+g_lockcol   := 0xAAAAAA      ;Back color of locked cell
+g_hdrgrdcol := 0xFF00FF      ;Header grid color
+g_grdcol    := 0xFFFFFF      ;Cell grid color
+g_bcknfcol  := 0xCCCCCC      ;Back color of active cell, lost focus
+g_txtnfcol  := 1             ;Text color of active cell, lost focus
+g_bckfocol  := 0xFFFF        ;Back color of active cell, has focus
+g_txtfocol  := 0             ;Text color of active cell, has focus
+
+g_ghdrwt    := 25            ;header width
+g_ghdrht    := 25            ;header height
+g_gcellw    := 50            ;cell width
+g_gcellht   := 50            ;cell height
+
+SS_SetGlobal(hCtrl, &quot;g&quot;, &quot;c&quot;, &quot;h&quot;, &quot;h&quot;, &quot;h&quot;)</pre></blockquote><h4 class=CHeading>Formula Example</h4><blockquote><pre>;formula
+    Gui, +LastFound
+    hwnd := WinExist()
+
+    hCtrl := SS_Add(hwnd, 0, 25, 552, 477, &quot;CELLEDIT STATUS&quot;)
+
+    SS_SetCell(hCTrl, 1, 1, &quot;txt= x  =&quot;, &quot;type=TEXT&quot;, &quot;txtal=CENTER&quot;, &quot;fnt=1&quot;)
+    SS_SetCell(hCTrl, 1, 2, &quot;txt= y  =&quot;, &quot;type=TEXT&quot;, &quot;txtal=CENTER&quot;, &quot;fnt=1&quot;)
+    SS_SetCell(hCTrl, 1, 3, &quot;txt=x+y =&quot;, &quot;type=TEXT&quot;, &quot;txtal=CENTER&quot;, &quot;fnt=1&quot;)
+
+    SS_SetCell(hCtrl, 2, 1, &quot;type=INTEGER&quot;, &quot;txt=90&quot;, &quot;fnt=1&quot;, &quot;txtal=LEFT&quot;)
+    SS_SetCell(hCtrl, 2, 2, &quot;type=INTEGER&quot;, &quot;txt=20&quot;, &quot;fnt=1&quot;, &quot;txtal=LEFT&quot; )
+    SS_SetCell(hCtrl, 2, 3, &quot;type=FORMULA&quot;, &quot;txt=AB1+AB2&quot;, &quot;txtal=LEFT&quot;)
+    SS_ReCalc(hCtrl)
+
+    Gui, Show, w550 h500, SpreadSheet
+return</pre></blockquote><h4 class=CHeading>Graph Example</h4><blockquote><pre>    Gui, +LastFound
+    hwnd := WinExist()
+
+    hCtrl := SS_Add(hwnd, 0, 25, 552, 477)
+
+    graph =
+    (LTrim Join
+        Grp(
+            T(-1,0,0,Rgb(0,0,0),&quot;Graph Demo&quot;),
+            X(0,PI()*4,0,1,Rgb(0,0,255),&quot;x-axi),
+            Y(-1.1,1.1,0,0.5,Rgb(255,0,0),&quot;y-axs&quot;is&quot;),
+            gx(AJ1:AJ13,Rgb(0,0,0),&quot;Cell values&quot;),
+            fx(Sin(x()),0.1,Rgb(255,0,255),&quot;Sin(x)&quot;),
+            fx(x()^3-x()^2-x(),0.1,Rgb(0,128,0),&quot;x^3-x^2-x&quot;))
+    )
+
+    SS_SetCell(hCtrl, 1, 1, &quot;type=GRAPH&quot;, &quot;txt=&quot; graph, &quot;bg=0x0D0FFFF&quot;)
+    SS_ExpandCell(hCtrl, 1, 1, 6, 15)
+
+    Gui, Show, w550 h500, SpreadSheet
+return</pre></blockquote></div></div></div>
+
+<div class="CGroup"><div class=CTopic><h3 class=CTitle><a name="Known_Bugs"></a>Known Bugs</h3><div class=CBody><ul><li>Cell cursor disapears in expanded cells.</li><li>Multiselect scrolling by mouse is too fast.</li><li>Scroll-locked area does not work well with splitts.</li><li>Float to ascii does not work on numbers &gt; 1e000 or &lt; 1e-4000</li></ul></div></div></div>
+
+<div class="CGroup"><div class=CTopic><h3 class=CTitle><a name="About"></a>About</h3><div class=CBody><ul><li>AHK module ver 2.1.1 by majkinetor</li><li>SpreadSheet control Version: 0.0.2.1 by KetilO <a href="http://www.masm32.com/board/index.php?topic=6913.0" class=LURL target=_top>http://www.masm32.com<wbr>/board<wbr>/index.php?topic=6913.0</a></li><li>Licenced under GNU GPL <a href="http://creativecommons.org/licenses/GPL/2.0/" class=LURL target=_top>http://creativecommons.org/licenses/GPL/2.0/</a></li></ul></div></div></div>
+
+</div><!--Content-->
+
+
+<div id=Footer><a href="http://www.naturaldocs.org">Generated by Natural Docs</a></div><!--Footer-->
+
+
+
+
+
+
+<!--START_ND_TOOLTIPS-->
+<div class=CToolTip id="tt1"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_Add(</td><td class=PParameter nowrap>hGui,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>X</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0,</td></tr><tr><td></td><td class=PParameter nowrap>Y</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0,</td></tr><tr><td></td><td class=PParameter nowrap>W</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>200,</td></tr><tr><td></td><td class=PParameter nowrap>H</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>100,</td></tr><tr><td></td><td class=PParameter nowrap>Style</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;VSCROLL HSCROLL&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Handler</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>DllPath</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;SprSht.dll&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Add control to the Gui</div></div><div class=CToolTip id="tt2"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_BlankCell(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Erase the cell</div></div><div class=CToolTip id="tt3"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_CreateCombo(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Content,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Height</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>150</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Creates COMBOBOX cell type</div></div><div class=CToolTip id="tt4"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_ConvertDate(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Date,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>RefreshFormat</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>false</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Converts date from / to integer</div></div><div class=CToolTip id="tt5"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_DeleteCell(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Delete cell</div></div><div class=CToolTip id="tt6"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_DeleteCol(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Delete column</div></div><div class=CToolTip id="tt7"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_ExpandCell(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>Left,</td></tr><tr><td></td><td class=PParameter nowrap>Top,</td></tr><tr><td></td><td class=PParameter nowrap>Right,</td></tr><tr><td></td><td class=PParameter nowrap>Bottom</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Expand a cell to cover more than one cell</div></div><div class=CToolTip id="tt8"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCell(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>Col,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>Row,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>pQ,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o1</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o3</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o4</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o5</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get the cell parameters.</div></div><div class=CToolTip id="tt9"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCellArray(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>V,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get all cell parameters into array.</div></div><div class=CToolTip id="tt10"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCellData(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get the cell data.</div></div><div class=CToolTip id="tt11"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCellRect(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>top,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>left,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>right,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>bottom</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get the current cells rect in active splitt.</div></div><div class=CToolTip id="tt12"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCellText(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get cell text</div></div><div class=CToolTip id="tt13"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCellType(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Flag</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get cell data type</div></div><div class=CToolTip id="tt14"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetColCount(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get number of columns</div></div><div class=CToolTip id="tt15"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetColWidth(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>col</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get column width.</div></div><div class=CToolTip id="tt16"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCurrentCell(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>col,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>row</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get current col/row in active window</div></div><div class=CToolTip id="tt17"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCurrentCol(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get current column in active window.</div></div><div class=CToolTip id="tt18"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCurrentRow(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get current row in active window.</div></div><div class=CToolTip id="tt19"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetCurrentWin(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get active splitt window</div></div><div class=CToolTip id="tt20"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetDateFormat(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get date format</div></div><div class=CToolTip id="tt21"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetLockCol(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get lock cols in active splitt</div></div><div class=CToolTip id="tt22"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetLockRow(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get lock rows in active splitt.</div></div><div class=CToolTip id="tt23"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetMultiSel(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>Top</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>Left</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>Right</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>Bottom</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get multiselection</div></div><div class=CToolTip id="tt24"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetRowCount(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get number of rows</div></div><div class=CToolTip id="tt25"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_GetRowHeight(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Returns row height</div></div><div class=CToolTip id="tt26"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_ImportLine(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>DataLine,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>SepChar</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Import a line of data.</div></div><div class=CToolTip id="tt27"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_InsertCol(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Insert column</div></div><div class=CToolTip id="tt28"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_InsertRow(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>-1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Insert row</div></div><div class=CToolTip id="tt29"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_LoadFile(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>File</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Load a file</div></div><div class=CToolTip id="tt30"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_NewSheet(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Clears the sheet.</div></div><div class=CToolTip id="tt31"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_ReCalc(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Recalculates the sheet</div></div><div class=CToolTip id="tt32"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SaveFile(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>File</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Save a file</div></div><div class=CToolTip id="tt33"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_ScrollCell(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Scrolls current cell into view.</div></div><div class=CToolTip id="tt34"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetCell(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o1</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o3</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o4</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o5</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o6</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o7</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o8</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o9</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o10</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o11</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set content of the cell</div></div><div class=CToolTip id="tt35"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetCellData(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Data,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set the data of the cell.</div></div><div class=CToolTip id="tt36"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetCellBLOB(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>BLOB,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>Col</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set the cell binary data.</div></div><div class=CToolTip id="tt37"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetCellString(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Txt</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>Type</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set the text of the selected cell.</div></div><div class=CToolTip id="tt38"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetColWidth(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>col,</td></tr><tr><td></td><td class=PParameter nowrap>width</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set column width</div></div><div class=CToolTip id="tt39"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetCurrentCell(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>col,</td></tr><tr><td></td><td class=PParameter nowrap>row</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set current cell in active window</div></div><div class=CToolTip id="tt40"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetCurrentWin(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>nWin</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set active splitt window</div></div><div class=CToolTip id="tt41"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetDateFormat(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>Format</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set date format</div></div><div class=CToolTip id="tt42"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetColCount(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>nCols</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set number of columns</div></div><div class=CToolTip id="tt43"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetFont(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>idx,</td></tr><tr><td></td><td class=PParameter nowrap>pFont</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set font</div></div><div class=CToolTip id="tt44"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetGlobal(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>g,</td></tr><tr><td></td><td class=PParameter nowrap>cell,</td></tr><tr><td></td><td class=PParameter nowrap>colhdr,</td></tr><tr><td></td><td class=PParameter nowrap>rowhdr,</td></tr><tr><td></td><td class=PParameter nowrap>winhdr</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set all global parameters for the control</div></div><div class=CToolTip id="tt45"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetGlobalFields(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Fields,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>v1</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>v2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>v3</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>v4</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>v5</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>v6</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>v7</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set individual global parameters for the control</div></div><div class=CToolTip id="tt46"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetLockCol(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Cols</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Lock columns in active split</div></div><div class=CToolTip id="tt47"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetLockRow(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Rows</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Lock rows in active split</div></div><div class=CToolTip id="tt48"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetMultiSel(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>Left,</td></tr><tr><td></td><td class=PParameter nowrap>Top,</td></tr><tr><td></td><td class=PParameter nowrap>Right,</td></tr><tr><td></td><td class=PParameter nowrap>Bottom</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set multiselection</div></div><div class=CToolTip id="tt49"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetRowCount(</td><td class=PParameter nowrap>hCtrl,</td></tr><tr><td></td><td class=PParameter nowrap>nRows</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set number of rows</div></div><div class=CToolTip id="tt50"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SetRowHeight(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Row</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0,</td></tr><tr><td></td><td class=PParameter nowrap>Height</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>0</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set row height</div></div><div class=CToolTip id="tt51"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SplittHor(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Create horizontal splitt in current splitt at current row.</div></div><div class=CToolTip id="tt52"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SplittVer(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Create vertical splitt in current splitt at current col</div></div><div class=CToolTip id="tt53"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SplittClose(</td><td class=PParameter nowrap>hCtrl</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Close the current splitt</div></div><div class=CToolTip id="tt54"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>SS_SplittSync(</td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>Flag</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Synchronizes a splitt window with it&rsquo;s parent</div></div><!--END_ND_TOOLTIPS-->
+
+
+
+
+<div id=MSearchResultsWindow><iframe src="" frameborder=0 name=MSearchResults id=MSearchResults></iframe><a href="javascript:searchPanel.CloseResultsWindow()" id=MSearchResultsWindowClose>Close</a></div>
+
+
+<script language=JavaScript><!--
+if (browserType) {if (browserVer) {document.write("</div>"); }document.write("</div>");}// --></script></body></html>
