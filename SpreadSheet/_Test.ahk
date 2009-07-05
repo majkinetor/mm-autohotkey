@@ -1,5 +1,7 @@
 _()
-S(s, "DRAWITEMSTRUCT: CtlType CtlID itemID itemAction itemState hwndItem hDC left top right bottom itemData")
+S(_,"DRAWITEMSTRUCT: CtlType CtlID itemID itemAction itemState hwndItem hDC left top right bottom itemData")
+S(_,"BLOBRECT: size=.2 left top right bottom")
+
 version = 2.1
 #singleinstance, force
 #MaxThreads, 255
@@ -40,6 +42,7 @@ CoordMode, tooltip, screen
 	SS_SetCell(hCtrl, 2, 3, "type=BUTTON FORCETEXT FIXEDSIZE", "txt=w0.5 h", "imgal=MIDDLE RIGHT", "fnt=1")
 
 	SS_SetCell(hCtrl, 1, 4, "type=TEXT", "txt=Visible", "bg=0xFF", "fg=0xFFFFFF")
+	SS_SetCell(hCtrl, 2, 4, "type=CHECKBOX", "txt=yes", "data=1", "fg=0xFFF")
 
 
 	SS_SetCell(hCtrl, 1, 6, "type=TEXT", "txt=Help", "bg=0xFFFF", "fg=-1")
@@ -68,9 +71,14 @@ CoordMode, tooltip, screen
 	SS_ExpandCell(hCtrl, 1, 14, 4, 20)
 	SS_ReCalc(hCtrl)
 
-	SS_SetCell(hCtrl, 5, 3, "type=OWNERDRAWINTEGER", "txt=101", "state=LOCKED", "h=45", "w=90"), hIcon := LoadIcon()
-	SS_SetCell(hCtrl, 6, 3, "type=OWNERDRAWBLOB", "txt=test", "state=LOCKED"), hIcon := LoadIcon()
+	;blobs
+	hIcon := LoadIcon(), 	S(BUF, "BLOBRECT! size left right", p0:=16, p1:=10, p2:=30)
+	SS_SetCell(hCtrl, 1, 5, "type=OWNERDRAWINTEGER", "txt=101", "state=LOCKED", "h=45", "w=90")		
+	SS_SetCell(hCtrl, 2, 5, "type=OWNERDRAWBLOB", "txt=test", "state=LOCKED")	;overdrawtext
+	SS_SetCell(hCtrl, 3, 5, "type=OWNERDRAWBLOB", "w=200", "state=LOCKED")		;overdrawblob
+	SS_SetCellBLOB(hCtrl, BUF, 3, 5)
 
+	
 	SS_SetGlobalFields(hCtrl, "cell_txtal", "RIGHT MIDDLE")
 	Gui, Show, w%w% h%h%, SpreadSheet
 	SS_Focus(hCtrl)		;refresh
@@ -80,12 +88,19 @@ return
 Handler(hwnd, Event, EArg, Col, Row) {
 	static s
 	GLOBAL hicon
+
 	if Event=D
 	{
 		S(_:=EArg, "DRAWITEMSTRUCT) hDc left top", hdc, left, top)
-		d := SS_GetCell(hwnd, col, row, "txt")
-	    DllCall("DrawIcon","uint", hDC,"uint", left ,"uint", top,"uint", hIcon)
-		DllCall("TextOut", "uint", hDC, "uint", left+12, "uint", top+8, "str", "Icon " d, "uint", StrLen(d)+5)		
+		bBlob := col = 3
+
+		if !bBlob
+			  d := SS_GetCellText(hwnd, col, row)  ;overdrawinteger
+		else  d := SS_GetCellBlob(EArg), S(d, "BLOBRECT) left right", l, r), d := "BLOB Rect width: " r-l   ;overdrawblob
+
+		if !bBlob
+			DllCall("DrawIcon","uint", hDC,"uint", left ,"uint", top,"uint", hIcon)
+		DllCall("TextOut", "uint", hDC, "uint", left+12, "uint", top+8, "str", d, "uint", StrLen(d))		
 		return	
 	}
 
@@ -96,7 +111,6 @@ Handler(hwnd, Event, EArg, Col, Row) {
 	if StrLen(s) > 500 
 		s =
 }
-
 
 SetGlobalSettings(){
 	global

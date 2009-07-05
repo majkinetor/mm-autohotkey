@@ -41,12 +41,7 @@
 			D	- Pointer to DRAWITEMSTRUCT. See http://msdn.microsoft.com/en-us/library/bb775802(VS.85).aspx
 
 	Returns:
-			Control's handle
-
-	Remarks:
-			Although overdrawn items are supported, keep in mind that creating at least one of such items will instantiate message handler for WM_DRAWITEM message,
-			which will get called by the control very frequently. Depending on number of such cell's and individual cell attributes, handler might be called even 1000 times per sec,
-			especially when user is resizing columns and rows. If you need to use overdrawn types, try to keep the amount of work in Handler at minimum.
+			Control's handle	
 
   */
 SS_Add(hGui,X=0,Y=0,W=200,H=100, Style="VSCROLL HSCROLL", Handler="", DllPath="SprSht.dll"){
@@ -282,11 +277,11 @@ SS_GetCell(hCtrl, Col, Row, pQ, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=
 
 		if (field="txt"){
 			if type in %INTEGER%,%OWNERDRAWINTEGER%
-				 v := NumGet(pData+0)		
+				 v := NumGet(pData+0)
 			else if type in %FLOAT%,%FORMULA%
 				 v := SS_getCellFloat(hCtrl, col, row)
 			else if (type=COMBOBOX)
-				 v := NumGet(pData+4)
+				 v := NumGet(pData+4)			
 			else v := SS_strAtAdr(pData + (type=CHECKBOX || type=OWNERDRAWBLOB ? 4 : 0))
 		} 
 
@@ -345,17 +340,31 @@ SS_GetCellArray(hCtrl, V, Col="", Row=""){
 	type &= ~0xF0
 	ifEqual, type, %EXPANDED%, return
 
-	if type in %CHECKBOX%,%COMBOBOX%
+	if type in %CHECKBOX%,%COMBOBOX%,%OWNERDRAWBLOB%
 	{
 		%V%_data:= NumGet(pData+0)
 		%V%_txt	:= type=COMBOBOX ? NumGet(pData+4) : SS_strAtAdr(pData + 4)
 	} 
 	else if type in %FLOAT%,%FORMULA%
 		%V%_txt := SS_getCellFloat(hCtrl, col, row)		
-	else if (type=INTEGER)
+	else if type in %INTEGER%,%OWNERDRAWINTEGER%
 		%V%_txt	:= NumGet(pData+0)
 	else 
 		%V%_txt	:= SS_strAtAdr(pData)	;copy text
+}
+
+
+/*  Function: GetCellBlob
+			  Returns pointer to the current cell BLOB.
+
+	Parameters:
+			  EArg	   - D event handlers event argument (pointer to DRAWITEM struct).
+			  GetText? - Set to true to return text instead of binary data.
+*/
+
+SS_GetCellBLOB(EArg, GetText=false) {	
+	pData := NumGet( NumGet(EArg+44)+36 )
+	return GetText ? DllCall("MulDiv","UInt",pData+4,"UInt",1,"UInt",1, "str") : pData
 }
 
 /*
@@ -733,11 +742,12 @@ SS_ScrollCell(hCtrl) {
 
 	Type Dependent Named Parameters:
 			  txt		- String (TEXT,CHECKBOX,*HDR), Number (INTEGER), hwndCombo (COMBOBOX), Formula Definition (FORMULA), Graph Definition (GRAPH)
-			  data		- 0-based selected index, 0 by default (COMBOBOX), 1|0 (CHECKBOX)
+			  data		- 0-based selected index, 0 by default (COMBOBOX), 1|0 (CHECKBOX), size (OVERDRAWBLOB, return)
 
 	Types:
 			o TEXT TEXTMULTILINE INTEGER(32b) FLOAT(32b-80b) HYPERLINK CHECKBOX COMBOBOX FORMULA GRAPH
-			o OWNERDRAWINTEGER - Ownerdrawn integer. You can implement D (draw) event.
+			o OWNERDRAWINTEGER - Ownerdraw integer. You can implement D (draw) event.
+			o OWNERDRAWBLOB	- Ownerdraw BLOB. You can put any binary data as cell's BLOB content. There is special support for textual BLOBs.
 			o EMPTY	- The cell contains formatting only.
 			o COLHDR ROWHDR WINHDR	- Column, row and window (splitt) header.
 			o EXPANDED - Part of expanded cell, internally used.
@@ -763,7 +773,7 @@ SS_ScrollCell(hCtrl) {
 			LEFT RIGHT MIDDLE - X aligments
 			TOP CENTER BOTTOM - Y aligments
 			AUTO - Text left middle, numbers right middle
-			GLOBAL	- If you omit aligment attribute, this one will be used. 
+			GLOBAL	- If you omit aligment attribute, this one will be used.
   */
 SS_SetCell(hCtrl, Col="", Row="", o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o9="", o10="", o11=""){
 	static SPRM_SETCELLDATA=0x483, SPRM_GETCELLDATA=0x482, SPRM_GETCELLTYPE=0x48F, WM_DRAWITEM := 0x02B, initOverDraw
@@ -884,6 +894,27 @@ SS_SetCellData(hCtrl, Data, Col="", Row="") {
 	SendMessage,SPRM_GETCELLDATA,,&ITEM,, ahk_id %hCtrl%
 	NumPut( Data, NumGet(ITEM, 36)+0)
 	SendMessage,SPRM_SETCELLDATA,,&ITEM,, ahk_id %hCtrl%
+}
+
+/*
+	Function: SetCellBLOB
+			  Set the cell binary data.
+
+	Parameters:
+			  BLOB		- Reference to binary data to set. First word contains BLOB size.
+			  Col, Row	- Cell coordinates. If omited current cell coordinates will be used.
+			  
+  */
+SS_SetCellBLOB(hCtrl, ByRef BLOB, Col="", Row="") {
+	static SPRM_SETCELLDATA=0x483, SPRIF_DATA=0x200, init
+	if !init
+		init++, VarSetCapacity(ITEM, 40, 0), NumPut(SPRIF_DATA, ITEM) 
+	if Col=
+		SS_GetCurrentCell(hCtrl, Col, Row)
+
+	NumPut(Col, ITEM, 4), NumPut(Row, ITEM, 8), NumPut(&BLOB, ITEM, 36)
+	SendMessage,SPRM_SETCELLDATA,,&ITEM,, ahk_id %hCtrl%
+	return ErrorLevel
 }
 
 /*
