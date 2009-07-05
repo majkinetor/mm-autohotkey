@@ -23,6 +23,9 @@ CoordMode, tooltip, screen
 
 	SS_SetCell(hCtrl, 1, 1, "type=FLOAT", "txt=14.123456", "txtal=4 RIGHT", "state=LOCKED")
 
+	hCombo := SS_CreateCombo(hCtrl, "0|1|2|3|4|5|6|7|8|9|10")
+	SS_SetCell(hCtrl, 2, 7, "type=COMBOBOX FIXEDSIZE", "txt=" hCombo, "imgal=right")
+
 	SS_SetCell(hCtrl, 1, 0, "txt=hello", "")
 	SS_SetCell(hCtrl, 0, 1, "txtal=BOTTOM RIGHT")
 
@@ -80,8 +83,6 @@ CoordMode, tooltip, screen
 	Gui, Show, w%w% h%h%, SpreadSheet
 	SS_Redraw(hCtrl)		;refresh
 return
-
-F2:: SetGlobalSettings()
 
 Handler(hwnd, Event, EArg, Col, Row) {
 	static s
