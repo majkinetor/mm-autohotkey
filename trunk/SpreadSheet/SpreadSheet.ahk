@@ -224,15 +224,6 @@ SS_ExpandCell(hCtrl, Left, Top, Right, Bottom ){
 }
 
 /*
-	Function: Focus
-			  Focus control. You can also use this function to refresh control.
-  */
-SS_Focus(hCtrl) {
-	ControlFocus,, ahk_id %hCtrl%
-	sleep, -1
-}
-
-/*
 	Function: GetCell
 			  Get the cell parameters.
 
@@ -704,6 +695,15 @@ SS_ReCalc(hCtrl){
 	static SPRM_RECALC=0x476		
 	SendMessage,SPRM_RECALC,,,, ahk_id %hCtrl%
 	return ERRORLEVEL
+}
+
+/*
+	Function: ReCalc
+			  Redraw the control.
+  */
+SS_Redraw(hCtrl){
+	static RDW_ALLCHILDREN:=0x80, RDW_INVALIDATE:=0x1
+	return DllCall("RedrawWindow", "uint", hCtrl, "uint", 0, "uint", 0, "uint", RDW_INVALIDATE | RDW_ALLCHILDREN)
 }
 
 /*
@@ -1706,11 +1706,12 @@ return
 */
 
 /* Group: About
-	o AHK module ver 2.1 by majkinetor for control version 0.0.2.1
+	o AHK module ver 2.1.1 by majkinetor
 	o SpreadSheet control Version: 0.0.2.1 by KetilO <http://www.masm32.com/board/index.php?topic=6913.0>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
 
  */
 
-;HexView Structure
+;HexView & S Structure
 ;[ITEM:|flag D|col D|row D|expx B|expy B|state B|dummy B|fmt.bckcol D|fmt.txtcol D|fmt.txtal B|fmt.imgal B|fmt.fnt B|fmt.tpe B|wt D|ht D|lpdta D
+;ITEM: flag col row expx=.1 expy=.1 state=.1 dummy=.1 bckcol txtcol txtal=.1 imgal=.1 fnt=.1 type=.1 w h lpdta
