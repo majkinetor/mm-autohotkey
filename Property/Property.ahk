@@ -476,11 +476,11 @@ Property_handler(hCtrl, event, earg, col, row){
 	if (r && event="EA" && param != "")	; checkbox & combobox don't have EDIT, but only UPDATE notification and in that case you can't prevent change.
 		SS_SetCellData(hCtrl, last, col, row), SS_Redraw(hCtrl)
 	return r
-}
 
 Property_timer:
 	SS_SetCurrentCell(hCtrl, 2, SS_GetCurrentRow(hCtrl))
 return
+}
 
 Property_initSheet(hCtrl, c=120){
 	static b
