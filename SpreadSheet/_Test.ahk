@@ -1,10 +1,8 @@
-_()
 S(_,"DRAWITEMSTRUCT: CtlType CtlID itemID itemAction itemState hwndItem hDC left top right bottom itemData")
 S(_,"BLOBRECT: size=.2 left top right bottom")
 
 version = 2.1
 #singleinstance, force
-#MaxThreads, 255
 SetBatchLines, -1
 CoordMode, tooltip, screen
 
@@ -22,7 +20,6 @@ CoordMode, tooltip, screen
 
 	hCtrl := SS_Add(hwnd, 0, hdr, w, h-hdr, "WINSIZE VSCROLL HSCROLL CELLEDIT ROWSIZE COLSIZE STATUS MULTISELECT", "Handler")
 	
-	SS_SetCell(hCtrl, 3, 1, "type=INTEGER DATE", "txt=" i := SS_ConvertDate(hCtrl, "10.11.1976"), "w=100")
 
 	SS_SetCell(hCtrl, 1, 1, "type=FLOAT", "txt=14.123456", "txtal=4 RIGHT", "state=LOCKED")
 
@@ -32,7 +29,7 @@ CoordMode, tooltip, screen
 
 	SS_SetDateFormat(hCtrl, "dd.MM.yyyy")
 	SS_SetCell(hCtrl, 3, 1, "type=INTEGER DATE", "txt=" i := SS_ConvertDate(hCtrl, "10.11.1976"), "w=100")
-	SS_SetCell(hCtrl, 4, 1, "type=INTEGER", "txt=" i)	
+
 	SS_SetCell(hCtrl, 2, 1, "type=TEXTMULTILINE FORCETYPE", "txt=Some`nMultiline Text", "fnt=1")
 
 
@@ -42,7 +39,7 @@ CoordMode, tooltip, screen
 	SS_SetCell(hCtrl, 2, 3, "type=BUTTON FORCETEXT FIXEDSIZE", "txt=w0.5 h", "imgal=MIDDLE RIGHT", "fnt=1")
 
 	SS_SetCell(hCtrl, 1, 4, "type=TEXT", "txt=Visible", "bg=0xFF", "fg=0xFFFFFF")
-	SS_SetCell(hCtrl, 2, 4, "type=CHECKBOX", "txt=yes", "data=1", "fg=0xFFF")
+	SS_SetCell(hCtrl, 2, 4, "type=CHECKBOX FIXEDSIZE", "txt=yes", "data=1", "fg=0xFFFF", "bg=0x421A", "h=40")
 
 
 	SS_SetCell(hCtrl, 1, 6, "type=TEXT", "txt=Help", "bg=0xFFFF", "fg=-1")
@@ -78,13 +75,13 @@ CoordMode, tooltip, screen
 	SS_SetCell(hCtrl, 3, 5, "type=OWNERDRAWBLOB", "w=200", "state=LOCKED")		;overdrawblob
 	SS_SetCellBLOB(hCtrl, BUF, 3, 5)
 
-	
+
 	SS_SetGlobalFields(hCtrl, "cell_txtal", "RIGHT MIDDLE")
 	Gui, Show, w%w% h%h%, SpreadSheet
-	SS_Focus(hCtrl)		;refresh
+	SS_Redraw(hCtrl)		;refresh
 return
 
-F2:: SetGlobalSettings(), SS_Focus(hctrL)
+F2:: SetGlobalSettings()
 
 Handler(hwnd, Event, EArg, Col, Row) {
 	static s
@@ -191,7 +188,7 @@ OnChange:
 		msgbox %left% %top% %right% %bottom%
 	}
 	if c=Set Multisel
-		SS_SetMultiSel(hCtrl, 2, 1, 4, 8), 	SS_Focus(hCtrl)
+		SS_SetMultiSel(hCtrl, 2, 1, 4, 8)
 
 	if c=Set Global
 		SetGlobalSettings()
@@ -257,7 +254,7 @@ OnChange:
 	if c=Set Cell Data to 0
 		SS_SetCellData(hCtrl, 0)
 
-	SS_Focus(hCtrl)
+	SS_Redraw(hCtrl)
 return
 
 Anchor(c, a = "", r = false) { ; v3.6 - Titan
@@ -331,5 +328,48 @@ return
 LoadIcon()
 {
 	return DllCall("LoadIcon", "uint", hInstance, "uint", 32512)
+}
 
+S(ByRef S,pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",ByRef  o6="",ByRef o7="",ByRef  o8=""){
+	static
+	static 1="UChar", 2="UShort", 4="Uint", 004="Float", 8="Uint64", 008="Double", 01="Char", 02="Short", 04="Int", 08="Int64"
+	local last_offset:=-4, last_type := 4, i, j, R
+
+	if (o1 = "~`a ")
+	{		
+		j := InStr(pQ, ":"), R := SubStr(pQ, 1, j-1), pQ := SubStr(pQ, j+2)
+		if i := InStr(R, "=")
+			_ := SubStr(R, 1, i-1), _%_% := SubStr(R, i+1, j-i), R:=_		
+
+		IfEqual, R,, return A_ThisFunc "> Struct name can't be empty"
+		loop, parse, pQ, %A_Space%, %A_Space%
+		{
+			j := InStr(A_LoopField, "=")
+			If j
+				 field := SubStr(A_LoopField, 1, j-1), offset := SubStr(A_LoopField, j+1)
+			else field := A_LoopField, offset := last_offset + last_type 
+
+			d := InStr(offset, ".")
+			if d
+				 type := SubStr(offset, d+1), offset := SubStr(offset, 1, d-1)
+			else type := 4
+			IfEqual, offset, , SetEnv, offset, % last_offset + last_type
+
+			%R%_%field% := offset "." type,  last_offset := offset,  last_type := type
+		}
+		return _%R%!="" ? _%R% : _%R% := last_offset + last_type
+	}
+	j := InStr(pQ, A_Space)-1,  i := SubStr(pQ, j, 1), R := SubStr(pQ, 1, j-1), pQ := SubStr(pQ, j+2)
+	IfEqual, R,, return A_ThisFunc "> Struct name can't be empty"
+	if (i = "!") 
+		 VarSetCapacity(s, _%R%)
+	loop, parse, pQ, %A_Space%, %A_Space%
+	{	
+		field := A_LoopField, data := %R%_%field%, offset := floor(data), type := SubStr(data, StrLen(offset)+2), type := %type%
+		ifEqual, data, , return A_ThisFunc "> Field or struct isn't recognised :  " R "." field 
+		if i in >,)
+			  o%A_Index% := NumGet(i=")" ? S+0 : &S+0, offset,type)
+		else  NumPut(o%A_Index%, i=")" ? S : &S+0, offset,type)
+	}
+	return o1	
 }
