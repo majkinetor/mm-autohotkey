@@ -84,6 +84,7 @@ CoordMode, tooltip, screen
 	SS_Focus(hCtrl)		;refresh
 return
 
+F2:: SetGlobalSettings(), SS_Focus(hctrL)
 
 Handler(hwnd, Event, EArg, Col, Row) {
 	static s
@@ -133,7 +134,7 @@ SetGlobalSettings(){
 	g_bckfocol  := 0xFFFF	    ;Back color of active cell, has focus   
 	g_txtfocol  := 0			;Text color of active cell, has focus   
 
-	g_ghdrwt    := 25			;header width
+	g_ghdrwt    := 75			;header width
 	g_ghdrht    := 25			;header height
 	g_gcellw    := 50			;cell width
 	g_gcellht   := 20			;cell height
@@ -171,7 +172,10 @@ OnChange:
 		SS_DeleteCell(hCtrl)
 
 	if c=Current Cell
+	{
+		SS_GetCurrentCell(hCtrl, col, row)
 		msgbox %col% %row%
+	}
 
 	if c=Delete Col
 		SS_DeleteCol(hCtrl)

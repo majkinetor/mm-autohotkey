@@ -372,7 +372,10 @@ SS_GetCellBLOB(EArg, GetText=false) {
 			  Get the cell data. 
 
 	Parameters:
-			  Col, Row	- Cell coordinates. If omited, current cell will be used
+			  Col, Row	- Cell coordinates. If omited, current cell will be used.
+
+	Remarks:
+			  This funcion also returns data for OVERDRAWINTEGER type. Its faster to use to get the integer then other functions.
   */
 SS_GetCellData(hCtrl, Col="", Row="") {
 	static SPRM_GETCELLDATA=0x482, SPRIF_DATA=0x200, init
@@ -1043,13 +1046,13 @@ SS_SetFont(hCtrl, idx, pFont) {
 			  Set all global parameters for the control
 
 	Parameters:
-				g		- Global formating array base name
-				cell	- Cell formatting array base name, optional
-				colhdr	- Column header formatting array base name, optional
-				rowhdr	- Row header formatting array base name, optional
-				winhdr	- Window header formatting array base name, optional
+				g		- Global formating array base name.
+				cell	- Cell formatting array base name.
+				colhdr	- Column header formatting array base name.
+				rowhdr	- Row header formatting array base name.
+				winhdr	- Window header formatting array base name.
 
-	Array elements:
+	Global array elements:
 				colhdrbtn	- Column header button
 				rowhdrbtn	- Row header button
 				winhdrbtn	- Win header button
@@ -1076,7 +1079,7 @@ SS_SetFont(hCtrl, idx, pFont) {
 				tpe			- Control type
 
   */
-SS_SetGlobal(hCtrl, g, cell="", colhdr="", rowhdr="", winhdr="") {
+SS_SetGlobal(hCtrl, g, cell, colhdr, rowhdr, winhdr) {
 	local p, N, s, params, himgal, htxtal
 	static SPRM_SETGLOBAL=0x489		; wParam=0, lParam=pointer to GLOBAL struct.
 	static LEFT=0x10, CENTER=0x20, RIGHT=0x30, MIDDLE=0x40, BOTTOM=0x80, GLOBAL=0xF0, MASK=0xF0, XMASK=0x30, YMASK=0xC0					;formats
@@ -1105,10 +1108,9 @@ SS_SetGlobal(hCtrl, g, cell="", colhdr="", rowhdr="", winhdr="") {
 														
 	N := 52											
 	loop, parse, params, %A_Space%							;colhdr    64	FORMAT <12>				;Column header formatting  	
-	{												 		;rowhdr			FORMAT <12>             ;Row header formatting     
-		N+=12,  p := %A_LoopField%							;winhdr			FORMAT <12>             ;Window header formatting  
-		ifEqual,p,,continue									;cell			FORMAT <12>				;Cell formatting           
-
+	{												 		;rowhdr	   76	FORMAT <12>             ;Row header formatting     
+		N+=12,  p := %A_LoopField%							;winhdr	   88	FORMAT <12>             ;Window header formatting  
+		ifEqual,p,,continue									;cell	   100	FORMAT <12>				;Cell formatting           
 		s := %p%_txtal,  htxtal := 0
 		loop, parse, s, %A_Tab%%A_Space%	
 			htxtal |= %A_LOOPFIELD%
@@ -1117,14 +1119,13 @@ SS_SetGlobal(hCtrl, g, cell="", colhdr="", rowhdr="", winhdr="") {
 		loop, parse, s, %A_Tab%%A_Space%	
 			himgal |= %A_LOOPFIELD%
 
-		NumPut( %p%_bg	, GLOBAL, N+0 )								
-		NumPut( %p%_fg	, GLOBAL, N )
+		NumPut( %p%_bg	, GLOBAL, N+0)								
+		NumPut( %p%_fg	, GLOBAL, N+4)
 		NumPut( htxtal,   GLOBAL, N+8, "UChar" )	
 		NumPut( himgal,   GLOBAL, N+9, "UChar")	
 		NumPut( %p%_fnt	, GLOBAL, N+10,"UChar" )	
 		NumPut( %p%_tpe	, GLOBAL, N+11,"UChar" )	
 	}
-
 	SendMessage,SPRM_SETGLOBAL,0,&GLOBAL,, ahk_id %hCtrl%
 	return ERRORLEVEL
 }
