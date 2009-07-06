@@ -67,7 +67,7 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 			  pQ	 - Query parameter. First word is struct name followed by the *mode char* and a space, followed by the space separated list of field names.
 					   If the first char after struct name is "<" or ")" function will work in Put mode, if char is ">" or ")" it works in "Get" mode.
 					   If char is "!" function works in IPut mode (Initialize & Put). For ! to work, you must define entire struct, not just part of it.
-					   The difference bewteen < and ( is that < works on binary data contained in S, while ( works on binary data pointed to by S. 
+					   The difference between < and ( is that < works on binary data contained in S, while ( works on binary data pointed to by S. 
 					   The same difference applies to > and ) modes.
 
 			  o1..o8 - Reference to output variables (Get) or input variables (Put)
@@ -91,7 +91,7 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 			S("RECT=16: top=4)					; Defines only 1 field of the RECT and overrides size. Returns 16, so ! can be used.
 			S("R: x=.1 y=.02 k z=28.004")		; Define R, size don't care. R.x is UChar at 0, R.y is Short at 1, R.k is Uint at 3 and  R.z is Float at 28.
 			S("R=48: x=.1 y=.02 k z=28.004")	; Override struct size. Returns user size (48 in this case).
-												;  This is not the same as above as it states that z is not the last field of the R struct and that actuall size is 48.
+												;  This is not the same as above as it states that z is not the last field of the R struct and that actual size is 48.
 			
 	Get & Put Examples:
 			S(b, "RECT< left right", x,y)		; b.left := x, b.right := y (b must be initialized)
@@ -162,8 +162,8 @@ S(ByRef S,pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",By
     Remarks:
 			  To use multiple storages, copy *v* function and change its name. 
 			  			  
-			  You can choose to initialize storage from additional ahk script containing only list of assigments to storage variables,
-			  to do it internaly by adding the values to the end of the your own copy of the function, or to do both, by accepting user values on startup,
+			  You can choose to initialize storage from additional ahk script containing only list of assignments to storage variables,
+			  to do it internally by adding the values to the end of the your own copy of the function, or to do both, by accepting user values on startup,
 			  and checking them afterwards.
   			  If you use stdlib module without including it directly, just make v.ahk script and put variable definitions there.
 
