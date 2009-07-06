@@ -44,7 +44,7 @@ HE_Add(hwnd, x, y, w, h, style="HSCROLL VSCROLL", dllPath="HiEdit.dll"){
       , "Uint", hwnd         ; hWndParent
       , "Uint", HE_MODULEID  ; hMenu
       , "Uint", 0            ; hInstance
-      , "Uint", 0)
+      , "Uint", 0, "Uint")
 	HE_SetTabsImageList(hCtrl)
 	return hCtrl
 }
