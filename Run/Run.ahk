@@ -15,10 +15,10 @@
 
 	Examples:
 		(start code)
-			sOutput := Run("ping.exe localhost")							 ;just grab the output
-			sOutput := Run("ping.exe localhost", "", "", "OnOutput")		 ;with notification function
-			sOutput := Run("cmd.exe /c dir /a /o", A_WinDir)				 ;with working dir
-			sOutput := Run("sort.exe", "", "abc`r`nefg`r`nhijk`r`n0123" ) ;with argument
+			sOutput := Run("ping.exe localhost")							;just grab the output
+			sOutput := Run("ping.exe localhost", "", "", "OnOutput")		;with notification function
+			sOutput := Run("cmd.exe /c dir /a /o", A_WinDir)				;with working dir
+			sOutput := Run("sort.exe", "", "abc`r`nefg`r`nhijk`r`n0123" )	;with stdin input
 			if !ErrorLevel
 				msgbox Program failed with exit code %ErrorLevel%
 			
