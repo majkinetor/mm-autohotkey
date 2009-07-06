@@ -4,19 +4,23 @@
 
 	Parameters:
 			Cmd		 - Command to execute.
-			Stream	 - If set to TRUE it'll create a console window and display output line-by-line, in addition to returning the result as a whole.
-  					   If string, name of the notification function to be called as output updates. The function accepts 1 argument.
 			Dir		 - Working Directory, optional.
 			Input	 - Program input (stdin).
-			ExitCode - Program exit code.
+			Stream	 - If set to TRUE it will create a console window and display output line-by-line, in addition to returning the result as a whole.
+  					   If string, name of the function to be called as output updates (stream handler). The function accepts one argument.
+
+	Remarks:
+			After the function finishes, ErrorLevel will be set to programs exit code.
+			You can't use function names for stream handler that consist only of numbers.
 
 	Examples:
 		(start code)
 			sOutput := Run("ping.exe localhost")							 ;just grab the output
-			sOutput := Run("ping.exe localhost", "OnOutput")				 ;with notification function
-			sOutput := Run("cmd.exe /c dir /a /o", "", A_WinDir)			 ;with working dir
-			sOutput := Run("sort.exe", "", "", "abc`r`nefg`r`nhijk`r`n0123") ;with argument
-			sOutput := Run("sort.exe 123", "", "", "", ExitCode)			 ;with ExitCode, in this case returns 1 as 123 is not found.
+			sOutput := Run("ping.exe localhost", "", "OnOutput")			 ;with notification function
+			sOutput := Run("cmd.exe /c dir /a /o", A_WinDir)				 ;with working dir
+			sOutput := Run("sort.exe", "", "abc`r`nefg`r`nhijk`r`n0123" ) ;with argument
+			if !ErrorLevel
+				msgbox Program failed with exit code %ErrorLevel%
 			
 			OnOutput(s){
 					OutputDebug %s%
@@ -28,7 +32,7 @@
 			o Developed by Sean. Modified and documented by majkinetor.
 			o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
  */
-Run(Cmd, Stream = "", Dir = "", Input = "", ByRef ExitCode="")
+Run(Cmd, Dir = "", Input = "", Stream = "")
 {
 	DllCall("CreatePipe", "UintP", hStdInRd , "UintP", hStdInWr , "Uint", 0, "Uint", 0)
 	DllCall("CreatePipe", "UintP", hStdOutRd, "UintP", hStdOutWr, "Uint", 0, "Uint", 0)
@@ -67,5 +71,6 @@ Run(Cmd, Stream = "", Dir = "", Input = "", ByRef ExitCode="")
 	Stream+0 ? (DllCall("Sleep","Uint",1000),hCon+1 ? DllCall("CloseHandle","Uint",hCon) : "",bAlloc ? DllCall("FreeConsole") : "") : ""
 	DllCall("GetExitCodeProcess", "uint", hProcess, "UintP", ExitCode, "int")
 	DllCall("CloseHandle", "Uint", hProcess)
+	ErrorLevel := ExitCode
 	Return	sOutput
 }
