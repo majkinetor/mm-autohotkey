@@ -77,7 +77,7 @@ return
 F1::
 	msgbox % Property_Count(hctrl)
 return
-F2:: m(Property_Define(hCtrl, true))
+F2:: Property_Define(hCtrl, true)
 
 
 GuiClose:
