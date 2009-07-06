@@ -55,7 +55,7 @@ SetBatchLines, -1
 
 	If !FileExist("properties")
 		 Property_Insert(hCtrl, p)
-	else Property_AddFromFile(hCtrl, "properties")
+	else Property_InsertFile(hCtrl, "properties")
 
 	Property_SetRowHeight(hCtrl, 25)
 	Gui, Show, w%w% h%h%
@@ -77,7 +77,8 @@ return
 F1::
 	msgbox % Property_Count(hctrl)
 return
-F2:: Property_Define(hCtrl, true)
+
+F2:: Property_Remove(hCtrl, "Digit`nMy WideButton`nMy Hyperlink")
 
 
 GuiClose:
