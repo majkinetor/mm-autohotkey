@@ -112,6 +112,26 @@ Property_Define(hCtrl, ComboEvent=false) {
 	return SubStr(s, 1, -2)
 }
 
+/*	Function:	Remove
+				Removes one or more properties from the list.
+
+	Parameters:
+				PropertyNames	- New line separated list of property names.
+	
+ */
+Property_Remove(hCtrl, PropertyNames){
+	plist := "`n" PropertyNames "`n"
+	cnt := SS_GetRowCount(hCtrl)
+	while (cnt > 0)
+	{
+		Name := SS_GetCellText(hCtrl, 1, cnt)
+		if InStr(plist, "`n" Name "`n")
+			SS_DeleteRow(hCtrl, cnt)
+		cnt--
+	}
+	SS_Redraw(hCtrl)
+}
+
 /*	Function:	Find
 				Returns index of the given property.
 
