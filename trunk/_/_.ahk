@@ -110,7 +110,9 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 				   For instance, "left=4.1" means that field name is "left", field offset is 4 bytes and field type is 1 (UChar). 
 				   You can omit field decimal in which case "Uint" is used as default type and offset is calculated from previous one (or it defaults to 0 if it is first field in the list).
 				   Precede type number with 0 to make it *signed type* or with 00 to make it *Float* or *Double*. For instance, .01 is "Char" and .004 is Float. 
-				   Struct name can also be followed by = and *size*, or just = in which case function will try to automatically calculate the struct size based on input fields.
+
+				   S will calculate the size of the struct for you based on the input fields. If you don't define entire struct (its perfectly valid to declare only parts of the struct you are interested in)
+				   you can still define struct size by including = and *size* after structs name. This allows you to use ! mode later.
 
 	Define Syntax:
  >			pQ		 :: StructName[=[Size]]: FieldDef1 FieldDef2 ... FieldDefN	
@@ -140,7 +142,7 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 	Examples:
 	(start code)
 	Define Examples:
-			S("RECT=16: left=0.4 top=0.4 right=0.4 bottom=0.4")		;Define RECT explicitly.
+			S("RECT=16: left=0.4 top=4.4 right=8.4 bottom=12.4")		;Define RECT explicitly.
 			S("RECT: left top right bottom")	; Define RECT struct with auto struct size and auto offset increment. Returns 16. The same as above.
 			S("RECT: right=8 bottom")			; Define only 2 fields of RECT struct. Since the fields are last one, ! can be used afterwards. Returns 16.
 			S("RECT: top=4)					    ; Defines only 1 field of the RECT. Returns 8, so ! can't be used.
@@ -202,7 +204,7 @@ S(ByRef S,pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",By
 
 /*
 	Function:	v
-				Storage functions, designed to use as stdlib or copy and enhance.
+				Storage function, designed to use as stdlib or copy and enhance.
 			  	
 	Parameters:
 			  var		- Variable name to retrieve. To get up several variables at once (up to 6), omit this parameter.
