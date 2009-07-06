@@ -45,53 +45,6 @@ Property_Add(hGui, X=0, Y=0, W=200, H=100, Style="", Handler="") {
 }
 
 /*
- Function:		AddFromFile
-				Add properties from a file.
-
- Parameters:
-				FileName - File from which to import properties. The file contains property definition list.
-				ParseIni - Set to TRUE if file is an INI file.
-
- Remarks:
-				<Insert> function doesn't tolerate `r symbol. If you are manually loading text from a file, make sure you replace `r`n with `n
-				or use *t option with FileRead.
-
- */
-Property_AddFromFile( hCtrl, FileName, ParseIni = false ) {
-	FileRead, txt, *t %FileName%
-	ifEqual, ParseIni, 0, return Property_Insert( hCtrl, txt )
-
-	oldTrim := A_AutoTrim
-	AutoTrim, on
-
-	loop, parse, ini, `r`n, `r`n
-	{
-		ifEqual, A_LoopField, , continue
-		line = %A_LoopField%
-		c := SubStr(A_LoopField,1,1)
-
-		if (c=";")
-			continue
-			
-		if (c = "[")
-			s .= "Type=Separator`nText=" line
-		else	{
-			j := InStr(line, "="), v := SubStr(line, j+1)
-
-			if v is integer
-				 Type := "Integer"
-			else Type := "Text"
-
-			s .= "Name=" SubStr(line, 1, j-1) "`nType=" Type "`nText=" v
-		}
-		s .= "`n`n"
-	}
-
-	AutoTrim, %oldTrim%
-	return Property_Insert(hctrl, SubStr(s,1,-2))
-}
-
-/*
  Function:		Clear
 				Clear Property control.
  */
@@ -327,6 +280,53 @@ Property_Insert(hCtrl, Properties, Position=0){
 	if !nrows
 		SS_SetCurrentCell(hCtrl, 2,1)
 	sleep, -1
+}
+
+/*
+ Function:		InsertFile
+				Insert properties from a file.
+
+ Parameters:
+				FileName - File from which to import properties. The file contains property definition list.
+				ParseIni - Set to TRUE if file is an INI file.
+
+ Remarks:
+				<Insert> function doesn't tolerate `r symbol. If you are manually loading text from a file, make sure you replace `r`n with `n
+				or use *t option with FileRead.
+
+ */
+Property_InsertFile( hCtrl, FileName, ParseIni = false ) {
+	FileRead, txt, *t %FileName%
+	ifEqual, ParseIni, 0, return Property_Insert( hCtrl, txt )
+
+	oldTrim := A_AutoTrim
+	AutoTrim, on
+
+	loop, parse, ini, `r`n, `r`n
+	{
+		ifEqual, A_LoopField, , continue
+		line = %A_LoopField%
+		c := SubStr(A_LoopField,1,1)
+
+		if (c=";")
+			continue
+			
+		if (c = "[")
+			s .= "Type=Separator`nText=" line
+		else	{
+			j := InStr(line, "="), v := SubStr(line, j+1)
+
+			if v is integer
+				 Type := "Integer"
+			else Type := "Text"
+
+			s .= "Name=" SubStr(line, 1, j-1) "`nType=" Type "`nText=" v
+		}
+		s .= "`n`n"
+	}
+
+	AutoTrim, %oldTrim%
+	return Property_Insert(hctrl, SubStr(s,1,-2))
 }
 
 /*
