@@ -26,11 +26,12 @@
 				Result	- Return 1 to prevent selection (S) or to prevent user changing the value (EA). For details about CB, see <Insert> and <Define>.
 
  Events:		
-				S - Select
+				S   - Select
 				EB	- Edit before. 
 				EA	- Edit after. Value contains user input. Return 1 to prevent change of value / param.
-				CB	- ComboBox event. <Insert> & <Define> fire up this event when they encounter ComboBox type (and so, functions using them, <AddFromFile> & <Save>). 
+				CB	- ComboBox event. <Insert> & <Define> fire up this event when they encounter ComboBox type (and so, functions using them, <InsertFile> & <Save>). 
 					  Insert fires it up automatically when it encounters ComboBox without Value. Define requires this event to be explicitly enabled.
+				F	- ForEach. You can fire this event with <ForEach> function and it will iterate all properties in the control.
 
  Retunrs:
 				Control's handle.
@@ -133,10 +134,10 @@ Property_Remove(hCtrl, PropertyNames){
 }
 
 /*	Function:	Find
-				Returns index of the given property.
+				Returns the current index of the property.
 
 	Parameters:
-				Name	- Name of the property.
+				Name	- Name of the property, the one with lower index will be returned.
 				StartAt	- Index from which to start searching, by default 0.
 	
 	Returns:
@@ -148,6 +149,33 @@ Property_Find(hCtrl, Name, StartAt=0) {
 		if SS_GetCellText(hCtrl, 1, startAt + A_Index) = Name
 			return A_Index
 	return 0
+}
+
+/*	Function:	ForEach
+				Iterator
+
+	Parameters:
+			    SkipSeparators	- Set to FALSE not to skip separators while iterating.
+
+	Remarks:
+				The function will rise "F" event for the control.
+ */
+Property_ForEach(hCtrl, SkipSeparators=TRUE)
+{
+	handler := Property(hctrl "handler")
+	ifEqual, handler, ,return
+
+	cnt := SS_GetRowCount(hCtrl)
+	loop, % cnt
+	{
+		t := SS_GetCellType(hCtrl, 2, A_Index, 2), param := ""
+		ifEqual, t, 15, continue
+
+		if t in 11,12								
+			 param := SS_GetCellData(hCtrl, 2, A_Index)
+		
+		%handler%(hCtrl, "F", SS_GetCellText(hCtrl, 1, A_Index), SS_GetCellText(hCtrl, 2, A_Index), param )
+	}
 }
 
 /*

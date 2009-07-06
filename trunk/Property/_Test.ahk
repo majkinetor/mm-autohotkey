@@ -78,7 +78,7 @@ F1::
 	msgbox % Property_Count(hctrl)
 return
 
-F2:: Property_Remove(hCtrl, "Digit`nMy WideButton`nMy Hyperlink")
+F2:: Property_ForEach(hCtrl)
 
 
 GuiClose:
@@ -121,6 +121,12 @@ Handler(hCtrl, event, name, value, param){
 
 	if event in EB,S
 		return
+
+	if event = F
+	{
+		m(name, value, param)
+		return
+	}
 
 	if (event = "CB") {
 		if param = Insert
