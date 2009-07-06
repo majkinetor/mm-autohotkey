@@ -20,63 +20,6 @@ _(k=-1, h=0) {
 	DetectHiddenWindows, % h ? "on" : "off"
 	SetBatchLines, %k%
 }
-
-/*	
-	Function:	d
-				Delay function.
-
-	Parameters:
-				fun		- Function name
-				delay	- Delay after which to execute function
-				o1, o2	- Function parameters.
-	
-	Remarks:
-				d executes functions after specified period of time (plus run time of function that were executed in the preceding chain).
-				It remembers function parameters per function and delay time.
-
-	Example:
-	>			d("f1", 1000)						;execute f1 after 1s without args
-	>			d("f2", 500,  "2")					; but f2 will first execute with first arg 2
-	>			d("f1", 4000, "data1", "data2")		; then f1 again.
- */
-
-d(fun, delay=1, o1="", o2="") {	
-	static 
-		
-	dv(fun delay "o1", o1),  dv(fun delay "o2", o2)
-	 ,list := dv("list", dv("list") "," delay "_" fun),
-	 , t := SubStr(list, 2, InStr(list, "_")-2)
-
-	SetTimer, d, -%t%
-	return
-d:	
-	list := dv("list")
-	, j := InStr(list, "_"),  i := InStr(list "," , ",", 0, j)
-	, f := SubStr(list, j+1, i-j-1),  t := SubStr(list, 2,j-2)
-	, list := SubStr(list, i),  j := InStr(list, "_"), nt := SubStr(list, 2,j-2)
-	, nt -= t
-
-	if nt < 0
-		 SetTimer, d, off
-	else SetTimer, d, -%nt%
-	dv("list",list,0), %f%(dv(f t "o1"), dv(f t "o2"))
-return
-}
-
-;d storage with autosorted list
-dv(var="", value="~`a ", bSort=1) { 
-	static
-	_ := %var%
-	if (value != "~`a "){
-		 SetEnv, %var%, %value%
-		 if (var = "list") && bSort
-		 {
-			Sort,list,N D,
-			_ := list
-		 }
-	}
-	return _
-}
 	
 /*	
 	Function: m
@@ -110,7 +53,6 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 				   For instance, "left=4.1" means that field name is "left", field offset is 4 bytes and field type is 1 (UChar). 
 				   You can omit field decimal in which case "Uint" is used as default type and offset is calculated from previous one (or it defaults to 0 if it is first field in the list).
 				   Precede type number with 0 to make it *signed type* or with 00 to make it *Float* or *Double*. For instance, .01 is "Char" and .004 is Float. 
-
 				   S will calculate the size of the struct for you based on the input fields. If you don't define entire struct (its perfectly valid to declare only parts of the struct you are interested in)
 				   you can still define struct size by including = and *size* after structs name. This allows you to use ! mode later.
 
@@ -148,7 +90,8 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 			S("RECT: top=4)					    ; Defines only 1 field of the RECT. Returns 8, so ! can't be used.
 			S("RECT=16: top=4)					; Defines only 1 field of the RECT and overrides size. Returns 16, so ! can be used.
 			S("R: x=.1 y=.02 k z=28.004")		; Define R, size don't care. R.x is UChar at 0, R.y is Short at 1, R.k is Uint at 3 and  R.z is Float at 28.
-			S("R=32: x=.1 y=.02 k z=28.004")	; The same but override struct size. Returns user size (32 in this case).
+			S("R=48: x=.1 y=.02 k z=28.004")	; Override struct size. Returns user size (48 in this case).
+												;  This is not the same as above as it states that z is not the last field of the R struct and that actuall size is 48.
 			
 	Get & Put Examples:
 			S(b, "RECT< left right", x,y)		; b.left := x, b.right := y (b must be initialized)
