@@ -69,8 +69,8 @@ Run(Cmd, Dir = "", Input = "", Stream = "")
 		Else	Break	
 	DllCall("CloseHandle", "Uint", hStdOutRd)
 	Stream+0 ? (DllCall("Sleep","Uint",1000),hCon+1 ? DllCall("CloseHandle","Uint",hCon) : "",bAlloc ? DllCall("FreeConsole") : "") : ""
-	DllCall("GetExitCodeProcess", "uint", hProcess, "UintP", ExitCode, "int")
+	DllCall("GetExitCodeProcess", "uint", hProcess, "intP", ExitCode)
 	DllCall("CloseHandle", "Uint", hProcess)
 	ErrorLevel := ExitCode
-	Return	sOutput
+	return	sOutput
 }
