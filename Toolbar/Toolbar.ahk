@@ -41,7 +41,7 @@
 
  Handler:
 
- > 			Handler(hCtrl, Event, Pos, Txt, Id)
+ > 			Handler(hCtrl, Event, Txt, Pos, Id)
 
 			Ctrl	- Handle of the Toolbar that sends the message.
 			Event	- Event name. See bellow.
