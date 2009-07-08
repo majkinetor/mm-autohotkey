@@ -45,15 +45,15 @@
 
   */
 SS_Add(hGui,X=0,Y=0,W=200,H=100, Style="VSCROLL HSCROLL", Handler="", DllPath="SprSht.dll"){
-	static SS_MODULEID
+	static MODULEID
 	static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
 	static VSCROLL=0x0001, HSCROLL=0x0002, STATUS=0x0004, GRIDLINES=0x0008, ROWSELECT=0x0010, CELLEDIT=0x0020, GRIDMODE=0x0040, COLSIZE=0x0080, ROWSIZE=0x0100, WINSIZE=0x0200, MULTISELECT=0x0400
 
   ;standard registering procedure
-	if !SS_MODULEID { 
+	if !MODULEID { 
 		if !DllCall("LoadLibrary", "str", DllPath)	
 			return A_ThisFunc "> Can't load library - " DllPath		
-		old := OnMessage(0x4E, "SS_onNotify"),	SS_MODULEID := 260609
+		old := OnMessage(0x4E, "SS_onNotify"),	MODULEID := 260609
 		if old != SS_onNotify
 			SS("oldNotify", RegisterCallback(old))
 	}
@@ -74,7 +74,7 @@ SS_Add(hGui,X=0,Y=0,W=200,H=100, Style="VSCROLL HSCROLL", Handler="", DllPath="S
       , "int",  w				; Width
       , "int",  h				; Height
       , "Uint", hGui			; hWndParent
-      , "Uint", SS_MODULEID		; hMenu
+      , "Uint", MODULEID		; hMenu
       , "Uint", 0				; hInstance
       , "Uint", 0, "Uint")
 	ifEqual, hCtrl, 0, return A_ThisFunc "> Error creating control"
@@ -1278,10 +1278,10 @@ SS_SplittSync(hCtrl, Flag=1 ) {	;. wParam=0, lParam=TRUE/FALSE
 
 
 SS_onNotify(wparam, lparam, msg, hwnd){
-	static SS_MODULEID := 260609, oldNotify="*"
+	static MODULEID := 260609, oldNotify="*"
 	static SPRN_SELCHANGE=1, SPRN_BEFOREEDIT=2, SPRN_AFTEREDIT=3, SPRN_BEFOREUPDATE=4, SPRN_AFTERUPDATE=5, SPRN_HYPERLINKENTER=6, SPRN_HYPERLINKLEAVE=7, SPRN_HYPERLINKCLICK=8, SPRN_BUTTONCLICK=9
 
-	if ((NumGet(lparam+4)) != SS_MODULEID){
+	if ((NumGet(lparam+4)) != MODULEID){
 		ifEqual, oldNotify, *, SetEnv, oldNotify, % SS("OldNotify")		
 		ifNotEqual, oldNotify,,return DllCall(oldNotify, "uint", wparam, "uint", lparam, "uint", msg, "uint", hwnd)		
 		return
