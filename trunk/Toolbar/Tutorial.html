@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><HTML><HEAD><style type="text/css">BODY {
+//	background-color: #2D2D2D;
+	font-family : Arial, Tahoma, Helvetica, sans-serif;
+}
+
+table#main {
+	width: 1100px;
+	background-color : #424242;
+}
+
+table#body, table#footer,table#header{
+	width: 100%;
+	background-color : #424242;
+}
+
+
+#body-left{
+	width: 20%;
+	background-color : inherit;
+}
+
+td#body-right{
+	width: 20%;
+	background-color : inherit;
+}
+
+td#body-mid{
+	width: 60%;
+	background-color : #FFFFFF;
+
+}
+ 
+table#header td{
+	width:100%;
+	background-color : inherit;	
+}
+
+table#footer td {
+	width:100%;
+	background-color : inherit;
+}
+
+
+
+
+/* .... */
+PRE  {
+     margin-left: 5%;
+}
+
+H3 {
+	border-bottom: solid;
+	border-width: 1px;
+	padding: 5px;
+	color : #990000;
+	font-family : Verdana, Tahoma, Arial, Helvetica, sans-serif;
+	font-size : 140%;
+	margin-top : 2em;
+}
+
+BLOCKQUOTE {
+	margin-left : 0;
+}
+
+TH {
+	background-color : #FFFFFF;
+}
+
+TD {
+	background-color : #F0F0F0;
+}
+
+</STYLE></HEAD><BODY>	<h3>Overview</h3>
+
+	<p>Toolbar module is encapsulation of the <a href="http://msdn.microsoft.com/en-us/library/bb760435(VS.85).aspx">system Toolbar <span class="caps">API</span></a>. The module is designed with following goals in mind:</p>
+
+	<ul>
+		<li>To allow programmers to quickly create toolbars in intuitive way (i.e. in <span class="caps">AHK</span> spirit)</li>
+		<li>To allow advanced (non-typical) use, such as dynamic toolbar creation in such way that it doesn&#8217;t complicate typical toolbar usage.</li>
+		<li>To allow users to customize toolbar and programmer to save changed toolbar state.</li>
+		<li>Not to have any side effects to your script.</li>
+	</ul>
+
+	<h3>How it works</h3>
+
+	<p>Toolbar consist of two sets of buttons &#8211; <b>current buttons</b> (buttons currently visible on the toolbar) and <b>available buttons</b> (buttons not currently visible, but user may add them using customization dialog). If you don&#8217;t want customization feature you can entirely omit list of available buttons. When user interacts with the toolbar specific event will be fired that you can implement in the body of the toolbar <b>event function</b>. </p>
+
+	<p>Each button may have associated image and text. Images are kept in the <a href="http://www.autohotkey.com/docs/commands/ListView.htm#IL_Create">ImageList</a>. By default you don&#8217;t have to specify image list. In that case module will use one of the system image catalogs that contain standard application icons. </p>
+
+	<p>To add toolbar in your gui, you use <a href="http://www.autohotkey.com/docs/commands/ListView.htm#IL_Create">Add</a> function. This function returns handle to newly created toolbar which you must use in all other functions. During creation, you can specify <b>toolbar style</b>: is it going to be flat, customizable, with tooltips etc&#8230; You must also specify event function that will be called whenever specific event is fired:</p>
+
+<pre><code>hToolbar := Toolbar_Add(hGui, &#34;OnToolbar&#34;, &#34;FLAT TOOLTIPS&#34;)
+</code></pre>
+
+	<p>After the toolbar is created you must add buttons to it. You can add buttons one by one, or as group. Each button is described using <strong>button definition</strong> &#8211; list of button characteristics separated by comma, for instance:</p>
+
+<pre><code>Toolbar_AddButtons(hToolbar, &#34;open, 11, ,dropdown&#34;)
+Toolbar_AddButtons(hToolbar, &#34;close&#34;)
+Toolbar_AddButtons(hToolbar, &#34;exit, 3&#34;)
+</code></pre>
+
+	<p>Above code will add three button to the toolbar <code>hToolbar</code>. First will have caption <code>open</code>, use 11th icon from the image list and be of type <code>dropdown</code> (button that also can display menu). You can omit one or more parameters in button definition as seen in second and third case.</p>
+
+	<p>However, you will most likely wish to handle set of button definitions as whole, so there is another syntax. You can use <b>button definition list</b> &#8211; list of button definitions, each one in the next line:</p>
+
+<pre><code>btns =
+(LTrim
+	open	,	,		,dropdown
+	close	,
+	-
+	undo	,4	,disabled	,dropdown
+	redo	,5
+	---
+	state	,11	,checked	,check
+)
+Toolbar_AddButtons(hToolbar, btns)
+</code></pre>
+
+	<p>The above code is more intuitive way of creating toolbar. First two buttons (<code>open</code> and <code>close</code>) will get icons 1 and 2 (since I didn&#8217;t specify any icon number, module will automatically set the number of line as an icon. You can specify separator using &#8211; and you can even set separator size: each &#8211; adds 10px to separator, so separator &#8211;  &#8211;  &#8211; will be of 30px size. Then, you can see that <code>state</code> button is of <code>check</code> type and that is initially <code>checked</code>. Button <code>undo</code> is created as <code>disabled</code> and is of type <code>dropdown</code> (so you can for instance display menu with undo levels). Separators are not counted when icon numbers are automatically set, so if you order icons in image list the way they appear on the toolbar, you can totally omit manual icon specification: first button will get icon number 1, second button icon number 2 and so on&#8230;</p>
+
+	<p>Once you have buttons on the toolbar, you need the way to handle user events. That&#8217;s the purpose of the event function which has following prototype:</p>
+
+<pre><code>OnToolbar(hwnd, event, pos, txt, id) {
+	;your code here
+}
+</code></pre>
+
+	<p>Above function must be written in order to handle toolbar events. It must have 5 parameters but you can name them whatever you like. Its parameters are, respectively, handle to the toolbar that generated event, event that is fired, position of the button that fired event, its caption and its ID (unique ID that each button has). One typical event handler would look like:</p>
+
+<pre><code>OnToolbar(hwnd, event, pos, txt, id) {
+	if (event = &#34;hot&#34;)
+		return SB_SetText(txt)	;if user is hovering the button with mouse, 
+					; set status bar text with the button text.
+ 
+	;display message box about event
+	MsgBox Event:  %event%`nPosition:  %pos%`nCaption:  %txt%`n`nID:%id%    
+}
+</code></pre>
+
+	<p>That pretty much covers the basics of using Toolbar module and it is everything you need to know to start using it.</p>
+
+	<h3>Customization</h3>
+
+	<p>You can let a user customize the toolbar in two different ways: create the toolbar with <code>adjustable</code> style or call <a href="http://www.autohotkey.com/docs/commands/ListView.htm#IL_Create">Customize</a> function. If you use the style, a user will be able to double click the empty toolbar area to show customization dialog. In the dialog user can reorder buttons or remove them from the toolbar (i.e. put them in the list of available buttons). User can also <code>SHIFT + drag</code> to reorder or remove the button without opening the customization dialog.</p>
+
+	<p>Typical scenario consist of buttons currently on the toolbar and the list of available buttons. Both types of buttons are added the same as before with one note &#8211; buttons marked with <code>*</code> will be added to the list of the available buttons instead to the toolbar itself:</p>
+
+<pre><code>btns =
+(LTrim
+	open	,	,		,dropdown
+	close	,
+	-
+	undo	,4	,disabled	,dropdown
+	redo	,5
+	---
+	state	,11	,checked	,check
+ 
+       *print   ,23
+       *find    ,13
+       *replace ,14
+)
+Toolbar_AddButtons(hToolbar, btns)
+</code></pre>
+
+	<p>Above, I add 5 buttons on the toolbar and I make 3 more available (marked with *). There is empty line between current and available buttons (this doesn&#8217;t influence parsing as empty lines in the button definition list are simply skipped). You can mix both type of buttons in the button definition list although I suggest to keep them separated with blank line for better visibility.</p>
+
+	<p>When application exits, you will most definitely want to save the current state of the toolbar in configuration file so you can start with that toolbar state on the next run. This is the purpose of the <a href="http://www.autohotkey.com/docs/commands/ListView.htm#IL_Create">Define</a> function. Code</p>
+
+<pre><code>btns := Toolbar_Define(hToolbar)
+</code></pre>
+
+	<p>will save the current button state (in the form of button definition list) to the <code>btns</code> variable. You can then save this variable in a file and load the toolbar from it next time your application is started.</p>
+
+	<h3>Notes and Tips</h3>
+
+<ul>
+<li>Before adding toolbar control to the <span class="caps">GUI</span>, you must first set its size so toolbar can set its own size based on the size of its parent. Since you will not want to show the window in that moment, you can do like this:
+    <pre>Gui, Show , w200 h300 Hide</pre>
+<li> If you use customization feature, be aware that you can not depend on button position in toolbar event handler as user can change it. You could use button text instead (as with <span class="caps">AHK</span> Menu handlers).
+  If you let the user change the button text also, beside position, you can not know what button user clicked based on position and its caption, so you need to use ID. Just set your own unique number as 
+  the last parameter of button definition:
+  <pre>weird button,,,dropdown, 101</pre>
+   As you can see, I set <code>101</code> as button&#8217;s identifier and in event handler I can be sure that i got the <code>weird button</code> by comparing its ID to the ID passed to the event handler.
+   You can use this for any other situation. If you don&#8217;t set button&#8217;s ID, module will do it on its own anyway but you can not know, generally, which number particular button may get (if the toolbar was customized)
+</li>
+<li>There are two ways to implement tooltips. Button caption can be seen as tooltip if you use <code>LIST TOOLTIPS</code> styles of the toolbar and omit <code>SHOWTEXT</code> among button styles. This means that button caption will not be visible at the right side of the button (only image will be shown) but text will be visible in tooltip when user hovers over that button. You can set multiline tooltips too &#8211; just put `r (line feed) where you want new line to appear (you can&#8217;t use new lines as they start new definition in the button definition list).
+Another way, more flexible, which allows you to have both captions and tooltips the same time is to write code for <code>hot</code> event (which fires when user hovers the button). In the handler posted above I set the status bar text in <code>hot</code> event but you could similarly display tooltip.
+<li>You can customize toolbar without opening customization dialog by holding <code>SHIFT</code> and dragging buttons around. For this to work you must crate toolbar with <code>adjustable</code> flag. By dragging you can do all operations that customization dialog allows except adding available buttons (obviously). You can, move button left or right, remove button by dropping it outside of the parent window, move the button to the end by dropping it bellow the toolbar in the client area of parent window, create separator before the button if you drop the button on itself.
+</li>
+<li>To postion tooltip anywhere in the parent window you must use optional <code>pPos</code> parameter when adding toolbar for the first time. This will set toolbar in movable mode, otherwise it automatically calculates its dimension according to the parent&#8217;s width. By specifying any of the x,y,w or h, you can put toolbar anywhere and size it as desired. 
+You can use AutoSize function and set its <code>align</code> parameter for the toolbar to be positioned on some of the common places.
+</li>
+<li>This is only small preview of possibilities. For detailed explanation of functions you can use see module <a href="http://www.autohotkey.com/docs/commands/ListView.htm#IL_Create">manual</a>. If you want to play with the module and experiment with its functions, see included test script.</li>
+</ul>
+
+</BODY></HTML>
