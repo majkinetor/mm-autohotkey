@@ -55,7 +55,7 @@
 Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 	static MODULEID
   ;STANDARD STYLES
-	static WS_CHILD := 0x40000000, WS_VISIBLE := 0x10000000, WS_CLIPSIBLINGS = 0x4000000, WS_CLIPCHILDREN = 0x2000000, TBSTYLE_BORDER=0x800000, TBSTYLE_THICKFRAME=0x40000, TBSTYLE_TABSTOP = 0x10000
+	static WS_CHILD := 0x40000000, WS_VISIBLE := 0x10000000, WS_CLIPSIBLINGS = 0x4000000, WS_CLIPCHILDREN = 0x2000000, TBSTYLE_THICKFRAME=0x40000, TBSTYLE_TABSTOP = 0x10000
   ;TOOLBAR STYLES
     static TBSTYLE_WRAPABLE = 0x200, TBSTYLE_FLAT = 0x800, TBSTYLE_LIST=0x1000, TBSTYLE_TOOLTIPS=0x100, TBSTYLE_TRANSPARENT = 0x8000, TBSTYLE_ADJUSTABLE = 0x20, TBSTYLE_VERTICAL=0x80
   ;TOOLBARE XTENDED STYLES
@@ -64,6 +64,7 @@ Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 	static TOOLBARCLASSNAME  = "ToolbarWindow32", TB_BUTTONSTRUCTSIZE=0x41E, TB_SETEXTENDEDSTYLE := 0x454, TB_SETUNICODEFORMAT := 0x2005
   ;common
 	static TBSTYLE_NODIVIDER=0x40, CCS_NOPARENTALIGN=0x8, CCS_NORESIZE = 0x4, TBSTYLE_BOTTOM = 0x3
+	static WS_EX_BORDER = 0x200
 
 	if !MODULEID { 
 		old := OnMessage(0x4E, "Toolbar_onNotify"),	MODULEID := 80609
@@ -77,7 +78,7 @@ Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 		ifEqual, A_LoopField,,continue
 		hStyle |= A_LoopField+0 ? A_LoopField : TBSTYLE_%A_LoopField%
 	}
-	ifEqual, hStyle, ,return A_ThisFunc "> Some of the styles are invalid"
+	ifEqual, hStyle, ,return A_ThisFunc "> Some of the styles are invalid."
 
 	if (Pos != ""){
 		x := y := 0, w := h := 100
@@ -93,7 +94,7 @@ Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 	}
 
     hCtrl := DllCall("CreateWindowEx" 
-             , "uint", 0
+             , "uint", WS_EX_BORDER
              , "str",  TOOLBARCLASSNAME 
              , "uint", 0 
              , "uint", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | hStyle
@@ -116,85 +117,20 @@ Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 	
 	return hCtrl 
 }
-;----------------------------------------------------------------------------------------------
-;Function:  AddButtons
-;			Add button(s) to the Toolbar. 
-;
-;Parameters:
-;			pBtns		- The button definition list. Each button to be added is specified on separate line
-;						  using button definition string. Empty lines will be skipped.
-;			pPos		- Optional 1-based index of a button, to insert the new buttons to the left of this button.
-;						  This doesn't apply to the list of available buttons.
-;
-;Button Definition:
-;			Button is defined by set of its characteristics separated by comma:
-;
-;			caption		- Button caption. All printable letters are valid except comma. 
-;						  "-" can be used to add separator. Add more "-" to set the separator width. Each "-" adds 10px to the separator.
-;			iconNumber  - Number of icon in the image list
-;			states		- Space separated list of button states. See bellow list of possible states.
-;			styles		- Space separated list of button styles. See bellow list of possible styles.
-;			ID			- Button ID, unique number you choose to identify button. On customizable toolbars position can't be used to set button information.
-;						  If you need to setup button information using <SetButton> function or obtain information using <GetButton>, you need to use button ID 
-;						  as user can change button position any time.
-;						  ID *must be* number between 1 and 10,000. Numbers > 10,000 are reserved for auto ID that module does on its own. In most
-;						  typical scenarios you don't need to use ID to identify the button.
-;
-;Button Styles:
-;			AUTOSIZE	- Specifies that the toolbar control should not assign the standard width to the button. Instead, the button's width will be calculated based on the width of the text plus the image of the button. 
-;			CHECK		- Creates a dual-state push button that toggles between the pressed and nonpressed states each time the user clicks it.
-;			CHECKGROUP	- Creates a button that stays pressed until another button in the group is pressed, similar to option buttons (also known as radio buttons).
-;			DROPDOWN	- Creates a drop-down style button that can display a list when the button is clicked.
-;			NOPREFIX	- Specifies that the button text will not have an accelerator prefix associated with it.
-;			SHOWTEXT	- Specifies that button text should be displayed. All buttons can have text, but only those buttons with the SHOWTEXT button style will display it. 
-;						  This button style must be used with the LIST style. If you set text for buttons that do not have the SHOWTEXT style, the toolbar control will 
-;						  automatically display it as a ToolTip when the cursor hovers over the button. For this to work you must create the toolbar with TOOLTIPS style.
-;						  You can create multiline tooltips by using $ in the tooltip caption. Each $ will be replaced with new line.
-;
-;Button States:
-;			CHECKED		- The button has the CHECK style and is being clicked.
-;			DISABLED	- The button does not accept user input.
-;			HIDDEN		- The button is not visible and cannot receive user input.
-;			WRAP		- The button is followed by a line break. Toolbar must not have WRAPABLE style.
-;
-;Remarks:
-;		Using this function you can add one or more buttons to the toolbar. Furthermore, adding group of buttons to the end (omiting pPos) is the 
-;		fastest way of adding set of buttons to the toolbar and it also allows you to use some automatic features that are not available when you add button by button.
-;		If you omit some parameter in button definition it will receive default value. Button that has no icon defined will get the icon with index that is equal to 
-;		the line number of its defintion list. Buttons without ID will get ID automaticaly, starting from 10 000. 
-;		You can use `r instead `n to create multiline button captions. This make sense only for toolbars that have LIST TOOLTIP toolbar style and no SHOWTEXT button style
-;	    (i.e. their captions are seen as tooltips and are not displayed.
-;
-Toolbar_AddButtons(hCtrl, pBtns, pPos=""){
-	static TB_ADDBUTTONSA = 0x414, TB_INSERTBUTTONA=0x415
 
-	cnt := Toolbar_compileButtons(hCtrl, pBtns, cBTN)
-	if pPos =
-		SendMessage, TB_ADDBUTTONSA, cnt, cBTN ,, ahk_id %hCtrl%
-	else loop, %cnt%
-		SendMessage, TB_INSERTBUTTONA, pPos+A_Index-2, cBTN + 20*(A_Index-1) ,, ahk_id %hCtrl%
-
-	Toolbar_mfree(cBTN)
-
-   ;for some reason, you need to call this 2 times for proper results in some scenarios .... !?
-	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
- 	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
-}
-
-;----------------------------------------------------------------------------------------------
-;Function:  AutoSize
-;			Causes a toolbar to be resized.
-;
-;Parameters:
-;			hCtrl - HWND of the toolbar
-;			align	 - How toolbar is aligned to its parent. bottom left (bl), bottom right (br), top right (tr), top left (tl) or fit (doesn't reposition control
-;					   resizes it so it takes minimum possible space with all buttons visible)	
-; 
-;Remarks:
-;			An application calls the AutoSize function after causing the size of a toolbar to 
-;			change either by setting the button or bitmap size or by adding strings for the first time.
-;
-Toolbar_AutoSize(hCtrl, align="fit"){
+/*
+ Function:  AutoSize
+ 			Causes a toolbar to be resized.
+ 
+ Parameters:
+ 			Align	 - How toolbar is aligned to its parent. bottom left (bl), bottom right (br), top right (tr), top left (tl) or fit (doesn't reposition control
+ 					   resizes it so it takes minimum possible space with all buttons visible)	
+  
+ Remarks:
+ 			An application calls the AutoSize function after causing the size of a toolbar to 
+ 			change either by setting the button or bitmap size or by adding strings for the first time.
+ */
+Toolbar_AutoSize(hCtrl, Align="fit"){
 	dhw := A_DetectHiddenWindows
 	DetectHiddenWindows,on
 
@@ -207,15 +143,15 @@ Toolbar_AutoSize(hCtrl, align="fit"){
 
 		hParent := DllCall("GetParent", "uint", hCtrl)
 		WinGetPos, ,,pw,ph, ahk_id %hParent%
-		if align = fit
+		if Align = fit
 			ControlMove,,,,%w%,%h%, ahk_id %hCtrl%
-		else if align = tr
+		else if Align = tr
 			ControlMove,,pw-w-f,c+f+2,%w%,%h%, ahk_id %hCtrl%
-		else if align = tl
+		else if Align = tl
 			ControlMove,,f,c+f+2,%w%,%h%, ahk_id %hCtrl%
-		else if align = br
+		else if Align = br
 			ControlMove,,pw-w-f,ph-h-f,%w%,%h%, ahk_id %hCtrl%
-		else if align = bl
+		else if Align = bl
 			ControlMove,,,ph-h-f,%w%,%h%, ahk_id %hCtrl%
 	}
 	else SendMessage,0x421,,,,ahk_id %hCtrl%
@@ -223,10 +159,10 @@ Toolbar_AutoSize(hCtrl, align="fit"){
 	DetectHiddenWindows, %dhw%
 }
 
-;----------------------------------------------------------------------------------------------
-;Function:  Clear
-;			Removes all buttons from the toolbar, both current and available
-;
+/*
+ Function:  Clear
+ 			Removes all buttons from the toolbar, both current and available
+ */
 Toolbar_Clear(hCtrl){
 
 	loop % Toolbar_Count(hCtrl)
@@ -458,6 +394,71 @@ Toolbar_GetMaxSize(hCtrl, ByRef pWidth, ByRef pHeight){
 	return res
 }
 
+/*
+ Function:  Insert
+ 			Insert button(s) on the Toolbar. 
+ 
+ Parameters:
+ 			Btns		- The button definition list. Each button to be added is specified on separate line
+ 						  using button definition string. Empty lines will be skipped.
+ 			Pos			- Optional 1-based index of a button, to insert the new buttons to the left of this button.
+ 						  This doesn't apply to the list of available buttons.
+ 
+ Button Definition:
+ 			Button is defined by set of its characteristics separated by comma:
+ 
+ 			caption		- Button caption. All printable letters are valid except comma. 
+ 						  "-" can be used to add separator. Add more "-" to set the separator width. Each "-" adds 10px to the separator.
+ 			iconNumber  - Number of icon in the image list
+ 			states		- Space separated list of button states. See bellow list of possible states.
+ 			styles		- Space separated list of button styles. See bellow list of possible styles.
+ 			ID			- Button ID, unique number you choose to identify button. On customizable toolbars position can't be used to set button information.
+ 						  If you need to setup button information using <SetButton> function or obtain information using <GetButton>, you need to use button ID 
+ 						  as user can change button position any time.
+ 						  ID *must be* number between 1 and 10,000. Numbers > 10,000 are reserved for auto ID that module does on its own. In most
+ 						  typical scenarios you don't need to use ID to identify the button.
+ 
+ Button Styles:
+ 			AUTOSIZE	- Specifies that the toolbar control should not assign the standard width to the button. Instead, the button's width will be calculated based on the width of the text plus the image of the button. 
+ 			CHECK		- Creates a dual-state push button that toggles between the pressed and nonpressed states each time the user clicks it.
+ 			CHECKGROUP	- Creates a button that stays pressed until another button in the group is pressed, similar to option buttons (also known as radio buttons).
+ 			DROPDOWN	- Creates a drop-down style button that can display a list when the button is clicked.
+ 			NOPREFIX	- Specifies that the button text will not have an accelerator prefix associated with it.
+ 			SHOWTEXT	- Specifies that button text should be displayed. All buttons can have text, but only those buttons with the SHOWTEXT button style will display it. 
+ 						  This button style must be used with the LIST style. If you set text for buttons that do not have the SHOWTEXT style, the toolbar control will 
+ 						  automatically display it as a ToolTip when the cursor hovers over the button. For this to work you must create the toolbar with TOOLTIPS style.
+ 						  You can create multiline tooltips by using $ in the tooltip caption. Each $ will be replaced with new line.
+ 
+ Button States:
+ 			CHECKED		- The button has the CHECK style and is being clicked.
+ 			DISABLED	- The button does not accept user input.
+ 			HIDDEN		- The button is not visible and cannot receive user input.
+ 			WRAP		- The button is followed by a line break. Toolbar must not have WRAPABLE style.
+ 
+ Remarks:
+ 		Using this function you can insert one or more buttons on the toolbar. Furthermore, adding group of buttons to the end (omiting pPos) is the 
+ 		fastest way of adding set of buttons to the toolbar and it also allows you to use some automatic features that are not available when you add button by button.
+ 		If you omit some parameter in button definition it will receive default value. Button that has no icon defined will get the icon with index that is equal to 
+ 		the line number of its defintion list. Buttons without ID will get ID automaticaly, starting from 10 000. 
+ 		You can use `r instead `n to create multiline button captions. This make sense only for toolbars that have LIST TOOLTIP toolbar style and no SHOWTEXT button style
+ 	    (i.e. their captions are seen as tooltips and are not displayed.
+ */
+Toolbar_Insert(hCtrl, Btns, Pos=""){
+	static TB_INSERTA = 0x414, TB_INSERTBUTTONA=0x415
+
+	cnt := Toolbar_compileButtons(hCtrl, Btns, cBTN)
+	if Pos =
+		SendMessage, TB_INSERTA, cnt, cBTN ,, ahk_id %hCtrl%
+	else loop, %cnt%
+		SendMessage, TB_INSERTBUTTONA, Pos+A_Index-2, cBTN + 20*(A_Index-1) ,, ahk_id %hCtrl%
+
+	Toolbar_mfree(cBTN)
+
+   ;for some reason, you need to call this 2 times for proper results in some scenarios .... !?
+	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
+ 	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
+}
+
 ;----------------------------------------------------------------------------------------------
 ;Function:  MoveButton
 ;			Moves a button from one position to another.
@@ -578,13 +579,13 @@ Toolbar_SetButtonSize(hCtrl, w, h="") {
 
 ;----------------------------------------------------------------------------------------------
 ;Function:  SetImageList
-;			Set toolbar image list
+;			Set toolbar image list.
 ;
 ;Parameters:
-;			hIL	- Image list handle
+;			hIL	- Image list handle.
 ;
 ;Returns:
-;			Handle of the previous image list
+;			Handle of the previous image list.
 ;
 Toolbar_SetImageList(hCtrl, hIL="1S"){
 	static TB_SETIMAGELIST = 0x430, TB_LOADIMAGES=0x432, TB_SETBITMAPSIZE=0x420
@@ -669,7 +670,8 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 	static id=10000								;automatic IDing starts form 10000,     1 <= userID < 10 000
     	
 	aBTN := Toolbar(hCtrl "aBTN")
-	aBTN = "" ? Toolbar_malloc( 50 * 20 + 4) :	;if space for array of * buttons isn't reserved and there are definitions of * buttons reserve it for 50 buttons + some more so i can keep some data there...
+	if (aBTN = "")
+		aBTN := Toolbar_malloc( 50 * 20 + 4)	;if space for array of * buttons isn't reserved and there are definitions of * buttons reserve it for 50 buttons + some more so i can keep some data there...
 
 	StringReplace, _, Btns, `n, , UseErrorLevel
 	btnNo := ErrorLevel + 1
@@ -687,35 +689,34 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 		a := SubStr(a1,1,1) = "*"
 		if a
 			a1 := SubStr(a1,2), o := aBTN + 4
-		else o := cBtn
+		else o := cBTN
 
 	 ;parse states
-		hstate := InStr(a3, "disabled") ? 0 : TBSTATE_ENABLED
+		hState := InStr(a3, "disabled") ? 0 : TBSTATE_ENABLED
 		loop, parse, a3, %A_Tab%%A_Space%, %A_Tab%%A_Space%
 		{
 			ifEqual, A_LoopField,,continue
-			hstate |= TBSTATE_%A_LOOPFIELD%
+			hState |= TBSTATE_%A_LOOPFIELD%
 		}
-		ifEqual, hState, , return A_ThisFunc "> Some of the states are invalid"
+		ifEqual, hState, , return A_ThisFunc "> Some of the states are invalid: " a3
 
 	 ;parse styles
 		hstyle := (A_LoopField >= "-") and (A_LoopField <= "-------------------") ? BTNS_SEP : 0
-		sep += (hstyle = BTNS_SEP) ? 1 : 0
+		sep += (hStyle = BTNS_SEP) ? 1 : 0
 		loop, parse, a4, %A_Tab%%A_Space%, %A_Tab%%A_Space%
 		{
 			ifEqual, A_LoopField,,continue
 			hstyle |= BTNS_%A_LOOPFIELD%
 		}
-		ifEqual, hStyle, , return A_ThisFunc "> Some of the styles are invalid"
+		ifEqual, hStyle, , return A_ThisFunc "> Some of the styles are invalid: " a4
 
 	 ;calculate icon
 		if a2 is not Integer					;if user didn't specify icon, use button number as icon index (don't count separators)
 			a2 := cnt+cnta+1-sep
-		
 		o += 20 * (a ? cnta : cnt)				;calculate offset o of this structure in array of TBBUTON structures.
 												; only A buttons (* marked) are remembered, current buttons will temporary use
 	 ;add caption to the string pool
-		if (hstyle != BTNS_SEP) {
+		if (hStyle != BTNS_SEP) {
 			StringReplace a1, a1, `r, `n, A		;replace `r with new lines (for multiline tooltips)
 			VarSetCapacity(buf, StrLen(a1)+1, 0), buf := a1	 ;Buf must be double-NULL-terminated
 			sIdx := DllCall("SendMessage","uint",hCtrl,"uint", TB_ADDSTRING, "uint",0,"uint",&buf)  ;returns the new index of the string within the string pool
@@ -723,7 +724,6 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 
 	 ;TBBUTTON Structure
 		bid := a5 ? a5 : ++id 					;user id or auto id makes button id
-
 		NumPut(a2-1,	o+0, 0)					;Zero-based index of the button image. If the button is a separator, determines the width of the separator, in pixels
 		NumPut(bid,	o+0, 4)						;Command identifier associated with the button
 		NumPut(hstate,  o+0, 8, "Char")			;Button state flags
@@ -958,7 +958,7 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 ;>      state, 11, checked  ,check
 ;>   )
 ;>
-;>   Toolbar_AddButtons(hCtrl, btns)
+;>   Toolbar_Insert(hCtrl, btns)
 ;>   Toolbar_SetButtonWidth(hCtrl, 50)                   ;set button width & height to 50 pixels
 ;>
 ;>   Gui, Show

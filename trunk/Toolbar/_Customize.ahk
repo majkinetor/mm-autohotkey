@@ -33,7 +33,7 @@ SetBatchLines, -1
 			*print
 		)
 	
-	Toolbar_AddButtons(hToolbar, btns)
+	Toolbar_Insert(hToolbar, btns)
 	Gui, Add, Text, y50, Customize the toolbar and reload application.`nDouble click the empty toolbar space or press F1`n`nYou can also SHIFT + drag buttons.
 	Gui, Add, Button, y+30 w100 gOnBtn, Reload
 	Gui, Add, Button, x+10 gOnBtn, Reset Toolbar and Reload

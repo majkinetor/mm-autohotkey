@@ -64,7 +64,7 @@ QL_AddFiles( pFiles="" ) {
 		aFiles_%id% := A_LoopField
 	}
 
-	Toolbar_AddButtons(hToolbar, btns)
+	Toolbar_Insert(hToolbar, btns)
 
 	Toolbar_GetMaxSize(hToolbar, w,h)
 	w += (caption ? 2*f : 0) + 4 
