@@ -626,7 +626,7 @@ Toolbar_ToggleStyle(hCtrl, Style="LIST"){
     static TBSTYLE_WRAPABLE = 0x200, TBSTYLE_FLAT = 0x800, TBSTYLE_LIST=0x1000, TBSTYLE_TOOLTIPS=0x100, TBSTYLE_TRANSPARENT = 0x8000, TBSTYLE_ADJUSTABLE = 0x20,  TBSTYLE_BORDER=0x800000, TBSTYLE_THICKFRAME=0x40000, TBSTYLE_TABSTOP = 0x10000
 	static TB_SETSTYLE=1080, TB_GETSTYLE=1081
 
-	s := Style+0 != "" ? Style : TBSTYLE_%pStyle%	
+	s := Style+0 != "" ? Style : TBSTYLE_%Style%	
 	ifEqual, s, , return A_ThisFunc "> Invalid style: " Style
 
 	WinSet, Style, ^%s%, ahk_id %hCtrl%
