@@ -439,3 +439,5 @@ WebControl_GetHtml(hCtrl){
 	o QHTM copyright © GipsySoft. See http://www.gipsysoft.com/qhtm/
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
  */
+
+#include *i ..\QHTM\qhtm.ahk
