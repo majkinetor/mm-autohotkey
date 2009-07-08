@@ -1282,8 +1282,8 @@ SS_onNotify(wparam, lparam, msg, hwnd){
 	static SPRN_SELCHANGE=1, SPRN_BEFOREEDIT=2, SPRN_AFTEREDIT=3, SPRN_BEFOREUPDATE=4, SPRN_AFTERUPDATE=5, SPRN_HYPERLINKENTER=6, SPRN_HYPERLINKLEAVE=7, SPRN_HYPERLINKCLICK=8, SPRN_BUTTONCLICK=9
 
 	if ((NumGet(lparam+4)) != SS_MODULEID){
-		ifEqual, oldNotify, *, SetEnv, ooldNotify, % SS("OldNotify")		
-		ifNotEqual, oldNotify,,return DllCall(OldNotify, "uint", wparam, "uint", lparam, "uint", msg, "uint", hwnd)		
+		ifEqual, oldNotify, *, SetEnv, oldNotify, % SS("OldNotify")		
+		ifNotEqual, oldNotify,,return DllCall(oldNotify, "uint", wparam, "uint", lparam, "uint", msg, "uint", hwnd)		
 		return
 	}
 
