@@ -3,17 +3,16 @@ SetBatchLines, -1
 
 	Gui, +LastFound +LabelMyGui
 	hGui := WinExist() 
-	w := 950, h := 650
+	w := 800, h := 660
 	Gui, Show , w%w% h%h% Hide, Toolbar Test		;set gui width & height (mandatory)
-
 	Gui, Add, StatusBar, , 
 
 	hIL := IL_Create(200, 0, 1) 
 	loop, 150
 	   IL_ADD(hIL, A_WinDir "\system32\shell32.dll", A_Index) 
 
-	hToolbar := Toolbar_Add(hGui, "OnToolbar", "WRAPABLE ADJUSTABLE FLAT TOOLTIPS", hIL)
-
+	hToolbar := Toolbar_Add(hGui, "OnToolbar", "BORDER WRAPABLE ADJUSTABLE FLAT TOOLTIPS", hIL)
+	Toolbar_Clear(hToolbar)
 	btns = 
 	(LTrim
 		btn &1  ,	,checked, check
@@ -34,52 +33,30 @@ return
 
 MakeTestGui(w, h){
 
-	help=
-	(LTrim
-		Function		Parameter(s)
-		____________________________________________________________________
+	Gui, Font, s8, Courier New
 
-		Insert		pBtns,  pPos=""
+	Gui, Add, Text,  x5 y400, Input / Output :
+	Gui, Add, Edit,  xp w%w% yp+20 h200,
 
-		Define			pQ = "c" - current btns only, "a" - available btns only, "" - everything
+	d=25
+	Gui, Add, BUTTON, w100 X+%d% yp gOnBtn section, Add
+	Gui, Add, BUTTON, w100 X+%d% yp gOnBtn, Insert
+	Gui, Add, BUTTON, w100 x+%d% yp gOnBtn, Define
 
-		DeleteButton		pPos=1 
+	Gui, Add, BUTTON, w100 Xs gOnBtn, Delete
+	Gui, Add, BUTTON, w100 X+%d% yp gOnBtn, Clear
+	Gui, Add, BUTTON, w100 X+%d%	gOnBtn, Count
 
-		GetButton		pWhichBtn,  pQ = C (Caption), I (Icon number), S (State), L (styLe)
+	Gui, Add, BUTTON, w100 Xs  gOnBtn, Customize
+	Gui, Add, BUTTON, w100 X+%d% yp gOnBtn, ToggleStyle
+	Gui, Add, BUTTON, w100 X+%d% yp gOnBtn, GetButton
 
-		Count			pQ="c | a" 
+	Gui, Add, BUTTON, w100 Xs  gOnBtn, SetButtonWidth
+	Gui, Add, BUTTON, w100 x+5 yp gOnBtn, SetButtonSize
+	Gui, Add, BUTTON, w100 x+5 gOnBtn, SetButton
 
-		SetButton		pWhichBtn,  state = "[-]checked, [-]disabled, [-]hidden",  width=""
+	Gui, Add, BUTTON, w350 h40 Xs y+30  gOnBtn, Open Help`n(right click on any buttton for its help)
 
-		SetButtonWidth		pMin, pMax=""
-
-		ToggleStyle		pStyle= "adjustable border flat list tooltips tabstop wrapable"	
-
-		
-		pWitchBtn		Button postion or ID. To specify ID use "." infront of the number
-		pQ			Query parameter, function dependant
-		pBtns			Button defintion: [*]caption, iconNum, state, style, ID
-	)
-		
-
-	Gui, Add, BUTTON, w100 X0 y%h% section gOnBtn, Define
-	Gui, Add, BUTTON, w100 X+10 yp gOnBtn, Add
-	Gui, Add, BUTTON, w100 X+10 yp gOnBtn, Insert
-	Gui, Add, BUTTON, w100 X+10 yp gOnBtn, Delete
-	Gui, Add, BUTTON, w100 X+10 yp gOnBtn, Clear
-
-	Gui, Add, BUTTON, w100 Xs	gOnBtn, Count
-	Gui, Add, BUTTON, w100 X+10 yp gOnBtn, Customize
-	Gui, Add, BUTTON, w100 X+10 yp gOnBtn, ToggleStyle
-
-	Gui, Add, BUTTON, w100 Xs  gOnBtn, GetButton
-	Gui, Add, BUTTON, w100 X+10 yp  gOnBtn, SetButton
-	Gui, Add, BUTTON, w100 X+10 yp  gOnBtn, SetButtonWidth
-	Gui, Add, BUTTON, w100 X+10 yp  gOnBtn, SetButtonSize
-
-	Gui, Add, Text, x0 y+10 , Input / Output :
-	Gui, Add, Edit, x0 w%w% y+5 h300,
-	Gui, Add, Text, x+10 yp w%w% h300, %help%
 }
 
 OnToolbar(hwnd, event, pos, txt, id) {
@@ -133,6 +110,9 @@ OnBtn:
 
 	if A_GuiControl = SetButtonSize
 		Toolbar_SetButtonSize(hToolbar, p1, p2)		
+
+	if A_GuiControl = Open Help`n(right click on any buttton for its help)
+		Run, Toolbar.html
 return
 
 Set(txt){
@@ -144,5 +124,18 @@ Get() {
 	StringReplace, txt, txt, `r`n, `n, A
 	return txt
 }
+
+GuiClose:
+	ExitApp
+return
+
+#IfWinActive Toolbar 
+
+RButton::
+	MouseGetPos, , , , h
+	ControlGetText,txt,%h%, A
+	Run, %A_ProgramFIles%\Internet Explorer\iexplore "%A_ScriptDir%\Toolbar.html#%txt%"
+return
+
 
 #Include Toolbar.ahk

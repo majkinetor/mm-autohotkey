@@ -3,7 +3,7 @@ SetBatchLines, -1
 
 	Gui, +LastFound
 	hGui := WinExist(), 
-	Gui, Show , w410 h160 Hide		;set gui width & height (mandatory)
+	Gui, Show , w410 h180 Hide		;set gui width & height (mandatory)
 
 	hToolbar := Toolbar_Add(hGui, "OnToolbar", "ADJUSTABLE FLAT LIST TOOLTIPS", 1)
 
