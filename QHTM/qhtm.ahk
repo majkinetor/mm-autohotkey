@@ -17,15 +17,16 @@
 			  Hwnd		- Handle of the parent.
 			  Text		- HTML to display.
 			  X-H		- Control coordinates.
-  			  Style		- List of control styles.
+  			  Style		- List of control styles, optional.
 			  Handler	- Notification handler, optional.
+			  DllPath	- Path to the control's dll, optional.
 
 	Styles:
 			  Border	  - Add border arond the control.
 			  Transparent - Make HTML control transparent.
 
 	Returns:
-			Control handle or error message.
+			  Controls handle or error message.
 
 	Handler:
 				 
@@ -36,16 +37,16 @@
 			ID		- HTML link ID						
 			Result  - Return 1 to open the link in system default editor.
  */
-QHTM_Add(Hwnd, Text, X, Y, W, H, Style="", Handler=""){
-	static QHTM_MODULEID
+QHTM_Add(Hwnd, Text, X, Y, W, H, Style="", Handler="", DllPath="qhtm.dll"){
+	static MODULEID
 	static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
-	static WS_EX_BORDER = 0x200, WS_EX_TRANSPARENT=0x20 ,init 
+	static WS_EX_BORDER = 0x200, WS_EX_TRANSPARENT=0x20
 
-	if !init {
-		init := QHTM_Init()
-		ifEqual, init, 0, return A_ThisFunc ">   Initialisation failed"
+	if !MODULEID{
+		if !QHTM_Init( DllPath )
+			return A_ThisFunc ">   Initialisation failed"
 
-		old := OnMessage(0x4E, "QHTM_onNotify"), QHTM_MODULEID := 171108
+		old := OnMessage(0x4E, "QHTM_onNotify"), MODULEID := 171108
 		if old != QHTM_onNotify
 			QHTM("oldNotify", RegisterCallback(old))
 	}
@@ -592,9 +593,9 @@ QHTM_onForm(hwndQHTM, pFormSubmit, lParam){
 
 
 QHTM_onNotify(Wparam, Lparam, Msg, Hwnd) {
-	static QHTM_MODULEID=171108, oldNotify="*"
+	static MODULEID=171108, oldNotify="*"
 
-	if ((NumGet(Lparam+4)) != QHTM_MODULEID){
+	if ((NumGet(Lparam+4)) != MODULEID){
 		ifEqual, oldNotify, *, SetEnv, oldNotify, % QHTM("OldNotify")		
 		ifNotEqual, oldNotify,,return DllCall(OldNotify, "uint", wparam, "uint", lparam, "uint", msg, "uint", hwnd)		
 		return
