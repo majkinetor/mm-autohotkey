@@ -59,11 +59,11 @@ MakeTestGui(w, h){
 
 }
 
-OnToolbar(hwnd, event, pos, txt, id) {
+OnToolbar(hwnd, event, txt, pos, id) {
 	if event = hot
 	{
-		d := Toolbar_GetButton(hwnd, pos, "d"),   s := Toolbar_GetButton(hwnd, pos, "s")
-		return SB_SetText(txt  "   Data: " d "  " s)
+		id := Toolbar_GetButton(hwnd, pos, "id"),   s := Toolbar_GetButton(hwnd, pos, "s")
+		return SB_SetText(txt  "   Data: " id "  " s)
 	}
 
 	msgbox Event:  %event%`nPosition:  %pos%`nCaption:  %txt%`n`nID:%id%
@@ -129,10 +129,11 @@ GuiClose:
 	ExitApp
 return
 
-#IfWinActive Toolbar 
-
+#IfWinActive Toolbar Test
 RButton::
 	MouseGetPos, , , , h
+	if !InStr(h, "Button")
+		return
 	ControlGetText,txt,%h%, A
 	Run, %A_ProgramFIles%\Internet Explorer\iexplore "%A_ScriptDir%\Toolbar.html#%txt%"
 return

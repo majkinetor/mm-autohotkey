@@ -43,7 +43,7 @@ return
 
 F1::Toolbar_Customize(hToolbar)
 
-OnToolbar(hToolbar, pEvent, pPos, pTxt, pID){
+OnToolbar(hToolbar, pEvent, pTxt, pPos, pID){
 	static no=0
 
 	if pEvent in change,adjust
