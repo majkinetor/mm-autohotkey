@@ -91,7 +91,7 @@ OnBtn:
 		Toolbar_Insert(hToolbar, _, 3)
 
 	if A_GuiControl = ToggleStyle
-		Toolbar_ToggleStyle(hToolbar, p1 != "" ? p1 : "LIST")
+		Set(Toolbar_ToggleStyle(hToolbar, p1 != "" ? p1 : "LIST"))
 
 	if A_GuiControl = Delete
 		Toolbar_DeleteButton(hToolbar, p1 != "" ? p1 : 1)
