@@ -244,19 +244,19 @@ Toolbar_DeleteButton(hCtrl, Pos=1) {
 
 	Parameters:
 			WhichButtton - One of the ways to identify the button: 1-based button position or button ID.
-						  If WhichButton is negative, the information about *available* button on position -WhichButton will be returned.				
-			pQ			- Query parameter, can be C (Caption) I (Icon number), S (State), L (styLe) or ID
-						  If omitted, all information will be returned in the form of button definition
+						  If WhichButton is negative, the information about available (*) button on position -WhichButton will be returned.	
+			pQ			- Query parameter, can be C (Caption) I (Icon number), S (State), L (styLe) or ID.
+						  If omitted, all information will be returned in the form of button definition.
 
 	Returns:
 			If pQ is omitted, button definition, otherwise requested button information.
 
 	Examples:
 	(start code)
-		   s := GetButton(hCtrl, 3)			 ;return string completely defining 3th current toolbar button
-		   c := GetButton(hCtrl, 3, "c")	 ;return only caption of the 3th current button
-		   d := GetButton(hCtrl,-2, "d")	 ;return only data of the 2nd available button
-	       s := GetButton(hCtrl, .101, "s")	 ;return the state of the current button with ID=101
+		   s := GetButton(hCtrl, 3)			 ;returns button definition for the third button.
+		   c := GetButton(hCtrl, 3, "c")	 ;returns only caption of that button.
+		   d := GetButton(hCtrl,-2, "id")	 ;returns only id of the 2nd button from the group of available (*) buttons.
+	       s := GetButton(hCtrl, .101, "s")	 ;returns the state of the button with ID=101.
 	(end code)
  */
 Toolbar_GetButton(hCtrl, WhichButton, pQ="") {
@@ -733,7 +733,7 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 
 	NumPut(cnta, aBTN + 0)		
 	if warning
-		msgbox You exceeded the limit of available buttons (50)
+		msgbox You exceeded the limit of available (*) buttons (50)
 
 	return cnt									;return number of buttons in the array
 }
