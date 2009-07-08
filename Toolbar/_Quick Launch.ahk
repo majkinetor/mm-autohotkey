@@ -3,10 +3,10 @@ SetBatchLines, -1
 SetWinDelay, -1
 
 	;============= SETUP ====================
-	vertical := 0
-	text	 := 0
+	vertical := 1
+	text	 := 1
 	caption  := 1		
-	icons	 := 1		;0 - small; 1 - large
+	icons	 := 0		;0 - small; 1 - large
 	;========================================
 	
 	Gui, +LastFound +ToolWindow +AlwaysOnTop 
@@ -33,7 +33,7 @@ SetWinDelay, -1
 return
 
 
-OnToolbar(hToolbar, pEvent, pPos, pTxt, pId) {
+OnToolbar(hToolbar, pEvent, pTxt, pPos, pId) {
 	global 
 	
 	if pEvent = click
