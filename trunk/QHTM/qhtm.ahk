@@ -11,40 +11,43 @@
 
 /*
 	Function: Add
-			  Add QHTM control
+			  Add QHTM control.
 
 	Parameters:
-			  Hwnd		- Handle of the parent
-			  Text		- HTML to display
-			  X-H		- Control coordinates
-  			  Style		- List of control styles
-			  Fun		- Notification function, optional
+			  Hwnd		- Handle of the parent.
+			  Text		- HTML to display.
+			  X-H		- Control coordinates.
+  			  Style		- List of control styles.
+			  Handler	- Notification handler, optional.
 
 	Styles:
-			  Border	  - Add border arond the control
-			  Transparent - Make HTML control transparent
+			  Border	  - Add border arond the control.
+			  Transparent - Make HTML control transparent.
 
 	Returns:
-			Control handle or error message
+			Control handle or error message.
 
-	Notification function:
+	Handler:
 				 
-	>  OnNotify(Hwnd, Link, Id)
+	>  Result := Handler(Hwnd, Link, Id)
 
-			Result  - Return 1 to open the link in system default editor.
 			Hwnd	- Handle of the control
 			Link	- Link text
 			ID		- HTML link ID						
+			Result  - Return 1 to open the link in system default editor.
  */
-QHTM_Add(Hwnd, Text, X, Y, W, H, Style="", Fun=""){
-	global QHTM_MODULEID
+QHTM_Add(Hwnd, Text, X, Y, W, H, Style="", Handler=""){
+	static QHTM_MODULEID
 	static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
-	static WS_EX_BORDER = 0x200, WS_EX_TRANSPARENT=0x20
-		  ,init 
+	static WS_EX_BORDER = 0x200, WS_EX_TRANSPARENT=0x20 ,init 
 
 	if !init {
 		init := QHTM_Init()
 		ifEqual, init, 0, return A_ThisFunc ">   Initialisation failed"
+
+		old := OnMessage(0x4E, "QHTM_onNotify"), QHTM_MODULEID := 171108
+		if old != QHTM_onNotify
+			QHTM("oldNotify", RegisterCallback(old))
 	}
 
 	hExStyle := 0
@@ -53,7 +56,6 @@ QHTM_Add(Hwnd, Text, X, Y, W, H, Style="", Fun=""){
 		IfEqual, A_LoopField, , continue
 		hExStyle |= WS_EX_%A_LOOPFIELD%
 	}
-
 
 	bBorder := bBorder ? WS_EX_BORDER : 0
 	hCtrl := DllCall("CreateWindowEx"
@@ -71,12 +73,8 @@ QHTM_Add(Hwnd, Text, X, Y, W, H, Style="", Fun=""){
 		  , "Uint", 0, "UInt")
 	IfEqual, hCtrl, 0, return A_ThisFunc ">   Error while creating control"
 
-	if(Fun != "") {
-		old := OnMessage(0x4E, "QHTM_onNotify")
-		if (old != "QHTM_onNotify")
-			QHTM_oldNotify := RegisterCallback(old)
-		QHTM_onNotify(hCtrl, Fun, 0, 0)
-	}
+	if IsFunc(Handler)
+		QHTM(hCtrl "Handler", Handler)
 
 	return hCtrl
 }
@@ -253,15 +251,14 @@ QHTM_GotoLink( hCtrl, LinkName ) {
 
  */
 QHTM_Init( DllPath="qhtm.dll" ){
-	global QHTM_MODULEID
 	static init
 	ifNotEqual, init, , return 1
 
 ;	i := DllCall("GetWindowLong", "uint", hGui, "int", GWL_HINSTANCE := -6)		;doesn't make any difference, I can just put 0.
 
-	init := DllCall("LoadLibrary", "Str", DllPath),  QHTM_MODULEID := 171108
+	init := DllCall("LoadLibrary", "Str", DllPath)
 	DllCall("qhtm\QHTM_Initialize", "UInt", 0)
-	DllCall("qhtm\QHTM_EnableCooltips", "UInt", 0)	;enable cool tooltips asap. To bad it doesn't work 
+	DllCall("qhtm\QHTM_EnableCooltips", "UInt", 0)
 	return init
 }
 
@@ -595,35 +592,45 @@ QHTM_onForm(hwndQHTM, pFormSubmit, lParam){
 
 
 QHTM_onNotify(Wparam, Lparam, Msg, Hwnd) {
-	local idFrom, fun, j, txt1, txt2, adr, len, hw
-	static funs="`n"
+	static QHTM_MODULEID=171108, oldNotify="*"
 
-	if !Hwnd
-		return funs .= Wparam " " LParam "`n"
-
-	idFrom := NumGet(lparam+4)
-	if (idFrom != QHTM_MODULEID)
-		return QHTM_oldNotify ? DllCall(QHTM_oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd) : ""
+	if ((NumGet(Lparam+4)) != QHTM_MODULEID){
+		ifEqual, oldNotify, *, SetEnv, oldNotify, % QHTM("OldNotify")		
+		ifNotEqual, oldNotify,,return DllCall(OldNotify, "uint", wparam, "uint", lparam, "uint", msg, "uint", hwnd)		
+		return
+	}
 
   ;NMHDR 
-	hw	   :=  NumGet(lparam+0)		;control sending the message
-
-	j := InStr(funs, "`n" hw)
-	j += StrLen(hw) + 2,  fun := SubStr(funs, j, InStr( funs, "`n", 0, j ) - j)
-
+	hw := NumGet(Lparam+0)			;control sending the message
+	handler := QHTM(hw "Handler")
+	ifEqual, handler,, return
 	
 	Loop, 2
 		adr := NumGet(lparam+12+(A_Index-1)*8), len := DllCall("lstrlenW", "UInt", adr), VarSetCapacity(txt%A_Index%, len, 0)
 	    , DllCall("WideCharToMultiByte" , "UInt", 0, "UInt", 0, "UInt", adr, "Int", -1, "Str", txt%A_Index%, "Int", len, "UInt", 0, "UInt", 0) 
 		, VarSetCapacity(txt%A_Index%, -1)
 	
-	NumPut(%fun%(hw, txt1, txt2), lparam+16)
+	NumPut(%handler%(hw, txt1, txt2), Lparam+16)
 }
 
 QHTM_StrAtAdr(adr) { 
    Return DllCall("MulDiv", "Int",adr, "Int",1, "Int",1, "str") 
 }
 
+
+;Storage
+QHTM(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
+	static
+	if (var = "" ){
+		if ( _ := InStr(value, ")") )
+			__ := SubStr(value, 1, _-1), value := SubStr(value, _+1)
+		loop, parse, value, %A_Space%
+			_ := %__%%A_LoopField%,  o%A_Index% := _ != "" ? _ : %A_LoopField%
+		return
+	} else _ := %var%
+	ifNotEqual, value, ~`a, SetEnv, %var%, %value%
+	return _
+}
 
 /* 
  Group: Links
@@ -634,8 +641,8 @@ QHTM_StrAtAdr(adr) {
 
 /* 
  Group: About 
+ 	o AHK module ver 1.02 by majkinetor.
 	o QHTML copyright © GipsySoft. See http://www.gipsysoft.com/qhtm/
-	o AHK wrapper ver 1.01 by majkinetor.
 	o Licenced under Creative Commons Attribution-Noncommercial <http://creativecommons.org/licenses/by-nc/3.0/>.
  */
 
