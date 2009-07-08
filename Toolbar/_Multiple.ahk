@@ -16,9 +16,9 @@
 			undo
 			redo
 		 )
-	Toolbar_AddButtons(h1, btns)
-	Toolbar_AddButtons(h2, btns)
-	Toolbar_AddButtons(h3, btns)
+	Toolbar_Insert(h1, btns)
+	Toolbar_Insert(h2, btns)
+	Toolbar_Insert(h3, btns)
 	Toolbar_SetButtonSize(h3, 60)
 
 	Gui, Show

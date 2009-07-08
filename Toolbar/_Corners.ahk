@@ -18,8 +18,8 @@
 			undo,,wrap
 			redo,,wrap
 		 )
-	Toolbar_AddButtons(h1, btns)
-	Toolbar_AddButtons(h2, btns)
+	Toolbar_Insert(h1, btns)
+	Toolbar_Insert(h2, btns)
 	Toolbar_Autosize(h1, "br")
 	Toolbar_Autosize(h2, "bl")
 

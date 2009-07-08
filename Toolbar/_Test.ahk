@@ -27,7 +27,7 @@ SetBatchLines, -1
 		*a2		,129
 		*a3		,130
 	)
-	Toolbar_AddButtons(hToolbar, btns)
+	Toolbar_Insert(hToolbar, btns)
 	Gui, Show, , 
 	MakeTestGui(w/2, h-430)
 return
@@ -39,7 +39,7 @@ MakeTestGui(w, h){
 		Function		Parameter(s)
 		____________________________________________________________________
 
-		AddButtons		pBtns,  pPos=""
+		Insert		pBtns,  pPos=""
 
 		Define			pQ = "c" - current btns only, "a" - available btns only, "" - everything
 
@@ -108,10 +108,10 @@ OnBtn:
 		Toolbar_Customize(hToolbar)
 
 	if A_GuiControl = Add
-		Toolbar_AddButtons(hToolbar, _)
+		Toolbar_Insert(hToolbar, _)
 
 	if A_GuiControl = Insert
-		Toolbar_AddButtons(hToolbar, _, 3)
+		Toolbar_Insert(hToolbar, _, 3)
 
 	if A_GuiControl = ToggleStyle
 		Toolbar_ToggleStyle(hToolbar, p1 != "" ? p1 : "LIST")
