@@ -2,10 +2,10 @@
 			*Encapsulation of the system Toolbar API.*
 			(see toolbar.png)
 			The module is designed with following goals in mind :
-			* To allow programmers to quickly create toolbars in intuitive way
+			* To allow programmers to quickly create toolbars in intuitive way.
 			* To allow advanced (non-typical) use, such as dynamic toolbar creation in such way that it doesn't complicate typical toolbar usage.
 			* To allow users to customize toolbar and programmer to save changed toolbar state.
-			* Not to have any side effects to your script.
+			* Not to have any side effects on your script.
 
  */
 
@@ -55,7 +55,7 @@
 Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 	static MODULEID
   ;STANDARD STYLES
-	static WS_CHILD := 0x40000000, WS_VISIBLE := 0x10000000, WS_CLIPSIBLINGS = 0x4000000, WS_CLIPCHILDREN = 0x2000000, TBSTYLE_THICKFRAME=0x40000, TBSTYLE_TABSTOP = 0x10000
+	static WS_CHILD := 0x40000000, WS_VISIBLE := 0x10000000, WS_CLIPSIBLINGS = 0x4000000, WS_CLIPCHILDREN = 0x2000000, TBSTYLE_THICKFRAME=0x40000, TBSTYLE_TABSTOP = 0x10000, TBSTYLE_BORDER=0
   ;TOOLBAR STYLES
     static TBSTYLE_WRAPABLE = 0x200, TBSTYLE_FLAT = 0x800, TBSTYLE_LIST=0x1000, TBSTYLE_TOOLTIPS=0x100, TBSTYLE_TRANSPARENT = 0x8000, TBSTYLE_ADJUSTABLE = 0x20, TBSTYLE_VERTICAL=0x80
   ;TOOLBARE XTENDED STYLES
@@ -64,7 +64,6 @@ Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 	static TOOLBARCLASSNAME  = "ToolbarWindow32", TB_BUTTONSTRUCTSIZE=0x41E, TB_SETEXTENDEDSTYLE := 0x454, TB_SETUNICODEFORMAT := 0x2005
   ;common
 	static TBSTYLE_NODIVIDER=0x40, CCS_NOPARENTALIGN=0x8, CCS_NORESIZE = 0x4, TBSTYLE_BOTTOM = 0x3
-	static WS_EX_BORDER = 0x200
 
 	if !MODULEID { 
 		old := OnMessage(0x4E, "Toolbar_onNotify"),	MODULEID := 80609
@@ -74,10 +73,9 @@ Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 
 	hStyle := 0
 	loop, parse, Style, %A_Tab%%A_Space%, %A_Tab%%A_Space%
-	{
 		ifEqual, A_LoopField,,continue
-		hStyle |= A_LoopField+0 ? A_LoopField : TBSTYLE_%A_LoopField%
-	}
+		else hStyle |= A_LoopField+0 ? A_LoopField : TBSTYLE_%A_LoopField%
+
 	ifEqual, hStyle, ,return A_ThisFunc "> Some of the styles are invalid."
 
 	if (Pos != ""){
@@ -94,7 +92,7 @@ Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 	}
 
     hCtrl := DllCall("CreateWindowEx" 
-             , "uint", WS_EX_BORDER
+             , "uint", InStr(Style, "border") ? 1 : 0				;	WS_EX_CLIENTEDGE = 0x200 for sunken
              , "str",  TOOLBARCLASSNAME 
              , "uint", 0 
              , "uint", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | hStyle
@@ -164,7 +162,6 @@ Toolbar_AutoSize(hCtrl, Align="fit"){
  			Removes all buttons from the toolbar, both current and available
  */
 Toolbar_Clear(hCtrl){
-
 	loop % Toolbar_Count(hCtrl)
 		SendMessage, 0x416, , , ,ahk_id %hCtrl%		;TB_DELETEBUTTON
 
@@ -172,31 +169,30 @@ Toolbar_Clear(hCtrl){
  	SendMessage,0x421,,,,ahk_id %hCtrl%				;Autosize
 }
 
-;----------------------------------------------------------------------------------------------
-;Function:  Customize
-;			Launches customization dialog
-;			(see customize.png)
-;
+/*
+ Function:  Customize
+ 			Launches customization dialog
+ 			(see customize.png)
+ */
 Toolbar_Customize(hCtrl) {
 	static TB_CUSTOMIZE=0x41B
 	SendMessage, TB_CUSTOMIZE,,,, ahk_id %hCtrl%
 }
 
-;----------------------------------------------------------------------------------------------
-;Function:  Define
-;			Get current toolbar definition
-;
-;Parameters:
-;			pQ			- Query parameter. Specify "c" to get only current buttons, "a" to get only available buttons.
-;						  Leave empty to get all buttons.
-;
-;Returns:
-;			Button definition list
-;
+/*
+ Function:  Define
+ 			Get current toolbar definition
+ 
+ Parameters:
+ 			pQ	- Query parameter. Specify "c" to get only current buttons, "a" to get only available buttons.
+ 				  Leave empty to get all buttons.
+ Returns:
+			Button definition list.
+ */
 Toolbar_Define(hCtrl, pQ="") {
 	if pQ !=
-		if  pQ not in a,c
-			return A_ThisFunc "> Invalid query parameter."
+		if pQ not in a,c
+			return A_ThisFunc "> Invalid query parameter: " pQ
 
 	if (pQ = "") or (pQ = "c")
 		loop, % Toolbar_Count(hCtrl)
@@ -204,8 +200,7 @@ Toolbar_Define(hCtrl, pQ="") {
 	ifEqual, pQ, c, return SubStr(btns, 1, -2)
 
 	if (pQ="") or (pQ = "a"){
-		if pQ =
-			btns .= "`r`n"
+		ifEqual, pQ, , SetEnv, btns, %btns%`r`n
 
 		cnta := NumGet( Toolbar(hCtrl "aBTN") )
 		loop, %cnta%
@@ -215,17 +210,16 @@ Toolbar_Define(hCtrl, pQ="") {
 	}
 }
 
-;----------------------------------------------------------------------------------------------
-;Function:  DeleteButton
-;			Delete button from the toolbar.
-;
-;Parameters:
-;			Pos		- 1-based position of the button, by default 1.
-;					  To delete one of the available buttons, specify "*" before the position.
-;
-;Returns:
-;			TRUE if successful.
-;
+/* Function:  DeleteButton
+ 			Delete button from the toolbar.
+ 
+ Parameters:
+ 			Pos		- 1-based position of the button, by default 1.
+ 					  To delete one of the available buttons, specify "*" before the position.
+ 
+ Returns:
+ 			TRUE if successful.
+ */
 Toolbar_DeleteButton(hCtrl, Pos=1) {
 	static TB_DELETEBUTTON = 0x416
 
@@ -250,7 +244,7 @@ Toolbar_DeleteButton(hCtrl, Pos=1) {
 
 	Parameters:
 			WhichButtton - One of the ways to identify the button: 1-based button position or button ID.
-						  If pWhichBtn is negative, the information about *available* button on position -pWhichBtn will be returned.				
+						  If WhichButton is negative, the information about *available* button on position -WhichButton will be returned.				
 			pQ			- Query parameter, can be C (Caption) I (Icon number), S (State), L (styLe) or ID
 						  If omitted, all information will be returned in the form of button definition
 
@@ -323,16 +317,17 @@ Toolbar_GetButton(hCtrl, WhichButton, pQ="") {
 	return buf
 }
 
-;----------------------------------------------------------------------------------------------
-;Function:  Count
-;			Get count of buttons on the toolbar
-;
-;Parameters:
-;			pQ			- Query parameter, set to "c" to get the number of current buttons (default)
-;						  Set to "a" to get the number of available buttons. Set to empty string to return both.
-;
-;Returns:
-;			if pQ is empty function returns rational number in the form cntC.cntA otherwise  requested count
+/*
+ Function:  Count
+ 			Get count of buttons on the toolbar
+ 
+ Parameters:
+ 			pQ			- Query parameter, set to "c" to get the number of current buttons (default)
+ 						  Set to "a" to get the number of available buttons. Set to empty string to return both.
+ 
+ Returns:
+			if pQ is empty function returns rational number in the form cntC.cntA otherwise  requested count
+ */
 Toolbar_Count(hCtrl, pQ="c") {
 	static TB_BUTTONCOUNT = 0x418
 
@@ -346,51 +341,50 @@ Toolbar_Count(hCtrl, pQ="c") {
 	return c "." a
 }
 
-;----------------------------------------------------------------------------------------------
-;Function:  GetRect
-;			Get button rectangle
-;
-;Parameters:
-;			pPos		- Button position. Leave blank to get dimensions of the toolbar control itself.
-;			pQ			- Query parameter: set x,y,w,h to return appropriate value, or leave blank to return all in single line.
-;
-;Returns:
-;			String with 4 values separated by space or requested information
-;
-Toolbar_GetRect(hCtrl, pPos="", pQ="") {
+/*
+ Function:  GetRect
+ 			Get button rectangle
+ 
+ Parameters:
+ 			pPos		- Button position. Leave blank to get dimensions of the toolbar control itself.
+ 			pQ			- Query parameter: set x,y,w,h to return appropriate value, or leave blank to return all in single line.
+ 
+ Returns:
+ 			String with 4 values separated by space or requested information
+ */
+Toolbar_GetRect(hCtrl, Pos="", pQ="") {
 	static TB_GETITEMRECT=0x41D
 
 	if pPos !=
-		ifLessOrEqual, pPos, 0, return "Err: Invalid button position"
+		ifLessOrEqual, Pos, 0, return "Err: Invalid button position"
 
 	VarSetCapacity(RECT, 16)
-    SendMessage, TB_GETITEMRECT, pPos-1,&RECT, ,ahk_id %hCtrl%
-	IfEqual, ErrorLevel, 0, return "Err: can't get rect"
+    SendMessage, TB_GETITEMRECT, Pos-1,&RECT, ,ahk_id %hCtrl%
+	IfEqual, ErrorLevel, 0, return A_ThisFunc "> Can't get rect"
 
-	if pPos =
+	if Pos =
 		DllCall("GetClientRect", "uint", hCtrl, "uint", &RECT)
 
 	x := NumGet(RECT, 0), y := NumGet(RECT, 4), r := NumGet(RECT, 8), b := NumGet(RECT, 12)
-
 	return (pQ = "x") ? x : (pQ = "y") ? y : (pQ = "w") ? r-x : (pQ = "h") ? b-y : x " " y " " r-x " " b-y
 }
 
-;----------------------------------------------------------------------------------------------
-;Function:  GetMaxSize
-;			Retrieves the total size of all of the visible buttons and separators in the toolbar.
-;
-;Parameters:
-;			pWidth, pHeight		- Variables which will receive size
-;
-;Returns:
-;			Returns nonzero if successful, or zero otherwise.
-;
-Toolbar_GetMaxSize(hCtrl, ByRef pWidth, ByRef pHeight){
+/*
+ Function:  GetMaxSize
+ 			Retrieves the total size of all of the visible buttons and separators in the toolbar.
+ 
+ Parameters:
+ 			Width, Height		- Variables which will receive size.
+ 
+ Returns:
+ 			Returns TRUE if successful.
+ */
+Toolbar_GetMaxSize(hCtrl, ByRef Width, ByRef Height){
 	static TB_GETMAXSIZE = 0x453
 
 	VarSetCapacity(SIZE, 8)
 	SendMessage, TB_GETMAXSIZE, 0, &SIZE, , ahk_id %hCtrl%
-	res := ErrorLevel, 	pWidth := NumGet(SIZE), pHeight := NumGet(SIZE, 4)
+	res := ErrorLevel, 	Width := NumGet(SIZE), Height := NumGet(SIZE, 4)
 	return res
 }
 
@@ -459,134 +453,134 @@ Toolbar_Insert(hCtrl, Btns, Pos=""){
  	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
 }
 
-;----------------------------------------------------------------------------------------------
-;Function:  MoveButton
-;			Moves a button from one position to another.
-;
-;Parameters:
-;			pOldPos		- 1-based postion of the button to be moved.
-;			pNewPos		- 1-based postion where the button will be moved.
-;
-;Returns:
-;			Returns nonzero if successful, or zero otherwise.
-;
-Toolbar_MoveButton(hCtrl, pOldPos, pNewPos) {
+/*
+ Function:  MoveButton
+ 			Moves a button from one position to another.
+ 
+ Parameters:
+ 			OldPos		- 1-based postion of the button to be moved.
+ 			NewPos		- 1-based postion where the button will be moved.
+ 
+ Returns:
+ 			Returns nonzero if successful, or zero otherwise.
+ */
+Toolbar_MoveButton(hCtrl, OldPos, NewPos) {
 	static TB_MOVEBUTTON = 0x452
-    SendMessage, TB_MOVEBUTTON, pOldPos-1,pNewPos-1, ,ahk_id %hCtrl%
+    SendMessage, TB_MOVEBUTTON, OldPos-1,NewPos-1, ,ahk_id %hCtrl%
 	return ErrorLevel
 }
 
-;----------------------------------------------------------------------------------------------
-;Function:  SetButtonInfo
-;			Set button information
-;
-;Parameters:
-;			pWhichBtn	- One of the 2 ways to identify the button: 1-based button position or button ID
-;			state		- List of button states to set, separated by white space.
-;			width		- Button width (can't be used with LIST style)
-;
-; Returns:
-;			Nonzero if successful, or zero otherwise.
-;
-Toolbar_SetButton(hCtrl, pWhichBtn, state="", width=""){
+/*
+ Function:  SetButton
+ 			Set button information
+ 
+ Parameters:
+ 			WhichButton	- One of the 2 ways to identify the button: 1-based button position or button ID
+ 			State		- List of button states to set, separated by white space.
+ 			Width		- Button width (can't be used with LIST style)
+ 
+  Returns:
+ 			Nonzero if successful, or zero otherwise.
+ 
+ */
+Toolbar_SetButton(hCtrl, WhichButton, State="", Width=""){
 	static TBIF_TEXT=2, TBIF_STATE=4, TBIF_SIZE=0x40, 
 	static TB_SETBUTTONINFO=0x442, TB_GETSTATE=0x412, TB_GETBUTTON = 0x417
 	static TBSTATE_CHECKED=1, TBSTATE_ENABLED=4, TBSTATE_HIDDEN=8, TBSTATE_ELLIPSES=0x40, TBSTATE_DISABLED=0
 
-	if pWhichBtn is not number
-		return "Err: Invalid button position or ID: " pWhichBtn
+	if WhichButton is not number
+		return A_ThisFunc "> Invalid button position or ID: " WhichButton
 
-    if (pWhichBtn >= 1){
+    if (WhichButton >= 1){
 		VarSetCapacity(TBB, 20)
-		SendMessage, TB_GETBUTTON, --pWhichBtn, &TBB,,ahk_id %hCtrl%
-		pWhichBtn := NumGet(&TBB+0, 4)
-	} else pWhichBtn := SubStr(pWhichBtn, 2)
+		SendMessage, TB_GETBUTTON, --WhichButton, &TBB,,ahk_id %hCtrl%
+		WhichButton := NumGet(&TBB+0, 4)
+	} else WhichButton := SubStr(WhichButton, 2)
 
-	SendMessage, TB_GETSTATE, pWhichBtn,,,ahk_id %hCtrl%
+	SendMessage, TB_GETSTATE, WhichButton,,,ahk_id %hCtrl%
 	hState := ErrorLevel
 
 	mask := 0
-	mask |= state != "" ?  TBIF_STATE : 0
-	mask |= width != "" ?  TBIF_SIZE  : 0
+	 ,mask |= State != "" ?  TBIF_STATE : 0
+	 ,mask |= Width != "" ?  TBIF_SIZE  : 0
 
-	if InStr(state, "-disabled") {
+	if InStr(State, "-disabled") {
 		hState |= TBSTATE_ENABLED 
-		StringReplace, state, state, -disabled
+		StringReplace, State, State, -disabled
 	}
-	else if InStr(state, "disabled")
+	else if InStr(State, "disabled")
 		hState &= ~TBSTATE_ENABLED
 
-	loop, parse, state, %A_Tab%%A_Space%, %A_Tab%%A_Space%
+	loop, parse, State, %A_Tab%%A_Space%, %A_Tab%%A_Space%
 	{
 		ifEqual, A_LoopField,,continue
 		if SubStr(A_LoopField, 1, 1) != "-"
-		 	  hstate |= TBSTATE_%A_LOOPFIELD%
+		 	  hState |= TBSTATE_%A_LOOPFIELD%
 		else  k := SubStr(A_LoopField, 2),    k := TBSTATE_%k%, 	hState &= ~k
 	}
-	ifEqual, hState, , return "Err: Some of the states are invalid"
+	ifEqual, hState, , return A_ThisFunc "> Some of the states are invalid: " State
 
 	VarSetCapacity(BI, 32, 0)
 	NumPut(32,		BI, 0)
 	NumPut(mask,	BI, 4)
 	NumPut(hState,	BI, 16, "Char")
-	NumPut(width,	BI, 18, "Short")
+	NumPut(Width,	BI, 18, "Short")
    
-	SendMessage, TB_SETBUTTONINFO, pWhichBtn, &BI, ,ahk_id %hCtrl%
+	SendMessage, TB_SETBUTTONINFO, WhichButton, &BI, ,ahk_id %hCtrl%
 	res := ErrorLevel
 	
 	SendMessage, 0x421, , ,,ahk_id %hCtrl%	;autosize
 	return res
 }
-;----------------------------------------------------------------------------------------------
-;Function:  SetButtonWidth
-;			Sets the size of the each button
-;
-;Parameters:
-;			pMin, pMax - Minimum and maximum button width. If you omit pMax it defaults to pMin.
-;
-;Returns:
-;			Nonzero if successful, or zero otherwise.
-;
-Toolbar_SetButtonWidth(hCtrl, pMin, pMax=""){
+/*
+ Function:  SetButtonWidth
+ 			Sets button width.
+ 
+ Parameters:
+ 			Min, Max - Minimum and maximum button width. If you omit pMax it defaults to pMin.
+ 
+ Returns:
+ 			TRUE if successful.
+ */
+Toolbar_SetButtonWidth(hCtrl, Min, Max=""){
 	static TB_SETBUTTONWIDTH=0x43B
+	ifEqual, Max, , SetEnv, Max, %Min%
 
-	if pMax =
-		pMax := pMin
-
-	SendMessage, TB_SETBUTTONWIDTH, 0,(pMax<<16) | pMin,,ahk_id %hCtrl%
+	SendMessage, TB_SETBUTTONWIDTH, 0,(Max<<16) | Min,,ahk_id %hCtrl%
 	ret := ErrorLevel
 
  	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
 	return ret
 }
 
-;----------------------------------------------------------------------------------------------
-;Function:  SetButtonSize
-;			Sets the size of the each button. Doesn't do anything with LIST style.
-;
-;Parameters:
-;			w, h		- Width & Height. If you omit height, it defaults to width.
-;
-Toolbar_SetButtonSize(hCtrl, w, h="") {
+/*
+	Function:	SetButtonSize
+ 				Sets the size of buttons.
+ 
+	Parameters:
+ 				W, H	- Width & Height. If you omit height, it defaults to width.
+ 
+	Remarks:
+				Doesnt work with LIST style.
+ */
+Toolbar_SetButtonSize(hCtrl, W, H="") {
 	static TB_SETBUTTONSIZE = 0x41F
-
-	if h =
-		h := w
-	SendMessage, TB_SETBUTTONSIZE, 0,(w<<16) | h,,ahk_id %hCtrl%
+	IfEqual, h, , SetEnv, h, %W%
+	SendMessage, TB_SETBUTTONSIZE, 0,(W<<16) | H,,ahk_id %hCtrl%
 	SendMessage, 0x421, , ,,ahk_id %hCtrl%	;autosize
 }
 
 
-;----------------------------------------------------------------------------------------------
-;Function:  SetImageList
-;			Set toolbar image list.
-;
-;Parameters:
-;			hIL	- Image list handle.
-;
-;Returns:
-;			Handle of the previous image list.
-;
+/*
+ Function:  SetImageList
+ 			Set toolbar image list.
+ 
+ Parameters:
+ 			hIL	- Image list handle.
+ 
+ Returns:
+ 			Handle of the previous image list.
+ */
 Toolbar_SetImageList(hCtrl, hIL="1S"){
 	static TB_SETIMAGELIST = 0x430, TB_LOADIMAGES=0x432, TB_SETBITMAPSIZE=0x420
 
@@ -602,17 +596,17 @@ Toolbar_SetImageList(hCtrl, hIL="1S"){
 	return ErrorLevel
 }
 
-;----------------------------------------------------------------------------------------------
-;Function:  SetMaxTextRows
-;			Sets the maximum number of text rows displayed on a toolbar button.
-;
-;Parameters:
-;			iMaxRows	- Maximum number of rows of text that can be displayed.
-;
-;Remarks:
-;			Returns nonzero if successful, or zero otherwise. To cause text to wrap, you must set the maximum 
-;			button width by using <SetButtonWidth>. The text wraps at a word break. Text in LIST styled toolbars is always shown on a single line.
-;
+/*
+ Function:  SetMaxTextRows
+ 			Sets the maximum number of text rows displayed on a toolbar button.
+ 
+ Parameters:
+ 			iMaxRows	- Maximum number of rows of text that can be displayed.
+ 
+ Remarks:
+ 			Returns nonzero if successful, or zero otherwise. To cause text to wrap, you must set the maximum 
+ 			button width by using <SetButtonWidth>. The text wraps at a word break. Text in LIST styled toolbars is always shown on a single line.
+ */
 Toolbar_SetMaxTextRows(hCtrl, iMaxRows=0) {
 	static TB_SETMAXTEXTROWS = 0x43C
     SendMessage, TB_SETMAXTEXTROWS,iMaxRows,,,ahk_id %hCtrl%
@@ -622,30 +616,27 @@ Toolbar_SetMaxTextRows(hCtrl, iMaxRows=0) {
 }
 
 
-;----------------------------------------------------------------------------------------------
-;Function:  ToggleStyle
-;			Toggle specific toolbar creation style
-;
-;Parameters:
-;			pStyle		- Style to toggle, by default "LIST". You can also specify numeric style value.
-;
-Toolbar_ToggleStyle(hCtrl, pStyle="LIST"){
+/*	Function:	ToggleStyle
+				Toggle specific toolbar creation style
+
+	Parameters:
+				Style	- Style to toggle, by default "LIST". You can also specify numeric style value.
+ */
+Toolbar_ToggleStyle(hCtrl, Style="LIST"){
     static TBSTYLE_WRAPABLE = 0x200, TBSTYLE_FLAT = 0x800, TBSTYLE_LIST=0x1000, TBSTYLE_TOOLTIPS=0x100, TBSTYLE_TRANSPARENT = 0x8000, TBSTYLE_ADJUSTABLE = 0x20,  TBSTYLE_BORDER=0x800000, TBSTYLE_THICKFRAME=0x40000, TBSTYLE_TABSTOP = 0x10000
 	static TB_SETSTYLE=1080, TB_GETSTYLE=1081
 
-	if pStyle is Integer
-			style := pStyle
-	else	style := TBSTYLE_%pStyle%
-	ifEqual, style, , return "Err: Invalid style"
+	s := Style+0 != "" ? Style : TBSTYLE_%pStyle%	
+	ifEqual, s, , return A_ThisFunc "> Invalid style: " Style
 
-	WinSet, Style, ^%style%, ahk_id %hCtrl%
+	WinSet, Style, ^%s%, ahk_id %hCtrl%
 
-; This didn't work...
-;	SendMessage, TB_GETSTYLE, ,,, ahk_id %hCtrl%
-;	style := (ErrorLevel & style) ? ErrorLevel & !style : ErrorLevel | style
-;	SendMessage, TB_SETSTYLE, 0, style,, ahk_id %hCtrl%
+	; This didn't work...
+	 ;	SendMessage, TB_GETSTYLE, ,,, ahk_id %hCtrl%
+	 ;	style := (ErrorLevel & style) ? ErrorLevel & !style : ErrorLevel | style
+	 ;	SendMessage, TB_SETSTYLE, 0, style,, ahk_id %hCtrl%
 
-	if (style = TBSTYLE_LIST) {
+	if (s = TBSTYLE_LIST) {
 		;somehow, text doesn't return without this, when you switch from ON to OFF
 		Toolbar_SetMaxTextRows(hCtrl, 0)
 		Toolbar_SetMaxTextRows(hCtrl, 1)	
@@ -671,7 +662,7 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
     	
 	aBTN := Toolbar(hCtrl "aBTN")
 	if (aBTN = "")
-		aBTN := Toolbar_malloc( 50 * 20 + 4)	;if space for array of * buttons isn't reserved and there are definitions of * buttons reserve it for 50 buttons + some more so i can keep some data there...
+		aBTN := Toolbar_malloc( 50 * 20 + 4),  Toolbar(hCtrl "aBTN", aBTN)	 ;if space for array of * buttons isn't reserved and there are definitions of * buttons reserve it for 50 buttons + some more so i can keep some data there...
 
 	StringReplace, _, Btns, `n, , UseErrorLevel
 	btnNo := ErrorLevel + 1
@@ -744,7 +735,6 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 	if warning
 		msgbox You exceeded the limit of available buttons (50)
 
-	Toolbar(hCtrl, "aBTN", aBTN)
 	return cnt									;return number of buttons in the array
 }
 
@@ -759,12 +749,11 @@ Toolbar_onNotify(Wparam, Lparam, Msg, Hwnd) {
 		return
 	}
 	
-	hw :=  NumGet(Lparam+0),  code :=  NumGet(Lparam+8) - 4294967296
+	hw :=  NumGet(Lparam+0),  code := NumGet(Lparam+8) - 4294967296
 	handler := Toolbar(hw "Handler")
 	ifEqual, handler,, return
 
-
-	iItem  :=  (code != TBN_HOTITEMCHANGE) ? NumGet(lparam+12) : NumGet(lparam+16)
+	iItem  := (code != TBN_HOTITEMCHANGE) ? NumGet(lparam+12) : NumGet(lparam+16)
 
 	SendMessage, TB_COMMANDTOINDEX,iItem,,,ahk_id %hw%	
 	pos := ErrorLevel 
@@ -786,9 +775,11 @@ Toolbar_onNotify(Wparam, Lparam, Msg, Hwnd) {
 		return 0
 	}
 
+  ;=================== CUSTOMIZATION NOTIFICATIONS ===========================
+
 	if (code = TBN_BEGINADJUST) {
 		cnta := NumGet( Toolbar(hw "aBTN") ) , cnt := Toolbar_getButtonArray(hw, cBTN), inDialog := true
-		if (cnta="" or cnta=0) && (cnt=0)
+		if (cnt=0) && (cnta=0)
 			Msgbox Nothing to customize
 		return
 	}
@@ -862,11 +853,11 @@ Toolbar_getStyleName( hStyle ) {
 	return style
 }
 
-;----------------------------------------------------------------------------------------------
-;After the customization dialog finishes, order and placements of buttons of the left and right side is changed.
-;As I keep available buttons as part of the AHK API, I must rebuild array of available buttons; add to it buttons 
-; that are removed from the toolbar and remove buttons that are added to the toolbar.
-;
+/*
+After the customization dialog finishes, order and placements of buttons of the left and right side is changed.
+As I keep available buttons as part of the AHK API, I must rebuild array of available buttons; add to it buttons 
+ that are removed from the toolbar and remove buttons that are added to the toolbar.
+ */
 Toolbar_onEndAdjust(hCtrl, cBTN, cnt) {
 	static TB_COMMANDTOINDEX = 0x419, BTNS_SEP=1
 	
@@ -937,43 +928,43 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 	return _
 }
 
-;-------------------------------------------------------------------------------------------------------------------
-;Group: Example
-;
-;>  Gui, +LastFound
-;>  hGui := WinExist()
-;>  Gui, Show , w400 h100 Hide                              ;set gui width & height prior to adding toolbar (mandatory)
-;>
-;>  hCtrl := Toolbar_Add(hGui, "OnToolbar", "FLAT TOOLTIPS", "1L")    ;add the toolbar
-;>
-;>  btns =
-;>   (LTrim
-;>      new,  7,            ,dropdown showtext
-;>      open, 8
-;>      save, 9, disabled
-;>      -
-;>      undo, 4,            ,dropdown
-;>      redo, 5,            ,dropdown
-;>      -----
-;>      state, 11, checked  ,check
-;>   )
-;>
-;>   Toolbar_Insert(hCtrl, btns)
-;>   Toolbar_SetButtonWidth(hCtrl, 50)                   ;set button width & height to 50 pixels
-;>
-;>   Gui, Show
-;>return
-;>
-;>;toolbar event handler
-;>OnToolbar(hCtrl, pEvent, pPos, pTxt, pId){				
-;>	if pEvent = click
-;>		msgbox %pTxt% (%pPos%)
-;>}
-;>
-;>#include Toolbar.ahk
+/*
+ Group: Example
+ (start code)
+	   Gui, +LastFound
+	   hGui := WinExist()
+	   Gui, Show , w500 h100 Hide                              ;set gui width & height prior to adding toolbar (mandatory)
+	 
+	   hCtrl := Toolbar_Add(hGui, "OnToolbar", "FLAT TOOLTIPS", "1L")    ;add the toolbar
+	 
+	   btns =
+		(LTrim
+		   new,  7,            ,dropdown showtext
+		   open, 8
+		   save, 9, disabled
+		   -
+		   undo, 4,            ,dropdown
+		   redo, 5,            ,dropdown
+		   -----
+		   state, 11, checked  ,check
+		)
+	 
+		Toolbar_Insert(hCtrl, btns)
+		Toolbar_SetButtonWidth(hCtrl, 50)                   ;set button width & height to 50 pixels
+	 
+		Gui, Show
+	return
+ 
+	;toolbar event handler
+	OnToolbar(hCtrl, Event, Pos, Txt){				
+		   tooltip %Event% %Txt% (%Pos%), 0, 0
+	}
+	(end code)
+ */
 
-;-------------------------------------------------------------------------------------------------------------------
-;Group: About
-;	o Ver 2.0 b2 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
-;	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
-;	o Licenced under Creative Commons Attribution-Noncommercial <http://creativecommons.org/licenses/by-nc/3.0/>.  
+/*
+ Group: About
+	o Ver 2.0 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
+	o Licenced under Creative Commons Attribution-Noncommercial <http://creativecommons.org/licenses/by-nc/3.0/>.  
+ */
