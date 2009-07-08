@@ -45,8 +45,8 @@
 
 			Ctrl	- Handle of the Toolbar that sends the message.
 			Event	- Event name. See bellow.
-			Pos		- Button position.
 			Txt		- Button caption.
+			Pos		- Button position.
 			Id		- Button ID.
 
  Returns: 
@@ -763,15 +763,15 @@ Toolbar_onNotify(Wparam, Lparam, Msg, Hwnd) {
 
 	if (code = NM_CLICK) {
 		IfEqual, pos, 4294967296, return
-		return %handler%(hw, "click", pos, txt, iItem)
+		return %handler%(hw, "click", txt, pos, iItem)
 	}
 
 	if (code = TBN_DROPDOWN)
-		return %handler%(hw, "menu", pos, txt, iItem)
+		return %handler%(hw, "menu", txt, pos, iItem)
 
 	if (code = TBN_HOTITEMCHANGE) {
 		IfEqual, pos, 4294967296, return
-		%handler%(hw, "hot", pos, txt, iItem)
+		%handler%(hw, "hot", txt, pos,  iItem)
 		return 0
 	}
 
