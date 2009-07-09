@@ -6,7 +6,7 @@
 	hScript := WinExist()
 
 	Gui, Font, s10
-	Gui, Add, Edit,		 vMyMsg  w200		, AHK message to AHK
+	Gui, Add, Edit,		 vMyMsg  w200		, AHK message to C#
 	Gui, Add, Edit,  x+0 vMyPort w50, 100
 
 	Gui, Font, s8
@@ -17,14 +17,12 @@
 
 	Gui, Show,	AutoSize
 
-	IPC_SetHandler("OnMessage")
+	IPC_OnMessage("OnMessage")
 return
 
-OnMessage(Hwnd, Data, Port, Size) {
-	global myLB
-
-	GuiControl, , MyLB, %Port% : %Data%
-}
+OnMessage:
+	  GuiControl, , MyLB, %IPC_Port% : %IPC_Message%
+return
 
 
 OnSend:
