@@ -966,5 +966,6 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
  Group: About
 	o Ver 2.1 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
 	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
-	o Licenced under Creative Commons Attribution-Noncommercial <http://creativecommons.org/licenses/by-nc/3.0/>.  
+	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
  */
+
