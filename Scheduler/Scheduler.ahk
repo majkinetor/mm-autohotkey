@@ -27,7 +27,7 @@
  */
 Scheduler_Create( v, bForce=false ) {
 	static arguments="Type Modifier Day Month IdleTime Time StartDate EndDate Computer User Password"
-	static Type="/sc", Modifier="/mo", Day="/d", Month="/m", IdleTime="/i", Time="/st", EndDate="/ed", Computer="/s", User="/u", Password="/p"
+	static Type="/sc", Modifier="/mo", Day="/d", Month="/m", IdleTime="/i", EndTime="/et" Time="/st", EndDate="/ed", Computer="/s", User="/u", Password="/p"
 
 	Name := %v%_Name,  Run := %v%_Run,  Args := %v%_Args
 
@@ -137,6 +137,10 @@ Scheduler_Exists(Name) {
 }
 
 
+Scheduler_Open() {
+	Run, %A_WinDir%\system32\taskschd.msc
+}
+
 Scheduler_run(CMDin, WorkingDir=0)
 {
   Global cmdretPID
@@ -221,3 +225,11 @@ Scheduler_run(CMDin, WorkingDir=0)
   StringTrimLeft, CMDout, CMDout, 1
   Return, CMDout
 }
+
+/* 
+ Group: About 
+ 	o v0.9 by majkinetor.
+	o Schtasks at MSDN: http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/en-us/schtasks.mspx?mfr=true
+	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
+ */
+
