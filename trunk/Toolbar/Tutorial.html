@@ -1,16 +1,13 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><HTML><HEAD><style type="text/css">BODY {
-//	background-color: #2D2D2D;
 	font-family : Arial, Tahoma, Helvetica, sans-serif;
 }
 
 table#main {
 	width: 1100px;
-	background-color : #424242;
 }
 
 table#body, table#footer,table#header{
 	width: 100%;
-	background-color : #424242;
 }
 
 
@@ -87,16 +84,16 @@ TD {
 
 	<p>Each button may have associated image and text. Images are kept in the <a href="http://www.autohotkey.com/docs/commands/ListView.htm#IL_Create">ImageList</a>. By default you don&#8217;t have to specify image list. In that case module will use one of the system image catalogs that contain standard application icons. </p>
 
-	<p>To add toolbar in your gui, you use <a href="http://www.autohotkey.com/docs/commands/ListView.htm#IL_Create">Add</a> function. This function returns handle to newly created toolbar which you must use in all other functions. During creation, you can specify <b>toolbar style</b>: is it going to be flat, customizable, with tooltips etc&#8230; You must also specify event function that will be called whenever specific event is fired:</p>
+	<p>To add toolbar in your gui, you use <a href="Toolbar.html#Add">Add</a> function. This function returns handle to newly created toolbar which you must use in all other functions. During creation, you can specify <b>toolbar style</b>: is it going to be flat, customizable, with tooltips etc&#8230; You must also specify event function that will be called whenever specific event is fired:</p>
 
 <pre><code>hToolbar := Toolbar_Add(hGui, &#34;OnToolbar&#34;, &#34;FLAT TOOLTIPS&#34;)
 </code></pre>
 
 	<p>After the toolbar is created you must add buttons to it. You can add buttons one by one, or as group. Each button is described using <strong>button definition</strong> &#8211; list of button characteristics separated by comma, for instance:</p>
 
-<pre><code>Toolbar_AddButtons(hToolbar, &#34;open, 11, ,dropdown&#34;)
-Toolbar_AddButtons(hToolbar, &#34;close&#34;)
-Toolbar_AddButtons(hToolbar, &#34;exit, 3&#34;)
+<pre><code>Toolbar_Insert(hToolbar, &#34;open, 11, ,dropdown&#34;)
+Toolbar_Insert(hToolbar, &#34;close&#34;)
+Toolbar_Insert(hToolbar, &#34;exit, 3&#34;)
 </code></pre>
 
 	<p>Above code will add three button to the toolbar <code>hToolbar</code>. First will have caption <code>open</code>, use 11th icon from the image list and be of type <code>dropdown</code> (button that also can display menu). You can omit one or more parameters in button definition as seen in second and third case.</p>
@@ -113,21 +110,21 @@ Toolbar_AddButtons(hToolbar, &#34;exit, 3&#34;)
 	---
 	state	,11	,checked	,check
 )
-Toolbar_AddButtons(hToolbar, btns)
+Toolbar_Insert(hToolbar, btns)
 </code></pre>
 
 	<p>The above code is more intuitive way of creating toolbar. First two buttons (<code>open</code> and <code>close</code>) will get icons 1 and 2 (since I didn&#8217;t specify any icon number, module will automatically set the number of line as an icon. You can specify separator using &#8211; and you can even set separator size: each &#8211; adds 10px to separator, so separator &#8211;  &#8211;  &#8211; will be of 30px size. Then, you can see that <code>state</code> button is of <code>check</code> type and that is initially <code>checked</code>. Button <code>undo</code> is created as <code>disabled</code> and is of type <code>dropdown</code> (so you can for instance display menu with undo levels). Separators are not counted when icon numbers are automatically set, so if you order icons in image list the way they appear on the toolbar, you can totally omit manual icon specification: first button will get icon number 1, second button icon number 2 and so on&#8230;</p>
 
 	<p>Once you have buttons on the toolbar, you need the way to handle user events. That&#8217;s the purpose of the event function which has following prototype:</p>
 
-<pre><code>OnToolbar(hwnd, event, pos, txt, id) {
+<pre><code>OnToolbar(hwnd, event, txt, pos, id) {
 	;your code here
 }
 </code></pre>
 
 	<p>Above function must be written in order to handle toolbar events. It must have 5 parameters but you can name them whatever you like. Its parameters are, respectively, handle to the toolbar that generated event, event that is fired, position of the button that fired event, its caption and its ID (unique ID that each button has). One typical event handler would look like:</p>
 
-<pre><code>OnToolbar(hwnd, event, pos, txt, id) {
+<pre><code>OnToolbar(hwnd, event, txt, pos, id) {
 	if (event = &#34;hot&#34;)
 		return SB_SetText(txt)	;if user is hovering the button with mouse, 
 					; set status bar text with the button text.
@@ -141,7 +138,7 @@ Toolbar_AddButtons(hToolbar, btns)
 
 	<h3>Customization</h3>
 
-	<p>You can let a user customize the toolbar in two different ways: create the toolbar with <code>adjustable</code> style or call <a href="http://www.autohotkey.com/docs/commands/ListView.htm#IL_Create">Customize</a> function. If you use the style, a user will be able to double click the empty toolbar area to show customization dialog. In the dialog user can reorder buttons or remove them from the toolbar (i.e. put them in the list of available buttons). User can also <code>SHIFT + drag</code> to reorder or remove the button without opening the customization dialog.</p>
+	<p>You can let a user customize the toolbar in two different ways: create the toolbar with <code>adjustable</code> style or call <a href="Toolbar.html#Customize">Customize</a> function. If you use the style, a user will be able to double click the empty toolbar area to show customization dialog. In the dialog user can reorder buttons or remove them from the toolbar (i.e. put them in the list of available buttons). User can also <code>SHIFT + drag</code> to reorder or remove the button without opening the customization dialog.</p>
 
 	<p>Typical scenario consist of buttons currently on the toolbar and the list of available buttons. Both types of buttons are added the same as before with one note &#8211; buttons marked with <code>*</code> will be added to the list of the available buttons instead to the toolbar itself:</p>
 
@@ -159,12 +156,12 @@ Toolbar_AddButtons(hToolbar, btns)
        *find    ,13
        *replace ,14
 )
-Toolbar_AddButtons(hToolbar, btns)
+Toolbar_Insert(hToolbar, btns)
 </code></pre>
 
 	<p>Above, I add 5 buttons on the toolbar and I make 3 more available (marked with *). There is empty line between current and available buttons (this doesn&#8217;t influence parsing as empty lines in the button definition list are simply skipped). You can mix both type of buttons in the button definition list although I suggest to keep them separated with blank line for better visibility.</p>
 
-	<p>When application exits, you will most definitely want to save the current state of the toolbar in configuration file so you can start with that toolbar state on the next run. This is the purpose of the <a href="http://www.autohotkey.com/docs/commands/ListView.htm#IL_Create">Define</a> function. Code</p>
+	<p>When application exits, you will most definitely want to save the current state of the toolbar in configuration file so you can start with that toolbar state on the next run. This is the purpose of the <a href="Toolbar.html#Define">Define</a> function. Code</p>
 
 <pre><code>btns := Toolbar_Define(hToolbar)
 </code></pre>
@@ -190,7 +187,7 @@ Another way, more flexible, which allows you to have both captions and tooltips 
 <li>To postion tooltip anywhere in the parent window you must use optional <code>pPos</code> parameter when adding toolbar for the first time. This will set toolbar in movable mode, otherwise it automatically calculates its dimension according to the parent&#8217;s width. By specifying any of the x,y,w or h, you can put toolbar anywhere and size it as desired. 
 You can use AutoSize function and set its <code>align</code> parameter for the toolbar to be positioned on some of the common places.
 </li>
-<li>This is only small preview of possibilities. For detailed explanation of functions you can use see module <a href="http://www.autohotkey.com/docs/commands/ListView.htm#IL_Create">manual</a>. If you want to play with the module and experiment with its functions, see included test script.</li>
+<li>This is only small preview of possibilities. For detailed explanation of functions you can use see module <a href="Toolbar.html">manual</a>. If you want to play with the module and experiment with its functions, see included test script.</li>
 </ul>
 
 </BODY></HTML>
