@@ -10,9 +10,9 @@
 		Modifier -  Number, Specifies how often the task runs within its schedule type (defaults to 1)
 					Additionally, the words FIRST, SECOND, THIRD, FOURTH, LAST, LASTDAY can be used.
 		Day		 -  Specifies a day of the week or a day of a month. Valid only with a WEEKLY or MONTHLY schedule.
-					For WEEKLY type, valid values are MON - SUN and * (every day). MON is the default.
-					A value of MON - SUN is required when the FIRST, SECOND, THIRD, FOURTH, or LAST modifier is used. 
-					A value of 1 - 31 is optional and is valid only with no modifier or a modifier of the 1 - 12 type.
+					For WEEKLY type, valid values are MON-SUN and * (every day). MON is the default.
+					A value of MON-SUN is required when the FIRST, SECOND, THIRD, FOURTH, or LAST modifier is used. 
+					A value of 1-31 is optional and is valid only with no modifier or a modifier of the 1-12 type.
 		Month	 -  Specifies a month of the year. Valid values are JAN - DEC and *  The parameter is valid only with a MONTHLY schedule. 
 					It is required when the LASTDAY modifier is used. Otherwise, it is optional and the default value is * (every month).
 		IdleTime -  A whole number from 1 to 999. Specifies how many minutes the computer is idle before the task starts. This parameter is valid only with an ONIDLE schedule, and then it is required.
