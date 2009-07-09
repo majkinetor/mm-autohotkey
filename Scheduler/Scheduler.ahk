@@ -3,8 +3,8 @@
 			 Creates new scheduled task
 
 	Parameters:
-		TaskName -	Specifies a name for the task
-		TaskRun	 -	Specifies the program or command that the task runs. 
+		Name	 -	Specifies a name for the task
+		Run		 -	Specifies the program or command that the task runs. 
 		Arguments-  Arguments of the program that the task runs.
 		Type	 -	MINUTE, HOURLY, DAILY, WEEKLY, MONTHLY,     ONCE, ONSTART, ONLOGON, ONIDLE.  By default, ONCE.
 		Modifier -  Number, Specifies how often the task runs within its schedule type (defaults to 1)
@@ -16,7 +16,7 @@
 		Month	 -  Specifies a month of the year. Valid values are JAN - DEC and *  The parameter is valid only with a MONTHLY schedule. 
 					It is required when the LASTDAY modifier is used. Otherwise, it is optional and the default value is * (every month).
 		IdleTime -  A whole number from 1 to 999. Specifies how many minutes the computer is idle before the task starts. This parameter is valid only with an ONIDLE schedule, and then it is required.
-		StartTime - Specifies the time of day that the task starts in HH:MM:SS 24-hour format. The default value is the current local time when the command completes. \
+		Time	  - Specifies the time of day that the task starts in HH:MM:SS 24-hour format. The default value is the current local time when the command completes. \
 					Valid with MINUTE, HOURLY, DAILY, WEEKLY, MONTHLY, and ONCE schedules. It is required with a ONCE schedule.
 		StartDate - Specifies the date that the task starts in MM/DD/YYYY format. The default value is the current date. Valid with all schedules, and is required for a ONCE schedule.
 		EndDate	  - Specifies the last date that the task is scheduled to run. This parameter is optional. It is not valid in a ONCE, ONSTART, ONLOGON, or ONIDLE schedule. By default, schedules have no ending date.
