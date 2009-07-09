@@ -15,7 +15,7 @@ SetBatchLines, -1
 	Toolbar_Clear(hToolbar)
 	btns = 
 	(LTrim
-		btn &1  ,	,checked, check
+		btn &1  ,	,checked,check
 		btn &2	,	,		,dropdown check showtext, 101
 		btn &3	,	,		,,
 		-
@@ -27,8 +27,8 @@ SetBatchLines, -1
 		*a3		,130
 	)
 	Toolbar_Insert(hToolbar, btns)
-	Gui, Show, , 
 	MakeTestGui(w/2, h-430)
+	Gui, Show
 return
 
 MakeTestGui(w, h){
