@@ -92,7 +92,7 @@ Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 	}
 
     hCtrl := DllCall("CreateWindowEx" 
-             , "uint", InStr(Style, "border") ? 0X200 : 0				;	WS_EX_CLIENTEDGE = 0x200 for sunken
+             , "uint", InStr(Style, "border") ? 1 : 0				;	WS_EX_CLIENTEDGE = 0x200 for sunken
              , "str",  TOOLBARCLASSNAME 
              , "uint", 0 
              , "uint", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | hStyle
