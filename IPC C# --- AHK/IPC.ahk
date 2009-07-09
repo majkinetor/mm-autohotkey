@@ -8,8 +8,8 @@
 
  Parameters:
 			 Hwnd	- Handle of the receiver
-			 Data	- Data to be sent, by default empty. Optional.
-			 Port	- Port, by default 100. Positive integer. Optional. 
+			 Data	- Data to be sent, by default empty.
+			 Port	- Port, by default 100. Positive integer.
 			 DataSize - If this parameter is used, Data contains pointer to the buffer holding binary data.
 						Omit this parameter to send textual messages to the receiver.					 
 
@@ -51,10 +51,10 @@ IPC_Send(Hwnd, Data="", Port=100, DataSize="") {
   Handler:
   >			 Handler(Hwnd, Data, Port, DataSize)
 
-			 Hwnd	- Handle of the window passing data
+			 Hwnd	- Handle of the window passing data.
 			 Data	- Data that is received.
-			 Port	- Data port.
-			 DataSize - If DataSize is not empty, Data is pointer to the actuall data. Otherwise Data is textual message.
+			 Port	- Port which received the data.
+			 DataSize - If DataSize is not empty, Data is pointer to the actual data. Otherwise, the Data is a textual message.
  */
 IPC_SetHandler( Handler ){
 	static WM_COPYDATA = 74, id=951753	;id is for security reasons
