@@ -956,7 +956,7 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 	return
  
 	;toolbar event handler
-	OnToolbar(hCtrl, Event, Pos, Txt){				
+	OnToolbar(hCtrl, Event, Txt, Pos){				
 		   tooltip %Event% %Txt% (%Pos%), 0, 0
 	}
 	(end code)
