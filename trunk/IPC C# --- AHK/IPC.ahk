@@ -25,7 +25,7 @@
  */
 IPC_Send(Hwnd, Data="", Port=100, DataSize="") {
 	static WM_COPYDATA = 74, ID=951753, INT_MAX=2147483647
-	if Port not between 0 AND %INT_MAX%
+	if Port not between 1 AND %INT_MAX%
 		return A_ThisFunc "> Port number is not in a positive integer range: " Port
 
 	if (DataSize = "")
