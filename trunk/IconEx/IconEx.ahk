@@ -114,9 +114,7 @@ IconEx(StartFile="", Pos="", Settings="", GuiNum=69) {
 }
 
 IconEx_onFilter(filter=""){
-	global IconEx_stopScan
 	static NOFOLDERS=1
-	IconEx_stopScan := 1
 
 	ControlGet,t,Choice,, ComboBox2
 	oldTrim := A_AutoTrim
@@ -140,7 +138,7 @@ IconEx_onFilter(filter=""){
 	}
 	else IconEx_("Filter", t)
 
-	IconEx_scan()
+	IconEx_scan("!")		;rescan
 }
 
 IconEx_onFilter:
@@ -150,7 +148,7 @@ return
 IconEx_onPath()  {
 	ControlGet,c,Choice, , ComboBox1
 	ifEqual, c,,return
-	IconEx_scan()
+	IconEx_scan("!")
 }
 
 IconEx_onPath:
@@ -193,7 +191,12 @@ IconEx_add2Combo( Item ) {
 ; Populates listview with icons from ther given file. If file name is empty, it will be taken from the ComboBox
 ; Check parameters, prepare GUI and see if pFile is folder or icon resource and call adequate function.
 IconEx_scan( FileName = "" ){
-	global IconEx_stopScan
+	if SubStr(FileName,1,1) = "!" {
+		IconEx_scanFolder(), IconEx_scanFile()	;stop them if working...
+		IconEx_("File", SubStr(FileName,2) )
+		SetTimer, IconEx_scanTimer, -20
+		return
+	}
 	IconEx_("", "GuiNum shell32dll hIconEx", guiNum, shell32dll, hIconEx)
 
 	Gui, %guiNum%:Default
@@ -227,16 +230,17 @@ IconEx_scan( FileName = "" ){
  ;everything is OK, add to combo and start scanning
 	IconEx_Add2Combo(pFile)
 	IconEx_("File", pFile)
+
 	If attrib contains D
 	{
 		IconEx_scanFolder( pFile )
 		ControlSendRaw, SysListView321, .., ahk_id %hIconEx%			;select the firt file
 	}
 	else  
-	    if IconEx_hasIcons( pFile )
+	    if IconEx_hasIcons( pFile ) {
 			IconEx_scanFile( pFile ),  LV_Modify(idx+1, "vis select focus") 
-		else {								;if no icon resource is given, browse parent folder and select icon in question
-			j := InStr(pFile, "\", 0, 0)
+		}
+		else {								;if no icon resource is given, browse parent folder and select given icon
 			idx := SubStr(pFile, j+1), pFile := SubStr( pFile, 1 , j-1)
 			IconEx_scanFolder( pFile )	
 			ControlSendRaw, SysListView321, %idx%, ahk_id %hIconEx%		;select the file
@@ -249,16 +253,19 @@ IconEx_scanTimer:
 	IconEx_scan( IconEx_("File") )
 return
 
-IconEx_scanFile( FileName ) {
-	global IconEx_stopScan
+IconEx_scanFile( FileName="" ) {
+	static stop
+	ifEqual, FileName,, return stop := 1
+
 	IconEx_("", "hIL shell32", hIL, shell32dll)
 	folderIcon  := IconEx_ILAdd(hIL, shell32dll, 5)
 	LV_Add("Icon" . folderIcon, ". .", FileName)
 
 	;Search for 9999 icons in the selected file
+	stop := 0
 	Loop, 9999
     {
-		IfEqual, IconEx_stopScan, 1, break	
+		ifEqual, stop, 1, return stop := 0
      
 		if idx := IconEx_ILAdd(hIL, FileName , A_Index)
 			LV_Add("Icon" . idx, idx-1, FileName ":" idx-1)
@@ -268,9 +275,9 @@ IconEx_scanFile( FileName ) {
 	IconEx_setStatus()
 }
 
-IconEx_scanFolder( FolderName ){
-	global IconEx_stopScan
-	static NOFOLDERS=1
+IconEx_scanFolder( FolderName="" ){
+	static NOFOLDERS=1, stop
+	ifEqual, FolderName,, return stop := 1
 
 	IconEx_("", "Flags Filter shell32dll hIL", flags, filter, shell32dll, hIL)
 	folderIcon := IconEx_ILAdd(hIL, shell32dll, 4)
@@ -279,11 +286,12 @@ IconEx_scanFolder( FolderName ){
 
  ;add folders
 	IconEx_setStatus( "scaning folder ..." )
+	stop := 0
     If !(flags & NOFOLDERS)
 	{
 		Loop, %FolderName%\*, 2 
 		{
-			IfEqual, IconEx_stopScan, 1, break	
+			ifEqual, stop, 1, return stop := 0
 
 		 ;don't add hiden and system
 			FileGetAttrib, attrib , %A_LoopFileFullPath%
@@ -299,8 +307,7 @@ IconEx_scanFolder( FolderName ){
  ;files	  
 	Loop, %FolderName%\*
 	{
-		IfEqual, IconEx_stopScan, 1, break	
-
+		ifEqual, stop, 1, return stop := 0
 		if (filter != "*") && !InStr(filter, A_LoopFileExt)
 		   continue
 		 
@@ -370,9 +377,8 @@ IconEx_onIconClick(e){
 
 	if (FileExist( file ) && IconEx_hasIcons( file )) OR (file = ">drives")
 	{
-		IconEx_stopScan := 0		;stop scaning if active
 		IconEx_("File", file)
-		SetTimer, IconEx_scanTimer, -50
+		SetTimer, IconEx_scanTimer, -10
 		return
 	}
 
@@ -467,7 +473,7 @@ IconEx_hkEnter() {
 	ControlGetFocus, c, ahk_id %hIconEx%
 
 	if (c="Edit1")
-		return IconEx_scan()
+		return IconEx_scan("!")
 	else if (c="Edit2")
 	{
 		ControlGetText, t,ComboBox2
