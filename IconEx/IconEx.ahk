@@ -183,7 +183,7 @@ IconEx_hasIcons( File ){
 
 ;Add item to combo and select it, but only if it is not already there.
 IconEx_add2Combo( Item ) {
-	ControlGet,s, FindString, %Item%, ComboBox1		; add to the combobox if not already in it
+	ControlGet,s, FindString, %Item%, ComboBox1, A		; add to the combobox if not already in it
 	if !s
 		GuiControl, ,  ComboBox1, %Item%||
 }
@@ -198,7 +198,6 @@ IconEx_scan( FileName = "" ){
 		return
 	}
 	IconEx_("", "GuiNum shell32dll hIconEx", guiNum, shell32dll, hIconEx)
-
 	Gui, %guiNum%:Default
 	IconEx_stopScan := 0
 	pFile := FileName
@@ -210,6 +209,7 @@ IconEx_scan( FileName = "" ){
 	pFile := IconEx_getFullName( pFile )
 
  ;clear list of files
+	selected := LV_GetNext()
 	LV_Delete()
 
  ;create new list of large images and replace and delete old one
@@ -220,7 +220,7 @@ IconEx_scan( FileName = "" ){
  	ifEqual, pFile, >drives, return IconEx_addDrives()
 
  ;check for file:idx 
-	if (j:= InStr(pFile,":",0,0)) > 2
+	if (j := InStr(pFile,":",0,0)) > 2
 		idx := SubStr(pFile, j+1), pFile := SubStr(pFile, 1, j-1)
 
  ;check for wrong path
@@ -234,16 +234,23 @@ IconEx_scan( FileName = "" ){
 	If attrib contains D
 	{
 		IconEx_scanFolder( pFile )
-		ControlSendRaw, SysListView321, .., ahk_id %hIconEx%			;select the firt file
+		prevSel := IconEx_("prevSel")
+		if (prevSel != "") {
+			SplitPath, prevSel, fn , dir			
+			if (dir = pFile)
+				 LV_Modify(fn, "vis select focus") 
+			IconEx_("prevIcon", "")
+		}
 	}
 	else  
 	    if IconEx_hasIcons( pFile ) {
-			IconEx_scanFile( pFile ),  LV_Modify(idx+1, "vis select focus") 
+			SplitPath, pFile, fn , dir			
+			IconEx_("prevSel", dir "\" selected), IconEx_scanFile( pFile ),  LV_Modify(idx+2, "vis select focus") 
 		}
-		else {								;if no icon resource is given, browse parent folder and select given icon
-			idx := SubStr(pFile, j+1), pFile := SubStr( pFile, 1 , j-1)
-			IconEx_scanFolder( pFile )	
-			ControlSendRaw, SysListView321, %idx%, ahk_id %hIconEx%		;select the file
+		else {								;if no icon resource is given, browse parent folder and select given icon			
+			SplitPath, pFile, fn, dir	
+			IconEx_scanFolder( dir )
+			ControlSendRaw, SysListView321, %fn%, ahk_id %hIconEx%		;select the file
 		}
 
 	IconEx_stopScan := 1
@@ -260,7 +267,6 @@ IconEx_scanFile( FileName="" ) {
 	IconEx_("", "hIL shell32", hIL, shell32dll)
 	folderIcon  := IconEx_ILAdd(hIL, shell32dll, 5)
 	LV_Add("Icon" . folderIcon, ". .", FileName)
-
 	;Search for 9999 icons in the selected file
 	stop := 0
 	Loop, 9999
@@ -360,6 +366,8 @@ IconEx_setStatus( s="" ){
 
 ; Handles icon click in ListView
 IconEx_onIconClick(e){
+	IfEqual, e, 0, return
+
 	guiNum := IconEx_("GuiNum")
 	Gui, %guiNum%:Default
 	LV_GetText(file, e, 2), LV_GetText(txt, e, 1)
@@ -372,7 +380,7 @@ IconEx_onIconClick(e){
 			file := (j:=InStr(file, "\", 0, 0)) ? SubStr( file, 1,  j-1) : ">drives"
 			if (StrLen(file)=2)		;drive
 				file .= "\"
-		}			
+		}
 	}
 
 	if (FileExist( file ) && IconEx_hasIcons( file )) OR (file = ">drives")
