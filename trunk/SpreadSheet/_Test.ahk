@@ -1,3 +1,5 @@
+_()
+
 S(_,"DRAWITEMSTRUCT: CtlType CtlID itemID itemAction itemState hwndItem hDC left top right bottom itemData")
 S(_,"BLOBRECT: size=.2 left top right bottom")
 
@@ -106,7 +108,7 @@ Handler(hwnd, Event, EArg, Col, Row) {
 	text := SS_GetCellText(hwnd, Col, Row)
 	StringReplace, text, text, `n, \n, A
 	s .= "cell: " col "," row "," SS_GetCellType(hwnd,col,row)  "    event: " event " (earg: " earg ")  Text: " text "`n" 
-	tooltip, %s%, 0, 0
+	tooltip %s%, 0, 0
 	if StrLen(s) > 500 
 		s =
 }
@@ -329,48 +331,4 @@ return
 LoadIcon()
 {
 	return DllCall("LoadIcon", "uint", hInstance, "uint", 32512)
-}
-
-S(ByRef S,pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",ByRef  o6="",ByRef o7="",ByRef  o8=""){
-	static
-	static 1="UChar", 2="UShort", 4="Uint", 004="Float", 8="Uint64", 008="Double", 01="Char", 02="Short", 04="Int", 08="Int64"
-	local last_offset:=-4, last_type := 4, i, j, R
-
-	if (o1 = "~`a ")
-	{		
-		j := InStr(pQ, ":"), R := SubStr(pQ, 1, j-1), pQ := SubStr(pQ, j+2)
-		if i := InStr(R, "=")
-			_ := SubStr(R, 1, i-1), _%_% := SubStr(R, i+1, j-i), R:=_		
-
-		IfEqual, R,, return A_ThisFunc "> Struct name can't be empty"
-		loop, parse, pQ, %A_Space%, %A_Space%
-		{
-			j := InStr(A_LoopField, "=")
-			If j
-				 field := SubStr(A_LoopField, 1, j-1), offset := SubStr(A_LoopField, j+1)
-			else field := A_LoopField, offset := last_offset + last_type 
-
-			d := InStr(offset, ".")
-			if d
-				 type := SubStr(offset, d+1), offset := SubStr(offset, 1, d-1)
-			else type := 4
-			IfEqual, offset, , SetEnv, offset, % last_offset + last_type
-
-			%R%_%field% := offset "." type,  last_offset := offset,  last_type := type
-		}
-		return _%R%!="" ? _%R% : _%R% := last_offset + last_type
-	}
-	j := InStr(pQ, A_Space)-1,  i := SubStr(pQ, j, 1), R := SubStr(pQ, 1, j-1), pQ := SubStr(pQ, j+2)
-	IfEqual, R,, return A_ThisFunc "> Struct name can't be empty"
-	if (i = "!") 
-		 VarSetCapacity(s, _%R%)
-	loop, parse, pQ, %A_Space%, %A_Space%
-	{	
-		field := A_LoopField, data := %R%_%field%, offset := floor(data), type := SubStr(data, StrLen(offset)+2), type := %type%
-		ifEqual, data, , return A_ThisFunc "> Field or struct isn't recognised :  " R "." field 
-		if i in >,)
-			  o%A_Index% := NumGet(i=")" ? S+0 : &S+0, offset,type)
-		else  NumPut(o%A_Index%, i=")" ? S : &S+0, offset,type)
-	}
-	return o1	
 }
