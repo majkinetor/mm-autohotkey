@@ -32,7 +32,7 @@
  			GuiNum		- GUI number to be used by the dialog, by default 69.
  
   Returns:
- 			Path of the selected icon. If icon is in icon resource, its index is specified after the file name with ":" as separator, for instance
+ 			Path of the selected icon. If icon is in icon resource, its 0 based index is specified after the file name with ":" as separator, for instance
  			shell32.dll:12. 
  
   Remarks:	
@@ -220,9 +220,10 @@ IconEx_scan( FileName = "" ){
  	ifEqual, pFile, >drives, return IconEx_addDrives()
 
  ;check for file:idx 
+	idx := 0
 	if (j := InStr(pFile,":",0,0)) > 2
 		idx := SubStr(pFile, j+1), pFile := SubStr(pFile, 1, j-1)
-
+	
  ;check for wrong path
 	if not attrib := FileExist(pFile)
 		return LV_Add("","> Invalid path")
@@ -236,16 +237,18 @@ IconEx_scan( FileName = "" ){
 		IconEx_scanFolder( pFile )
 		prevSel := IconEx_("prevSel")
 		if (prevSel != "") {
-			SplitPath, prevSel, fn , dir			
-			if (dir = pFile)
-				 LV_Modify(fn, "vis select focus") 
+			SplitPath, prevSel, idx , dir			
+			ifEqual, dir, %pFile%, SetEnv, sel, %idx%
 			IconEx_("prevIcon", "")
-		}
+		} else sel=1
+		LV_Modify(sel, "vis select focus") 
 	}
 	else  
 	    if IconEx_hasIcons( pFile ) {
 			SplitPath, pFile, fn , dir			
-			IconEx_("prevSel", dir "\" selected), IconEx_scanFile( pFile ),  LV_Modify(idx+2, "vis select focus") 
+			IconEx_("prevSel", dir "\" selected)
+			IconEx_scanFile( pFile )
+			LV_Modify(idx+2, "vis select focus")
 		}
 		else {								;if no icon resource is given, browse parent folder and select given icon			
 			SplitPath, pFile, fn, dir	
@@ -323,8 +326,6 @@ IconEx_scanFolder( FolderName="" ){
 		if IconEx_hasIcons( A_LoopFileFullPath )
 			 LV_Add("Icon" . idx, A_LoopFileName ">", A_LoopFileFullPath)		
 		else LV_Add("Icon" . idx, A_LoopFileName, A_LoopFileFullPath)
-
-		; IconEx_setStatus("adding icon " . idx . " : " A_LoopFIleName)
 	}
 
 	icnCount := LV_GetCount()-foldercount-1
@@ -396,7 +397,7 @@ IconEx_onIconClick(e){
 }
 
 IconEx_onIconClick:
-	critical			;!!!
+	critical 50
 	If A_GuiEvent = A
 		IconEx_onIconClick(A_EventInfo)
 return
