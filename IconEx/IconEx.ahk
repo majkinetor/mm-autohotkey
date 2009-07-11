@@ -46,7 +46,7 @@
  			Backspace	- Go to the parent folder.
  			Enter		- Enter folder or icon resource.
   */
-IconEx(StartFile="", Pos="", Settings="", GuiNum=69){
+IconEx(StartFile="", Pos="", Settings="", GuiNum=69) {
 	static WM_ACTIVATE = 6
 	static sFilter = "*||ico icl|exe dll| |show folders|hide folders| |icon size 24|icon size 32|icon size 48|icon size 64|icon size 92|icon size 128"
 
@@ -113,36 +113,49 @@ IconEx(StartFile="", Pos="", Settings="", GuiNum=69){
 	return IconEx_("result")
 }
 
-IconEx_onFilter(){
+IconEx_onFilter(filter=""){
 	global IconEx_stopScan
 	static NOFOLDERS=1
 	IconEx_stopScan := 1
-	ControlGet,c,Choice,, ComboBox2
-	ifEqual,c, , return
 
-	ControlGetText, t,ComboBox2
-	IfEqual, t,%A_Space%,return
+	ControlGet,t,Choice,, ComboBox2
+	oldTrim := A_AutoTrim
+	AutoTrim, on
+	t = %t%
+	filter = %filter%
+	AutoTrim, %oldTrim%
+	if ( filter t = "" )
+		return
 
 	flags := IconEx_("Flags")
 	
 	if (t="show folders")
-		flags &= !NOFOLDERS
+		IconEx_("Flags", flags &= !NOFOLDERS)
 	else if (t="hide folders")
-		flags |= NOFOLDERS
+		IconEx_("Flags", flags |= NOFOLDERS)
 	else if InStr(t, "icon size ") {
 		iconSize := SubStr(t, 11) 
 		ifLess, iconSize, 24, SetEnv, iconSize, 24
+		IconEx_("IconSize", iconSize)
 	}
 	else IconEx_("Filter", t)
 
-	IconEx_("Flags", flags), IconEx_("IconSize", iconSize)
-	IconEx_Scan()
+	IconEx_scan()
 }
 
 IconEx_onFilter:
 	IconEx_onFilter()
 return
 
+IconEx_onPath()  {
+	ControlGet,c,Choice, , ComboBox1
+	ifEqual, c,,return
+	IconEx_scan()
+}
+
+IconEx_onPath:
+	IconEx_onPath()
+return
 
 ;Convert relative file name to the full file name
 IconEx_getFullName( Fn ) {
@@ -164,16 +177,6 @@ IconEx_onActivate(Wparam, Lparam, Msg, Hwnd){
     if (wparam & 0xFF) and (hwnd = hParent) 
         WinActivate ahk_id %hIconEx% 
 }
-
-IconEx_onPath(){
-	ControlGet,c,Choice, , ComboBox1
-	ifEqual, c,,return
-	IconEx_scan()
-}
-
-IconEx_onPath:
-	IconEx_onPath()
-return
 
 ;Returns true if file has icon resources or if file is the folder.
 IconEx_hasIcons( File ){
@@ -208,8 +211,7 @@ IconEx_scan( FileName = "" ){
 
  ;create new list of large images and replace and delete old one
 	IconEx_("hIL", hIL := IconEx_ILCreate(100, 100))
-	ListID := LV_SetImageList(hIL)
-    IL_Destroy(ListID)
+	IL_Destroy(LV_SetImageList(hIL))
 
  ;check for drives 
  	ifEqual, pFile, >drives, return IconEx_addDrives()
@@ -225,7 +227,6 @@ IconEx_scan( FileName = "" ){
  ;everything is OK, add to combo and start scanning
 	IconEx_Add2Combo(pFile)
 	IconEx_("File", pFile)
-
 	If attrib contains D
 	{
 		IconEx_scanFolder( pFile )
@@ -272,7 +273,6 @@ IconEx_scanFolder( FolderName ){
 	static NOFOLDERS=1
 
 	IconEx_("", "Flags Filter shell32dll hIL", flags, filter, shell32dll, hIL)
-
 	folderIcon := IconEx_ILAdd(hIL, shell32dll, 4)
 	goUpIcon   := IconEx_ILAdd(hIL, shell32dll, 5)
 	LV_Add("Icon" . goUpIcon, ". .", FolderName)
@@ -300,8 +300,10 @@ IconEx_scanFolder( FolderName ){
 	Loop, %FolderName%\*
 	{
 		IfEqual, IconEx_stopScan, 1, break	
+
 		if (filter != "*") && !InStr(filter, A_LoopFileExt)
 		   continue
+		 
 		idx := IconEx_ILAdd(hIL, A_LoopFileFullPath,1)
 		ifEqual, idx, 0, continue
 
@@ -467,7 +469,10 @@ IconEx_hkEnter() {
 	if (c="Edit1")
 		return IconEx_scan()
 	else if (c="Edit2")
-		return IconEx_onFilter()
+	{
+		ControlGetText, t,ComboBox2
+		return IconEx_onFilter(t)
+	}
 	else if (c="SysListView321") 
 	{
 		Gui, %guiNum%:Default
