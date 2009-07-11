@@ -1445,29 +1445,8 @@ SS_strAtAdr(adr) {
    Return DllCall("MulDiv", "Int",adr, "Int",1, "Int",1, "str") 
 }
 
-/*
-	Storage function
-			  
-	
-	Parameters:
-			  var		- Variable name to retreive. To get up to 5 variables at once, omit this parameter
-			  value		- Optional variable value to set. If var is empty value contains list of vars to retreive with optional prefix
-			  o1 .. o5	- If present, reference to variables to receive values.
-	
-	Returns:
-			  o	if _value_ is omited, function returns the current value of _var_
-			  o	if _value_ is set, function sets the _var_ to _value_ and returns previous value of the _var_
-			  o if _var_ is empty, function accepts list of variables in _value_ and returns values of those varaiables in o1 .. o5
-
-	Examples:
-			
- >			s(x)	 - return value of x
- >			s(x, v)  - set value of x to v and return previous value
- >			s("", "x y z", x, y, z)  - get values of x, y and z into x, y and z
- >			s("", "preffix_)x y z", x, y, z) - get values of preffix_x, preffix_y and preffix_z into x, y and z
-			
-*/
-ss(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
+;Storage function
+s(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
 	static
 	if (var = "" ){
 		if ( _ := InStr(value, ")") )
