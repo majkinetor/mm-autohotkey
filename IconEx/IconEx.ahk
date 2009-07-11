@@ -237,10 +237,11 @@ IconEx_scan( FileName = "" ){
 		IconEx_scanFolder( pFile )
 		prevSel := IconEx_("prevSel")
 		if (prevSel != "") {
-			SplitPath, prevSel, idx , dir			
+			SplitPath, prevSel, idx , dir
 			ifEqual, dir, %pFile%, SetEnv, sel, %idx%
 			IconEx_("prevIcon", "")
-		} else sel=1
+		} else sel := 1
+		ifEqual, sel, 0, SetEnv, sel, 1
 		LV_Modify(sel, "vis select focus") 
 	}
 	else  
