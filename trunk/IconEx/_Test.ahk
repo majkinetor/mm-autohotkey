@@ -8,7 +8,7 @@ OnColor:
 	 res := IconEx("", "", "setings.ini")
 	 j := InStr(res, ":", 0, 0), idx := 1
 	 if j > 2
-		idx := SubStr( res, j+1), res := SubStr(res, 1, j-1)
+		idx := SubStr( res, j+1)+1, res := SubStr(res, 1, j-1)
 	 ifEqual, res, , return
 
 	 cnt++
