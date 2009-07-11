@@ -37,7 +37,7 @@
  >					ShowMenu(MenuDef, "MenuName1", "", "|")						;use | as item separator.
  
   About:
- 				v1.0 by majkinetor
+ 				v1.0 by majkinetor.
  				See:  http://www.autohotkey.com/forum/topic23138.html
  */
 ShowMenu( MenuDef, MenuName="", Sub="", Sep="`n", r=0 ) {
