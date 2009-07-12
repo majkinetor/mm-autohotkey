@@ -1,16 +1,16 @@
 /* Title:		Tray
 				*Tray icon controller*
  :
-				Using this module you can totaly control Windows notification area. 
+				Using this module you can totally control Windows notification area. 
 				Your script can create any number of tray icons and receive notifications about user actions on them.
-				Also, you can get 3thd party tray icons information and modify them.
+				Also, you can get and modify 3thd party tray icons information.
  */
 
 /*Function:		Add
  				Add icon in the system tray.
  
   Parameters:
- 				hGui	- Handle of the parent window (the one that monitors notification messages)
+ 				hGui	- Handle of the parent window.
  				Handler	- Notification handler.
  				Icon	- Icon path or handle. Icons allocated by module will be automatically destroyed when <Remove> function
  						  returns. If you pass icon handle, <Remove> will not destroy it. If path is an icon resource, you can 
@@ -21,8 +21,8 @@
  >				Handler(Hwnd, Event)
  
  				Hwnd	- Handle of the tray icon.
- 				Event	- L (Left click),R(Right click), M (Middle click), P (Position - mouse move).
-		 				  CAdditionally, "u" or "d" can follow event name meaning "up" and "doubleclick".
+ 				Event	- L (Left click), R(Right click), M (Middle click), P (Position - mouse move).
+		 				  Additionally, "u" or "d" can follow event name meaning "up" and "doubleclick".
  						  For example, you will be notified on "Lu" when user releases the left mouse button.
  				
   Returns:
@@ -57,24 +57,26 @@ Tray_Add( hGui, Handler, Icon, Tooltip="") {
 	return uid
 }
 
+
 /*Function:		Define
  				Get information about system tray icons.
  
   Parameters:
 				Filter  - Contains process name, ahk_pid or ahk_id for which to return information.
-				pQ		- Query parameter, by default "phw"
+				pQ		- Query parameter, by default "phw".
 				Sep		- Separator char, by default |.
 
   Query:
 				h	- Handle.
-				i	- PosItion (0 based).
+				i	- PosItion (1 based).
 				w	- Parent Window handle.
 				p	- Process Pid.
 				n	- Process Name.
+				m   - Message id.
+				o	- IcOn handle.
  
   Returns:
 				String containing icon information per line. 
-				Icon infomration is separted list of position, icon handle and handle of the window responsible for the icon.
  */
 Tray_Define(Filter="", pQ="", Sep="|"){
 	static TB_BUTTONCOUNT = 0x418, TB_GETBUTTON=0x417
@@ -93,18 +95,24 @@ Tray_Define(Filter="", pQ="", Sep="|"){
 	idxTB := Tray_getTrayBar()
 	SendMessage,TB_BUTTONCOUNT,,,ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
 	
-	i := -1
+	i := 0
 	Loop, %ErrorLevel%
 	{
 		SendMessage, TB_GETBUTTON, A_Index-1, pProc, ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
 
 		VarSetCapacity(BTN,32), DllCall("ReadProcessMemory", "Uint", hProc, "Uint", pProc, "Uint", &BTN, "Uint", 32, "Uint", 0)
-		dwData := NumGet(BTN,12)
-		ifEqual, dwData, 0, SetEnv, dwData, % NumGet(BTN, 16, "Int64")
+		if !(dwData := NumGet(BTN,12))
+			dwData := NumGet(BTN,16,"int64")
 
 		VarSetCapacity(NFO,32), DllCall("ReadProcessMemory", "Uint", hProc, "Uint", dwData, "Uint", &NFO, "Uint", 32, "Uint", 0)
-		w := NumGet(NFO),  h := NumGet(NFO, 8)
-		
+
+		if NumGet(BTN,12)
+			w	:= NumGet(NFO, 0)
+		  ,	h	:= NumGet(NFO, 4)
+		  ,	m	:= NumGet(NFO, 8)
+		  ,	o	:= NumGet(NFO,20)
+		else w := NumGet(NFO, 0,"int64"), h := NumGet(NFO, 8), m := NumGet(NFO, 12), o := NumGet(NFO, 24)
+
 		WinGet, n, ProcessName, ahk_id %w%
 		WinGet, p, PID, ahk_id %w%
 		i++
@@ -130,8 +138,8 @@ Tray_Get(hGui, hTray, pQ, ByRef o1, ByRef o2, ByRef o3) {
 				Modify icon properties.
 
 	Parameters:
-				hGui	- Handle of the parent window (the one that monitors notification messages).
-				hTray	- Handle of the tray icon (returned by <Add> function)
+				hGui	- Handle of the parent window.
+				hTray	- Handle of the tray icon.
 				Icon	- Icon path or handle, set to "" to skip.
 				Tooltip	- ToolTip text, omit to keep the current tooltip.
 
@@ -171,6 +179,7 @@ Tray_Modify( hGui, hTray, Icon, Tooltip="~`a " ) {
 	Parameters:
 				Pos		- Position of the icon to move, 1 based.
 				NewPos	- New position of the icon, if omited, icon will be moved to the end.
+
 	Returns:
  				TRUE on success, FALSE otherwise.
  */
@@ -213,8 +222,12 @@ Tray_Remove( hGui, hTray="") {
 	}
 }
 
-/* Function:	Refresh
+/*	Function:	Refresh
  				Refresh tray icons.
+
+	Remarks:
+				If process exits forcefully, its tray icons wont be removed.
+				Call this function to refresh the notification area in such cases.
  
  */
 Tray_Refresh(){ 
@@ -277,10 +290,10 @@ Tray(var="", value="~`a ") {
 		Gui,  +LastFound
 		hGui := WinExist()
  
-		Tray_Add( hGui, "OnTrayIcon", "Tray.ico", "My Tray Icon")
+		Tray_Add( hGui, "OnTrayIcon", "shell32.dll:1", "My Tray Icon")
 	return
  
-	OnTrayIcon(hCtrl, Event){
+	OnTrayIcon(Hwnd, Event){
 	  	if (Event != "R")		;return if event is not right click
 			return
  
