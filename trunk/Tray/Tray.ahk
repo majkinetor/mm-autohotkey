@@ -57,6 +57,17 @@ Tray_Add( hGui, Handler, Icon, Tooltip="") {
 	return uid
 }
 
+/*Function:		Count
+ 				Get the number of icons in the notificaiton area.
+
+ */
+Tray_Count() {
+	static TB_BUTTONCOUNT = 0x418
+	idxTB := Tray_getTrayBar()
+	SendMessage,TB_BUTTONCOUNT,,,ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
+	return ErrorLevel
+}
+
 /*Function:		Define
  				Get information about system tray icons.
  
@@ -78,7 +89,7 @@ Tray_Add( hGui, Handler, Icon, Tooltip="") {
   Returns:
 				String containing icon information per line. 
  */
-Tray_Define(Filter="", pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""){
+Tray_Define(Filter="", pQ="", ByRef o1="~`a ", ByRef o2="", ByRef o3="", ByRef o4=""){
 	static TB_BUTTONCOUNT = 0x418, TB_GETBUTTON=0x417, sep="|"
 	ifEqual, pQ,, SetEnv, pQ, ihw
 
@@ -97,7 +108,6 @@ Tray_Define(Filter="", pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 	idxTB := Tray_getTrayBar()
 	SendMessage,TB_BUTTONCOUNT,,,ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
 	
-
 	i := bPos ? bPos-1 : 0
 	cnt := bPos ?  1 : ErrorLevel
 	Loop, %cnt%
@@ -124,7 +134,7 @@ Tray_Define(Filter="", pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 	}
 	DllCall("VirtualFreeEx", "Uint", hProc, "Uint", pProc, "Uint", 0, "Uint", 0x8000), DllCall("CloseHandle", "Uint", hProc)
 	
-	if bPos
+	if (bPos)
 		loop, parse, pQ
 			o%A_Index% := %A_LoopField%
 
@@ -148,7 +158,6 @@ Tray_GetTooltip(Position){
 	hProc := DllCall("OpenProcess", "Uint", 0x38, "int", 0, "Uint", pidTaskbar)
 	pProc := DllCall("VirtualAllocEx", "Uint", hProc, "Uint", 0, "Uint", 32, "Uint", 0x1000, "Uint", 0x4)
 	idxTB := Tray_getTrayBar()
-	
 	SendMessage, TB_GETBUTTON, Position-1, pProc, ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
 	VarSetCapacity(BTN,32), DllCall("ReadProcessMemory", "Uint", hProc, "Uint", pProc, "Uint", &BTN, "Uint", 32, "Uint", 0)
 	If	dwData	:= NumGet(BTN,12)
