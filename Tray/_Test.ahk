@@ -3,13 +3,13 @@
 	Gui,  +LastFound                                                                 
 	hGui := WinExist()                                                               
 
-	iconNo := 5
+	iconNo := 10
 
 	loop, %iconNo%
-		hTray := Tray_Add( hGui, "OnTrayIcon", "Tray.ico", "My Tray Icon " A_Index), aTrayIcons_%hTray% := A_Index, aIcon_%A_Index% := hTray
+		hTray := Tray_Add( hGui, "OnTrayIcon", "shell32.dll:" A_Index, "My Tray Icon " A_Index), aTrayIcons_%hTray% := A_Index, aIcon_%A_Index% := hTray
 return                                                                               
 																				   
-OnTrayIcon(hwnd, event) {
+OnTrayIcon(Hwnd, Event) {
 	global
 
 	if event not in R,M,L	;return if event is not right click
@@ -19,12 +19,13 @@ OnTrayIcon(hwnd, event) {
 	MsgBox, ,Icon %n%, %EVENT% Button clicked.`n`nPress F1 to exit script 
 }                 
 
-F1::
 OnExit:
+F1::
 	loop, %iconNo%
 		Tray_Remove(hGui, aIcon_%A_Index%) 	;must be done or icon will stand there hanging if app is restarted
 
 	ExitApp
 return
+
 
 #include Tray.ahk
