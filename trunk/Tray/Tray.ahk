@@ -290,8 +290,9 @@ Tray(var="", value="~`a ") {
 */
 
 /* Group: About
-	o v2.0 by majkinetor. See http://www.autohotkey.com/forum/topic26042.html
-	o Tray_Refresh by HotKeyIt
-	o Reference: <http://msdn2.microsoft.com/en-us/library/aa453686.aspx>
+	o v2.0 by majkinetor. See <http://www.autohotkey.com/forum/topic26042.html>.
+	o Tray_Refresh by HotKeyIt <http://www.autohotkey.com/forum/topic36966.html>.
+	o Parts of code are modified Sean's work: <http://www.autohotkey.com/forum/topic17314.html>.
+	o MSDN Reference: <http://msdn2.microsoft.com/en-us/library/aa453686.aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
  */
