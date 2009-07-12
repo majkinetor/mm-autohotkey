@@ -57,14 +57,14 @@ Tray_Add( hGui, Handler, Icon, Tooltip="") {
 	return uid
 }
 
-
 /*Function:		Define
  				Get information about system tray icons.
  
   Parameters:
-				Filter  - Contains process name, ahk_pid or ahk_id for which to return information.
-				pQ		- Query parameter, by default "phw".
-				Sep		- Separator char, by default |.
+				Filter  - Contains process name, ahk_pid, ahk_id or 1-based position for which to return information.
+						  If you specify position as Filter, you can use output variables to store information.
+				pQ		- Query parameter, by default "ihw".
+				o1 .. o4 - Refernce to output variables.
 
   Query:
 				h	- Handle.
@@ -78,11 +78,13 @@ Tray_Add( hGui, Handler, Icon, Tooltip="") {
   Returns:
 				String containing icon information per line. 
  */
-Tray_Define(Filter="", pQ="", Sep="|"){
-	static TB_BUTTONCOUNT = 0x418, TB_GETBUTTON=0x417
+Tray_Define(Filter="", pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""){
+	static TB_BUTTONCOUNT = 0x418, TB_GETBUTTON=0x417, sep="|"
 	ifEqual, pQ,, SetEnv, pQ, ihw
 
-	if Filter contains ahk_pid,ahk_id
+	if Filter is integer
+		 bPos := Filter
+	else if Filter contains ahk_pid,ahk_id
 		 bPid := InStr(Filter, "ahk_pid"),  bID := !bPid,  Filter := SubStr(Filter, 8)
 	else bName := true
 
@@ -95,44 +97,73 @@ Tray_Define(Filter="", pQ="", Sep="|"){
 	idxTB := Tray_getTrayBar()
 	SendMessage,TB_BUTTONCOUNT,,,ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
 	
-	i := 0
-	Loop, %ErrorLevel%
+
+	i := bPos ? bPos-1 : 0
+	cnt := bPos ?  1 : ErrorLevel
+	Loop, %cnt%
 	{
-		SendMessage, TB_GETBUTTON, A_Index-1, pProc, ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
+		i++
+		SendMessage, TB_GETBUTTON, i-1, pProc, ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
 
 		VarSetCapacity(BTN,32), DllCall("ReadProcessMemory", "Uint", hProc, "Uint", pProc, "Uint", &BTN, "Uint", 32, "Uint", 0)
 		if !(dwData := NumGet(BTN,12))
 			dwData := NumGet(BTN,16,"int64")
 
 		VarSetCapacity(NFO,32), DllCall("ReadProcessMemory", "Uint", hProc, "Uint", dwData, "Uint", &NFO, "Uint", 32, "Uint", 0)
-
 		if NumGet(BTN,12)
-			w	:= NumGet(NFO, 0)
-		  ,	h	:= NumGet(NFO, 4)
-		  ,	m	:= NumGet(NFO, 8)
-		  ,	o	:= NumGet(NFO,20)
+			 w := NumGet(NFO, 0),		  h	:= NumGet(NFO, 4), m := NumGet(NFO, 8),	 o := NumGet(NFO, 20)
 		else w := NumGet(NFO, 0,"int64"), h := NumGet(NFO, 8), m := NumGet(NFO, 12), o := NumGet(NFO, 24)
 
 		WinGet, n, ProcessName, ahk_id %w%
 		WinGet, p, PID, ahk_id %w%
-		i++
-		if !Filter|| (bName && Filter=n) || (bPid && Filter=p) || (bId && Filter=w) {
+		if !Filter || bPos || (bName && Filter=n) || (bPid && Filter=p) || (bId && Filter=w) {
 			loop, parse, pQ
-				f := A_LoopField, res .= %f% Sep
+				f := A_LoopField, res .= %f% sep
 			res := SubStr(res, 1, -1) "`n"		
 		}
 	}
 	DllCall("VirtualFreeEx", "Uint", hProc, "Uint", pProc, "Uint", 0, "Uint", 0x8000), DllCall("CloseHandle", "Uint", hProc)
+	
+	if bPos
+		loop, parse, pQ
+			o%A_Index% := %A_LoopField%
 
 	DetectHiddenWindows,  %oldDetect%
 	return SubStr(res, 1, -1)
 }
 
-Tray_Get(hGui, hTray, pQ, ByRef o1, ByRef o2, ByRef o3) {
-	;tooltip, icon handle, position, class, processname, pid, tooltip, msgid
+/* Function:	GetTooltip
+ 				Get tooltip of the tray icon.
 
+   Parameters:
+				Position	- Position of the tray icon.
+  */
+Tray_GetTooltip(Position){
+	static TB_GETBUTTON=0x417
+
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+
+	WinGet,	pidTaskbar, PID, ahk_class Shell_TrayWnd
+	hProc := DllCall("OpenProcess", "Uint", 0x38, "int", 0, "Uint", pidTaskbar)
+	pProc := DllCall("VirtualAllocEx", "Uint", hProc, "Uint", 0, "Uint", 32, "Uint", 0x1000, "Uint", 0x4)
+	idxTB := Tray_getTrayBar()
+	
+	SendMessage, TB_GETBUTTON, Position-1, pProc, ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
+	VarSetCapacity(BTN,32), DllCall("ReadProcessMemory", "Uint", hProc, "Uint", pProc, "Uint", &BTN, "Uint", 32, "Uint", 0)
+	If	dwData	:= NumGet(BTN,12)
+		 iString := NumGet(BTN,16)
+	else iString := NumGet(BTN,24,"int64")
+
+	VarSetCapacity(sTooltip,128), VarSetCapacity(wTooltip,256)
+	 ,DllCall("ReadProcessMemory", "Uint", hProc, "Uint", iString, "Uint", &wTooltip, "Uint", 256, "Uint", 0)
+	 ,DllCall("WideCharToMultiByte", "Uint", 0, "Uint", 0, "str", wTooltip, "int", -1, "str", sTooltip, "int", 128, "Uint", 0, "Uint", 0)
+	 ,DllCall("VirtualFreeEx", "Uint", hProc, "Uint", pProc, "Uint", 0, "Uint", 0x8000)
+	 ,DllCall("CloseHandle", "Uint", hProc)
+
+	DetectHiddenWindows,  %oldDetect%
+	return sTooltip
 }
-
 
 /*	Function:	Modify
 				Modify icon properties.
@@ -303,9 +334,9 @@ Tray(var="", value="~`a ") {
 */
 
 /* Group: About
-	o v2.0 by majkinetor. See <http://www.autohotkey.com/forum/topic26042.html>.
+	o v2.0a by majkinetor. See <http://www.autohotkey.com/forum/topic26042.html>.
 	o Tray_Refresh by HotKeyIt <http://www.autohotkey.com/forum/topic36966.html>.
-	o Parts of code are modified Sean's work: <http://www.autohotkey.com/forum/topic17314.html>.
-	o MSDN Reference: <http://msdn2.microsoft.com/en-us/library/aa453686.aspx>
-	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
+	o Parts of the code are modifications of the Sean's work <http://www.autohotkey.com/forum/topic17314.html>.
+	o MSDN Reference: <http://msdn2.microsoft.com/en-us/library/aa453686.aspx> .
+	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> .
  */
