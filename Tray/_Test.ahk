@@ -39,7 +39,7 @@ OnPicture:
 
 	Tray_Define(c, "inhw", pos, name, handle, parent)
 	tip := Tray_GetTooltip(c)
-	msgbox Pos: %pos%  Handle: %handle%  Parent: %parent%  Name: %name%`nTooltip: %tip%
+	msgbox Pos: %pos%  Handle: %handle%  Parent: %parent%  Name: %name%`nTooltip:%tip%
 return	
 
 
