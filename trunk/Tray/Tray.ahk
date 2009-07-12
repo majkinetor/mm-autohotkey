@@ -53,6 +53,75 @@ Tray_Add( hGui, Handler, Icon, Tooltip="") {
 	return uid
 }
 
+/*Function:		Define
+ 				Get information about system tray icons.
+ 
+  Parameters:
+				Filter  - Contains process name, ahk_pid or ahk_id for which to return information.
+				pQ		- Query parameter, by default "phw"
+				Sep		- Separator char, by default |.
+
+  Query:
+				h	- Handle.
+				i	- PosItion (0 based).
+				w	- Parent Window handle.
+				p	- Process Pid.
+				n	- Process Name.
+ 
+  Returns:
+				String containing icon information per line. 
+				Icon infomration is separted list of position, icon handle and handle of the window responsible for the icon.
+ */
+Tray_Define(Filter="", pQ="", Sep="|"){
+	static TB_BUTTONCOUNT = 0x418, TB_GETBUTTON=0x417
+	ifEqual, pQ,, SetEnv, pQ, ihw
+
+	if Filter contains ahk_pid,ahk_id
+		 bPid := InStr(Filter, "ahk_pid"),  bID := !bPid,  Filter := SubStr(Filter, 8)
+	else bName := true
+
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+
+	WinGet,	pidTaskbar, PID, ahk_class Shell_TrayWnd
+	hProc := DllCall("OpenProcess", "Uint", 0x38, "int", 0, "Uint", pidTaskbar)
+	pProc := DllCall("VirtualAllocEx", "Uint", hProc, "Uint", 0, "Uint", 32, "Uint", 0x1000, "Uint", 0x4)
+	idxTB := Tray_getTrayBar()
+	SendMessage,TB_BUTTONCOUNT,,,ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
+	
+	i := -1
+	Loop, %ErrorLevel%
+	{
+		SendMessage, TB_GETBUTTON, A_Index-1, pProc, ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
+
+		VarSetCapacity(BTN,32), DllCall("ReadProcessMemory", "Uint", hProc, "Uint", pProc, "Uint", &BTN, "Uint", 32, "Uint", 0)
+		dwData := NumGet(BTN,12)
+		ifEqual, dwData, 0, SetEnv, dwData, % NumGet(BTN, 16, "Int64")
+
+		VarSetCapacity(NFO,32), DllCall("ReadProcessMemory", "Uint", hProc, "Uint", dwData, "Uint", &NFO, "Uint", 32, "Uint", 0)
+		w := NumGet(NFO),  h := NumGet(NFO, 8)
+		
+		WinGet, n, ProcessName, ahk_id %w%
+		WinGet, p, PID, ahk_id %w%
+		i++
+		if !Filter|| (bName && Filter=n) || (bPid && Filter=p) || (bId && Filter=w) {
+			loop, parse, pQ
+				f := A_LoopField, res .= %f% Sep
+			res := SubStr(res, 1, -1) "`n"		
+		}
+	}
+	DllCall("VirtualFreeEx", "Uint", hProc, "Uint", pProc, "Uint", 0, "Uint", 0x8000), DllCall("CloseHandle", "Uint", hProc)
+
+	DetectHiddenWindows,  %oldDetect%
+	return SubStr(res, 1, -1)
+}
+
+Tray_Get(hGui, hTray, pQ, ByRef o1, ByRef o2, ByRef o3) {
+	;tooltip, icon handle, position, class, processname, pid, tooltip, msgid
+
+}
+
+
 /*	Function:	Modify
 				Modify icon properties.
 
@@ -72,8 +141,8 @@ Tray_Modify( hGui, hTray, Icon, Tooltip="~`a " ) {
 	NumPut(88, NID, 0)
 
 	hFlags := 0
-	Icon != "" ? hFlags |= NIF_ICON :
-	Tooltip != "" ? hFlags |= NIF_TIP :
+	hFlags |= Icon != "" ?  NIF_ICON : 0
+	hFlags |= Tooltip != "" ? NIF_TIP : 0
 
 	if (Icon != "") {
 		hIcon := Icon/Icon ? Icon : Tray_loadIcon(Icon)
@@ -92,25 +161,52 @@ Tray_Modify( hGui, hTray, Icon, Tooltip="~`a " ) {
 	return DllCall("shell32.dll\Shell_NotifyIconA", "uint", NIM_MODIFY, "uint", &NID)	
 }
 
+/*	Function:	Move
+ 				Move the tray icons.
+ 
+	Parameters:
+				Pos		- Position of the icon to move, 1 based.
+				NewPos	- New position of the icon, if omited, icon will be moved to the end.
+	Returns:
+ 				TRUE on success, FALSE otherwise.
+ */
+Tray_Move(Pos, NewPos=""){
+	static TB_MOVEBUTTON = 0x452
+	idxTB := Tray_getTrayBar()
+
+	if (NewPos = "") {
+		SendMessage,TB_BUTTONCOUNT,,,ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
+		NewPos := ErrorLevel
+	}
+
+	SendMessage,TB_MOVEBUTTON, Pos-1, NewPos-1, ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
+}
+
 /* Function:	Remove
- 				Remove the tray icon.
+ 				Removes the tray icon.
  
   Parameters:
  				hGui	- Handle of the parent window.
- 				hTray	- Handle of the tray icon. If omited, all icons will be removed.
+ 				hTray	- Handle of the tray icon. If omited, all icons owned by the hGui will be removed.
  
   Returns:
  				TRUE on success, FALSE otherwise.
  */
-Tray_Remove( hGui, hTray) {
+Tray_Remove( hGui, hTray="") {
 	static NIM_DELETE=2
 	
-	VarSetCapacity( NID, 88, 0), NumPut(88, NID),  NumPut(hGui, NID, 4)
+	s := hTray
+	if (hTray = "")
+		s := Tray_Define("ahk_id " hGui, "h")
 
-	NumPut(hTray, NID, 8)
-	if hIcon := Tray(hTray "hIcon", "")
-		DllCall("DestroyIcon", "uint", hIcon)
-	return DllCall("shell32.dll\Shell_NotifyIconA", "uint", NIM_DELETE, "uint", &NID)
+	res := 1
+	loop, parse, s, `n
+	{
+		VarSetCapacity( NID, 88, 0), NumPut(88, NID),  NumPut(hGui, NID, 4), NumPut(A_LoopField, NID, 8)
+		if hIcon := Tray(A_LoopField "hIcon", "")
+			   DllCall("DestroyIcon", "uint", hIcon)
+		res &= DllCall("shell32.dll\Shell_NotifyIconA", "uint", NIM_DELETE, "uint", &NID)
+	}
 }
 
 /* Function:	Refresh
@@ -128,6 +224,17 @@ Tray_Refresh(){
 }
 
 ;======================================== PRIVATE ====================================
+
+Tray_getTrayBar(){
+	ControlGet, hParent, hWnd,, TrayNotifyWnd1  , ahk_class Shell_TrayWnd
+	ControlGet, hChild , hWnd,, ToolbarWindow321, ahk_id %hParent%
+	Loop {
+		ControlGet, hwnd, HWND,, ToolbarWindow32%A_Index%, ahk_class Shell_TrayWnd
+		IfEqual, hwnd, 0, return
+		IfEqual, hwnd, %hChild%, return A_Index
+	}
+}
+
 
 Tray_loadIcon(pPath, pSize=32){
 	j := InStr(pPath, ":", 0, 0), idx := 0
