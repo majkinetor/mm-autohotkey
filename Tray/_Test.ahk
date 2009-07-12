@@ -1,12 +1,12 @@
+SetBatchLines, -1
 #singleinstance, force
 	OnExit, OnExit
 	Gui,  +LastFound                                                                 
-	hGui := WinExist()                                                               
+	hGui := WinExist()
 
-	iconNo := 10
-
+	iconNo := 2
 	loop, %iconNo%
-		hTray := Tray_Add( hGui, "OnTrayIcon", "shell32.dll:" A_Index, "My Tray Icon " A_Index), aTrayIcons_%hTray% := A_Index, aIcon_%A_Index% := hTray
+		hTray := Tray_Add( hGui, "OnTrayIcon", "shell32.dll:" A_Index, "My Tray Icon " A_Index)
 return                                                                               
 																				   
 OnTrayIcon(Hwnd, Event) {
@@ -19,13 +19,23 @@ OnTrayIcon(Hwnd, Event) {
 	MsgBox, ,Icon %n%, %EVENT% Button clicked.`n`nPress F1 to exit script 
 }                 
 
-OnExit:
 F1::
-	loop, %iconNo%
-		Tray_Remove(hGui, aIcon_%A_Index%) 	;must be done or icon will stand there hanging if app is restarted
-
+OnExit:
+	Tray_Remove(hGui)
 	ExitApp
 return
 
+F2::
+	m(Tray_Define("ahk_id " hGui, "i") )
+;	Tray_Modify(66116, 1226, "shell32.dll:1", "aloha")
+return
+
+F3::	
+	;put ahk icons at the end
+	s := Tray_Define("autohotkey.exe", "i")
+	loop, parse, s, `n
+		Tray_Move(A_LoopField+2 - A_Index)
+
+return
 
 #include Tray.ahk
