@@ -1,5 +1,9 @@
 /* Title:		Tray
 				*Tray icon controller*
+ :
+				Using this module you can totaly control Windows notification area. 
+				Your script can create any number of tray icons and receive notifications about user actions on them.
+				Also, you can get 3thd party tray icons information and modify them.
  */
 
 /*Function:		Add
