@@ -13,6 +13,7 @@
  			that was open, etc.
  :
  			Dialog is resizable, and have support for filters and icon size.
+			(see IconEx.png)
  */
 
 /*
