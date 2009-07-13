@@ -49,7 +49,7 @@ DetectHiddenWindows, On
 ;	reNotepad := Rebar_AddBand(hRebar, hNotepad, "L 300", "mh 140", "T Note", "I 17")
 
   ;Add other GUI controls
-	h := Rebar_Height(hRebar) + 90
+	h := Rebar_Height(hRebar)+90
 
 	Gui, Font, s8
 	Gui, Add, Text, y%h% x2 , F1 to recall initial layout   F2 to toggle lock   F3 to show layout
