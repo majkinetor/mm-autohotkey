@@ -56,10 +56,8 @@ Rebar_Add(hGui, Style="", hIL="", Pos="", Handler="") {
 
 	hStyle := 0
 	loop, parse, Style, %A_Tab%%A_Space%, %A_Tab%%A_Space%
-	{
 		ifEqual, A_LoopField,,continue
-		hStyle |= A_LoopField+0 ? A_LoopField : RBS_%A_LoopField%
-	}
+		else hStyle |= A_LoopField+0 ? A_LoopField : RBS_%A_LoopField%
 
 	ifEqual, hStyle, ,return A_ThisFunc "> Some of the styles are invalid: " Style
 
@@ -133,7 +131,7 @@ Rebar_Add(hGui, Style="", hIL="", Pos="", Handler="") {
  			*				- Default styles for the band. For instance "* break" will set band style to default plus "break" style.
  
  Returns:
- 			ID of the newly created band.
+ 			ID of the newly created band or 0 if it fails.
 
  Remarks:
 			For some reason, using the Gui, Font to change font size before adding ComboBox child to the band will make it buggy in a sense
@@ -144,14 +142,14 @@ Rebar_AddBand(hRebar, hCtrl, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8
 	static RB_INSERTBANDA=0x401
 
 	if !(hCtrl+0)
-		return "Err: Invalid child handle"
+		return A_ThisFunc "> Invalid child handle: " hCtrl
 
 	pos := Rebar_compileBand(BAND, hCtrl, o1, o2, o3, o4, o5, o6, o7, o8, o9)
 	if pos is not Integer
 		return pos
 	
 	SendMessage, RB_INSERTBANDA, pos, &BAND,, ahk_id %hReBar% 
-	ifEqual, ErrorLevel, 0, return "Err: Can't create band" 
+	ifEqual, ErrorLevel, 0, return 0
 	return 	NumGet(BAND, 52)   ;return ID
 }
 
@@ -210,7 +208,7 @@ Rebar_GetBand(hRebar, WhichBand, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", B
 	VarSetCapacity(BAND, 80, 0), NumPut(80,BAND), NumPut(hMask, BAND, 4)
 	VarSetCapacity(wTxt, 64), NumPut(&wTxt, BAND, 20), NumPut(64, BAND, 24)
     SendMessage, RB_GETBANDINFO, WhichBand, &BAND, ,ahk_id %hRebar%
-	ifEqual, Errorlevel, 0, return "Err: Can't get band info"
+	ifEqual, Errorlevel, 0, return A_ThisFunc "> Can't get band info."
 
 	loop, parse, pQ
 	{
@@ -276,7 +274,7 @@ Rebar_GetRect(hRebar, WhichBand="", pQ="", ByRef o1="", ByRef o2="", ByRef o3=""
 	else {
 		WhichBand := WhichBand >= 10000 ? Rebar_Id2Index(hrebar, WhichBand)-1 : WhichBand-1
 	    SendMessage, RB_GETRECT , WhichBand, &RECT, ,ahk_id %hRebar%
-		IfEqual, ErrorLevel, 0, return "Err: can't get rect"
+		IfEqual, ErrorLevel, 0, return A_ThisFunc "> Can't get band rect."
 	}
 
 	xx := NumGet(RECT, 0, "Int"), yy := NumGet(RECT, 4, "Int")
@@ -449,7 +447,7 @@ Rebar_SetBandStyle(hRebar, WhichBand, Style) {
     SendMessage, RB_GETBANDINFO, WhichBand, &BAND, ,ahk_id %hRebar%
 
 	hStyle := Rebar_getStyle( Style, true, hNegStyle) | NumGet(BAND,8),   hStyle &= hNegStyle
-	ifEqual, hStyle, ,return "Err: Some of the styles are invalid"
+	ifEqual, hStyle, ,return A_ThisFunc "> Some of the styles are invalid: " Style
 
 	NumPut(hStyle ,BAND, 8)		;style
 	SendMessage, RB_SETBANDINFOA, WhichBand, &BAND, ,ahk_id %hRebar%
@@ -540,7 +538,7 @@ Rebar_compileBand(ByRef BAND, hCtrl, ByRef o1="", ByRef o2="", ByRef o3="", ByRe
   ;handle styles	
 	if NP_S !=
 		if (hStyle := Rebar_getStyle( NP_S, true )) = ""
-			return "Err: Some of the styles are invalid"
+			return A_ThisFunc "> Some of the styles are invalid."
 
   ;set mask
 	hMask := (NP_T != "" ? RBBIM_TEXT : 0)
