@@ -7,7 +7,7 @@ DetectHiddenWindows, On
 	hGui := WinExist() 
 	Gui, Show, w600 h300 hide
 
-	Gui, Font,s10, Courier New
+	Gui, Font,, Courier New
 
   ;create image list
 	hIL := IL_Create(10, 0, 1) 
