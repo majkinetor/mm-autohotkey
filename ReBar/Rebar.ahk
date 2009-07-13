@@ -105,7 +105,7 @@ Rebar_Add(hGui, Style="", hIL="", Pos="", Handler="") {
  			Inserts a new band in a rebar control.
  
  Parameters:
- 			hCtrl			- Control to be hosted by the band
+ 			hCtrl			- Control to be hosted by the band.
  			o1 .. o8		- Named parameters. See below.
  
  Named parameters:
@@ -134,6 +134,11 @@ Rebar_Add(hGui, Style="", hIL="", Pos="", Handler="") {
  
  Returns:
  			ID of the newly created band.
+
+ Remarks:
+			For some reason, using the Gui, Font to change font size before adding ComboBox child to the band will make it buggy in a sense
+			that ComboBox list will not be able to show (although you can still select items using arrows). 
+	
  */
 Rebar_AddBand(hRebar, hCtrl, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o9=""){
 	static RB_INSERTBANDA=0x401
