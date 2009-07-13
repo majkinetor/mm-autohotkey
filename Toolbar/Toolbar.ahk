@@ -28,16 +28,17 @@
 			adjust	- User has finished customizing the toolbar.
 
  Control Styles:
-			ADJUSTABLE	- Allows users to change a toolbar button's position by dragging it while holding down the SHIFT key and to open customization dialog by double clicking Toolbar empty area, or separator.
-			BORDER		- Creates a Toolbar that has a thin-line border.
-			BOTTOM		- Causes the control to position itself at the bottom of the parent window's client area.
-			FLAT		- Creates a flat toolbar. In a flat toolbar, both the toolbar and the buttons are transparent and hot-tracking is enabled. Button text appears under button bitmaps. To prevent repainting problems, this style should be set before the toolbar control becomes visible.
-			LIST		- Creates a flat toolbar with button text to the right of the bitmap. Otherwise, this style is identical to FLAT style. To prevent repainting problems, this style should be set before the toolbar control becomes visible.
-			TOOLTIPS	- Creates a ToolTip control that an application can use to display descriptive text for the buttons in the toolbar.
-			NODIVDER	- Prevents a two-pixel highlight from being drawn at the top of the control.
-			TABSTOP		- Specifies that a control can receive the keyboard focus when the user presses the TAB key.
-			WRAPABLE	- Creates a toolbar that can have multiple lines of buttons. Toolbar buttons can "wrap" to the next line when the toolbar becomes too narrow to include all buttons on the same line. When the toolbar is wrapped, the break will occur on either the rightmost separator or the rightmost button if there are no separators on the bar. This style must be set to display a vertical toolbar control when the toolbar is part of a vertical rebar control.
-			VERTICAL	- Creates vertical toolbar.
+			adjustable	- Allows users to change a toolbar button's position by dragging it while holding down the SHIFT key and to open customization dialog by double clicking Toolbar empty area, or separator.
+			border		- Creates a Toolbar that has a thin-line border.
+			bottom		- Causes the control to position itself at the bottom of the parent window's client area.
+			flat		- Creates a flat toolbar. In a flat toolbar, both the toolbar and the buttons are transparent and hot-tracking is enabled. Button text appears under button bitmaps. To prevent repainting problems, this style should be set before the toolbar control becomes visible.
+			list		- Creates a flat toolbar with button text to the right of the bitmap. Otherwise, this style is identical to FLAT style. To prevent repainting problems, this style should be set before the toolbar control becomes visible.
+			tooltips	- Creates a ToolTip control that an application can use to display descriptive text for the buttons in the toolbar.
+			nodivder	- Prevents a two-pixel highlight from being drawn at the top of the control.
+			tabstop		- Specifies that a control can receive the keyboard focus when the user presses the TAB key.
+			wrapable	- Creates a toolbar that can have multiple lines of buttons. Toolbar buttons can "wrap" to the next line when the toolbar becomes too narrow to include all buttons on the same line. When the toolbar is wrapped, the break will occur on either the rightmost separator or the rightmost button if there are no separators on the bar. This style must be set to display a vertical toolbar control when the toolbar is part of a vertical rebar control.
+			vertical	- Creates vertical toolbar.
+			menu		- Creates a toolbar that simulates Windows menu. This is combination of other flags and its genrally used alone.
 
  Handler:
 
