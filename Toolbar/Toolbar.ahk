@@ -684,7 +684,7 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 	 ;check for available button
 		a := SubStr(a1,1,1) = "*"
 		if a
-			a1 := SubStr(a1,2), o := aBTN + 4
+			 a1 := SubStr(a1,2), o := aBTN + 4
 		else o := cBTN
 
 	 ;parse states
