@@ -59,7 +59,7 @@ Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
     static TBSTYLE_WRAPABLE = 0x200, TBSTYLE_FLAT = 0x800, TBSTYLE_LIST=0x1000, TBSTYLE_TOOLTIPS=0x100, TBSTYLE_TRANSPARENT = 0x8000, TBSTYLE_ADJUSTABLE = 0x20, TBSTYLE_VERTICAL=0x80
 	static TBSTYLE_EX_DRAWDDARROWS = 0x1, TBSTYLE_EX_HIDECLIPPEDBUTTONS=0x10, TBSTYLE_EX_MIXEDBUTTONS=0x8
 	static TB_BUTTONSTRUCTSIZE=0x41E, TB_SETEXTENDEDSTYLE := 0x454, TB_SETUNICODEFORMAT := 0x2005
-	static TBSTYLE_NODIVIDER=0x40, CCS_NOPARENTALIGN=0x8, CCS_NORESIZE = 0x4, TBSTYLE_BOTTOM = 0x3, TBSTYLE_MENU=0, TBSTYLE_BORDER=0x800000
+	static TBSTYLE_NODIVIDER=0x40, CCS_NOPARENTALIGN=0x8, CCS_NORESIZE = 0x4, TBSTYLE_BOTTOM = 0x3, TBSTYLE_BORDER=0x800000, TBSTYLE_MENU=6711500 ; menu = TBSTYLE_FLAT | TBSTYLE_LIST | WS_CLIPSIBLINGS (ws_cs used as marker only)
 
 	if !MODULEID { 
 		old := OnMessage(0x4E, "Toolbar_onNotify"),	MODULEID := 80609
@@ -67,11 +67,9 @@ Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 			Toolbar("oldNotify", RegisterCallback(old))
 	}
 
-  	hStyle := 0
-	hExStyle := TBSTYLE_EX_MIXEDBUTTONS ; TBSTYLE_EX_HIDECLIPPEDBUTTONS
-	if bMenu := InStr(Style, "MENU")
-		 hStyle |= TBSTYLE_FLAT | TBSTYLE_LIST | WS_CLIPSIBLINGS		;set this style only if custom flag MENU is set. It serves only as a mark later
-	else hExStyle |= TBSTYLE_EX_DRAWDDARROWS
+  	hStyle := 0,  hExStyle := TBSTYLE_EX_MIXEDBUTTONS   ;TBSTYLE_EX_HIDECLIPPEDBUTTONS
+	if !InStr(Style, "menu")
+		hExStyle |= TBSTYLE_EX_DRAWDDARROWS
 
 	loop, parse, Style, %A_Tab%%A_Space%, %A_Tab%%A_Space%
 		ifEqual, A_LoopField,,continue
@@ -680,7 +678,7 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 		StringSplit, a, A_LoopField, `,,%A_Space%%A_Tab%
 
 	 ;check icon
-		if (bMenu AND a2="") or (a2=0)
+		if (bMenu && a2="") || ( a2=0 )
 			a2 := -1		;so to become I_IMAGENONE = -2
 
 	 ;check for available button
