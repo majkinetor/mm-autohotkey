@@ -54,16 +54,11 @@
  */
 Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 	static MODULEID
-  ;STANDARD STYLES
-	static WS_CHILD := 0x40000000, WS_VISIBLE := 0x10000000, WS_CLIPSIBLINGS = 0x4000000, WS_CLIPCHILDREN = 0x2000000, TBSTYLE_THICKFRAME=0x40000, TBSTYLE_TABSTOP = 0x10000, TBSTYLE_BORDER=0
-  ;TOOLBAR STYLES
+	static WS_CHILD := 0x40000000, WS_VISIBLE := 0x10000000, WS_CLIPSIBLINGS = 0x4000000, WS_CLIPCHILDREN = 0x2000000, TBSTYLE_THICKFRAME=0x40000, TBSTYLE_TABSTOP = 0x10000
     static TBSTYLE_WRAPABLE = 0x200, TBSTYLE_FLAT = 0x800, TBSTYLE_LIST=0x1000, TBSTYLE_TOOLTIPS=0x100, TBSTYLE_TRANSPARENT = 0x8000, TBSTYLE_ADJUSTABLE = 0x20, TBSTYLE_VERTICAL=0x80
-  ;TOOLBARE XTENDED STYLES
 	static TBSTYLE_EX_DRAWDDARROWS = 0x1, TBSTYLE_EX_HIDECLIPPEDBUTTONS=0x10, TBSTYLE_EX_MIXEDBUTTONS=0x8
-  ;OTHER
-	static TOOLBARCLASSNAME  = "ToolbarWindow32", TB_BUTTONSTRUCTSIZE=0x41E, TB_SETEXTENDEDSTYLE := 0x454, TB_SETUNICODEFORMAT := 0x2005
-  ;common
-	static TBSTYLE_NODIVIDER=0x40, CCS_NOPARENTALIGN=0x8, CCS_NORESIZE = 0x4, TBSTYLE_BOTTOM = 0x3
+	static TB_BUTTONSTRUCTSIZE=0x41E, TB_SETEXTENDEDSTYLE := 0x454, TB_SETUNICODEFORMAT := 0x2005
+	static TBSTYLE_NODIVIDER=0x40, CCS_NOPARENTALIGN=0x8, CCS_NORESIZE = 0x4, TBSTYLE_BOTTOM = 0x3, TBSTYLE_MENU=0, TBSTYLE_BORDER=0x800000
 
 	if !MODULEID { 
 		old := OnMessage(0x4E, "Toolbar_onNotify"),	MODULEID := 80609
@@ -71,7 +66,12 @@ Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 			Toolbar("oldNotify", RegisterCallback(old))
 	}
 
-	hStyle := 0
+  	hStyle := 0
+	hExStyle := TBSTYLE_EX_MIXEDBUTTONS ; TBSTYLE_EX_HIDECLIPPEDBUTTONS
+	if bMenu := InStr(Style, "MENU")
+		 hStyle |= TBSTYLE_FLAT | TBSTYLE_LIST | WS_CLIPSIBLINGS		;set this style only if custom flag MENU is set. It serves only as a mark later
+	else hExStyle |= TBSTYLE_EX_DRAWDDARROWS
+
 	loop, parse, Style, %A_Tab%%A_Space%, %A_Tab%%A_Space%
 		ifEqual, A_LoopField,,continue
 		else hStyle |= A_LoopField+0 ? A_LoopField : TBSTYLE_%A_LoopField%
@@ -92,8 +92,8 @@ Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 	}
 
     hCtrl := DllCall("CreateWindowEx" 
-             , "uint", InStr(Style, "border") ? 1 : 0				;	WS_EX_CLIENTEDGE = 0x200 for sunken
-             , "str",  TOOLBARCLASSNAME 
+             , "uint", 0
+             , "str",  "ToolbarWindow32" 
              , "uint", 0 
              , "uint", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | hStyle
              , "uint", x, "uint", y, "uint", w, "uint", h
@@ -104,7 +104,7 @@ Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
     ifEqual, hCtrl, 0, return A_ThisFunc "> Can't create toolbar." 
 	
 	SendMessage, TB_BUTTONSTRUCTSIZE, 20, 0, , ahk_id %hCtrl%
-	SendMessage, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS|TBSTYLE_EX_MIXEDBUTTONS, , ahk_id %hCtrl%  ;!!! u ovom drugom je bilo disabled
+	SendMessage, TB_SETEXTENDEDSTYLE, 0, hExStyle, , ahk_id %hCtrl% 
 	SendMessage, TB_SETUNICODEFORMAT, 0, 0, , ahk_id %hCtrl%		  ;set to ANSI
 
 	if(ImageList != "")
@@ -138,7 +138,7 @@ Toolbar_AutoSize(hCtrl, Align="fit"){
 
 		SysGet, f, 8		;SM_CYFIXEDFRAME , Thickness of the frame around the perimeter of a window that has a caption but is not sizable
 		SysGet, c, 4		;SM_CYCAPTION: Height of a caption area, in pixels.
-
+		
 		hParent := DllCall("GetParent", "uint", hCtrl)
 		WinGetPos, ,,pw,ph, ahk_id %hParent%
 		if Align = fit
@@ -561,7 +561,7 @@ Toolbar_SetButtonWidth(hCtrl, Min, Max=""){
  				W, H	- Width & Height. If you omit height, it defaults to width.
  
 	Remarks:
-				Doesnt work with LIST style.
+				With LIST style, you can only set the height.
  */
 Toolbar_SetButtonSize(hCtrl, W, H="") {
 	static TB_SETBUTTONSIZE = 0x41F
@@ -569,7 +569,6 @@ Toolbar_SetButtonSize(hCtrl, W, H="") {
 	SendMessage, TB_SETBUTTONSIZE, 0,(W<<16) | H,,ahk_id %hCtrl%
 	SendMessage, 0x421, , ,,ahk_id %hCtrl%	;autosize
 }
-
 
 /*
  Function:  SetImageList
@@ -657,9 +656,12 @@ Button definition:
 Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 	static BTNS_SEP=1, BTNS_CHECK =2, BTNS_CHECKGROUP = 6, BTNS_DROPDOWN = 8, BTNS_A=16, BTNS_AUTOSIZE = 16, BTNS_NOPREFIX = 32, BTNS_SHOWTEXT = 64
 	static TBSTATE_CHECKED=1, TBSTATE_ENABLED=4, TBSTATE_HIDDEN=8, TBSTATE_DISABLED=0, TBSTATE_WRAP = 0x20
-	static TB_ADDSTRING = 0x41C
+	static TB_ADDSTRING = 0x41C, WS_CLIPSIBLINGS = 0x4000000
 	static id=10000								;automatic IDing starts form 10000,     1 <= userID < 10 000
-    	
+
+	WinGet, bMenu, Style, ahk_id %hCtrl%
+	bMenu := bMenu & WS_CLIPSIBLINGS		
+
 	aBTN := Toolbar(hCtrl "aBTN")
 	if (aBTN = "")
 		aBTN := Toolbar_malloc( 50 * 20 + 4),  Toolbar(hCtrl "aBTN", aBTN)	 ;if space for array of * buttons isn't reserved and there are definitions of * buttons reserve it for 50 buttons + some more so i can keep some data there...
@@ -675,6 +677,10 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 
 		a1:=a2:=a3:=a4:=a5:=""					;a1-caption;  a2-icon_num;  a3-state;  a4-style;	a5-id;
 		StringSplit, a, A_LoopField, `,,%A_Space%%A_Tab%
+
+	 ;check icon
+		if (bMenu AND a2="") or (a2=0)
+			a2 := -1		;so to become I_IMAGENONE = -2
 
 	 ;check for available button
 		a := SubStr(a1,1,1) = "*"
@@ -692,7 +698,9 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 		ifEqual, hState, , return A_ThisFunc "> Some of the states are invalid: " a3
 
 	 ;parse styles
-		hstyle := (A_LoopField >= "-") and (A_LoopField <= "-------------------") ? BTNS_SEP : 0
+
+		hStyle := bMenu ? BTNS_SHOWTEXT | BTNS_DROPDOWN : 0
+		hstyle |= (A_LoopField >= "-") and (A_LoopField <= "-------------------") ? BTNS_SEP : 0
 		sep += (hStyle = BTNS_SEP) ? 1 : 0
 		loop, parse, a4, %A_Tab%%A_Space%, %A_Tab%%A_Space%
 		{
