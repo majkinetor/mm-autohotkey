@@ -1,0 +1,859 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+
+<html><head><title>Rebar</title><style>/*
+   IMPORTANT: If you're editing this file in the output directory of one of
+   your projects, your changes will be overwritten the next time you run
+   Natural Docs.  Instead, copy this file to your project directory, make your
+   changes, and you can use it with -s.  Even better would be to make a CSS
+   file in your project directory with only your changes, which you can then
+   use with -s [original style] [your changes].
+
+   On the other hand, if you're editing this file in the Natural Docs styles
+   directory, the changes will automatically be applied to all your projects
+   that use this style the next time Natural Docs is run on them.
+
+   This file is part of Natural Docs, which is Copyright (C) 2003-2008 Greg Valure
+   Natural Docs is licensed under the GPL
+*/
+
+body {
+    font: 10pt Verdana, Arial, sans-serif;
+    color: #000000;
+    margin: 0; padding: 0;
+    }
+
+.ContentPage,
+.IndexPage,
+.FramedMenuPage {
+    background-color: #E8E8E8;
+    }
+.FramedContentPage,
+.FramedIndexPage,
+.FramedSearchResultsPage,
+.PopupSearchResultsPage {
+    background-color: #FFFFFF;
+    }
+
+
+a:link,
+a:visited { color: #900000; text-decoration: none }
+a:hover { color: #900000; text-decoration: underline }
+a:active { color: #FF0000; text-decoration: underline }
+
+td {
+    vertical-align: top }
+
+img { border: 0;  }
+
+
+/*
+    Comment out this line to use web-style paragraphs (blank line between
+    paragraphs, no indent) instead of print-style paragraphs (no blank line,
+    indented.)
+*/
+p {
+    text-indent: 5ex; margin: 0 }
+
+
+/*  Opera doesn't break with just wbr, but will if you add this.  */
+.Opera wbr:after {
+	content: "\00200B";
+	}
+
+
+/*  Blockquotes are used as containers for things that may need to scroll.  */
+blockquote {
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+    }
+
+
+.Firefox1 blockquote {
+    padding-bottom: .5em;
+    }
+
+/*  Turn off scrolling when printing.  */
+@media print {
+    blockquote {
+        overflow: visible;
+        }
+    .IE blockquote {
+        width: auto;
+        }
+    }
+
+
+
+#Menu {
+    font-size: 9pt;
+    padding: 10px 0 0 0;
+    }
+.ContentPage #Menu,
+.IndexPage #Menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 31ex;
+    overflow: hidden;
+    }
+.ContentPage .Firefox #Menu,
+.IndexPage .Firefox #Menu {
+    width: 27ex;
+    }
+
+
+    .MTitle {
+        font-size: 16pt; font-weight: bold; font-variant: small-caps;
+        text-align: center;
+        padding: 5px 10px 15px 10px;
+        border-bottom: 1px dotted #000000;
+        margin-bottom: 15px }
+
+    .MSubTitle {
+        font-size: 9pt; font-weight: normal; font-variant: normal;
+        margin-top: 1ex; margin-bottom: 5px }
+
+
+    .MEntry a:link,
+    .MEntry a:hover,
+    .MEntry a:visited { color: #606060; margin-right: 0 }
+    .MEntry a:active { color: #A00000; margin-right: 0 }
+
+
+    .MGroup {
+        font-variant: small-caps; font-weight: bold;
+        margin: 1em 0 1em 10px;
+        }
+
+    .MGroupContent {
+        font-variant: normal; font-weight: normal }
+
+    .MGroup a:link,
+    .MGroup a:hover,
+    .MGroup a:visited { color: #545454; margin-right: 10px }
+    .MGroup a:active { color: #A00000; margin-right: 10px }
+
+
+    .MFile,
+    .MText,
+    .MLink,
+    .MIndex {
+        padding: 1px 17px 2px 10px;
+        margin: .25em 0 .25em 0;
+        }
+
+    .MText {
+        font-size: 8pt; font-style: italic }
+
+    .MLink {
+        font-style: italic }
+
+    #MSelected {
+        color: #000000; background-color: #FFFFFF;
+        /*  Replace padding with border.  */
+        padding: 0 10px 0 10px;
+        border-width: 1px 2px 2px 0; border-style: solid; border-color: #000000;
+        margin-right: 5px;
+        }
+
+    /*  Close off the left side when its in a group.  */
+    .MGroup #MSelected {
+        padding-left: 9px; border-left-width: 1px }
+
+    /*  A treat for Mozilla users.  Blatantly non-standard.  Will be replaced with CSS 3 attributes when finalized/supported.  */
+    .Firefox #MSelected {
+        -moz-border-radius-topright: 10px;
+        -moz-border-radius-bottomright: 10px }
+    .Firefox .MGroup #MSelected {
+        -moz-border-radius-topleft: 10px;
+        -moz-border-radius-bottomleft: 10px }
+
+
+    #MSearchPanel {
+        padding: 0px 6px;
+        margin: .25em 0;
+        }
+
+
+    #MSearchField {
+        font: italic 9pt Verdana, sans-serif;
+        color: #606060;
+        background-color: #E8E8E8;
+        border: none;
+        padding: 2px 4px;
+        width: 100%;
+        }
+    /* Only Opera gets it right. */
+    .Firefox #MSearchField,
+    .IE #MSearchField,
+    .Safari #MSearchField {
+        width: 94%;
+        }
+    .Opera9 #MSearchField,
+    .Konqueror #MSearchField {
+        width: 97%;
+        }
+    .FramedMenuPage .Firefox #MSearchField,
+    .FramedMenuPage .Safari #MSearchField,
+    .FramedMenuPage .Konqueror #MSearchField {
+        width: 98%;
+        }
+
+    /* Firefox doesn't do this right in frames without #MSearchPanel added on.
+        It's presence doesn't hurt anything other browsers. */
+    #MSearchPanel.MSearchPanelInactive:hover #MSearchField {
+        background-color: #FFFFFF;
+        border: 1px solid #C0C0C0;
+        padding: 1px 3px;
+        }
+    .MSearchPanelActive #MSearchField {
+        background-color: #FFFFFF;
+        border: 1px solid #C0C0C0;
+        font-style: normal;
+        padding: 1px 3px;
+        }
+
+    #MSearchType {
+        visibility: hidden;
+        font: 8pt Verdana, sans-serif;
+        width: 98%;
+        padding: 0;
+        border: 1px solid #C0C0C0;
+        }
+    .MSearchPanelActive #MSearchType,
+    /*  As mentioned above, Firefox doesn't do this right in frames without #MSearchPanel added on. */
+    #MSearchPanel.MSearchPanelInactive:hover #MSearchType,
+    #MSearchType:focus {
+        visibility: visible;
+        color: #606060;
+        }
+    #MSearchType option#MSearchEverything {
+        font-weight: bold;
+        }
+
+    .Opera8 .MSearchPanelInactive:hover,
+    .Opera8 .MSearchPanelActive {
+        margin-left: -1px;
+        }
+
+
+    iframe#MSearchResults {
+        width: 60ex;
+        height: 15em;
+        }
+    #MSearchResultsWindow {
+        display: none;
+        position: absolute;
+        left: 0; top: 0;
+        border: 1px solid #000000;
+        background-color: #E8E8E8;
+        }
+    #MSearchResultsWindowClose {
+        font-weight: bold;
+        font-size: 8pt;
+        display: block;
+        padding: 2px 5px;
+        }
+    #MSearchResultsWindowClose:link,
+    #MSearchResultsWindowClose:visited {
+        color: #000000;
+        text-decoration: none;
+        }
+    #MSearchResultsWindowClose:active,
+    #MSearchResultsWindowClose:hover {
+        color: #800000;
+        text-decoration: none;
+        background-color: #F4F4F4;
+        }
+
+
+
+
+#Content {
+    padding-bottom: 15px;
+    }
+
+.ContentPage #Content {
+    border-width: 0 0 1px 1px;
+    border-style: solid;
+    border-color: #000000;
+    background-color: #FFFFFF;
+    font-size: 9pt;  /* To make 31ex match the menu's 31ex. */
+    
+    }
+.ContentPage .Firefox #Content {
+    margin-left: 27ex;
+    }
+
+
+
+    .CTopic {
+        font-size: 10pt;
+        margin-bottom: 3em;
+        }
+
+
+    .CTitle {
+        font-size: 12pt; font-weight: bold;
+        border-width: 0 0 1px 0; border-style: solid; border-color: #A0A0A0;
+        margin: 0 15px .5em 15px }
+
+    .CGroup .CTitle {
+        font-size: 16pt; font-variant: small-caps;
+        padding-left: 15px; padding-right: 15px;
+        border-width: 0 0 2px 0; border-color: #000000;
+        margin-left: 0; margin-right: 0 }
+
+    .CClass .CTitle,
+    .CInterface .CTitle,
+    .CDatabase .CTitle,
+    .CDatabaseTable .CTitle,
+    .CSection .CTitle {
+        font-size: 18pt;
+        color: #FFFFFF; background-color: #A0A0A0;
+        padding: 10px 15px 10px 15px;
+        border-width: 2px 0; border-color: #000000;
+        margin-left: 0; margin-right: 0 }
+
+    #MainTopic .CTitle {
+        font-size: 20pt;
+        color: #FFFFFF; background-color: #7070C0;
+        padding: 10px 15px 10px 15px;
+        border-width: 0 0 3px 0; border-color: #000000;
+        margin-left: 0; margin-right: 0 }
+
+    .CBody {
+        margin-left: 15px; margin-right: 15px }
+
+
+    .CToolTip {
+        position: absolute; visibility: hidden;
+        left: 0; top: 0;
+        background-color: #FFFFE0;
+        padding: 5px;
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #000000;
+        font-size: 8pt;
+        }
+
+    .Opera .CToolTip {
+        max-width: 98%;
+        }
+
+    /*  Scrollbars would be useless.  */
+    .CToolTip blockquote {
+        overflow: hidden;
+        }
+    .IE6 .CToolTip blockquote {
+        overflow: visible;
+        }
+
+    .CHeading {
+        font-weight: bold; font-size: 10pt;
+        margin: 1.5em 0 .5em 0;
+        }
+
+    .CBody pre {
+        font: 10pt "Courier New", Courier, monospace;
+        margin: 1em 0;
+        }
+
+    .CBody ul {
+        /*  I don't know why CBody's margin doesn't apply, but it's consistent across browsers so whatever.
+             Reapply it here as padding.  */
+        padding-left: 15px; padding-right: 15px;
+        margin: .5em 5ex .5em 5ex;
+        }
+
+    .CDescriptionList {
+        margin: .5em 5ex 0 5ex }
+
+        .CDLEntry {
+            font: 10pt "Courier New", Courier, monospace; color: #808080;
+            padding-bottom: .25em;
+            white-space: nowrap }
+
+        .CDLDescription {
+            font-size: 10pt;  /*  For browsers that don't inherit correctly, like Opera 5.  */
+            padding-bottom: .5em; padding-left: 5ex }
+
+
+    .CTopic img {
+        text-align: center;
+        display: block;
+        margin: 1em auto;
+        }
+    .CImageCaption {
+        font-variant: small-caps;
+        font-size: 8pt;
+        color: #808080;
+        text-align: center;
+        position: relative;
+        top: 1em;
+        }
+
+    .CImageLink {
+        color: #808080;
+        font-style: italic;
+        }
+    a.CImageLink:link,
+    a.CImageLink:visited,
+    a.CImageLink:hover { color: #808080 }
+
+
+
+
+
+.Prototype {
+    font: 10pt "Courier New", Courier, monospace;
+    padding: 5px 3ex;
+    border-width: 1px; border-style: solid;
+    margin: 0 5ex 1.5em 5ex;
+    }
+
+    .Prototype td {
+        font-size: 10pt;
+        }
+
+    .PDefaultValue,
+    .PDefaultValuePrefix,
+    .PTypePrefix {
+        color: #8F8F8F;
+        }
+    .PTypePrefix {
+        text-align: right;
+        }
+    .PAfterParameters {
+        vertical-align: bottom;
+        }
+
+    .IE .Prototype table {
+        padding: 0;
+        }
+
+    .CFunction .Prototype {
+        background-color: #F4F4F4; border-color: #D0D0D0 }
+    .CProperty .Prototype {
+        background-color: #F4F4FF; border-color: #C0C0E8 }
+    .CVariable .Prototype {
+        background-color: #FFFFF0; border-color: #E0E0A0 }
+
+    .CClass .Prototype {
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #A0A0A0;
+        background-color: #F4F4F4;
+        }
+    .CInterface .Prototype {
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #A0A0D0;
+        background-color: #F4F4FF;
+        }
+
+    .CDatabaseIndex .Prototype,
+    .CConstant .Prototype {
+        background-color: #D0D0D0; border-color: #000000 }
+    .CType .Prototype,
+    .CEnumeration .Prototype {
+        background-color: #FAF0F0; border-color: #E0B0B0;
+        }
+    .CDatabaseTrigger .Prototype,
+    .CEvent .Prototype,
+    .CDelegate .Prototype {
+        background-color: #F0FCF0; border-color: #B8E4B8 }
+
+    .CToolTip .Prototype {
+        margin: 0 0 .5em 0;
+        white-space: nowrap;
+        }
+
+
+
+
+
+.Summary {
+    margin: 1.5em 5ex 0 5ex }
+
+    .STitle {
+        font-size: 12pt; font-weight: bold;
+        margin-bottom: .5em }
+
+
+    .SBorder {
+        background-color: #FFFFF0;
+        padding: 15px;
+        border: 1px solid #C0C060 }
+
+    /* In a frame IE 6 will make them too long unless you set the width to 100%.  Without frames it will be correct without a width
+        or slightly too long (but not enough to scroll) with a width.  This arbitrary weirdness simply astounds me.  IE 7 has the same
+        problem with frames, haven't tested it without.  */
+    .FramedContentPage .IE .SBorder {
+        width: 100% }
+
+    /*  A treat for Mozilla users.  Blatantly non-standard.  Will be replaced with CSS 3 attributes when finalized/supported.  */
+    .Firefox .SBorder {
+        -moz-border-radius: 20px }
+
+
+    .STable {
+        font-size: 9pt; width: 100% }
+
+    .SEntry {
+        width: 30% }
+    .SDescription {
+        width: 70% }
+
+
+    .SMarked {
+        background-color: #F8F8D8 }
+
+    .SDescription { padding-left: 2ex }
+    .SIndent1 .SEntry { padding-left: 1.5ex }   .SIndent1 .SDescription { padding-left: 3.5ex }
+    .SIndent2 .SEntry { padding-left: 3.0ex }   .SIndent2 .SDescription { padding-left: 5.0ex }
+    .SIndent3 .SEntry { padding-left: 4.5ex }   .SIndent3 .SDescription { padding-left: 6.5ex }
+    .SIndent4 .SEntry { padding-left: 6.0ex }   .SIndent4 .SDescription { padding-left: 8.0ex }
+    .SIndent5 .SEntry { padding-left: 7.5ex }   .SIndent5 .SDescription { padding-left: 9.5ex }
+
+    .SDescription a { color: #800000}
+    .SDescription a:active { color: #A00000 }
+
+    .SGroup td {
+        padding-top: .5em; padding-bottom: .25em }
+
+    .SGroup .SEntry {
+        font-weight: bold; font-variant: small-caps }
+
+    .SGroup .SEntry a { color: #800000 }
+    .SGroup .SEntry a:active { color: #F00000 }
+
+
+    .SMain td,
+    .SClass td,
+    .SDatabase td,
+    .SDatabaseTable td,
+    .SSection td {
+        font-size: 10pt;
+        padding-bottom: .25em }
+
+    .SClass td,
+    .SDatabase td,
+    .SDatabaseTable td,
+    .SSection td {
+        padding-top: 1em }
+
+    .SMain .SEntry,
+    .SClass .SEntry,
+    .SDatabase .SEntry,
+    .SDatabaseTable .SEntry,
+    .SSection .SEntry {
+        font-weight: bold;
+        }
+
+    .SMain .SEntry a,
+    .SClass .SEntry a,
+    .SDatabase .SEntry a,
+    .SDatabaseTable .SEntry a,
+    .SSection .SEntry a { color: #000000 }
+
+    .SMain .SEntry a:active,
+    .SClass .SEntry a:active,
+    .SDatabase .SEntry a:active,
+    .SDatabaseTable .SEntry a:active,
+    .SSection .SEntry a:active { color: #A00000 }
+
+
+
+
+
+.ClassHierarchy {
+    margin: 0 15px 1em 15px }
+
+    .CHEntry {
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #A0A0A0;
+        margin-bottom: 3px;
+        padding: 2px 2ex;
+        font-size: 10pt;
+        background-color: #F4F4F4; color: #606060;
+        }
+
+    .Firefox .CHEntry {
+        -moz-border-radius: 4px;
+        }
+
+    .CHCurrent .CHEntry {
+        font-weight: bold;
+        border-color: #000000;
+        color: #000000;
+        }
+
+    .CHChildNote .CHEntry {
+        font-style: italic;
+        font-size: 8pt;
+        }
+
+    .CHIndent {
+        margin-left: 3ex;
+        }
+
+    .CHEntry a:link,
+    .CHEntry a:visited,
+    .CHEntry a:hover {
+        color: #606060;
+        }
+    .CHEntry a:active {
+        color: #800000;
+        }
+
+
+
+
+
+#Index {
+    background-color: #FFFFFF;
+    }
+
+/*  As opposed to .PopupSearchResultsPage #Index  */
+.IndexPage #Index,
+.FramedIndexPage #Index,
+.FramedSearchResultsPage #Index {
+    padding: 15px;
+    }
+
+.IndexPage #Index {
+    border-width: 0 0 1px 1px;
+    border-style: solid;
+    border-color: #000000;
+    font-size: 9pt;  /* To make 27ex match the menu's 27ex. */
+    margin-left: 27ex;
+    }
+
+
+    .IPageTitle {
+        font-size: 20pt; font-weight: bold;
+        color: #FFFFFF; background-color: #7070C0;
+        padding: 10px 15px 10px 15px;
+        border-width: 0 0 3px 0; border-color: #000000; border-style: solid;
+        margin: -15px -15px 0 -15px }
+
+    .FramedSearchResultsPage .IPageTitle {
+        margin-bottom: 15px;
+        }
+
+    .INavigationBar {
+        font-size: 10pt;
+        text-align: center;
+        background-color: #FFFFF0;
+        padding: 5px;
+        border-bottom: solid 1px black;
+        margin: 0 -15px 15px -15px;
+        }
+
+    .INavigationBar a {
+        font-weight: bold }
+
+    .IHeading {
+        font-size: 16pt; font-weight: bold;
+        padding: 2.5em 0 .5em 0;
+        text-align: center;
+        width: 3.5ex;
+        }
+    #IFirstHeading {
+        padding-top: 0;
+        }
+
+    .IEntry {
+        font-size: 10pt;
+        padding-left: 1ex;
+        }
+    .PopupSearchResultsPage .IEntry {
+        font-size: 8pt;
+        padding: 1px 5px;
+        }
+    .PopupSearchResultsPage .Opera9 .IEntry,
+    .FramedSearchResultsPage .Opera9 .IEntry {
+        text-align: left;
+        }
+    .FramedSearchResultsPage .IEntry {
+        padding: 0;
+        }
+
+    .ISubIndex {
+        padding-left: 3ex; padding-bottom: .5em }
+    .PopupSearchResultsPage .ISubIndex {
+        display: none;
+        }
+
+    /*  While it may cause some entries to look like links when they aren't, I found it's much easier to read the
+         index if everything's the same color.  */
+    .ISymbol {
+        font-weight: bold; color: #900000  }
+
+    .IndexPage .ISymbolPrefix,
+    .FramedIndexPage .ISymbolPrefix {
+        font-size: 10pt;
+        text-align: right;
+        color: #C47C7C;
+        background-color: #F8F8F8;
+        border-right: 3px solid #E0E0E0;
+        border-left: 1px solid #E0E0E0;
+        padding: 0 1px 0 2px;
+        }
+    .PopupSearchResultsPage .ISymbolPrefix,
+    .FramedSearchResultsPage .ISymbolPrefix {
+        color: #900000;
+        }
+    .PopupSearchResultsPage .ISymbolPrefix {
+        font-size: 8pt;
+        }
+
+    .IndexPage #IFirstSymbolPrefix,
+    .FramedIndexPage #IFirstSymbolPrefix {
+        border-top: 1px solid #E0E0E0;
+        }
+    .IndexPage #ILastSymbolPrefix,
+    .FramedIndexPage #ILastSymbolPrefix {
+        border-bottom: 1px solid #E0E0E0;
+        }
+    .IndexPage #IOnlySymbolPrefix,
+    .FramedIndexPage #IOnlySymbolPrefix {
+        border-top: 1px solid #E0E0E0;
+        border-bottom: 1px solid #E0E0E0;
+        }
+
+    a.IParent,
+    a.IFile {
+        display: block;
+        }
+
+    .PopupSearchResultsPage .SRStatus {
+        padding: 2px 5px;
+        font-size: 8pt;
+        font-style: italic;
+        }
+    .FramedSearchResultsPage .SRStatus {
+        font-size: 10pt;
+        font-style: italic;
+        }
+
+    .SRResult {
+        display: none;
+        }
+
+
+
+#Footer {
+    font-size: 8pt;
+    color: #989898;
+    text-align: right;
+    }
+
+#Footer p {
+    text-indent: 0;
+    margin-bottom: .5em;
+    }
+
+.ContentPage #Footer,
+.IndexPage #Footer {
+    text-align: right;
+    margin: 2px;
+    }
+
+.FramedMenuPage #Footer {
+    text-align: center;
+    margin: 5em 10px 10px 10px;
+    padding-top: 1em;
+    border-top: 1px solid #C8C8C8;
+    }
+
+    #Footer a:link,
+    #Footer a:hover,
+    #Footer a:visited { color: #989898 }
+    #Footer a:active { color: #A00000 }
+
+</style><script language=JavaScript src="../javascript/main.js"></script><script language=JavaScript src="../javascript/searchdata.js"></script></head><body class="ContentPage" onLoad="NDOnLoad()"><script language=JavaScript><!--
+if (browserType) {document.write("<div class=" + browserType + ">");if (browserVer) {document.write("<div class=" + browserVer + ">"); }}// --></script>
+
+<!--  Generated by Natural Docs, version 1.4 -->
+<!--  http://www.naturaldocs.org  -->
+
+<!-- saved from url=(0026)http://www.naturaldocs.org -->
+
+
+
+
+<div id=Content><div class="CSection"><div class=CTopic id=MainTopic><h1 class=CTitle><a name="Rebar"></a>Rebar</h1><div class=CBody><p>Rebar control act as container for child windows.&nbsp; An application assigns child windows, which are often other controls, to a rebar control band.&nbsp; Rebar controls contain one or more bands, and each band can have any combination of a gripper bar, a bitmap, a text label, and a child window.&nbsp; However, bands cannot contain more than one child window.&nbsp; As you dynamically reposition a rebar control band, the rebar control manages the size and position of the child window assigned to that band.</p><img src="images/rebar.png" width="488" height="100"><!--START_ND_SUMMARY--><div class=Summary><div class=STitle>Summary</div><div class=SBorder><table border=0 cellspacing=0 cellpadding=0 class=STable><tr class="SMain"><td class=SEntry><a href="#Rebar" >Rebar</a></td><td class=SDescription>Rebar control act as container for child windows. </td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#Add" id=link1 onMouseOver="ShowTip(event, 'tt1', 'link1')" onMouseOut="HideTip('tt1')">Add</a></td><td class=SDescription>Add a rebar to the GUI</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#AddBand" id=link2 onMouseOver="ShowTip(event, 'tt2', 'link2')" onMouseOut="HideTip('tt2')">AddBand</a></td><td class=SDescription>Inserts a new band in a rebar control.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#Count" id=link3 onMouseOver="ShowTip(event, 'tt3', 'link3')" onMouseOut="HideTip('tt3')">Count</a></td><td class=SDescription>Retrieves the number of bands in a rebar control.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#DeleteBand" id=link4 onMouseOver="ShowTip(event, 'tt4', 'link4')" onMouseOut="HideTip('tt4')">DeleteBand</a></td><td class=SDescription>Deletes a band from a rebar control.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetBand" id=link5 onMouseOver="ShowTip(event, 'tt5', 'link5')" onMouseOut="HideTip('tt5')">GetBand</a></td><td class=SDescription>Get band information</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GetLayout" id=link6 onMouseOver="ShowTip(event, 'tt6', 'link6')" onMouseOut="HideTip('tt6')">GetLayout</a></td><td class=SDescription>Get layout of bands in rebar. </td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetRect" id=link7 onMouseOver="ShowTip(event, 'tt7', 'link7')" onMouseOut="HideTip('tt7')">GetRect</a></td><td class=SDescription>Get band rectangle</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#Height" id=link8 onMouseOver="ShowTip(event, 'tt8', 'link8')" onMouseOut="HideTip('tt8')">Height</a></td><td class=SDescription>Returns the height of the rebar control.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#Id2Index" >Id2Index</a></td><td class=SDescription>Returns 1 based position of the band with given id</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#Lock" id=link9 onMouseOver="ShowTip(event, 'tt9', 'link9')" onMouseOut="HideTip('tt9')">Lock</a></td><td class=SDescription>Locks or unlcoks the rebar (sets or removes &ldquo;nogripper&rdquo; style for all bands in rebar)</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#MoveBand" id=link10 onMouseOver="ShowTip(event, 'tt10', 'link10')" onMouseOut="HideTip('tt10')">MoveBand</a></td><td class=SDescription>Moves a band from one index to another.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SetBand" id=link11 onMouseOver="ShowTip(event, 'tt11', 'link11')" onMouseOut="HideTip('tt11')">SetBand</a></td><td class=SDescription>Sets characteristics of an existing band in a rebar control</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#SetBandState" id=link12 onMouseOver="ShowTip(event, 'tt12', 'link12')" onMouseOut="HideTip('tt12')">SetBandState</a></td><td class=SDescription>Minimize or maximize the band</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SetBandWidth" id=link13 onMouseOver="ShowTip(event, 'tt13', 'link13')" onMouseOut="HideTip('tt13')">SetBandWidth</a></td><td class=SDescription>Sets the width for a band.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#SetBandStyle" id=link14 onMouseOver="ShowTip(event, 'tt14', 'link14')" onMouseOut="HideTip('tt14')">SetBandStyle</a></td><td class=SDescription>Sets the style for a band</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SetLayout" id=link15 onMouseOver="ShowTip(event, 'tt15', 'link15')" onMouseOut="HideTip('tt15')">SetLayout</a></td><td class=SDescription>Set layout of bands in rebar.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#ShowBand" id=link16 onMouseOver="ShowTip(event, 'tt16', 'link16')" onMouseOut="HideTip('tt16')">ShowBand</a></td><td class=SDescription>Shows or hides the band</td></tr><tr class="SGroup SIndent1"><td class=SEntry><a href="#Example" >Example</a></td><td class=SDescription></td></tr><tr class="SGroup SIndent1"><td class=SEntry><a href="#About" >About</a></td><td class=SDescription></td></tr></table></div></div><!--END_ND_SUMMARY--></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="Add"></a>Add</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_Add(</td><td class=PParameter nowrap>hGui,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pStyle</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>pIL</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>pPos</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Add a rebar to the GUI</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>hGui</td><td class=CDLDescription>Handle of the GUI</td></tr><tr><td class=CDLEntry>pStyle</td><td class=CDLDescription>White space separated list of styles.&nbsp; See bellow for details.&nbsp; By default &ldquo;VARHEIGHT DBLCLKTOGGLE&rdquo;.&nbsp; Integer styles are allowed.</td></tr><tr><td class=CDLEntry>pIL</td><td class=CDLDescription>Optional image list associated with the control.</td></tr><tr><td class=CDLEntry>pPos</td><td class=CDLDescription>Optional position of the rebar - any space separated combination of the x y w h keywords followed by the size.</td></tr></table><h4 class=CHeading>Control styles</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>autosize</td><td class=CDLDescription>The rebar control will automatically change the layout of the bands when the size or position of the control changes.</td></tr><tr><td class=CDLEntry>bandborders</td><td class=CDLDescription>The rebar control displays narrow lines to separate adjacent bands.</td></tr><tr><td class=CDLEntry>dblclktoggle</td><td class=CDLDescription>The rebar band will toggle its maximized or minimized state when the user double-clicks the band.&nbsp; Without this style, the maximized or minimized state is toggled when the user single-clicks on the band.</td></tr><tr><td class=CDLEntry>fixedorder</td><td class=CDLDescription>The rebar control always displays bands in the same order.&nbsp; You can move bands to different rows, but the band order is static.</td></tr><tr><td class=CDLEntry>varheight</td><td class=CDLDescription>The rebar control displays bands at the minimum required height, when possible.&nbsp; Without this style, the rebar control displays all bands at the same height, using the height of the tallest visible band to determine the height of other bands.</td></tr><tr><td class=CDLEntry>verticalgripper</td><td class=CDLDescription>The size grip will be displayed vertically instead of horizontally in a vertical rebar control.</td></tr><tr><td class=CDLEntry>vertical</td><td class=CDLDescription>Causes the control to be displayed vertically.</td></tr></table><h4 class=CHeading>Returns</h4><p>Handle to the newly created control</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="AddBand"></a>AddBand</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_AddBand(</td><td class=PParameter nowrap>hRebar,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>o1</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o3</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o4</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o5</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o6</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o7</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o8</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o9</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Inserts a new band in a rebar control.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>hCtrl</td><td class=CDLDescription>Control to be hosted by the band</td></tr><tr><td class=CDLEntry>o1 .. o8</td><td class=CDLDescription>Named parameters.&nbsp; See below.</td></tr></table><h4 class=CHeading>Named parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>S</td><td class=CDLDescription>Band styles separated by white space.&nbsp; By default &ldquo;gripperalways&rdquo;.&nbsp; See bellow.</td></tr><tr><td class=CDLEntry>L</td><td class=CDLDescription>Length of the band.&nbsp; By default, width of the child control is used + 10px</td></tr><tr><td class=CDLEntry>mW</td><td class=CDLDescription>Minimum width of the child control.</td></tr><tr><td class=CDLEntry>mH</td><td class=CDLDescription>Minimum height of the child control.&nbsp; By default the height of the child control.</td></tr><tr><td class=CDLEntry>I</td><td class=CDLDescription>Header icon index.</td></tr><tr><td class=CDLEntry>T</td><td class=CDLDescription>Header text.</td></tr><tr><td class=CDLEntry>C</td><td class=CDLDescription>Background and foreground color separated by space.</td></tr><tr><td class=CDLEntry>BG</td><td class=CDLDescription>Background bitmap.</td></tr><tr><td class=CDLEntry>P</td><td class=CDLDescription>1-based postion of the band.&nbsp; Set to 0 add the band to the end (default)</td></tr></table><h4 class=CHeading>Band styles</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>break</td><td class=CDLDescription>The band is on a new line.</td></tr><tr><td class=CDLEntry>childedge</td><td class=CDLDescription>The band has an edge at the top and bottom of the child window.</td></tr><tr><td class=CDLEntry>fixedbmp</td><td class=CDLDescription>The background bitmap does not move when the band is resized.</td></tr><tr><td class=CDLEntry>fixedsize</td><td class=CDLDescription>The band can&rsquo;t be sized.&nbsp; With this style, the sizing grip is not displayed on the band.</td></tr><tr><td class=CDLEntry>gripperalways</td><td class=CDLDescription>The band will always have a sizing grip, even if it is the only band in the rebar.</td></tr><tr><td class=CDLEntry>hidden</td><td class=CDLDescription>The band will not be visible.</td></tr><tr><td class=CDLEntry>nogripper</td><td class=CDLDescription>The band will never have a sizing grip, even if there is more than one band in the rebar.</td></tr><tr><td class=CDLEntry>usechevron</td><td class=CDLDescription>Show a chevron button if the band is smaller than ideal.</td></tr><tr><td class=CDLEntry>novert</td><td class=CDLDescription>Don&rsquo;t show when vertical.</td></tr><tr><td class=CDLEntry>hidetitle</td><td class=CDLDescription>Keep band title hidden.</td></tr><tr><td class=CDLEntry>*</td><td class=CDLDescription>Default styles for the band.&nbsp; For instance &ldquo;* break&rdquo; will set band style to default plus &ldquo;break&rdquo; style.</td></tr></table><h4 class=CHeading>Returns</h4><p>ID of the newly created band</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="Count"></a>Count</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_Count(</td><td class=PParameter nowrap>hRebar</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Retrieves the number of bands in a rebar control.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="DeleteBand"></a>DeleteBand</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_DeleteBand(</td><td class=PParameter nowrap>hRebar,</td></tr><tr><td></td><td class=PParameter nowrap>pWhichBand</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Deletes a band from a rebar control.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pWhichBand</td><td class=CDLDescription>Band position or ID.&nbsp; Leave blank to get dimensions of the rebar control itself.</td></tr></table><h4 class=CHeading>Returns</h4><p>Nonzero if successful, or zero otherwise.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetBand"></a>GetBand</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_GetBand(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hRebar,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>pWhichBand,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>pQ</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o1</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o3</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o4</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o5</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o6</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o7</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get band information</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pWhichBand</td><td class=CDLDescription>Band position or ID.</td></tr><tr><td class=CDLEntry>pQ</td><td class=CDLDescription>Query parameter: S (Style), L (Length), C (Color), I (Icon index), T (Text), N (identificatioN), B (Bitmap handle)</td></tr><tr><td class=CDLEntry>pSep</td><td class=CDLDescription>Separator, by default &ldquo;`n&rdquo; (with pNames true, equals to &ldquo;ini format&rdquo;)</td></tr><tr><td class=CDLEntry>pNames</td><td class=CDLDescription>Set to TRUE to prepend query parameter names before the value.</td></tr></table><h4 class=CHeading>Returns</h4><p>String with values separated by pSep, in order specified by query parameter.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetLayout"></a>GetLayout</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_GetLayout(</td><td class=PParameter nowrap>hRebar</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get layout of bands in rebar.&nbsp; Layout is single line string containing information about position of bars in the rebar control.&nbsp; Return value of this function is fed into <a href="#SetLayout" class=LFunction id=link17 onMouseOver="ShowTip(event, 'tt15', 'link17')" onMouseOut="HideTip('tt15')">SetLayout</a> later, to restore layout.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetRect"></a>GetRect</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_GetRect(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hRebar,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>pWhichBand</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>pQ</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o1</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o3</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o4</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get band rectangle</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pWhichBand</td><td class=CDLDescription>Band position or ID.&nbsp; Leave blank to get dimensions of the rebar control itself.</td></tr><tr><td class=CDLEntry>pQ</td><td class=CDLDescription>Query parameter: set x,y,w,h to return appropriate value, or leave blank to return all in single line.</td></tr><tr><td class=CDLEntry>o1 .. o4</td><td class=CDLDescription>Output variables</td></tr></table><h4 class=CHeading>Returns</h4><p>String with 4 values separated by space or requested information</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="Height"></a>Height</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_Height(</td><td class=PParameter nowrap>hRebar</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Returns the height of the rebar control.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="Id2Index"></a>Id2Index</h3><div class=CBody><p>Returns 1 based position of the band with given id</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>id</td><td class=CDLDescription>ID of the band</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="Lock"></a>Lock</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_Lock(</td><td class=PParameter nowrap>hRebar,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pLock</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Locks or unlcoks the rebar (sets or removes &ldquo;nogripper&rdquo; style for all bands in rebar)</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pLock</td><td class=CDLDescription>Leave empty to lock, set to &ldquo;-&rdquo; to unlock, set to &ldquo;~&rdquo; to toggle.</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="MoveBand"></a>MoveBand</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_MoveBand(</td><td class=PParameter nowrap>hRebar,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pFrom,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pTo</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Moves a band from one index to another.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pFrom</td><td class=CDLDescription>1-based index of the band to be moved.</td></tr><tr><td class=CDLEntry>pTo</td><td class=CDLDescription>1-based index of the new band position.&nbsp; By default 1 (i.e. move to top)</td></tr></table><h4 class=CHeading>Returns</h4><p>TRUE if successful, or FALSE otherwise.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetBand"></a>SetBand</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_SetBand(</td><td class=PParameter nowrap>hRebar,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pWhichBand,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>o1</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o3</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o4</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o5</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o6</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o7</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o8</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o9</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Sets characteristics of an existing band in a rebar control</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pWhichBand</td><td class=CDLDescription>Band position or ID that is about to be changed</td></tr><tr><td class=CDLEntry>o1 .. o9</td><td class=CDLDescription>Named parameters.&nbsp; Any named parameter that can be specified in <a href="#Add" class=LFunction id=link18 onMouseOver="ShowTip(event, 'tt1', 'link18')" onMouseOut="HideTip('tt1')">Add</a> function can be used here</td></tr></table><h4 class=CHeading>Returns</h4><p>TRUE if successful, FALSE otherwise.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetBandState"></a>SetBandState</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_SetBandState(</td><td class=PParameter nowrap>hRebar,</td></tr><tr><td></td><td class=PParameter nowrap>pWhichBand,</td></tr><tr><td></td><td class=PParameter nowrap>pState</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Minimize or maximize the band</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pWhichBand</td><td class=CDLDescription>Band position or ID.&nbsp; Leave blank to get dimensions of the rebar control itself.</td></tr><tr><td class=CDLEntry>pState</td><td class=CDLDescription>Set &ldquo;-&rdquo; to minimize, &ldquo;+&rdquo; to maximize to full width, &ldquo;*&rdquo; to maximize to ideal width (this is the width of the control when it is added to the band)</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetBandWidth"></a>SetBandWidth</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_SetBandWidth(</td><td class=PParameter nowrap>hRebar,</td></tr><tr><td></td><td class=PParameter nowrap>pWhichBand,</td></tr><tr><td></td><td class=PParameter nowrap>pWidth</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Sets the width for a band.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pWhichBand</td><td class=CDLDescription>Band position or ID</td></tr><tr><td class=CDLEntry>pWidth</td><td class=CDLDescription>Width</td></tr></table><h4 class=CHeading>Returns</h4><p>TRUE if the value was set and FALSE otherwise.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetBandStyle"></a>SetBandStyle</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_SetBandStyle(</td><td class=PParameter nowrap>hRebar,</td></tr><tr><td></td><td class=PParameter nowrap>pWhichBand,</td></tr><tr><td></td><td class=PParameter nowrap>pStyle</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Sets the style for a band</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pWhichBand</td><td class=CDLDescription>Band position or ID</td></tr><tr><td class=CDLEntry>pStyle</td><td class=CDLDescription>List of styles to add/remove for the band.&nbsp; Use - prefix to remove the style.</td></tr></table><h4 class=CHeading>Returns</h4><p>TRUE if successful, or FALSE otherwise.</p><h4 class=CHeading>Remarks</h4><p>If you want to to replace band styles complitely use <a href="#SetBand" class=LFunction id=link19 onMouseOver="ShowTip(event, 'tt11', 'link19')" onMouseOut="HideTip('tt11')">SetBand</a> function and S parameter.&nbsp; This function toggles desired styles.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetLayout"></a>SetLayout</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_SetLayout(</td><td class=PParameter nowrap>hRebar,</td></tr><tr><td></td><td class=PParameter nowrap>pLayout</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Set layout of bands in rebar.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pLayout</td><td class=CDLDescription>String with information about position of bands in rebar control.&nbsp; Use <a href="#GetLayout" class=LFunction id=link20 onMouseOver="ShowTip(event, 'tt6', 'link20')" onMouseOut="HideTip('tt6')">GetLayout</a> function to get this string.&nbsp; Layout syntax is:</td></tr></table><blockquote><pre>id1 len1 break1|id2 len2 break2|....|idN lenN breakN</pre></blockquote></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="ShowBand"></a>ShowBand</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_ShowBand(</td><td class=PParameter nowrap>hRebar,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pWhichBand,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>bShow</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>true</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Shows or hides the band</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pWhichBand</td><td class=CDLDescription>Band position or ID.&nbsp; Leave blank to get dimensions of the rebar control itself.</td></tr><tr><td class=CDLEntry>bShow</td><td class=CDLDescription>True to show the band (default), FALSE to hide it.</td></tr></table><h4 class=CHeading>Returns</h4><p>TRUE if successful, or FALSE otherwise.</p></div></div></div>
+
+<div class="CGroup"><div class=CTopic><h3 class=CTitle><a name="Example"></a>Example</h3><div class=CBody><blockquote><pre>  Gui, +LastFound +Resize
+  hGui := WinExist()
+  Gui, Show, w400 h140 hide           ;set window size, mandatory
+
+  ;create edit
+  Gui, Add, Edit, HWNDhEdit w100 h100
+
+  ;create combo
+  Gui, Add, ComboBox, HWNDhCombo w80, item 1 |item 2|item 3
+
+  ;create rebar
+  hRebar := Rebar_Add(hGui)
+  ReBar_AddBand(hRebar, hEdit, &quot;mw 100&quot;, &quot;L 400&quot;, &quot;T Log &quot;)   ;Add edit band, set lenght of the band to 400
+                                                              ; minimum width of edit to 100, set text to &quot;Log &quot;
+  ReBar_AddBand(hRebar, hCombo, &quot;L 300&quot;, &quot;P 1&quot;)               ;Add combo band to top, set length of the band to 300
+
+  Gui, Show
+return
+#include Rebar.ahk</pre></blockquote></div></div></div>
+
+<div class="CGroup"><div class=CTopic><h3 class=CTitle><a name="About"></a>About</h3><div class=CBody><ul><li>Ver 1.0 b1 by majkinetor.</li><li>MSDN Reference: <a href="http://msdn.microsoft.com/en-us/library/bb774375(VS.85).aspx" class=LURL target=_top>http://msdn.microsoft.com<wbr>/en-us<wbr>/library<wbr>/bb774375(VS.85).aspx</a></li><li>Licenced under Creative Commons Attribution-Noncommercial <a href="http://creativecommons.org/licenses/by-nc/3.0/" class=LURL target=_top>http://creativecommons.org/licenses/by-nc/3.0/</a>.</li></ul></div></div></div>
+
+</div><!--Content-->
+
+
+<div id=Footer><a href="http://www.naturaldocs.org">Generated by Natural Docs</a></div><!--Footer-->
+
+
+
+
+
+
+<!--START_ND_TOOLTIPS-->
+<div class=CToolTip id="tt1"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_Add(</td><td class=PParameter nowrap>hGui,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pStyle</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>pIL</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>pPos</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Add a rebar to the GUI</div></div><div class=CToolTip id="tt2"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_AddBand(</td><td class=PParameter nowrap>hRebar,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>hCtrl,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>o1</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o3</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o4</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o5</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o6</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o7</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o8</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o9</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Inserts a new band in a rebar control.</div></div><div class=CToolTip id="tt3"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_Count(</td><td class=PParameter nowrap>hRebar</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Retrieves the number of bands in a rebar control.</div></div><div class=CToolTip id="tt4"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_DeleteBand(</td><td class=PParameter nowrap>hRebar,</td></tr><tr><td></td><td class=PParameter nowrap>pWhichBand</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Deletes a band from a rebar control.</div></div><div class=CToolTip id="tt5"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_GetBand(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hRebar,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>pWhichBand,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>pQ</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o1</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o3</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o4</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o5</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o6</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o7</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get band information</div></div><div class=CToolTip id="tt6"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_GetLayout(</td><td class=PParameter nowrap>hRebar</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get layout of bands in rebar. </div></div><div class=CToolTip id="tt7"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_GetRect(</td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>hRebar,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>pWhichBand</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>&nbsp;</td><td class=PParameter nowrap>pQ</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o1</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o3</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PType nowrap>ByRef&nbsp;</td><td class=PParameter nowrap>o4</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get band rectangle</div></div><div class=CToolTip id="tt8"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_Height(</td><td class=PParameter nowrap>hRebar</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Returns the height of the rebar control.</div></div><div class=CToolTip id="tt9"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_Lock(</td><td class=PParameter nowrap>hRebar,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pLock</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Locks or unlcoks the rebar (sets or removes &ldquo;nogripper&rdquo; style for all bands in rebar)</div></div><div class=CToolTip id="tt10"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_MoveBand(</td><td class=PParameter nowrap>hRebar,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pFrom,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pTo</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>1</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Moves a band from one index to another.</div></div><div class=CToolTip id="tt11"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_SetBand(</td><td class=PParameter nowrap>hRebar,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pWhichBand,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>o1</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o3</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o4</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o5</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o6</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o7</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o8</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>o9</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Sets characteristics of an existing band in a rebar control</div></div><div class=CToolTip id="tt12"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_SetBandState(</td><td class=PParameter nowrap>hRebar,</td></tr><tr><td></td><td class=PParameter nowrap>pWhichBand,</td></tr><tr><td></td><td class=PParameter nowrap>pState</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Minimize or maximize the band</div></div><div class=CToolTip id="tt13"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_SetBandWidth(</td><td class=PParameter nowrap>hRebar,</td></tr><tr><td></td><td class=PParameter nowrap>pWhichBand,</td></tr><tr><td></td><td class=PParameter nowrap>pWidth</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Sets the width for a band.</div></div><div class=CToolTip id="tt14"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_SetBandStyle(</td><td class=PParameter nowrap>hRebar,</td></tr><tr><td></td><td class=PParameter nowrap>pWhichBand,</td></tr><tr><td></td><td class=PParameter nowrap>pStyle</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Sets the style for a band</div></div><div class=CToolTip id="tt15"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_SetLayout(</td><td class=PParameter nowrap>hRebar,</td></tr><tr><td></td><td class=PParameter nowrap>pLayout</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Set layout of bands in rebar.</div></div><div class=CToolTip id="tt16"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Rebar_ShowBand(</td><td class=PParameter nowrap>hRebar,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>pWhichBand,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>bShow</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>true</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Shows or hides the band</div></div><!--END_ND_TOOLTIPS-->
+
+
+
+
+<div id=MSearchResultsWindow><iframe src="" frameborder=0 name=MSearchResults id=MSearchResults></iframe><a href="javascript:searchPanel.CloseResultsWindow()" id=MSearchResultsWindowClose>Close</a></div>
+
+
+<script language=JavaScript><!--
+if (browserType) {if (browserVer) {document.write("</div>"); }document.write("</div>");}// --></script></body></html>
