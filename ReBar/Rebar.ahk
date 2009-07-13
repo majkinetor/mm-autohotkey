@@ -476,17 +476,29 @@ Rebar_SetLayout(hRebar, Layout) {
 	}
 }
 
+/*
+	Function: SizeToRect
 
-;l8r !!!
-;Rebarar_Autosize(hRebar){
-;	static RB_SIZETORECT = 0x417
-;	
-;	hParent := DllCall("GetParent", "uint", hRebar)
-;	VarSetCapacity(RECT, 16),  DllCall("GetClientRect", "uint", hParent, "uint", &RECT)
-;
-;	SendMessage, RB_SIZETORECT, 0, &RECT, , ahk_id %hRebar%
-;	return ErrorLevel
-;}
+	Parameters:
+			RECT	- Reference to rectangle structure. If omited, parents rectangle will be used (GetClientRect).
+
+	Remarks:
+			The rebar bands will be arranged and wrapped as necessary to fit the rectangle. 
+			Bands that have the VARIABLEHEIGHT style will be resized as evenly as possible to fit the rectangle. 
+			The height of a horizontal rebar or the width of a vertical rebar may change, depending on the new layout.
+
+ */
+Rebar_SizeToRect(hRebar, ByRef RECT="~`a "){
+	static RB_SIZETORECT = 0x417
+	
+	hParent := DllCall("GetParent", "uint", hRebar)
+	
+	if (RECT != "~`a ")
+		VarSetCapacity(RECT, 16),  DllCall("GetClientRect", "uint", hParent, "uint", &RECT)
+
+	SendMessage, RB_SIZETORECT, 0, &RECT, , ahk_id %hRebar%
+	return ErrorLevel
+}
 
 
 /*
