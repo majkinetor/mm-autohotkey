@@ -488,14 +488,20 @@ Rebar_SetLayout(hRebar, Layout) {
 
 /*
  Function:  ShowBand
- 			Shows or hides the band
+ 			Shows or hides the band.
  
  Parameters:
  			WhichBand	- Band position or ID. Leave blank to get dimensions of the rebar control itself.
- 			bShow		- True to show the band (default), FALSE to hide it.
+ 			bShow		- True to show the band (default), FALSE to hide it. 
  
  Returns:
  			TRUE if successful, or FALSE otherwise.
+
+ Remarks:
+			This function can also be used to resize the band to mach the parents size. 
+			Put call to this function inside GuiSize routine. Update to first band will reposition all bands to match the Gui size.
+return
+
  */
 Rebar_ShowBand(hRebar, WhichBand, bShow=true) {
 	static RB_SHOWBAND=0x423
@@ -544,7 +550,7 @@ Rebar_compileBand(ByRef BAND, hCtrl, ByRef o1="", ByRef o2="", ByRef o3="", ByRe
 	hBmp := (NP_BG  != "") ? DllCall("LoadImage", "uint", 0, "str", NP_BG, "uint", 0, "uint", 0, "uint", 0, "uint", 0x10) : 0
 	NP_L := (NP_L+0 != "") ? NP_L : wIdeal + 10		;if no len is specified use controls width + something for header
 	id	 += hCtrl ? 1 : 0
-
+ 
 	VarSetCapacity(BAND, 80, 0)
 	 ,NumPut(80		,BAND)			;cbSize
 	 ,NumPut(hMask	,BAND, 4)		;mask
