@@ -285,7 +285,7 @@ Dlg_Icon(ByRef Icon, ByRef Index, hGui=0) {
             hGui            - Parent's handle, positive number by default 0 (influences dialog position).
             Title			- Dialog title.
             Filter          - Specify filter as with FileSelectFile. Separate multiple filters with "|". For instance "All Files (*.*)|Audio (*.wav; *.mp2; *.mp3)|Documents (*.txt)"
-            DefultFilter    - Index of default filter, by default 1.
+            DefaultFilter   - Index of default filter (1 based), by default 1.
             Root			- Specifies startup directory and initial content of "File Name" edit. 
 							  Directory must have trailing "\".
             DefaulltExt     - Extension to append when none given .
@@ -316,7 +316,7 @@ Dlg_Icon(ByRef Icon, ByRef Index, hGui=0) {
   Remarks:
 		    Those functions will change the working directory of the script. Use SetWorkingDir afterwards to restore working directory if needed.
  */	
-Dlg_Open( hGui=0, Title="", Filter="", DefultFilter="", Root="", DefaultExt="", Flags="FILEMUSTEXIST HIDEREADONLY" ) { 
+Dlg_Open( hGui=0, Title="", Filter="", DefaultFilter="", Root="", DefaultExt="", Flags="FILEMUSTEXIST HIDEREADONLY" ) { 
 	static OFN_S:=0, OFN_ALLOWMULTISELECT:=0x200, OFN_CREATEPROMPT:=0x2000, OFN_DONTADDTORECENT:=0x2000000, OFN_EXTENSIONDIFFERENT:=0x400, OFN_FILEMUSTEXIST:=0x1000, OFN_FORCESHOWHIDDEN:=0x10000000, OFN_HIDEREADONLY:=0x4, OFN_NOCHANGEDIR:=0x8, OFN_NODEREFERENCELINKS:=0x100000, OFN_NOVALIDATE:=0x100, OFN_OVERWRITEPROMPT:=0x2, OFN_PATHMUSTEXIST:=0x800, OFN_READONLY:=0x1, OFN_SHOWHELP:=0x10, OFN_NOREADONLYRETURN:=0x8000, OFN_NOTESTFILECREATE:=0x10000
 
 	IfEqual, Filter, ,SetEnv, Filter, All Files (*.*)
