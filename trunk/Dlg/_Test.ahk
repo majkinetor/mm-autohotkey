@@ -32,7 +32,7 @@ OnBtn:
 
 	if A_GuiControl = Open
 	{
-		res := Dlg_Open(hGui, "Select several files", "All Files (*.*)|Audio (*.wav; *.mp2; *.mp3)|Documents (*.txt)", "", "h:\", "", "ALLOWMULTISELECT FILEMUSTEXIST HIDEREADONLY")
+		res := Dlg_Open(hGui, "Select several files", "All Files (*.*)|Audio (*.wav; *.mp2; *.mp3)|Documents (*.txt)", 1, "h:\", "", "ALLOWMULTISELECT FILEMUSTEXIST HIDEREADONLY")
 		StringReplace, res, res, `n, `r`n, A
 		Set(res)
 	}
