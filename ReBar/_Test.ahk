@@ -124,4 +124,4 @@ Log(txt){
 
 
 #include Rebar.ahk
-#include ..\Toolbar\Toolbar.ahk
+#include Toolbar.ahk
