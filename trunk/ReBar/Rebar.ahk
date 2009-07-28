@@ -555,7 +555,7 @@ Rebar_compileBand(ByRef BAND, hCtrl, ByRef o1="", ByRef o2="", ByRef o3="", ByRe
   ;set mask
 	hMask := (NP_T != "" ? RBBIM_TEXT : 0)
 			|(hStyle ? RBBIM_STYLE : 0) 
-			|(NP_B != "" ? RBBIM_BACKGROUND : 0) 
+			|(NP_BG != "" ? RBBIM_BACKGROUND : 0) 
 			|(NP_I ? RBBIM_IMAGE : 0)  
 			|(NP_C != "" ? RBBIM_COLORS : 0) 
 			|(hCtrl ? RBBIM_SIZE | RBBIM_CHILD | RBBIM_IDEALSIZE | RBBIM_ID : 0) ;RBBIM_SIZE only on update
@@ -733,7 +733,7 @@ Rebar(var="", value="~`a") {
  */
 
 /* Group: About
-	o Ver 2.0a by majkinetor. 
+	o Ver 2.0b by majkinetor. 
 	o MSDN Reference: <http://msdn.microsoft.com/en-us/library/bb774375(VS.85).aspx>.
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>.
  */

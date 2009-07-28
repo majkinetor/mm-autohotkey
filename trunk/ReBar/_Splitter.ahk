@@ -5,7 +5,7 @@ SetBatchLines, -1
 	Gui, +LastFound +Resize 
 	hGui := WinExist() 
 	Gui, Show, w600 h300 hide
- 
+
   ;create edit
 	Gui, Add, Edit, HWNDhLog w400 h100, F1 - Maximize band 1`nF2 - Maximize band 2`nF3 - Toggle titles`n`nClick band title or separator to animate
 
@@ -14,7 +14,7 @@ SetBatchLines, -1
 
 	hRebar := Rebar_Add(hGui, "fixedorder", "", "")	
 	ReBar_AddBand(hRebar, hLog, "S gripperalways", "T log")
-	ReBar_AddBand(hRebar, hCombo, "mW 0", "L 100", "T combo")
+	ReBar_AddBand(hRebar, hCombo, "mW 0", "L 100", "T combo", "BG images\test.bmp")
 
 	Gui, Show
 return
