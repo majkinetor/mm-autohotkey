@@ -3,7 +3,7 @@ SetBatchLines, -1
 
 	Gui, +LastFound
 	hGui := WinExist(), 
-	Gui, Show , w410 h180 Hide		;set gui width & height (mandatory)
+	Gui, Show , w420 h180 Hide		;set gui width & height (mandatory)
 
 	hToolbar := Toolbar_Add(hGui, "OnToolbar", "ADJUSTABLE FLAT LIST TOOLTIPS", 1)
 
@@ -36,8 +36,8 @@ SetBatchLines, -1
 	Toolbar_Insert(hToolbar, btns)
 	Gui, Add, Text, y50, Customize the toolbar and reload application.`nDouble click the empty toolbar space or press F1`n`nYou can also SHIFT + drag buttons.
 	Gui, Add, Button, y+30 w100 gOnBtn, Reload
-	Gui, Add, Button, x+10 gOnBtn, Reset Toolbar and Reload
-	Gui, Add, Text, x+20 yp+5 w150
+	Gui, Add, Button, x+10 gOnBtn, Reset Toolbar
+	Gui, Add, Text, x+15 yp+5 w150
 	Gui, Show, ,Customization Test
 return
 

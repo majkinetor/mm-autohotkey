@@ -20,13 +20,6 @@
 						  Each catalog contains number of common icons in large and small size -- S or L (default). Defaults to "1L" (first catalog, large icons)
 			Pos			- Position of the toolbar specified - any space separated combination of the x y w h keywords followed by the size.
 
- Events:
-			click	- User has clicked on the button. 
-			menu	- User has clicked on the dropdown icon.
-			hot		- User is hovering the button with the mouse.
-			change	- User has dragged the button using SHIFT + drag.			
-			adjust	- User has finished customizing the toolbar.
-
  Control Styles:
 			adjustable	- Allows users to change a toolbar button's position by dragging it while holding down the SHIFT key and to open customization dialog by double clicking Toolbar empty area, or separator.
 			border		- Creates a Toolbar that has a thin-line border.
@@ -49,6 +42,14 @@
 			Txt		- Button caption.
 			Pos		- Button position.
 			Id		- Button ID.
+
+ Events:
+			click	- User has clicked on the button. 
+			rclick  - User has clicked the right button.
+			menu	- User has clicked on the dropdown icon.
+			hot		- User is hovering the button with the mouse.
+			change	- User has dragged the button using SHIFT + drag.			
+			adjust	- User has finished customizing the toolbar.
 
  Returns: 
 			Control's handle or error message.
@@ -747,77 +748,102 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 	return cnt									;return number of buttons in the array
 }
 
-Toolbar_onNotify(Wparam, Lparam, Msg, Hwnd) {
-	static MODULEID = 80609, oldNotify="*"
-	static NM_CLICK=-2, TBN_DROPDOWN = -710, TBN_HOTITEMCHANGE = -713, TBN_BEGINADJUST=-703, TBN_GETBUTTONINFOA=-700, TBN_QUERYINSERT=-706, TBN_QUERYDELETE=-707, TBN_BEGINADJUST=-703, TBN_ENDADJUST=-704, TBN_RESET=-705, TBN_TOOLBARCHANGE=-708, TB_COMMANDTOINDEX = 0x419
-	static cnt, cnta, cBTN, inDialog
+Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) { 
+	critical
+	static MODULEID = 80609, oldNotify="*" 
+	static NM_CLICK=-2, NM_RCLICK=-5, NM_LDOWN=-20, TBN_DROPDOWN=-710, TBN_HOTITEMCHANGE=-713, TBN_ENDDRAG=-702, TBN_BEGINADJUST=-703, TBN_GETBUTTONINFOA=-700, TBN_QUERYINSERT=-706, TBN_QUERYDELETE=-707, TBN_BEGINADJUST=-703, TBN_ENDADJUST=-704, TBN_RESET=-705, TBN_TOOLBARCHANGE=-708, TB_COMMANDTOINDEX=0x419
+	static cnt, cnta, cBTN, inDialog,    s_LDOWNPos:=0, s_HOTITEMCHANGEPos:=0 
+	; If s_LDOWNPos=0, the left mouse button has not been clicked.  If s_LDOWNPos<>0,				--jballi
+	; the left mouse button has been clicked and the variable contains the button position. 
 
-	if ((NumGet(Lparam+4)) != MODULEID){
-		ifEqual, oldNotify, *, SetEnv, oldNotify, % Toolbar("OldNotify")		
-		ifNotEqual, oldNotify,,return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)		
-		return
-	}
-	
-	hw :=  NumGet(Lparam+0),  code := NumGet(Lparam+8) - 4294967296
-	handler := Toolbar(hw "Handler")
-	ifEqual, handler,, return
+	if ((NumGet(Lparam+4)) != MODULEID){ 
+		ifEqual, oldNotify, *, SetEnv, oldNotify, % Toolbar("OldNotify")       
+		ifNotEqual, oldNotify,,return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)       
+		return 
+	} 
+    
+	hw :=  NumGet(Lparam+0), code := NumGet(Lparam+8, 0, "Int"),  handler := Toolbar(hw "Handler") 
+	ifEqual, handler,, return 
 
-	iItem  := (code != TBN_HOTITEMCHANGE) ? NumGet(lparam+12) : NumGet(lparam+16)
+	iItem  := (code != TBN_HOTITEMCHANGE) ? NumGet(lparam+12) : NumGet(lparam+16) 
 
-	SendMessage, TB_COMMANDTOINDEX,iItem,,,ahk_id %hw%	
-	pos := ErrorLevel 
-	
-	pos++
-	txt := Toolbar_GetButton( hw, pos, "c")
+	SendMessage, TB_COMMANDTOINDEX,iItem,,,ahk_id %hw%    
+	pos:=ErrorLevel+1 
+	txt := Toolbar_GetButton( hw, pos, "c") 
 
-	if (code = NM_CLICK) {
-		IfEqual, pos, 4294967296, return
-		return %handler%(hw, "click", txt, pos, iItem)
-	}
+  ;This traps NM_LDOWN (left mouse click down) and assigns the current button pos to s_LDOWNPos		--jballi
+	if (code=NM_LDOWN) {  
+        s_LDOWNPos:=Pos 
+        return 0 
+    } 
+ 
+  ;New trap for TBN_ENDDRAG.  This replaces the trap for NM_CLICK									--jballi
+	if (code=TBN_ENDDRAG)
+        if (s_LDOWNPos = s_HOTITEMCHANGEPos) { 
+             s_LDOWNPos := 0 
+			 return %handler%(hw, "click",txt,pos,iItem) 
+		} 
+		else return 0 
 
-	if (code = TBN_DROPDOWN)
-		return %handler%(hw, "menu", txt, pos, iItem)
+ /* Original NM_CLICK code. Problematic because of bug reported here:								--jballi
+    http://www.autohotkey.com/forum/viewtopic.php?p=283031#283031
+   
+	if (code = NM_CLICK) { 
+      IfEqual, pos, 4294967296, return 
+      return %handler%(hw, "click", txt, pos, iItem) 
+   } 
+ */
+	if (code=NM_RCLICK)		;																		--jballi
+		ifEqual, pos, 4294967296, return 0 
+        else  return %handler%(hw,"rclick", txt, pos, iItem) 
 
-	if (code = TBN_HOTITEMCHANGE) {
-		IfEqual, pos, 4294967296, return
-		%handler%(hw, "hot", txt, pos,  iItem)
-		return 0
-	}
 
-  ;=================== CUSTOMIZATION NOTIFICATIONS ===========================
+	if (code = TBN_DROPDOWN) 
+      return %handler%(hw, "menu", txt, pos, iItem) 
 
-	if (code = TBN_BEGINADJUST) {
-		cnta := NumGet( Toolbar(hw "aBTN") ) , cnt := Toolbar_getButtonArray(hw, cBTN), inDialog := true
-		if (cnt=0) && (cnta=0)
-			Msgbox Nothing to customize
-		return
-	}
+ 
+	if (code = TBN_HOTITEMCHANGE) { 
+        s_HOTITEMCHANGEPos := pos		;s_HOTITEMCHANGEPos contains the last button position		--jballi
+										; of the cursor on the toolbar or 4294967296 if not on a toolbar button. 
+      IfEqual, pos, 4294967296, return 
+      %handler%(hw, "hot", txt, pos,  iItem) 
+      return 0 
+   } 
 
-	if (code = TBN_GETBUTTONINFOA)	{
-		if (iItem = cnt + cnta)		;iItem is position, not identifier. Win keeps sending incresing numbers until we say "no more" (return 0)
-			return 0
-		
-		TBB := lparam + 16			;The OS buffer where to put button structure
-		o := (iItem < cnt) ?  cBTN + 20*iItem : Toolbar( hw "aBTN") + 20*(iItem-cnt) + 4
-		Toolbar_memcpy( TBB, o, 20) ;copy the compiled item into notification struct
-		return 1
-	}
+  ;=================== CUSTOMIZATION NOTIFICATIONS =========================== 
 
-	;Return at least one TRUE in QueryInsert to show the dialog, if the dialog is openinig. When the dialog is open, QueryInsert affects btn addition. QueryDelete affects deletion.
-	if (code = TBN_QUERYINSERT) or (code = TBN_QUERYDELETE) {
-		if (cnta="" or cnta=0) AND (cnt=0)
-			return FALSE
-		return TRUE
-	}
+	if (code = TBN_BEGINADJUST) { 
+		cnta := NumGet( Toolbar(hw "aBTN") ) , cnt := Toolbar_getButtonArray(hw, cBTN), inDialog := true 
+		if (cnt=0) && (cnta=0) 
+			Msgbox Nothing to customize 
+		return 
+	} 
 
-	if (code=TBN_ENDADJUST) {
-		Toolbar_onEndAdjust(hw, cBTN, cnt), inDialog := false
-		return %handler%(hw, "adjust", "", "", "")
-	}
+	if (code = TBN_GETBUTTONINFOA)   { 
+		if (iItem = cnt + cnta)					;iItem is position, not identifier. Win keeps sending incresing numbers until we say "no more" (return 0) 
+			return 0 
+       
+		TBB := lparam + 16						;The OS buffer where to put button structure 
+		o := (iItem < cnt) ?  cBTN + 20*iItem : Toolbar( hw "aBTN") + 20*(iItem-cnt) + 4 
+		Toolbar_memcpy( TBB, o, 20) ;copy the compiled item into notification struct 
+		return 1 
+	} 
 
-	;This will fire when user is dragging buttons around with adjustable style
-	if (code = TBN_TOOLBARCHANGE) and !inDialog
-		return %handler%(hw, "change", "", "", "")
+    ;Return at least one TRUE in QueryInsert to show the dialog, if the dialog is openinig. When the dialog is open, QueryInsert affects btn addition. QueryDelete affects deletion. 
+	if (code = TBN_QUERYINSERT) or (code = TBN_QUERYDELETE) { 
+		if (cnta="" or cnta=0) AND (cnt=0) 
+			return FALSE 
+		return TRUE 
+	} 
+
+	if (code=TBN_ENDADJUST) { 
+		Toolbar_onEndAdjust(hw, cBTN, cnt), inDialog := false 
+		return %handler%(hw, "adjust", "", "", "") 
+	} 
+
+	;This will fire when user is dragging buttons around with adjustable style 
+	if (code = TBN_TOOLBARCHANGE) and !inDialog 
+		return %handler%(hw, "change", "", "", "") 
 }
 
 
@@ -973,7 +999,8 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 
 /*
  Group: About
-	o Ver 2.11 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Ver 2.12 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Parts of code in Toolbar_onNotify by jballi.
 	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
  */
