@@ -53,6 +53,27 @@
 
  Returns: 
 			Control's handle or error message.
+
+
+ Remarks:
+			To avoid lost messages and/or script lockup, events triggered by the toolbar buttons should complete quickly. 
+			If an event takes more than a few milliseconds to complete, consider creating an independent thread to accomplish the task:
+
+ (start code)
+			if event=click
+			    if button=BigFatRoutine 
+			    { 
+			        SetTimer MyBigFatRoutine,0 
+			        return 
+				}
+ (end code)
+
+			If you happen to have unusual control behavior - missing events, redrawing issues etc... try adding _Critical_ command (or better Critical N) at the start of the Toolbar_onNotify function.
+			It helps to improve the odds that no messages are dropped. The drawback of using the command is that the function refuses to be interrupted. 
+			This is not a problem if the developer is very careful not to call any routines or functions that use anything more than a few milliseconds. 
+			However, any little mistake -- an unexpected menu, prompt, MsgBox, etc., and the script will lock up. 
+			Without the Critical command, the function is a lot more forgiving. 
+			The developer should still be careful but the script won't shut down if something unexpected happens.
  */
 Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 	static MODULEID
