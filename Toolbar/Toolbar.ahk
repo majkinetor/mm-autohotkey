@@ -204,13 +204,13 @@ Toolbar_Customize(hCtrl) {
 
 /*
  Function:  Define
- 			Get current toolbar definition
+ 			Get the toolbar definition list.
  
  Parameters:
  			pQ	- Query parameter. Specify "c" to get only current buttons, "a" to get only available buttons.
  				  Leave empty to get all buttons.
  Returns:
-			Button definition list.
+			Button definition list. You can use the list directly with <Insert> function.
  */
 Toolbar_Define(hCtrl, pQ="") {
 	if pQ !=
@@ -219,15 +219,15 @@ Toolbar_Define(hCtrl, pQ="") {
 
 	if (pQ = "") or (pQ = "c")
 		loop, % Toolbar_Count(hCtrl)
-			btns .= Toolbar_GetButton(hCtrl, A_Index) "`r`n"
+			btns .= Toolbar_GetButton(hCtrl, A_Index) "`n"
 	ifEqual, pQ, c, return SubStr(btns, 1, -2)
 
 	if (pQ="") or (pQ = "a"){
-		ifEqual, pQ, , SetEnv, btns, %btns%`r`n
+		ifEqual, pQ, , SetEnv, btns, %btns%`n
 
 		cnta := NumGet( Toolbar(hCtrl "aBTN") )
 		loop, %cnta%
-			btns .= Toolbar_GetButton(hCtrl, -A_Index) "`r`n"
+			btns .= Toolbar_GetButton(hCtrl, -A_Index) "`n"
 	
 		return SubStr(btns, 1, -2)
 	}
@@ -1019,7 +1019,7 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 
 /*
  Group: About
-	o Ver 2.12 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Ver 2.13 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
 	o Parts of code in Toolbar_onNotify by jballi.
 	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
