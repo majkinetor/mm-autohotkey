@@ -76,7 +76,11 @@ OnBtn:
 	stringsplit, p, _, `,,%A_Space%%A_Tab%
 
 	if A_GuiControl = Define
-		Set( Toolbar_Define(hToolbar, p1) )
+	{
+		_ := Toolbar_Define(hToolbar, p1)
+		StringReplace, _, _, `n, `r`n, A
+		Set(_)
+	}
 
 	if A_GuiControl = Count
 		Set( Toolbar_Count(hToolbar, p1) )
