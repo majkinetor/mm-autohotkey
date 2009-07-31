@@ -444,7 +444,7 @@ Toolbar_GetMaxSize(hCtrl, ByRef Width, ByRef Height){
  			SHOWTEXT	- Specifies that button text should be displayed. All buttons can have text, but only those buttons with the SHOWTEXT button style will display it. 
  						  This button style must be used with the LIST style. If you set text for buttons that do not have the SHOWTEXT style, the toolbar control will 
  						  automatically display it as a ToolTip when the cursor hovers over the button. For this to work you must create the toolbar with TOOLTIPS style.
- 						  You can create multiline tooltips by using $ in the tooltip caption. Each $ will be replaced with new line.
+ 						  You can create multiline tooltips by using `r in the tooltip caption. Each `r will be replaced with new line.
  
  Button States:
  			CHECKED		- The button has the CHECK style and is being clicked.
