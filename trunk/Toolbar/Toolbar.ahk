@@ -799,11 +799,11 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
  
   ;New trap for TBN_ENDDRAG.  This replaces the trap for NM_CLICK									--jballi
 	if (code=TBN_ENDDRAG)
-        if (s_LDOWNPos = s_HOTITEMCHANGEPos) { 
-             s_LDOWNPos := 0 
-			 return %handler%(hw, "click",txt,pos,iItem) 
-		} 
-		else return 0 
+        if (s_LDOWNPos=s_HOTITEMCHANGEPos) and InStr(Toolbar_GetButton(hw,pos,"s"),"disabled")=0 
+        { 
+            s_LDOWNPos:=0 
+            return %handler%(hw,"click",txt,pos,iItem) 
+        } else return 0 
 
  /* Original NM_CLICK code. Problematic because of bug reported here:								--jballi
     http://www.autohotkey.com/forum/viewtopic.php?p=283031#283031
