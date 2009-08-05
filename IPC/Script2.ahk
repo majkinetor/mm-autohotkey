@@ -5,7 +5,7 @@
 	;========================
 
 	Gui, +LastFound	  +AlwaysOnTop
-	hScript := WinExist()
+	hScript := WinExist() + 0
 
 	Gui, Font, s10
 	Gui, Add, Edit,		 vMyMsg  w200 , Message to %target%
@@ -19,7 +19,7 @@
 	Gui, Add, ListBox,xm w440 h300 vMyLB,
 
 	Gui, Show, x%x%	AutoSize
-
+	GuiControl, , MyLB, This script HWND: %hScript%
 	IPC_SetHandler("OnData")
 return
 
