@@ -1,7 +1,7 @@
 /* Title:	IPC
-			*Inter-process Communication*.
+			*Inter-Process Communication*.
  :
-			A script can use this module to send the data to another script using WM_COPYDATA message.
+			A script can use this module to send text or binary data to another script using WM_COPYDATA message.
  */
 
 /*
@@ -21,6 +21,8 @@
 			The receiving script should consider the data read-only. The receiving script should not free the memory referenced by Data parameter.
 			If the receiving script must access the data after function returns, it must copy the data into a local buffer.
 
+			This function uses Gui +Lastfound to obtain the handle of the sender.
+
  Returns:
 			Returns TRUE if message was or FALSE if sending failed. Error message is returned on invalid usage.
  */
@@ -39,9 +41,7 @@ IPC_Send(Hwnd, Data="", Port=100, DataSize="") {
 	 , NumPut(pData,	COPYDATA, 8)             
 	
 	Gui, +LastFound	 
-	thisHWND := WinExist()
-
-   	SendMessage, WM_COPYDATA, thisHWND, &COPYDATA,, ahk_id %Hwnd%
+   	SendMessage, WM_COPYDATA, WinExist(), &COPYDATA,, ahk_id %Hwnd%
 	return ErrorLevel="FAIL" ? false : true
 }
 
