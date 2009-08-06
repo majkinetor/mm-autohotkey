@@ -1,7 +1,8 @@
 /* Title:	IPC
 			*Inter-Process Communication*.
  :
-			A script can use this module to send text or binary data to another script using WM_COPYDATA message.
+			A script can use this module to send text or binary data to another script or DotNet application using WM_COPYDATA message.
+			AHK module is implemented in IPC.ahk. DotNet library is implemented in IPC.cs. API is the same.
  */
 
 /*
