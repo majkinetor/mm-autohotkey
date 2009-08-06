@@ -1,7 +1,7 @@
 #SingleInstance, off	;allow multiple instances
 
-	target := "Script2"
-	stress := 1000,   x:=300
+	target := "Script1"
+	stress := 1000,   x:=800
 	;========================
 
 	Gui, +LastFound	  +AlwaysOnTop
@@ -61,4 +61,4 @@ GuiClose:
 	ExitApp
 return
 
-#include IPC.ahk
+#include ..\IPC.ahk
