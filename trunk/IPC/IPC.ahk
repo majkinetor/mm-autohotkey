@@ -1,8 +1,9 @@
 /* Title:	IPC
 			*Inter-Process Communication*.
  :
-			A script can use this module to send text or binary data to another script or DotNet application using WM_COPYDATA message.
-			AHK module is implemented in IPC.ahk. DotNet library is implemented in IPC.cs. API is the same.
+			An AHK script or DotNet application can use this module to send text or binary data to another AHK script or DotNet application using WM_COPYDATA message.
+			AHK module is implemented in IPC.ahk. DotNet library is implemented in IPC.cs. API is the same up to the language differences.
+
  */
 
 /*
@@ -90,6 +91,6 @@ IPC_onCopyData(WParam, LParam) {
  Group: About 
  	o IPC AHK & .Net library ver 2.6 by majkinetor.
 	o Fixes for 64b systems of IPC.cs made by Lexikos.
-	o MSDN Reference: http://www.google.com/search?client=opera&rls=en-GB&q=wm_copydata&sourceid=opera&ie=utf-8&oe=utf-8
+	o MSDN Reference: <http://msdn.microsoft.com/en-us/library/ms649011(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
  */
