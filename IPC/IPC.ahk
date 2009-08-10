@@ -88,7 +88,8 @@ IPC_onCopyData(WParam, LParam) {
 
 /* 
  Group: About 
- 	o IPC AHK & .Net library ver 2.5 by majkinetor.
+ 	o IPC AHK & .Net library ver 2.6 by majkinetor.
+	o Fixes for 64b systems of IPC.cs made by Lexikos.
 	o MSDN Reference: http://www.google.com/search?client=opera&rls=en-GB&q=wm_copydata&sourceid=opera&ie=utf-8&oe=utf-8
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
  */
