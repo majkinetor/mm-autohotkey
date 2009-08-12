@@ -232,10 +232,48 @@ t(ByRef v="~`a "){
 	ifEqual, v, ~`a ,SetEnv, t, %A_TickCount%
 	return v := A_TickCount - t
 }
+/*
+Function:	d
+			Delay/Thread function
+			  	
+	Parameters:
+				fun - Function to be executed.
+				delay - Delay in ms.
+				a1, a2 - Parameters.
+	
+	Example:
+			(start code)
+				d("fun1", "",  1)	;execute asap in new thread with param 1
+				d("fun2", 500, "abc")   ;execute after 500ms in new thread with param "abc"
+			(end code)
+ */
+d(fun, delay, a1="", a2="" ) {
+	static adrSetTimer, adrTimerProc
+
+	if !adrSetTimer
+	{
+		adrSetTimer := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "SetTimer")
+		adrTimerProc := RegisterCallback("d_","", 4)
+		d_( "adrKillTimer", DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "KillTimer"))
+	}
+
+	Old_IsCritical := A_IsCritical 
+	critical 1000
+	id := DllCall(adrSetTimer, "uint", 0, "uint", 0, "uint", delay, "uint", adrTimerProc)
+	d_(id, fun), d_(id "_1", a1), d_(id "_2", a2)
+	Critical %Old_IsCritical%
+}
+
+d_(hwnd, msg, id="", time=""){
+	static 
+	ifEqual, id, , return %hwnd% := msg
+	DllCall(adrKillTimer, "uint", 0, "uint", id)
+	fun := %id%, %fun%( %id%_1, %id%_2 )
+}
 
 
 
 /* Group: About
-	o 0.2 by majkinetor
+	o 0.3 by majkinetor
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
  */
