@@ -576,6 +576,13 @@ Toolbar_SetButtonWidth(hCtrl, Min, Max=""){
 	return ret
 }
 
+;Toolbar_SetDrawTextFlags(hModbar, 3, 2) ;right align text
+Toolbar_SetDrawTextFlags(hCtrl, f1, f2) {
+	static TB_SETDRAWTEXTFLAGS = 1094
+	SendMessage, TB_SETDRAWTEXTFLAGS, f1,f2,,ahk_id %hCtrl%
+
+}
+
 /*
 	Function:	SetButtonSize
  				Sets the size of buttons.
@@ -746,8 +753,9 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 
 	 ;TBBUTTON Structure
 		bid := a5 ? a5 : ++id 					;user id or auto id makes button id
-		NumPut(a2-1,	o+0, 0)					;Zero-based index of the button image. If the button is a separator, determines the width of the separator, in pixels
-		NumPut(bid,	o+0, 4)						;Command identifier associated with the button
+
+		NumPut(a2,		o+0, 0)					;Zero-based index of the button image. If the button is a separator, determines the width of the separator, in pixels
+		NumPut(bid,		o+0, 4)					;Command identifier associated with the button
 		NumPut(hstate,  o+0, 8, "Char")			;Button state flags
 		NumPut(hStyle,  o+0, 9, "Char")			;Button style
 		NumPut(0,		o+0, 12)				;User data
