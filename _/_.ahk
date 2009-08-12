@@ -247,7 +247,7 @@ Function:	d
 				d("fun2", 500, "abc")   ;execute after 500ms in new thread with param "abc"
 			(end code)
  */
-d(fun, delay, a1="", a2="" ) {
+d(fun, delay="", a1="", a2="" ) {
 	static adrSetTimer, adrTimerProc
 
 	if !adrSetTimer
