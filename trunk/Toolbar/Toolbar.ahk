@@ -494,6 +494,25 @@ Toolbar_MoveButton(hCtrl, OldPos, NewPos) {
 }
 
 /*
+ Function:  SetBitmapSize
+ 			Sets the size of the bitmapped images to be added to a toolbar.
+ 
+ Parameters:
+			Width, Height - Width & heightin pixels, of the bitmapped images. Defaults to 0,0
+ 
+ Returns:
+ 			TRUE if successful, or FALSE otherwise.
+
+ Remarks:
+			The size can be set only before adding any bitmaps to the toolbar. 
+			If an application does not explicitly set the bitmap size, the size defaults to 16 by 15 pixels. 
+ */
+Toolbar_SetBitmapSize(hCtrl, Width=0, Height=0) {
+	static TB_SETBITMAPSIZE=1056
+    SendMessage, TB_SETBITMAPSIZE, Width,Height, ,ahk_id %hCtrl%
+}
+
+/*
  Function:  SetButton
  			Set button information
  
@@ -754,12 +773,12 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 	 ;TBBUTTON Structure
 		bid := a5 ? a5 : ++id 					;user id or auto id makes button id
 
-		NumPut(a2,		o+0, 0)					;Zero-based index of the button image. If the button is a separator, determines the width of the separator, in pixels
-		NumPut(bid,		o+0, 4)					;Command identifier associated with the button
+		NumPut(a2-1,	o+0, 0, "Int")			;Zero-based index of the button image. If the button is a separator, determines the width of the separator, in pixels
+		NumPut(bid,		o+0, 4, "Int")			;Command identifier associated with the button
 		NumPut(hstate,  o+0, 8, "Char")			;Button state flags
 		NumPut(hStyle,  o+0, 9, "Char")			;Button style
 		NumPut(0,		o+0, 12)				;User data
-		NumPut(sIdx,	o+0, 16)				;Zero-based index of the button string
+		NumPut(sIdx,	o+0, 16, "Int")			;Zero-based index of the button string
 
 		if a
 		{
