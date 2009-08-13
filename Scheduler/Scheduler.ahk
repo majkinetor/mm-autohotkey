@@ -120,11 +120,17 @@ Scheduler_Query(Name="", var=""){
 	static Time="Start Time", Run="Task To Run", User="Run As User", Type="Schedule Type", StartDate="Start Date", EndDate="End Date", Day="Days", Month="Months", Computer="HostName", Status="Status", LastResult="Last Result", Modifier="Repeat: Every"
 	local cmd, res, p, out, out1
 
-	StringReplace, Name, Name, `", ,A
-	cmd := "/query " (Name != "" ? "/fo List /v /tn """ Name """"  : "")
-	res := Scheduler_run("Schtasks " cmd)
-	if InStr(res, "ERROR: The system cannot find the file specified")
-		res := ""
+	if A_OSVersion in WIN_VISTA
+	{
+		StringReplace, Name, Name, `", ,A
+		cmd := "/query " (Name != "" ? "/fo List /v /tn """ Name """"  : "")
+		res := Scheduler_run("Schtasks " cmd)
+		if InStr(res, "ERROR: The system cannot find the file specified")
+			res := ""
+	} else {
+		cmd := "/query /fo List /v"
+		res := Scheduler_run("Schtasks " cmd)
+	}
 
 	if (var != "")
 	{
@@ -152,7 +158,11 @@ Scheduler_Query(Name="", var=""){
 				Name	- Name of the task.
  */
 Scheduler_Exists(Name) {
-	return Scheduler_Query(Name) != ""
+
+	if A_OsVersion in WIN_VISTA
+		return Scheduler_Query(Name) != ""
+	else if InStr("`n" Scheduler_Run("schtasks /query /fo CSV /NH"), """" Name """")
+			return true
 }
 
 /*	Function: Open
@@ -171,7 +181,7 @@ Scheduler_Open() {
 		return
 	}
 
-	if (A_OSVersion = "WIN_VISTA")
+	if A_OSVersion in WIN_VISTA
 		 Run, %A_WinDir%\system32\taskschd.msc,,,PID
 	else Run, %A_WinDir%\explorer.exe ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\::{D6277990-4C6A-11CF-8D87-00AA0060F5BF},,,PID
 
@@ -185,18 +195,20 @@ Scheduler_fixData( var ) {
 		%var%_Modifier := m1*60 + m2
 }
 
-Scheduler_run(Cmd, Dir = "", Input = "", Stream = "")
+;v1.2   
+Scheduler_run(Cmd, Dir = "", Skip=0, Input = "", Stream = "")
 {
 	DllCall("CreatePipe", "UintP", hStdInRd , "UintP", hStdInWr , "Uint", 0, "Uint", 0)
 	DllCall("CreatePipe", "UintP", hStdOutRd, "UintP", hStdOutWr, "Uint", 0, "Uint", 0)
 	DllCall("SetHandleInformation", "Uint", hStdInRd , "Uint", 1, "Uint", 1)
 	DllCall("SetHandleInformation", "Uint", hStdOutWr, "Uint", 1, "Uint", 1)
-	VarSetCapacity(pi, 16, 0)
+
+	VarSetCapacity(pi, 16, 0) 
 	NumPut(VarSetCapacity(si, 68, 0), si)	; size of si
-	NumPut(0x100	, si, 44)		; STARTF_USESTDHANDLES
-	NumPut(hStdInRd	, si, 56)		; hStdInput
-	NumPut(hStdOutWr, si, 60)		; hStdOutput
-	NumPut(hStdOutWr, si, 64)		; hStdError
+	 ,NumPut(0x100,		si, 44)		; STARTF_USESTDHANDLES
+	 ,NumPut(hStdInRd,	si, 56)		; hStdInput
+	 ,NumPut(hStdOutWr, si, 60)		; hStdOutput
+	 ,NumPut(hStdOutWr, si, 64)		; hStdError
 	If !DllCall("CreateProcess", "Uint", 0, "Uint", &Cmd, "Uint", 0, "Uint", 0, "int", True, "Uint", 0x08000000, "Uint", 0, "Uint", Dir ? &Dir : 0, "Uint", &si, "Uint", &pi)	; bInheritHandles and CREATE_NO_WINDOW
 		return A_ThisFunc "> Can't create process:`n" Cmd 
 	
@@ -205,42 +217,40 @@ Scheduler_run(Cmd, Dir = "", Input = "", Stream = "")
 
 	If Input !=
 		DllCall("WriteFile", "Uint", hStdInWr, "Uint", &Input, "Uint", StrLen(Input), "UintP", nSize, "Uint", 0)
-
 	DllCall("CloseHandle", "Uint", hStdInWr)
-	Stream+0 ? (bAlloc:=DllCall("AllocConsole"),hCon:=DllCall("CreateFile","str","CON","Uint",0x40000000,"Uint",bAlloc ? 0 : 3,"Uint",0,"Uint",3,"Uint",0,"Uint",0)) : ""
+
+	if (Stream+0)
+		bAlloc := DllCall("AllocConsole") ,hCon:=DllCall("CreateFile","str","CON","Uint",0x40000000,"Uint", bAlloc ? 0 : 3, "Uint",0, "Uint",3, "Uint",0, "Uint",0)
+
 	VarSetCapacity(sTemp, nTemp:=Stream ? 64-nTrim:=1 : 4095)
-	Loop
+	loop
 		If	DllCall("ReadFile", "Uint", hStdOutRd, "Uint", &sTemp, "Uint", nTemp, "UintP", nSize:=0, "Uint", 0) && nSize
 		{
-			NumPut(0,sTemp,nSize,"Uchar"), VarSetCapacity(sTemp,-1), sOutput.=sTemp
-			If	Stream
-				Loop
-					If	RegExMatch(sOutput, "S)[^\n]*\n", sTrim, nTrim)
-						Stream+0 ? DllCall("WriteFile", "Uint", hCon, "Uint", &sTrim, "Uint", StrLen(sTrim), "UintP", 0, "Uint", 0) : %Stream%(sTrim), nTrim+=StrLen(sTrim)
-					Else	Break
+			NumPut(0,sTemp,nSize,"Uchar"), VarSetCapacity(sTemp,-1),  sOutput .= sTemp
+			if Stream
+				loop
+					if RegExMatch(sOutput, "S)[^\n]*\n", sTrim, nTrim)
+						 Stream+0 ? DllCall("WriteFile", "Uint", hCon, "Uint", &sTrim, "Uint", StrLen(sTrim), "UintP", 0, "Uint", 0) : %Stream%(sTrim), nTrim += StrLen(sTrim)
+					else break
 		}
-		Else	Break	
+		else break
+
 	DllCall("CloseHandle", "Uint", hStdOutRd)
-	Stream+0 ? (DllCall("Sleep","Uint",1000),hCon+1 ? DllCall("CloseHandle","Uint",hCon) : "",bAlloc ? DllCall("FreeConsole") : "") : ""
-	DllCall("GetExitCodeProcess", "uint", hProcess, "intP", ExitCode)
-	DllCall("CloseHandle", "Uint", hProcess)
+	Stream+0 ? (DllCall("Sleep", "Uint", 1000), hCon+1 ? DllCall("CloseHandle","Uint", hCon) : "", bAlloc ? DllCall("FreeConsole") : "" ) : ""
+	DllCall("GetExitCodeProcess", "uint", hProcess, "intP", ExitCode), DllCall("CloseHandle", "Uint", hProcess)
+
+	if (Skip != ""){
+		StringSplit, s, Skip, ., 
+		StringReplace, sOutput, sOutput, `n, `n, A UseErrorLevel
+		s2 := ErrorLevel - (s2 ? s2 : 0) + 1, 	s1++
+		loop, parse, sOutput,`n,`r
+			if A_Index between %s1% and %s2%
+				s .= A_LoopField "`r`n"
+		StringTrimRight, sOutput, s, 2
+	}
+
 	ErrorLevel := ExitCode
 	return	sOutput
-}
-
-Scheduler_getCommandLine(PID) { 
-	Static pFunc 
-	If !( hProcess := DllCall( "OpenProcess", UInt,0x043A, Int,0, UInt, PID ) ) 
-        Return  
-	If pFunc= 
-		pFunc := DllCall( "GetProcAddress", UInt, DllCall( "GetModuleHandle", Str,"kernel32.dll" ), Str,"GetCommandLineA" ) 
-
-	hThrd := DllCall( "CreateRemoteThread", UInt,hProcess, UInt,0, UInt,0, UInt,pFunc, UInt,0, UInt,0, UInt,0 )
-	DllCall( "WaitForSingleObject", UInt,hThrd, UInt,0xFFFFFFFF ) 
-	DllCall( "GetExitCodeThread", UInt,hThrd, UIntP,pcl ), VarSetCapacity( sCmdLine,512 ) 
-	DllCall( "ReadProcessMemory", UInt,hProcess, UInt,pcl, Str,sCmdLine, UInt,512, UInt,0 ) 
-	DllCall( "CloseHandle", UInt,hThrd ), DllCall( "CloseHandle", UInt,hProcess ) 
-	Return sCmdLine 
 }
 
 /* 
