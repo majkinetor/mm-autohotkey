@@ -7,12 +7,13 @@
 		Run		 -	Specifies the program or command that the task runs. 
 		Args	 -  Arguments of the program that the task runs.
 		Type	 -	MINUTE, HOURLY, DAILY, WEEKLY, MONTHLY,     ONCE, ONSTART, ONLOGON, ONIDLE.  By default, ONCE.
-		Modifier -  Number, Specifies how often the task runs within its schedule type (defaults to 1)
-					Additionally, the words FIRST, SECOND, THIRD, FOURTH, LAST, LASTDAY can be used.
+		Mod		 -  Modifier, number, Specifies how often the task runs within its schedule type (defaults to 1). See bellow.	 
+
 		Day		 -  Specifies a day of the week or a day of a month. Valid only with a WEEKLY or MONTHLY schedule.
 					For WEEKLY type, valid values are MON-SUN and * (every day). MON is the default.
-					A value of MON-SUN is required when the FIRST, SECOND, THIRD, FOURTH, or LAST modifier is used. 
+					A value of MON-SUN is required when the FIRST, SECOND, THIRD, FOURTH, or LAST modifier is used.
 					A value of 1-31 is optional and is valid only with no modifier or a modifier of the 1-12 type.
+
 		Month	 -  Specifies a month of the year. Valid values are JAN - DEC and *  The parameter is valid only with a MONTHLY schedule. 
 					It is required when the LASTDAY modifier is used. Otherwise, it is optional and the default value is * (every month).
 		IdleTime -  A whole number from 1 to 999. Specifies how many minutes the computer is idle before the task starts. This parameter is valid only with an ONIDLE schedule, and then it is required.
@@ -24,10 +25,18 @@
 		User	  - Runs the command with the permissions of the specified user account. By default, the command runs with the permissions of the user logged on to the computer running SchTasks.
 		Password  - Specifies the password of the user account specified in the _User_ parameter (required with it)
 
+	
+	Modifiers:
+		MINUTE  - (1 - 1439) The task runs every n minutes.
+		HOURLY  - (1 - 23)	 The task runs every n hours.
+		DAILY	- (1 - 365)	 The task runs every n days.
+		WEEKLY  - (1 - 52)	 The task runs every n weeks.
+		MONTHLY - (1 - 12)	 The task runs every n months. LASTDAY - The task runs on the last day of the month. FIRST, SECOND, THIRD, FOURTH, LAST  Use with the /d day parameter to run a task on a particular week and day. For example, on the third Wednesday of the month.
+
  */
 Scheduler_Create( v, bForce=false ) {
-	static arguments="Type Modifier Day Month IdleTime Time StartDate EndDate Computer User Password"
-	static Type="/sc", Modifier="/mo", Day="/d", Month="/m", IdleTime="/i", Time="/st", EndDate="/ed", Computer="/s", User="/u", Password="/p"
+	static arguments="Type Mod Day Month IdleTime Time StartDate EndDate Computer User Password"
+	static Type="/sc", Mod="/mo", Day="/d", Month="/m", IdleTime="/i", Time="/st", EndDate="/ed", Computer="/s", User="/u", Password="/p"
 
 	Name := %v%_Name,  Run := %v%_Run,  Args := %v%_Args
 
@@ -77,7 +86,7 @@ Scheduler_Create( v, bForce=false ) {
 	
  */
 Scheduler_ClearVar(v){
-	static arguments="Type Modifier Day Month IdleTime Time StartDate EndDate Computer User Password"
+	static arguments="Type Mod Day Month IdleTime Time StartDate EndDate Computer User Password"
 	loop, parse, arguments, %A_Space%
 		%v%_%A_LoopField% := ""
 }
@@ -118,8 +127,8 @@ Scheduler_Delete( Name, bForce=false, User="", Password="", Computer="")
  */
 Scheduler_Query(Name="", var=""){
 	global
-	static args="Run Type Modifier Day Month IdleTime Time StartDate EndDate Computer User Password"
-	static Time="Start Time", Run="Task To Run", User="Run As User", Type="Schedule Type", StartDate="Start Date", EndDate="End Date", Day="Days", Month="Months", Computer="HostName", Status="Status", LastResult="Last Result", Modifier="Repeat: Every"
+	static args="Run Type Mod Day Month IdleTime Time StartDate EndDate Computer User Password"
+	static Time="Start Time", Run="Task To Run", User="Run As User", Type="Schedule Type", StartDate="Start Date", EndDate="End Date", Day="Days", Month="Months", Computer="HostName", Status="Status", LastResult="Last Result", Mod="Repeat: Every"
 	local cmd, res, p, out, out1
 
 	if A_OSVersion in WIN_VISTA
@@ -193,8 +202,8 @@ Scheduler_Open() {
 ;fix garbadge data reported by schtasks app.
 Scheduler_fixData( var ) {
 	
-	if RegExMatch( %var%_Modifier, "S)(\d+)\D+(\d+)", m)		;1 Hour(s), 10 Minute(s)
-		%var%_Modifier := m1*60 + m2
+	if RegExMatch( %var%_Mod, "S)(\d+)\D+(\d+)", m)		;1 Hour(s), 10 Minute(s)
+		%var%_Mod := m1*60 + m2
 }
 
 ;v1.2   

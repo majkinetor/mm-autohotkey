@@ -13,6 +13,7 @@ Computer="HostName"
 ,StartDate="Start Date"
 ,EndTate="End Date"
 ,IdleTime="Idle Time"
+,Modifier="Repeat: Every"	
 
 "Days","Months","Run As User","Delete Task If Not Rescheduled","Stop Task If Runs X Hours and X Mins","Repeat: Every","Repeat: Until: Time","Repeat: Until: Duration","Repeat: Stop If Still Running","Power Management"
 
