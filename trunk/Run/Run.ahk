@@ -78,7 +78,6 @@ Run(Cmd, Dir = "", Input = "", Stream = "", Skip = 0)
 	Stream+0 ? (DllCall("Sleep", "Uint", 1000), hCon+1 ? DllCall("CloseHandle","Uint", hCon) : "", bAlloc ? DllCall("FreeConsole") : "" ) : ""
 	DllCall("GetExitCodeProcess", "uint", hProcess, "intP", ExitCode), DllCall("CloseHandle", "Uint", hProcess)
 
-	ErrorLevel := ExitCode
 	if (Skip != ""){
 		StringSplit, s, Skip, ., 
 		StringReplace, sOutput, sOutput, `n, `n, A UseErrorLevel
@@ -88,5 +87,7 @@ Run(Cmd, Dir = "", Input = "", Stream = "", Skip = 0)
 				s .= A_LoopField "`r`n"
 		StringTrimRight, sOutput, s, 2
 	}
+
+	ErrorLevel := ExitCode
 	return	sOutput
 }
