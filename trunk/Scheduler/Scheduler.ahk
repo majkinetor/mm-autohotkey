@@ -1,6 +1,3 @@
-/* Title: Scheduler
- */
-
 /* 
 	Function: Create	
 			 Creates new scheduled task
@@ -155,10 +152,12 @@ Scheduler_Exists(Name) {
 }
 
 /* Function: Open
-			 Opens Task Scheduler
+			 Opens or activates the Task Scheduler
  */
 Scheduler_Open() {
-	Run, %A_WinDir%\system32\taskschd.msc
+	if (A_OSVersion = "WIN_VISTA")
+		 Run, %A_WinDir%\system32\taskschd.msc
+	else Run, %A_WinDir%\explorer.exe ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\::{D6277990-4C6A-11CF-8D87-00AA0060F5BF}
 }
 
 ;fix garbadge data reported by schtasks app.
@@ -209,6 +208,21 @@ Scheduler_run(Cmd, Dir = "", Input = "", Stream = "")
 	DllCall("CloseHandle", "Uint", hProcess)
 	ErrorLevel := ExitCode
 	return	sOutput
+}
+
+Scheduler_getCommandLine(PID) { 
+	Static pFunc 
+	If !( hProcess := DllCall( "OpenProcess", UInt,0x043A, Int,0, UInt, PID ) ) 
+        Return  
+	If pFunc= 
+		pFunc := DllCall( "GetProcAddress", UInt, DllCall( "GetModuleHandle", Str,"kernel32.dll" ), Str,"GetCommandLineA" ) 
+
+	hThrd := DllCall( "CreateRemoteThread", UInt,hProcess, UInt,0, UInt,0, UInt,pFunc, UInt,0, UInt,0, UInt,0 )
+	DllCall( "WaitForSingleObject", UInt,hThrd, UInt,0xFFFFFFFF ) 
+	DllCall( "GetExitCodeThread", UInt,hThrd, UIntP,pcl ), VarSetCapacity( sCmdLine,512 ) 
+	DllCall( "ReadProcessMemory", UInt,hProcess, UInt,pcl, Str,sCmdLine, UInt,512, UInt,0 ) 
+	DllCall( "CloseHandle", UInt,hThrd ), DllCall( "CloseHandle", UInt,hProcess ) 
+	Return sCmdLine 
 }
 
 /* 
