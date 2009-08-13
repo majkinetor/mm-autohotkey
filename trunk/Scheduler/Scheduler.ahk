@@ -55,6 +55,7 @@ Scheduler_Create( v, bForce=false ) {
 			cmd = %cmd% %c% %val%
 	}
 
+	;moze bolje bez ovoga vidi /F parametar od create
 	if Scheduler_Exists(Name)
 	{
 		if !bForce
