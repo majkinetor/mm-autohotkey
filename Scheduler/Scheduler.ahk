@@ -5,7 +5,7 @@
 	Parameters:
 		Name	 -	Specifies a name for the task
 		Run		 -	Specifies the program or command that the task runs. 
-		Arguments-  Arguments of the program that the task runs.
+		Args	 -  Arguments of the program that the task runs.
 		Type	 -	MINUTE, HOURLY, DAILY, WEEKLY, MONTHLY,     ONCE, ONSTART, ONLOGON, ONIDLE.  By default, ONCE.
 		Modifier -  Number, Specifies how often the task runs within its schedule type (defaults to 1)
 					Additionally, the words FIRST, SECOND, THIRD, FOURTH, LAST, LASTDAY can be used.
@@ -40,6 +40,9 @@ Scheduler_Create( v, bForce=false ) {
    ;defaults 
 	if ( %v%_Type = "" )
 		%v%_Type := "ONCE"
+
+	if (%v%_Computer = "")
+		%v%_Computer := "localhost"
 	
    ;generate cmd line
 	cmd = /create /tn "%Name%" /tr "\"%Run%\" %Args%"
@@ -62,6 +65,7 @@ Scheduler_Create( v, bForce=false ) {
 		}
 		Scheduler_Delete( %v%_Name, true)
 	}
+	m(cmd)
 	res := Scheduler_run("Schtasks " cmd)
 	StringReplace, res, res, `r`nType "SCHTASKS /CREATE /?" for usage.`r`n
 	return res
@@ -141,23 +145,37 @@ Scheduler_Query(Name="", var=""){
 	return res
 }
 
-/* Function: Exists
-			 Check if task exists.
+/* Function:	Exists
+				Check if task exists.
 	
    Parameter: 
-			 Name	- Name of the task.
+				Name	- Name of the task.
  */
 Scheduler_Exists(Name) {
 	return Scheduler_Query(Name) != ""
 }
 
-/* Function: Open
-			 Opens or activates the Task Scheduler
+/*	Function: Open
+			  Opens or activates the Task Scheduler
+
+	Returns:
+				PID of Task Scheduler process
  */
 Scheduler_Open() {
+	static PID
+
+	Process, Exist, ahk_pid %PID%
+	if ErrorLevel
+	{
+		WinActivate, ahk_pid %PID%
+		return
+	}
+
 	if (A_OSVersion = "WIN_VISTA")
-		 Run, %A_WinDir%\system32\taskschd.msc
-	else Run, %A_WinDir%\explorer.exe ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\::{D6277990-4C6A-11CF-8D87-00AA0060F5BF}
+		 Run, %A_WinDir%\system32\taskschd.msc,,,PID
+	else Run, %A_WinDir%\explorer.exe ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\::{D6277990-4C6A-11CF-8D87-00AA0060F5BF},,,PID
+
+	return PID
 }
 
 ;fix garbadge data reported by schtasks app.
