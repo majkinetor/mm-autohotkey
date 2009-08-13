@@ -1,6 +1,6 @@
 /* 
-	Function: Create	
-			 Creates new scheduled task
+	Function:	Create	
+				Creates new scheduled task.
 
 	Parameters:
 		Name	 -	Specifies a name for the task
@@ -71,8 +71,9 @@ Scheduler_Create( v, bForce=false ) {
 	return res
 }
 
-/* Function: ClearVar
-			 Clears the global array.
+/*	Function:	ClearVar
+				Clears the global array.
+	
  */
 Scheduler_ClearVar(v){
 	static arguments="Type Modifier Day Month IdleTime Time StartDate EndDate Computer User Password"
@@ -165,11 +166,11 @@ Scheduler_Exists(Name) {
 			return true
 }
 
-/*	Function: Open
-			  Opens or activates the Task Scheduler
+/*	Function:	Open
+				Opens or activates the Task Scheduler.
 
 	Returns:
-				PID of Task Scheduler process
+				PID of Task Scheduler process.
  */
 Scheduler_Open() {
 	static PID
