@@ -4,8 +4,8 @@ _()
 	v_Args  = test.txt
 	v_Type	= HOURLY
 
-	v_User = Administrator
-	v_Password = kljun7
+;	v_User = 
+;	v_Password = 
 
 	msgbox % Scheduler_Create("v")
 ;	msgbox % Scheduler_Delete("My Task 3")
