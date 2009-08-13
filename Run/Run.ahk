@@ -9,8 +9,8 @@ _()
 			Input	 - Program input (stdin).
 			Stream	 - If set to TRUE it will create a console window and display output line-by-line, in addition to returning the result as a whole.
   					   If string, name of the function to be called as output updates (stream handler). The function accepts one argument.
-			Skip	 - Decimal, number of lines to be omited from the start and the end of the command output.
-					   For instance 3.5, means that first 3 and last 5 lines will be omited.
+			Skip	 - Decimal, number of lines to be omitted from the start and the end of the command output.
+					   For instance 3.5, means that first 3 and last 5 lines will be omitted.
 
 	Remarks:
 			After the function finishes, ErrorLevel will be set to programs exit code.
