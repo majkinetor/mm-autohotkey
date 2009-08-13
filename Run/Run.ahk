@@ -1,4 +1,3 @@
-_()
 /*
 	Function: Run
 			  Retreive and be notified about output from the console programs.
