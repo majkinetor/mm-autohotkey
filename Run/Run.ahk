@@ -5,11 +5,11 @@
 	Parameters:
 			Cmd		 - Command to execute.
 			Dir		 - Working Directory, optional.
+			Skip	 - Decimal, number of lines to be omitted from the start and the end of the command output.
+					   For instance 3.5, means that first 3 and last 5 lines will be omitted.
 			Input	 - Program input (stdin).
 			Stream	 - If set to TRUE it will create a console window and display output line-by-line, in addition to returning the result as a whole.
   					   If string, name of the function to be called as output updates (stream handler). The function accepts one argument.
-			Skip	 - Decimal, number of lines to be omitted from the start and the end of the command output.
-					   For instance 3.5, means that first 3 and last 5 lines will be omitted.
 
 	Remarks:
 			After the function finishes, ErrorLevel will be set to programs exit code.
@@ -30,11 +30,11 @@
 		 (end code)
 
 	About:	
-			o v1.1
+			o v1.2
 			o Developed by Sean. Modified and documented by majkinetor.
 			o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
  */
-Run(Cmd, Dir = "", Input = "", Stream = "", Skip = 0)
+Run(Cmd, Dir = "", Skip=0, Input = "", Stream = "")
 {
 	DllCall("CreatePipe", "UintP", hStdInRd , "UintP", hStdInWr , "Uint", 0, "Uint", 0)
 	DllCall("CreatePipe", "UintP", hStdOutRd, "UintP", hStdOutWr, "Uint", 0, "Uint", 0)
