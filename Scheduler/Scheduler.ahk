@@ -75,7 +75,6 @@ Scheduler_Create( v, bForce=false ) {
 		}
 		Scheduler_Delete( %v%_Name, true)
 	}
-	m(cmd)
 	res := Scheduler_run("Schtasks " cmd)
 	StringReplace, res, res, `r`nType "SCHTASKS /CREATE /?" for usage.`r`n
 	return res
@@ -138,6 +137,7 @@ Scheduler_Query(Name="", var=""){
 		res := Scheduler_run("Schtasks " cmd)
 		if InStr(res, "ERROR: The system cannot find the file specified")
 			res := ""
+
 	} else {
 		cmd := "/query /fo List /v"
 		res := Scheduler_run("Schtasks " cmd)
@@ -185,15 +185,13 @@ Scheduler_Exists(Name) {
 Scheduler_Open() {
 	static PID
 
-	Process, Exist, ahk_pid %PID%
-	if ErrorLevel
-	{
+	if WinExist("ahk_pid " PID)	{
 		WinActivate, ahk_pid %PID%
 		return
 	}
 
 	if A_OSVersion in WIN_VISTA
-		 Run, %A_WinDir%\system32\taskschd.msc,,,PID
+		 Run, %A_WinDir%\system32\mmc.exe %A_WinDir%\system32\taskschd.msc,,,PID
 	else Run, %A_WinDir%\explorer.exe ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\::{D6277990-4C6A-11CF-8D87-00AA0060F5BF},,,PID
 
 	return PID
