@@ -19,12 +19,18 @@
 		IdleTime -  A whole number from 1 to 999. Specifies how many minutes the computer is idle before the task starts. This parameter is valid only with an ONIDLE schedule, and then it is required.
 		Time	  - Specifies the time of day that the task starts in HH:MM:SS 24-hour format. The default value is the current local time when the command completes. \
 					Valid with MINUTE, HOURLY, DAILY, WEEKLY, MONTHLY, and ONCE schedules. It is required with a ONCE schedule.
+		EndTime	  - A value that specifies the end time to run the task. The time format is HH:mm (24-hour time). For example, 14:50 specifies 2:50PM. This is not applicable for the following schedule types: ONSTART, ONLOGON, ONIDLE, and ONEVENT.
+		Duration  - A value that specifies the duration to run the task. The time format is HH:mm (24-hour time). For example, 14:50 specifies 2:50PM. This is not applicable with /ET and for the following schedule types: ONSTART, ONLOGON, ONIDLE, and ONEVENT. For /V1 tasks (Task Scheduler 1.0 tasks), if /RI is specified, then the duration default is one hour.
 		StartDate - Specifies the date that the task starts in MM/DD/YYYY format. The default value is the current date. Valid with all schedules, and is required for a ONCE schedule.
 		EndDate	  - Specifies the last date that the task is scheduled to run. This parameter is optional. It is not valid in a ONCE, ONSTART, ONLOGON, or ONIDLE schedule. By default, schedules have no ending date.
 		Computer  - Specifies the name or IP address of a remote computer (with or without backslashes). The default is the local computer.
 		User	  - Runs the command with the permissions of the specified user account. By default, the command runs with the permissions of the user logged on to the computer running SchTasks.
 		Password  - Specifies the password of the user account specified in the _User_ parameter (required with it)
+		Flags	  - See bellow.
 
+	Flags:
+		K		  - A value that terminates the task at the end time or duration time. This is not applicable for the following schedule types: ONSTART, ONLOGON, ONIDLE, and ONEVENT. Either EndTime or Duration must be specified.
+		Z         - A value that marks the task to be deleted after its final run.
 	
 	Modifiers:
 		MINUTE  - (1 - 1439) The task runs every n minutes.
@@ -36,7 +42,7 @@
  */
 Scheduler_Create( v, bForce=false ) {
 	static arguments="Type Mod Day Month IdleTime Time StartDate EndDate Computer User Password"
-	static Type="/sc", Mod="/mo", Day="/d", Month="/m", IdleTime="/i", Time="/st", EndDate="/ed", Computer="/s", User="/u", Password="/p"
+	static Type="/sc", Mod="/mo", Day="/d", Month="/m", IdleTime="/i", Time="/st", EndDate="/ed", Computer="/s", User="/u", Password="/p", EndTime="/et", Duration="/du"
 
 	Name := %v%_Name,  Run := %v%_Run,  Args := %v%_Args
 
@@ -53,6 +59,17 @@ Scheduler_Create( v, bForce=false ) {
 	if (%v%_Computer = "")
 		%v%_Computer := "localhost"
 	
+   ;check for 2.0
+	if A_OSVersion not in WIN_VISTA
+	{
+		if (%v%_EndTime != "")
+			return A_ThisFunc "> Your OS doesn't support this feature: EndTime"
+		if (%v%_Duration != "")
+			return A_ThisFunc "> Your OS doesn't support this feature: Duration"
+		if (%v%_Flags != "")
+			return A_ThisFunc "> Your OS doesn't support this feature: Flags"
+	}
+	
    ;generate cmd line
 	cmd = /create /tn "%Name%" /tr "\"%Run%\" %Args%"
 	loop, parse, arguments, %A_Space%
@@ -64,7 +81,11 @@ Scheduler_Create( v, bForce=false ) {
 			cmd = %cmd% %c% %val%
 	}
 
-	;moze bolje bez ovoga vidi /F parametar od create
+	;add flags
+	loop, parse, %v%_Flags
+		cmd .= " /" A_LoopField
+	
+	;in vista it can be done with /F but this works too...
 	if Scheduler_Exists(Name)
 	{
 		if !bForce
@@ -176,6 +197,20 @@ Scheduler_Exists(Name) {
 			return true
 }
 
+
+/* Function:	Exists
+				Check if task exists.
+	
+   Parameter: 
+				Name	- Name of the task.
+ */
+Scheduler_Enable( Name, Value ) {
+	if A_OsVersion not in WIN_VISTA
+		return A_ThisFunc "> Your OS doesn't support this feature"
+	
+	Scheduler_Run("schtasks /change /TN """ Name """ /" Value ? "ENABLE" : "DISABLE")
+}
+
 /*	Function:	Open
 				Opens or activates the Task Scheduler.
 
@@ -264,7 +299,7 @@ Scheduler_run(Cmd, Dir = "", Skip=0, Input = "", Stream = "")
 
 /* 
  Group: About 
- 	o v0.9 by majkinetor.
+ 	o v0.94 by majkinetor.
 	o Schtasks at MSDN: http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/en-us/schtasks.mspx?mfr=true
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
  */
