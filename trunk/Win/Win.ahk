@@ -68,7 +68,6 @@ Win_Animate(Hwnd, Type="", Time=100){
  Examples:
  (start code)
   	Win_Get(hwnd, "CIT", class, pid, text)					;get class, pid and text
-  	Win_Get(hwnd, "UR", bActive, rect)						;get status and rect string 
     Win_Get(hwnd, "RxwTC", x, w, t, c)						;get x & width attributes of window rect, title and class
   	Win_Get(hwnd, "RxywhCLxyTBy",wx,wy,ww,wh,c,lx,ly,t,b)	;get all 4 attributes of window rect, class, x & y of client rect, text and horizontal border height
     right := Win_Get(hwnd, "Rx") + Win_Get(hwnd, "Rw")		;first output is returned as function result so u can use function in expressions.
@@ -96,7 +95,7 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
 		continue
 
 		Window_Get_I:
-				WinGet, o%i%, PID, ahk_id %hwnd%		
+				WinGet, o%i%, PID, ahk_id20/08/2009 %hwnd%		
 		continue
 
 		Window_Get_N:
