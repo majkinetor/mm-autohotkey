@@ -41,8 +41,8 @@
 
  */
 Scheduler_Create( v, bForce=false ) {
-	static arguments="Type Mod Day Month IdleTime Time StartDate EndDate Computer User Password"
-	static Type="/sc", Mod="/mo", Day="/d", Month="/m", IdleTime="/i", Time="/st", EndDate="/ed", Computer="/s", User="/u", Password="/p", EndTime="/et", Duration="/du"
+	static arguments="Type Mod Day Month IdleTime Time EndDate Computer User Password StartDate EndTime Duration Repeat"
+	static Type="/sc", Mod="/mo", Day="/d", Month="/m", IdleTime="/i", Time="/st", EndDate="/ed", Computer="/s", User="/u", Password="/p", StartDate="/sd", EndTime="/et", Duration="/du", Repeat="/ri"
 
 	Name := %v%_Name,  Run := %v%_Run,  Args := %v%_Args
 
@@ -106,8 +106,8 @@ Scheduler_Create( v, bForce=false ) {
 	
  */
 Scheduler_ClearVar(v){
-	static arguments="Type Mod Day Month IdleTime Time StartDate EndDate Computer User Password"
-	loop, parse, arguments, %A_Space%
+	static args="Computer,Name,NextRun,LastRun,User,Run,State,Time,Type,StartDate,EndDate,LastResult,Mod"
+	loop, parse, args, `,
 		%v%_%A_LoopField% := ""
 }
 
@@ -138,48 +138,45 @@ Scheduler_Delete( Name, bForce=false, User="", Password="", Computer="")
 }
 /* 
 	Function: Query
-			  Query specified scheduled task or all tasks
+			  Query specified scheduled task or all tasks.
 
 	Parameters:
 		Name   - Specifies the name of task. Use empty string to return all tasks.
-		var	   - If non empty, variable prefix for task parameters extraction
+		var	   - If non empty, variable prefix for task parameters extraction.
 
  */
 Scheduler_Query(Name="", var=""){
 	global
-	static args="Run Type Mod Day Month IdleTime Time StartDate EndDate Computer User Password"
-	static Time="Start Time", Run="Task To Run", User="Run As User", Type="Schedule Type", StartDate="Start Date", EndDate="End Date", Day="Days", Month="Months", Computer="HostName", Status="Status", LastResult="Last Result", Mod="Repeat: Every"
+	static args="Computer,Name,NextRun,LastRun,User,Run,State,Time,Type,StartDate,EndDate,LastResult,Mod"
+	static 1="Computer",2="Name",3="NextRun",6="LastRun",7="LastResult",8="User",9="Run",12="State",20="Time",21="StartDate",22="EndDate",23="Day",24="Month",25="Mod"
+
 	local cmd, res, p, out, out1
 
 	if A_OSVersion in WIN_VISTA
 	{
 		StringReplace, Name, Name, `", ,A
-		cmd := "/query " (Name != "" ? "/fo List /v /tn """ Name """"  : "")
-		res := Scheduler_run("Schtasks " cmd)
+		cmd := "Schtasks /query /fo CSV /v " (Name != "" ? "/tn """ Name """"  : "")
+		res := Scheduler_run(cmd)
 		if InStr(res, "ERROR: The system cannot find the file specified")
 			res := ""
-
+		
+		;remove header, /NH has a bug : Schtasks /query /fo CSV /v /NH /tn "ISPP Konzola StanjaPodracunaISPP" ---> reports that LIST ouptut is active ....
+		res := SubStr(res, InStr(res, "`n")+1)
 	} else {
-		cmd := "/query /fo List /v"
+		cmd := "/query /fo CSV /v"
 		res := Scheduler_run("Schtasks " cmd)
 	}
-
-	if (var != "")
-	{
-		%var% := ""
-		loop, parse, args, %A_Space%
+	
+	if (var != ""){
+		Scheduler_ClearVar( var )
+		loop, parse, res, CSV
 		{
-			p := %A_LoopField%
-			if (p = "") {
-				%var%_%A_LoopField% := ""
-				continue
-			}
-			RegExMatch(res, "im)^" p ":\s*(.+)$", out)
-			%var%_%A_LoopField% := (out1 != "N/A") ? out1 : ""
+			ifEqual, A_Index, 26, break
+			f := %A_Index%			
+			ifEqual, f, ,continue
+			%var%_%f% := Scheduler_fixData(f, A_LoopField)
 		}
-		%var% := res
 	}
-	Scheduler_fixData(var)
 	return res
 }
 
@@ -233,10 +230,12 @@ Scheduler_Open() {
 }
 
 ;fix garbadge data reported by schtasks app.
-Scheduler_fixData( var ) {
-	
-	if RegExMatch( %var%_Mod, "S)(\d+)\D+(\d+)", m)		;1 Hour(s), 10 Minute(s)
-		%var%_Mod := m1*60 + m2
+Scheduler_fixData( Field, Value ) {
+	if (Field = "Mod")
+		if RegExMatch( Value, "S)(\d+)\D+(\d+)", m)		;1 Hour(s), 10 Minute(s)
+			return m1*60 + m2
+
+	return Value
 }
 
 ;v1.2   
