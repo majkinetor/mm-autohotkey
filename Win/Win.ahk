@@ -343,10 +343,39 @@ Win_Redraw( Hwn, Flags ) {
  Returns:
 			Handle of the previous menu.
  */
-Win_SetMenu(hwnd, hMenu=0){
+Win_SetMenu(Hwnd, hMenu=0){
 	hPrevMenu := DllCall("GetMenu", "uint", hwnd)
 	DllCall("SetMenu", "uint", hwnd, "uint", hMenu)
 	return hPrevMenu
+}
+
+/*
+ Function:	SetIcon
+ 			Set the titlebar icon for the window.
+ 
+ Parameters:
+			Icon	- Path to the icon. If omited, icon is removed.
+			Flag	- 1 sets the large icon for the window, 0 sets the small icon for the window, 2 sets both (default).
+
+ Returns:
+			The return value is a handle to the previous large or small icon, depending on the Flag value.
+ */
+Win_SetIcon( Hwnd, Icon="", Flag=2){
+	static WM_SETICON = 0x80, LR_LOADFROMFILE=0x10, IMAGE_ICON=1
+
+	if Flag not in 0,1,2
+		return A_ThisFunc "> Unsupported Flag: " Flag
+
+	if Icon != 
+		hIcon := DllCall("LoadImage", "Uint", 0, "str", Icon, "uint",IMAGE_ICON, "int", 16, "int", 16, "uint", LR_LOADFROMFILE)  
+
+	if Flag in 0,2
+		SendMessage, WM_SETICON, 0, hIcon, , ahk_id %Hwnd%		;ICON_SMALL=0
+
+	if Flag in 0,1
+		SendMessage, WM_SETICON, 1, hIcon, , ahk_id %Hwnd%		;ICON_BIG=1
+
+	return ErrorLevel
 }
 
 /*
