@@ -343,7 +343,7 @@ Win_Redraw( Hwnd, Flags ) {
 			Handle of the previous menu.
  */
 Win_SetMenu(Hwnd, hMenu=0){
-	hPrevMenu := DllCall("GetMenu", "uint", hwnd)
+	hPrevMenu := DllCall("GetMenu", "uint", hwnd, "Uint")
 	DllCall("SetMenu", "uint", hwnd, "uint", hMenu)
 	return hPrevMenu
 }
