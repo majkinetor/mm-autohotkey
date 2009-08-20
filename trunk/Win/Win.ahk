@@ -372,7 +372,7 @@ Win_SetIcon( Hwnd, Icon="", Flag=2){
 	if Flag in 0,2
 		SendMessage, WM_SETICON, 0, hIcon, , ahk_id %Hwnd%		;ICON_SMALL=0
 
-	if Flag in 0,1
+	if Flag in 1,2
 		SendMessage, WM_SETICON, 1, hIcon, , ahk_id %Hwnd%		;ICON_BIG=1
 
 	return ErrorLevel
