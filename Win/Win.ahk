@@ -477,3 +477,10 @@ Win_Subclass(hCtrl, Fun, Opt="", ByRef $WndProc="") {
 	   
     return DllCall("SetWindowLong", "UInt", hCtrl, "Int", -4, "Int", $WndProc, "UInt") 
 }
+
+/*
+Group: About
+	o v1.0 by majkinetor.
+	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
+	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
+/*
