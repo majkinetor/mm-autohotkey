@@ -266,7 +266,7 @@ Win_Is(Hwnd, pQ="win") {
 
  Example:
 			Difference between ControlMove and Win_Move:
-			(code start)
+			(start code)
    				Gui, Add, Edit, h40 hwndhEdit w100
   				gui, show, w200 h300
   			return
@@ -278,7 +278,7 @@ Win_Is(Hwnd, pQ="win") {
   			F2::
   				Win_Move(hEdit, 0, 0)
   			return
-			(code end)
+			(end code)
  */
 Win_Move(Hwnd, X="", Y="", W="", H="", Flags="") {
 ;	static SWP_NOMOVE=2, SWP_NOREDRAW=8, SWP_NOSIZE=1, SWP_NOZORDER=4, SWP_NOACTIVATE = 0x10, SWP_ASYNCWINDOWPOS=0x4000, HWND_BOTTOM=1, HWND_TOPMOST=-1, HWND_NOTOPMOST = -2
