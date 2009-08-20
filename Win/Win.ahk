@@ -327,9 +327,9 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
  Remarks:
 			This function will update the window for sure, unlike WinSet or InvalidateRect.
  */
-Win_Redraw( Hwn, Flags ) {
+Win_Redraw( Hwnd, Flags ) {
 	static RDW_ALLCHILDREN:=0x80, RDW_ERASE:=0x4, RDW_ERASENOW:=0x200, RDW_FRAME:=0x400, RDW_INTERNALPAINT:=0x2, RDW_INVALIDATE:=0x1, RDW_NOCHILDREN:=0x40, RDW_NOERASE:=0x20, RDW_NOFRAME:=0x800, RDW_NOINTERNALPAINT:=0x10, RDW_UPDATENOW:=0x100, RDW_VALIDATE:=0x8
-	return DllCall("RedrawWindow", "uint", handle, "uint", 0, "uint", 0, "uint"
+	return DllCall("RedrawWindow", "uint", Hwnd, "uint", 0, "uint", 0, "uint"
 		      ,RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ERASENOW | RDW_UPDATENOW | RDW_ALLCHILDREN)
 }
 
@@ -367,7 +367,7 @@ Win_SetIcon( Hwnd, Icon="", Flag=2){
 		return A_ThisFunc "> Unsupported Flag: " Flag
 
 	if Icon != 
-		hIcon := DllCall("LoadImage", "Uint", 0, "str", Icon, "uint",IMAGE_ICON, "int", 16, "int", 16, "uint", LR_LOADFROMFILE)  
+		hIcon := DllCall("LoadImage", "Uint", 0, "str", Icon, "uint",IMAGE_ICON, "int", 32, "int", 32, "uint", LR_LOADFROMFILE)  
 
 	if Flag in 0,2
 		SendMessage, WM_SETICON, 0, hIcon, , ahk_id %Hwnd%		;ICON_SMALL=0
