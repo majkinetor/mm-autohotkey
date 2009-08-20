@@ -820,10 +820,9 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 }
 
 Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) { 
-	static 
 	static MODULEID = 80609, oldNotify="*" 
 	static NM_CLICK=-2, NM_RCLICK=-5, NM_LDOWN=-20, TBN_DROPDOWN=-710, TBN_HOTITEMCHANGE=-713, TBN_ENDDRAG=-702, TBN_BEGINADJUST=-703, TBN_GETBUTTONINFOA=-700, TBN_QUERYINSERT=-706, TBN_QUERYDELETE=-707, TBN_BEGINADJUST=-703, TBN_ENDADJUST=-704, TBN_RESET=-705, TBN_TOOLBARCHANGE=-708, TB_COMMANDTOINDEX=0x419
-	static cnt, cnta, cBTN, inDialog
+	static cnt, cnta, cBTN, inDialog, LDOWN
 
 	
 	; If s_LDOWNPos=0, the left mouse button has not been clicked.  If s_LDOWNPos<>0,				--jballi
@@ -842,43 +841,25 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 	pos:=ErrorLevel+1 
 	txt := Toolbar_GetButton( hw, pos, "c") 
 
-  ;This traps NM_LDOWN (left mouse click down) and assigns the current button pos to s_LDOWNPos		--jballi
-	if (code=NM_LDOWN) {  
-        LDOWN_%HW% := Pos 
-        return 0 
-    } 
- 
-  ;New trap for TBN_ENDDRAG.  This replaces the trap for NM_CLICK									--jballi
-	if (code=TBN_ENDDRAG)
-	{
-        if (LDOWN_%HW% = HOT_%HW%) and !InStr(Toolbar_GetButton(hw,pos,"s"),"disabled")
-        { 
-            LDOWN_%HW% := 0 
-            return %handler%(hw,"click",txt,pos,iItem) 
-        } else return 0 
-	}
-
- /* Original NM_CLICK code. Problematic because of bug reported here:								--jballi
-    http://www.autohotkey.com/forum/viewtopic.php?p=283031#283031
-   
+	if (code=NM_LDOWN)
+        return  LDOWN := Pos 
+  
 	if (code = NM_CLICK) { 
-      IfEqual, pos, 4294967296, return 
-      return %handler%(hw, "click", txt, pos, iItem) 
-   } 
- */
-	if (code=NM_RCLICK)		;																		--jballi
+		IfEqual, pos, 4294967296, return 
+		if (LDOWN) and !InStr(Toolbar_GetButton(hw,pos,"s"),"disabled")
+  		  LDOWN := 0, %handler%(hw, "click", txt, pos, iItem)
+    } 
+
+	if (code=NM_RCLICK)	{
 		ifEqual, pos, 4294967296, return 0 
         else  return %handler%(hw,"rclick", txt, pos, iItem) 
-
+	}
 
 	if (code = TBN_DROPDOWN) 
       return %handler%(hw, "menu", txt, pos, iItem) 
 
  
 	if (code = TBN_HOTITEMCHANGE) { 
-        HOT_%HW% := pos					;s_HOTITEMCHANGEPos contains the last button position		--jballi
-										; of the cursor on the toolbar or 4294967296 if not on a toolbar button. 
-		OutputDebug, hot %pos%
       IfEqual, pos, 4294967296, return  
       %handler%(hw, "hot", txt, pos,  iItem) 
       return 0 
