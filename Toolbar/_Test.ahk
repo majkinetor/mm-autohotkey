@@ -11,7 +11,7 @@ SetBatchLines, -1
 	loop, 150
 	   IL_ADD(hIL, A_WinDir "\system32\shell32.dll", A_Index) 
 
-	hToolbar := Toolbar_Add(hGui, "OnToolbar", "BORDER WRAPABLE ADJUSTABLE FLAT TOOLTIPS", hIL)
+	hToolbar := Toolbar_Add(hGui, "OnToolbar", "BORDER WRAPABLE ADJUSTABLE", hIL)
 	Toolbar_Clear(hToolbar)
 	btns = 
 	(LTrim

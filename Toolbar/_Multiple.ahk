@@ -25,7 +25,9 @@
 return
 
 OnToolbar(h,e,t,p,i){
-
+	if e = hot
+		return 
+	msgbox HWND %h%`nText: t
 }
 
 GuiClose:
