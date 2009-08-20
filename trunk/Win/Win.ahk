@@ -358,6 +358,7 @@ Win_SetMenu(Hwnd, hMenu=0){
 
  Returns:
 			The return value is a handle to the previous large or small icon, depending on the Flag value.
+			If Flag=2, big icon handle is returned only.
  */
 Win_SetIcon( Hwnd, Icon="", Flag=2){
 	static WM_SETICON = 0x80, LR_LOADFROMFILE=0x10, IMAGE_ICON=1
@@ -368,7 +369,7 @@ Win_SetIcon( Hwnd, Icon="", Flag=2){
 	if Icon != 
 		hIcon := DllCall("LoadImage", "Uint", 0, "str", Icon, "uint",IMAGE_ICON, "int", 32, "int", 32, "uint", LR_LOADFROMFILE)  
 
-	if Flag in 0,2
+	if Flag in 0,2 
 		SendMessage, WM_SETICON, 0, hIcon, , ahk_id %Hwnd%		;ICON_SMALL=0
 
 	if Flag in 1,2
