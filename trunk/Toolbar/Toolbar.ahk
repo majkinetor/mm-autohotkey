@@ -838,13 +838,12 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 	iItem  := (code != TBN_HOTITEMCHANGE) ? NumGet(lparam+12) : NumGet(lparam+16) 
 
 	SendMessage, TB_COMMANDTOINDEX,iItem,,,ahk_id %hw%    
-	pos:=ErrorLevel+1 
-	txt := Toolbar_GetButton( hw, pos, "c") 
+	pos := ErrorLevel + 1 , txt := Toolbar_GetButton( hw, pos, "c")
 
 	if (code=NM_LDOWN)
-        return  LDOWN := Pos 
+        return LDOWN := Pos 
   
-	if (code = NM_CLICK) { 
+	if (code=NM_CLICK) { 
 		IfEqual, pos, 4294967296, return 
 		if (LDOWN) and !InStr(Toolbar_GetButton(hw,pos,"s"),"disabled")
   		  LDOWN := 0, %handler%(hw, "click", txt, pos, iItem)
@@ -878,8 +877,8 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 		if (iItem = cnt + cnta)					;iItem is position, not identifier. Win keeps sending incresing numbers until we say "no more" (return 0) 
 			return 0 
        
-		TBB := lparam + 16						;The OS buffer where to put button structure 
-		o := (iItem < cnt) ?  cBTN + 20*iItem : Toolbar( hw "aBTN") + 20*(iItem-cnt) + 4 
+		TBB := lparam + 16						;The OS buffer where to put the button structure 
+		o := (iItem < cnt) ?  cBTN + 20*iItem : Toolbar( hw "aBTN") + 20*(iItem-cnt) + 4
 		Toolbar_memcpy( TBB, o, 20) ;copy the compiled item into notification struct 
 		return 1 
 	} 
@@ -896,7 +895,7 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 		return %handler%(hw, "adjust", "", "", "") 
 	} 
 
-	;This will fire when user is dragging buttons around with adjustable style 
+	;This will fire when user is dragging buttons around with adjustable style
 	if (code = TBN_TOOLBARCHANGE) and !inDialog 
 		return %handler%(hw, "change", "", "", "") 
 }
@@ -1054,9 +1053,8 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 
 /*
  Group: About
-	o Ver 2.14 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Ver 2.15 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
 	o Parts of code in Toolbar_onNotify by jballi.
 	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
  */
-
