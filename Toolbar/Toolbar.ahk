@@ -261,6 +261,9 @@ Toolbar_DeleteButton(hCtrl, Pos=1) {
 	return ErrorLevel
 }
 
+Toolbar_FindButton(hCtrl, Text, ByRef pos, ByRef id="") {
+}
+
 /*
 	Function:  GetButton
 			Get button information
@@ -412,6 +415,25 @@ Toolbar_GetMaxSize(hCtrl, ByRef Width, ByRef Height){
 }
 
 /*
+ Function:  CommandToIndex
+ 			Retrieves the button position given the ID.
+ 
+ Parameters:
+ 			ID	- Button ID, number > 0.
+ 
+ Returns:
+ 			0 if button with that ID doesn't exist, pos > 0 otherwise.
+ */
+
+Toolbar_CommandToIndex( hCtrl, ID ) {
+	static TB_COMMANDTOINDEX=0x419
+
+	SendMessage, TB_COMMANDTOINDEX, ID,, ,ahk_id %hCtrl%
+	ifEqual, ErrorLevel, 4294967295, return 0
+	return ErrorLevel + 1
+}
+
+/*
  Function:  Insert
  			Insert button(s) on the Toolbar. 
  
@@ -492,6 +514,7 @@ Toolbar_MoveButton(hCtrl, OldPos, NewPos) {
     SendMessage, TB_MOVEBUTTON, OldPos-1,NewPos-1, ,ahk_id %hCtrl%
 	return ErrorLevel
 }
+
 
 /*
  Function:  SetBitmapSize
@@ -797,12 +820,14 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 }
 
 Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) { 
+	static 
 	static MODULEID = 80609, oldNotify="*" 
 	static NM_CLICK=-2, NM_RCLICK=-5, NM_LDOWN=-20, TBN_DROPDOWN=-710, TBN_HOTITEMCHANGE=-713, TBN_ENDDRAG=-702, TBN_BEGINADJUST=-703, TBN_GETBUTTONINFOA=-700, TBN_QUERYINSERT=-706, TBN_QUERYDELETE=-707, TBN_BEGINADJUST=-703, TBN_ENDADJUST=-704, TBN_RESET=-705, TBN_TOOLBARCHANGE=-708, TB_COMMANDTOINDEX=0x419
-	static cnt, cnta, cBTN, inDialog,    s_LDOWNPos:=0, s_HOTITEMCHANGEPos:=0 
+	static cnt, cnta, cBTN, inDialog
+
+	
 	; If s_LDOWNPos=0, the left mouse button has not been clicked.  If s_LDOWNPos<>0,				--jballi
 	; the left mouse button has been clicked and the variable contains the button position. 
-
 	if ((NumGet(Lparam+4)) != MODULEID){ 
 		ifEqual, oldNotify, *, SetEnv, oldNotify, % Toolbar("OldNotify")       
 		ifNotEqual, oldNotify,,return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)       
@@ -811,7 +836,6 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
     
 	hw :=  NumGet(Lparam+0), code := NumGet(Lparam+8, 0, "Int"),  handler := Toolbar(hw "Handler") 
 	ifEqual, handler,, return 
-
 	iItem  := (code != TBN_HOTITEMCHANGE) ? NumGet(lparam+12) : NumGet(lparam+16) 
 
 	SendMessage, TB_COMMANDTOINDEX,iItem,,,ahk_id %hw%    
@@ -820,17 +844,19 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 
   ;This traps NM_LDOWN (left mouse click down) and assigns the current button pos to s_LDOWNPos		--jballi
 	if (code=NM_LDOWN) {  
-        s_LDOWNPos:=Pos 
+        LDOWN_%HW% := Pos 
         return 0 
     } 
  
   ;New trap for TBN_ENDDRAG.  This replaces the trap for NM_CLICK									--jballi
 	if (code=TBN_ENDDRAG)
-        if (s_LDOWNPos=s_HOTITEMCHANGEPos) and InStr(Toolbar_GetButton(hw,pos,"s"),"disabled")=0 
+	{
+        if (LDOWN_%HW% = HOT_%HW%) and !InStr(Toolbar_GetButton(hw,pos,"s"),"disabled")
         { 
-            s_LDOWNPos:=0 
+            LDOWN_%HW% := 0 
             return %handler%(hw,"click",txt,pos,iItem) 
         } else return 0 
+	}
 
  /* Original NM_CLICK code. Problematic because of bug reported here:								--jballi
     http://www.autohotkey.com/forum/viewtopic.php?p=283031#283031
@@ -850,9 +876,10 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 
  
 	if (code = TBN_HOTITEMCHANGE) { 
-        s_HOTITEMCHANGEPos := pos		;s_HOTITEMCHANGEPos contains the last button position		--jballi
+        HOT_%HW% := pos					;s_HOTITEMCHANGEPos contains the last button position		--jballi
 										; of the cursor on the toolbar or 4294967296 if not on a toolbar button. 
-      IfEqual, pos, 4294967296, return 
+		OutputDebug, hot %pos%
+      IfEqual, pos, 4294967296, return  
       %handler%(hw, "hot", txt, pos,  iItem) 
       return 0 
    } 
@@ -1046,7 +1073,7 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 
 /*
  Group: About
-	o Ver 2.13 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Ver 2.14 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
 	o Parts of code in Toolbar_onNotify by jballi.
 	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
