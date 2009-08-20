@@ -19,8 +19,8 @@
 			hide		- Hides the window. By default, the window is shown.
 			slide		- Uses slide animation. Ignored when used with CENTER.
 			:
-			hneg		- Animates the window from left to right. This flag can be used with roll or slide animation. It is ignored when used with CENTER or BLEND.
-			hpos		- Animates the window from left to right. This flag can be used with roll or slide animation. It is ignored when used with CENTER or BLEND
+			hneg		- Animates the window from right to left. This flag can be used with roll or slide animation. It is ignored when used with CENTER or BLEND.
+			hpos		- Animates the window from left to right. This flag can be used with roll or slide animation. It is ignored when used with CENTER or BLEND.
 			vneg		- Animates the window from top to bottom. This flag can be used with roll or slide animation. It is ignored when used with CENTER or BLEND.
 			vpos		- Animates the window from bottom to top. This flag can be used with roll or slide animation. It is ignored when used with CENTER or BLEND.
  Returns:
@@ -322,11 +322,16 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 /*
  Function:	Redraw
  			Redraws the window.
+
+			Hwnd - Handle of the window. If this parameter is omited, Redraw updates the desktop window.
  
+ Returns:
+			A nonzero value indicates success. Zero indicates failure.
+
  Remarks:
 			This function will update the window for sure, unlike WinSet or InvalidateRect.
  */
-Win_Redraw( Hwnd, Flags ) {
+Win_Redraw( Hwnd=0 ) {
 	static RDW_ALLCHILDREN:=0x80, RDW_ERASE:=0x4, RDW_ERASENOW:=0x200, RDW_FRAME:=0x400, RDW_INTERNALPAINT:=0x2, RDW_INVALIDATE:=0x1, RDW_NOCHILDREN:=0x40, RDW_NOERASE:=0x20, RDW_NOFRAME:=0x800, RDW_NOINTERNALPAINT:=0x10, RDW_UPDATENOW:=0x100, RDW_VALIDATE:=0x8
 	return DllCall("RedrawWindow", "uint", Hwnd, "uint", 0, "uint", 0, "uint"
 		      ,RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ERASENOW | RDW_UPDATENOW | RDW_ALLCHILDREN)
