@@ -849,7 +849,7 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 	if (code=NM_CLICK) { 		
 		IfEqual, pos, 4294967296, return 
 		if (LDOWN>0) and !InStr(Toolbar_GetButton(hw,pos,"s"),"disabled")
-  		  m("lup"), LDOWN := 0, %handler%(hw, "click", txt, pos, iItem)
+  		  LDOWN := 0, %handler%(hw, "click", txt, pos, iItem)
     } 
 
 	if (code=NM_RCLICK)
