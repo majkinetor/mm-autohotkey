@@ -1,7 +1,7 @@
 #SingleInstance, force
 SetBatchLines, -1
 
-	Gui, +LastFound +LabelMyGui
+	Gui, +LastFound
 	hGui := WinExist() 
 	w := 800, h := 660
 	Gui, Show , w%w% h%h% Hide, Toolbar Test		;set gui width & height (mandatory)
@@ -31,6 +31,17 @@ SetBatchLines, -1
 	Gui, Show
 return
 
+
+OnToolbar(hwnd, event, txt, pos, id) {
+	if event = hot
+	{
+		id := Toolbar_GetButton(hwnd, pos, "id"),   s := Toolbar_GetButton(hwnd, pos, "s")
+		return SB_SetText(txt  "   Data: " id "  " s)
+	}
+
+	tooltip Event:  %event%`nPosition:  %pos%`nCaption:  %txt%`n`nID:%id%`nTickCount:%A_TickCount%, -200, 0
+}
+
 MakeTestGui(w, h){
 
 	Gui, Font, s8, Courier New
@@ -57,16 +68,6 @@ MakeTestGui(w, h){
 
 	Gui, Add, BUTTON, w350 h40 Xs y+30  gOnBtn, Open Help`n(right click on any buttton for its help)
 
-}
-
-OnToolbar(hwnd, event, txt, pos, id) {
-	if event = hot
-	{
-		id := Toolbar_GetButton(hwnd, pos, "id"),   s := Toolbar_GetButton(hwnd, pos, "s")
-		return SB_SetText(txt  "   Data: " id "  " s)
-	}
-
-	msgbox Event:  %event%`nPosition:  %pos%`nCaption:  %txt%`n`nID:%id%
 }
 
 OnBtn:

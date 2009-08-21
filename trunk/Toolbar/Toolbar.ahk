@@ -821,7 +821,7 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 
 Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) { 
 	static MODULEID = 80609, oldNotify="*" 
-	static NM_CLICK=-2, NM_RCLICK=-5, NM_LDOWN=-20, TBN_DROPDOWN=-710, TBN_HOTITEMCHANGE=-713, TBN_ENDDRAG=-702, TBN_BEGINADJUST=-703, TBN_GETBUTTONINFOA=-700, TBN_QUERYINSERT=-706, TBN_QUERYDELETE=-707, TBN_BEGINADJUST=-703, TBN_ENDADJUST=-704, TBN_RESET=-705, TBN_TOOLBARCHANGE=-708, TB_COMMANDTOINDEX=0x419
+	static NM_CLICK=-2, NM_RCLICK=-5, NM_DBLCLK=-3, NM_LDOWN=-20, TBN_DROPDOWN=-710, TBN_HOTITEMCHANGE=-713, TBN_ENDDRAG=-702, TBN_BEGINADJUST=-703, TBN_GETBUTTONINFOA=-700, TBN_QUERYINSERT=-706, TBN_QUERYDELETE=-707, TBN_BEGINADJUST=-703, TBN_ENDADJUST=-704, TBN_RESET=-705, TBN_TOOLBARCHANGE=-708, TB_COMMANDTOINDEX=0x419
 	static cnt, cnta, cBTN, inDialog, LDOWN
 
 	
@@ -841,22 +841,24 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 	pos := ErrorLevel + 1 , txt := Toolbar_GetButton( hw, pos, "c")
 
 	if (code=NM_LDOWN)
-        return LDOWN := Pos 
-  
-	if (code=NM_CLICK) { 
+        LDOWN := LDOWN != -1 ? 1 : 0
+
+	if (code=NM_DBLCLK)
+		LDown := 0
+
+	if (code=NM_CLICK) { 		
 		IfEqual, pos, 4294967296, return 
-		if (LDOWN) and !InStr(Toolbar_GetButton(hw,pos,"s"),"disabled")
-  		  LDOWN := 0, %handler%(hw, "click", txt, pos, iItem)
+		if (LDOWN>0) and !InStr(Toolbar_GetButton(hw,pos,"s"),"disabled")
+  		  m("lup"), LDOWN := 0, %handler%(hw, "click", txt, pos, iItem)
     } 
 
-	if (code=NM_RCLICK)	{
+	if (code=NM_RCLICK)
 		ifEqual, pos, 4294967296, return 0 
-        else  return %handler%(hw,"rclick", txt, pos, iItem) 
-	}
+        else  %handler%(hw,"rclick", txt, pos, iItem) 
 
-	if (code = TBN_DROPDOWN) 
-      return %handler%(hw, "menu", txt, pos, iItem) 
 
+	if (code = TBN_DROPDOWN)
+		LDOWN := -1, %handler%(hw, "menu", txt, pos, iItem)
  
 	if (code = TBN_HOTITEMCHANGE) { 
       IfEqual, pos, 4294967296, return  
