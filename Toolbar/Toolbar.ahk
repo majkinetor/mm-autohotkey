@@ -843,12 +843,10 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 	if (code=NM_LDOWN)
         LDOWN := LDOWN != -1 ? 1 : 0
 
-	if (code=NM_DBLCLK)
-		LDown := 0
 
 	if (code=NM_CLICK) { 		
 		IfEqual, pos, 4294967296, return 
-		if (LDOWN>0) and !InStr(Toolbar_GetButton(hw,pos,"s"),"disabled")
+		if ((LDOWN>0) && !InStr(Toolbar_GetButton(hw,pos,"s"),"disabled")) || InStr(Toolbar_GetButton(hw,pos,"l"),"check")
   		  LDOWN := 0, %handler%(hw, "click", txt, pos, iItem)
     } 
 
