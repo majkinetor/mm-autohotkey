@@ -1,3 +1,16 @@
+_()
+	Gui, Show, x100 y100 h500 w500 
+	Gui, Add, Button, HWNDWin, okadsfasdfasdfsdf
+	Gui, +Lastfound 
+	Win := WinExist() 
+Return
+
+f1::
+
+	Win_Animate(Win, "hide blend") 
+return
+
+
 /*
 	Title:	Win
 			*Set of window functions*
@@ -33,13 +46,11 @@ Win_Animate(Hwnd, Type="", Time=100){
 
 	hFlags := 0
 	loop, parse, Type, %A_Tab%%A_Space%, %A_Tab%%A_Space%
-	{
 		ifEqual, A_LoopField,,continue
-		hFlags |= AW_%A_LoopField%
-	}
+		else hFlags |= AW_%A_LoopField%
+
 	ifEqual, hFlags, ,return "Err: Some of the types are invalid"
-	
-	return DllCall("AnimateWindow", "uint", hwnd, "uint", Time, "uint", hFlags)
+	DllCall("AnimateWindow", "uint", Hwnd, "uint", Time, "uint", hFlags)
 }
 
 /*
@@ -289,15 +300,20 @@ Win_Move(Hwnd, X="", Y="", W="", H="", Flags="") {
 		
 	if (x y != "") {
 		p := DllCall("GetParent", "uint", hwnd), Win_Get(p, "Lxy", px, py), Win_GetRect(hwnd, "xywh", cx, cy, cw, ch)
-		ifEqual, x, , SetEnv, x, % cx - px
-		ifEqual, y, , SetEnv, y, % cy - py
+		if x=
+			x := cx - px
+		if y=
+			y := cy - py
 	} else hFlags |= SWP_NOMOVE
 
 	if (h w != "") {
-		cx ? Win_GetRect(hwnd, "wh", cw, ch) :
-		ifEqual, w, ,SetEnv, w, %cw%
-		ifEqual, h, ,SetEnv, h, %ch%
-	} else hFlags |= SWP_NOSIZE
+		if !cx
+			Win_GetRect(hwnd, "wh", cw, ch)
+		if w=
+			w := cw
+		if h=
+			h := ch
+	} else  hFlags |= SWP_NOSIZE
 
 	return DllCall("SetWindowPos", "uint", Hwnd, "uint", 0, "int", x, "int", y, "int", w, "int", h, "uint", hFlags)
 }
