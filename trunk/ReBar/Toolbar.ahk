@@ -758,10 +758,9 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 
 	if ((NumGet(Lparam+4)) != MODULEID){ 
 		ifEqual, oldNotify, *, SetEnv, oldNotify, % Toolbar("OldNotify")       
-		ifNotEqual, oldNotify,,return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)       
+		ifNotEqual, oldNotify,,return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
 		return 
 	} 
-    
 	hw :=  NumGet(Lparam+0), code := NumGet(Lparam+8, 0, "Int"),  handler := Toolbar(hw "Handler") 
 	ifEqual, handler,, return 
 

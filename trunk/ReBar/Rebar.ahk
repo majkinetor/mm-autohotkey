@@ -607,8 +607,8 @@ Rebar_compileBand(ByRef BAND, hCtrl, ByRef o1="", ByRef o2="", ByRef o3="", ByRe
   pNegStyle - Hex value of the negative styles
  */
 Rebar_getStyle( pStyle, pHex = false, ByRef hNegStyle=""){
-	static STYLE_BREAK=1, STYLE_FIXEDSIZE=0x2, STYLE_FIXEDBMP=0x20, STYLE_NOVERT=0x10, STYLE_VARIABLEHEIGHT=0x40, STYLE_CHILDEDGE=0x4, STYLE_USECHEVRON=0x200, STYLE_GRIPPERALWAYS = 0x80, STYLE_HIDETITLE = 0x400, STYLE_NOGRIPPER = 0x100
-	static styles = "break,fixedbmp,novert,usechevron,fixedsize,gripperalways,hiddetittle,nogripper", STYLE_DEFAULT = 0x80	;GRIPPERALWAYS
+	static STYLE_HIDDEN=0x8, STYLE_BREAK=1, STYLE_FIXEDSIZE=0x2, STYLE_FIXEDBMP=0x20, STYLE_NOVERT=0x10, STYLE_VARIABLEHEIGHT=0x40, STYLE_CHILDEDGE=0x4, STYLE_USECHEVRON=0x200, STYLE_GRIPPERALWAYS = 0x80, STYLE_HIDETITLE = 0x400, STYLE_NOGRIPPER = 0x100
+	static styles = "hidden,break,fixedbmp,novert,usechevron,fixedsize,gripperalways,hiddetittle,nogripper", STYLE_DEFAULT = 0x80	;GRIPPERALWAYS
 
   ;get hex value of named style
 	if (pStyle+0 = "") or pHex 
@@ -668,14 +668,17 @@ Rebar_onNotify(Wparam, Lparam, Msg, Hwnd) {
 	static MODULEID := 30608, oldNotify="*"
 	static RBN_LAYOUTCHANGED = -833, RBN_HEIGHTCHANGE = -831, RBN_CHEVRONPUSHED = -841, RBN_CHILDSIZE = -839
 
-	if ((NumGet(Lparam+4)) != MODULEID){
-		ifEqual, oldNotify, *, SetEnv, oldNotify, % Rebar("oldNotify")		
-		ifNotEqual, oldNotify,,return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)		
+	if (_ := (NumGet(Lparam+4))) != MODULEID
+	 if _ < 10000	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000. Its unlikely that u will use more then 10K ahk controls.
 		return
-	}
+	 else {
+		ifEqual, oldNotify, *, SetEnv, oldNotify, % Rebar("oldNotify")		
+		if oldNotify !=
+			return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
+	 }
+
 	hw := NumGet(Lparam+0),  code := NumGet(Lparam+8, 0, "Int"),  handler := Rebar(hw "Handler")	
 	ifEqual, handler, ,return
-
 
 	if (code = RBN_CHEVRONPUSHED)
 		%handler%(hw, "C")
