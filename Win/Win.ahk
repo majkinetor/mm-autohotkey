@@ -1,16 +1,3 @@
-_()
-	Gui, Show, x100 y100 h500 w500 
-	Gui, Add, Button, HWNDWin, okadsfasdfasdfsdf
-	Gui, +Lastfound 
-	Win := WinExist() 
-Return
-
-f1::
-
-	Win_Animate(Win, "hide blend") 
-return
-
-
 /*
 	Title:	Win
 			*Set of window functions*
@@ -274,21 +261,6 @@ Win_Is(Hwnd, pQ="win") {
 			In order to do that you must get the current position of the control. That can be done with ControlGetPos which works in pair with ControlMove hence it is not relative to the client rect or WinGetPos which returns screen coordinates of child control so those can not 
 			be imediatelly used in WinMove as it positions child window relative to the parents client rect. This scenario can be additionaly complicated by the fact that each window may have its own theme which influences the size of its borders, non client area, etc...
 
- Example:
-			Difference between ControlMove and Win_Move:
-			(start code)
-   				Gui, Add, Edit, h40 hwndhEdit w100
-  				gui, show, w200 h300
-  			return
-  
-  			F1::
-  				ControlMove, ,0,0, , , ahk_id %hEdit%
-  			return
-  
-  			F2::
-  				Win_Move(hEdit, 0, 0)
-  			return
-			(end code)
  */
 Win_Move(Hwnd, X="", Y="", W="", H="", Flags="") {
 ;	static SWP_NOMOVE=2, SWP_NOREDRAW=8, SWP_NOSIZE=1, SWP_NOZORDER=4, SWP_NOACTIVATE = 0x10, SWP_ASYNCWINDOWPOS=0x4000, HWND_BOTTOM=1, HWND_TOPMOST=-1, HWND_NOTOPMOST = -2
@@ -501,7 +473,7 @@ Win_Subclass(hCtrl, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.0 by majkinetor.
+	o v1.0a by majkinetor.
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*
