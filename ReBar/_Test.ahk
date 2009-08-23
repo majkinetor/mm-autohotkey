@@ -32,7 +32,7 @@ DetectHiddenWindows, On
 
   ;create rebar	
 	hRebar := Rebar_Add(hGui, "", hIL, "", "OnRebar")	
-	ReBar_AddBand(hRebar, hLog, "mw 500", "L 400", "T Log")
+	id := ReBar_AddBand(hRebar, hLog, "mw 500", "L 400", "T Log", "S hidden")
 	ReBar_AddBand(hRebar, hCombo, "L 300", "I 4", "T dir")
 	ReBar_AddBand(hRebar, hToolbar, "mW 45", "S usechevron" )
 	ReBar_AddBand(hRebar, hMenu, "mW 45", "P 1", "S usechevron")
@@ -74,7 +74,8 @@ F1::
 return
 
 F2::
-	Rebar_Lock(hRebar, "~")
+;	Rebar_Lock(hRebar, "~")
+		ReBar_SetBand(hRebar, id, "S hidden")
 return
 
 F3::
