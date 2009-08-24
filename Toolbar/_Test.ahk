@@ -130,6 +130,8 @@ Get() {
 	return txt
 }
 
+GuiEscape:
+
 GuiClose:
 	ExitApp
 return
