@@ -741,4 +741,4 @@ Rebar(var="", value="~`a") {
 	o Ver 2.0c by majkinetor. 
 	o MSDN Reference: <http://msdn.microsoft.com/en-us/library/bb774375(VS.85).aspx>.
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>.
- */
+*/
