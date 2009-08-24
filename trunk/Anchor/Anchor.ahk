@@ -1,68 +1,102 @@
-;	static WM_SIZE = 0x05,
-Anchor(hCtrl="", aDef=""){
-	static tokens := "xywhr", WM_SIZE = 0x05
-	static 
-	
-	if A_Gui !=
+_()
+	Gui, +Resize
+
+	Gui, Add, Edit, HWNDhe1 w100 h100
+	Anchor(he1, "w.5h", "", "")
+	Gui, Add, Edit, HWNDhe2 w100 x+5 h100
+	Anchor(he2, "x.5w.5h", "", "")
+
+	Gui, Add, Edit, HWNDhe3 w100 xm h100
+	Anchor(he3, "y", "", "")
+	Gui, Add, Edit, HWNDhe4 w100 x+5 h100
+	Anchor(he4, "yw", "", "")
+
+	Gui, Show, autosize
+return
+
+
+F1::
+	Win_MoveDelta(he1, "", "", -50)
+	Win_MoveDelta(he2, -50, "", 50)
+	Anchor(he1, "w.5h", "", "")
+	Anchor(he2, "x.5w.5h", "", "")
+	Anchor(he3, "y", "", "")
+	Anchor(he4, "yw", "", "")
+return
+
+
+
+
+
+
+
+Anchor(hCtrl, aDef, r, Hwnd){
+	static
+	static tokens="x,w,y,h", adrSetWindowPos, WM_SIZE = 0x05
+
+	if Hwnd =
 	{
-		OnMessage(WM_SIZE, "Anchor_size")
-;		Gui, %A_Gui%:+LastFound
-;		hwnd := WinExist()
-;		return Panel_size(hwnd, %hPanel%_a)
-	}
+		if !adrSetWindowPos
+		{
+			adrSetWindowPos := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "SetWindowPos")
+			OnMessage(WM_SIZE, "Anchor")
+		}
+;		ControlGetPos, cx, cy, cw, ch, , ahk_id %hCtrl%
+		Win_GetRect(hCtrl, "*xywh", cx, cy, cw, ch)
+
+		hPanel := DllCall("GetParent", "uint", hCtrl)
+
+	 ;add space between tokens for easier parsing
+		loop, parse, tokens
+			StringReplace, aDef, aDef, %A_LoopField%, %A_Space%%A_LoopField%
+		aDef := SubStr(aDef, 2)
+
+	 ;compile
+		loop, parse, aDef, %A_Space%
+		{
+			s := A_LoopField,	z := SubStr(s,1,1)
+
+			if z=r
+				continue
+
+			if (j := InStr(s, "/"))
+				j := SubStr(s, 2, j-2) / SubStr(s, j+1), s := SubStr(s,1,1) j
+			else if (SubStr(s,2)="")
+					s .= "1"
+
+			j := SubStr(A_LoopField, 1, 1), j := c%j%
+			StringReplace, s, s, %z%, %z%:
+			StringReplace, aDef, aDef, %A_LoopField%, %s%:%j%
+		}
+
+		if j := InStr(%hPanel%_a , "`n"  hCtrl " ")
+		{
+			re = `nm)^%hCtrl%.+$
+			%hPanel%_a := RegExReplace(%hPanel%_a, re, hCtrl " " aDef)
+			reset := 1
+		} else 
+			%hPanel%_a .= "`n"  hCtrl " " aDef	;store anchor definition for the control
 		
-
-	hPanel := DllCall("GetParent", "uint", hCtrl)
-
-	ControlGetPos, px, py, pw, ph, , ahk_id %hPanel%
-	ControlGetPos, cx, cy, cw, ch, , ahk_id %hCtrl%
-	cx-=px, cy-=py		;!!! -borderx -bordery
-
- ;add space between tokens for easier parsing
-	loop, parse, tokens
-		StringReplace, aDef, aDef, %A_LoopField%, %A_Space%%A_LoopField%
-	aDef := SubStr(aDef, 2)
-
- ;compile
-	loop, parse, aDef, %A_Space%
-	{
-		s := A_LoopField,	z := SubStr(s,1,1)
-
-		if z=r
-			continue
-
-		if (j := InStr(s, "/"))
-			j := SubStr(s, 2, j-2) / SubStr(s, j+1), s := SubStr(s,1,1) j
-		else if (SubStr(s,2)="")
-				s .= "1"
-
-		j := SubStr(A_LoopField, 1, 1), j := c%j%
-		StringReplace, s, s, %z%, %z%:
-		StringReplace, aDef, aDef, %A_LoopField%, %s%:%j%
+		return
 	}
+	pw := aDef & 0xFFFF,	ph := aDef >> 16	
+	if (%hwnd%_s = "") || reset 
+		%hwnd%_s := pw " " ph, reset := 0
+	
 
-	%hPanel%_a .= "`n"  hCtrl " " aDef	;store anchor definition for the control
-	%hPanel%_s := pw " " ph				;store size for the parent
-}
-
-
-Anchor_size(Hwnd, aList, startSize) {
-	static tokens="x,w,y,h", adrSetWindowPos
-
-	if !adrSetWindowPos
-		adrSetWindowPos := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "SetWindowPos")
-
-	ph := A_GuiHeight, 	pw := A_GuiWidth
 	ControlGetPos, px, py,,, , ahk_id %Hwnd%
 
-	StringSplit, s, startSize, %A_Space%
-	loop, parse, aList, `n, `n
+	StringSplit, s, %Hwnd%_s, %A_Space%
+	loop, parse, %Hwnd%_a, `n, `n
 	{
 		ifEqual, A_LoopField, , continue
 		
-		j := InStr(A_LoopField, " "),  hCtrl := SubStr(A_LoopField, 1, j-1),  aDef := SubStr(A_LoopField, j+1)
-		ControlGetPos, cx, cy, cw, ch, , ahk_id %hCtrl%
-		cx-=px, cy-=py		;!!! -borderx -bordery
+		j := InStr(A_LoopField, " "), hCtrl := SubStr(A_LoopField, 1, j-1), aDef := SubStr(A_LoopField, j+1)
+
+;		ControlGetPos, cx, cy, cw, ch, , ahk_id %hCtrl%
+;		cx-=px, cy-=py		;!!! -borderx -bordery
+		Win_GetRect(hCtrl, "*xywh", cx, cy, cw, ch)
+
 		loop, parse, aDef, %A_Space%
 		{
 			if (SubStr(A_LoopField, 1, 1) = "r"){
@@ -80,7 +114,8 @@ Anchor_size(Hwnd, aList, startSize) {
 		flag |= uw OR uh ? 0 : 1		;SWP_NOSIZE=1
 		flag |= ux OR uy ? 0 : 2		;SWP_NOMOVE=2
 
-		DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag)
-;		ifEqual, r, 2, % RedrawDelayed(hCtrl)
+		DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag) ; SWP_NOZORDER=4
+;		ifEqual, r, 2, % redrawDelayed(hCtrl)
 	}
 }
+#include Win.ahk
