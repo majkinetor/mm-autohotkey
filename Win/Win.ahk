@@ -352,6 +352,10 @@ Win_SetMenu(Hwnd, hMenu=0){
  Returns:
 			The return value is a handle to the previous large or small icon, depending on the Flag value.
 			If Flag=2, big icon handle is returned only.
+
+ Remarks:
+			For 3thd party processes you can only set large icon.
+
  */
 Win_SetIcon( Hwnd, Icon="", Flag=2){
 	static WM_SETICON = 0x80, LR_LOADFROMFILE=0x10, IMAGE_ICON=1
@@ -407,9 +411,9 @@ Win_SetParent(Hwnd, hParent=0){
 ;GWL_HWNDPARENT should have been called GWL_HWNDOWNER, but nobody noticed it until after a bazillion copies of the SDK had gone out. This is what happens 
 ;when the the dev team lives on M&Ms and CocaCola for to long. Too bad. Live with it.
 ;
-Win_SetOwner(hwnd, hOwner){
+Win_SetOwner(Hwnd, hOwner){
 	static GWL_HWNDPARENT = -8
-	return DllCall("SetWindowLong", "uint", hwnd, "int", GWL_HWNDPARENT, "uint", hOwner)		
+	return DllCall("SetWindowLong", "uint", Hwnd, "int", GWL_HWNDPARENT, "uint", hOwner)		
 }
 
 /*
@@ -423,8 +427,8 @@ Win_SetOwner(hwnd, hOwner){
 		If the window was previously visible, the return value is nonzero. 
 		If the window was previously hidden, the return value is zero.
  */
-Win_Show(hwnd, bShow=true) {
-	return DllCall("ShowWindow", "uint", hwnd, "uint", bShow ? 5:0)
+Win_Show(Hwnd, bShow=true) {
+	return DllCall("ShowWindow", "uint", Hwnd, "uint", bShow ? 5:0)
 }
 
 /*
