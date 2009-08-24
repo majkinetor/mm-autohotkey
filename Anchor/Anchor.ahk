@@ -1,13 +1,14 @@
 ;	static WM_SIZE = 0x05,
 Anchor(hCtrl="", aDef=""){
-	static tokens := "xywhr"
+	static tokens := "xywhr", WM_SIZE = 0x05
 	static 
 	
 	if A_Gui !=
 	{
-		Gui, %A_Gui%:+LastFound
-		hwnd := WinExist()
-		return Panel_size(hwnd, %hPanel%_a)
+		OnMessage(WM_SIZE, "Anchor_size")
+;		Gui, %A_Gui%:+LastFound
+;		hwnd := WinExist()
+;		return Panel_size(hwnd, %hPanel%_a)
 	}
 		
 
@@ -45,7 +46,7 @@ Anchor(hCtrl="", aDef=""){
 }
 
 
-Panel_size(Hwnd, aList, startSize) {
+Anchor_size(Hwnd, aList, startSize) {
 	static tokens="x,w,y,h", adrSetWindowPos
 
 	if !adrSetWindowPos
