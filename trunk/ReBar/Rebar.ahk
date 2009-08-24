@@ -99,61 +99,6 @@ Rebar_Add(hGui, Style="", hIL="", Pos="", Handler="") {
 }
 
 /*
- Function:	AddBand
- 			Inserts a new band in a rebar control.
- 
- Parameters:
- 			hCtrl			- Control to be hosted by the band.
- 			o1 .. o8		- Named parameters. See below.
- 
- Named parameters:
- 			S				- Band styles separated by white space. By default "gripperalways". See bellow.
- 			L				- Length of the band. By default, width of the child control is used + 10px
- 			mW				- Minimum width of the child control.
- 			mH				- Minimum height of the child control. By default the height of the child control.
- 			I				- Header icon index.
- 			T				- Header text.
- 			C				- Background and foreground color separated by space.
- 			BG				- Background bitmap.
- 			P				- 1-based position of the band. Set to 0 add the band to the end (default).
- 
- Band styles:
- 			break			- The band is on a new line.
- 			childedge		- The band has an edge at the top and bottom of the child window.
- 			fixedbmp		- The background bitmap does not move when the band is resized.
- 			fixedsize		- The band can't be sized. With this style, the sizing grip is not displayed on the band.
- 			gripperalways	- The band will always have a sizing grip, even if it is the only band in the rebar.
- 			hidden			- The band will not be visible.
- 			nogripper		- The band will never have a sizing grip, even if there is more than one band in the rebar.
- 			usechevron		- Show a chevron button if the band is smaller than ideal.
- 			novert			- Don't show when vertical.
- 			hidetitle		- Keep band title hidden.
- 			*				- Default styles for the band. For instance "* break" will set band style to default plus "break" style.
- 
- Returns:
- 			ID of the newly created band or 0 if it fails.
-
- Remarks:
-			For some reason, using the Gui, Font to change font size before adding ComboBox child to the band will make it buggy in a sense
-			that ComboBox list will not be able to show (although you can still select items using arrows). 
-	
- */
-Rebar_AddBand(hRebar, hCtrl, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o9=""){
-	static RB_INSERTBANDA=0x401
-
-	if !(hCtrl+0)
-		return A_ThisFunc "> Invalid child handle: " hCtrl
-
-	pos := Rebar_compileBand(BAND, hCtrl, o1, o2, o3, o4, o5, o6, o7, o8, o9)
-	if pos is not Integer
-		return pos
-	
-	SendMessage, RB_INSERTBANDA, pos, &BAND,, ahk_id %hReBar% 
-	ifEqual, ErrorLevel, 0, return 0
-	return 	NumGet(BAND, 52)   ;return ID
-}
-
-/*
  Function:  Count
 			Retrieves the number of bands in a rebar control.
  */
@@ -315,6 +260,64 @@ Rebar_ID2Index(hRebar, Id){
 	SendMessage, RB_IDTOINDEX, Id,,, ahk_id %hRebar%
 	return Errorlevel+1
 }
+
+/*
+ Function:	Insert
+ 			Inserts a new band in a rebar control.
+ 
+ Parameters:
+ 			hCtrl			- Control to be hosted by the band.
+ 			o1 .. o8		- Named parameters. See below.
+ 
+ Named parameters:
+ 			S				- Band styles separated by white space. By default "gripperalways". See bellow.
+ 			L				- Length of the band. By default, width of the child control is used + 10px
+ 			mW				- Minimum width of the child control.
+ 			mH				- Minimum height of the child control. By default the height of the child control.
+ 			I				- Header icon index.
+ 			T				- Header text.
+ 			C				- Background and foreground color separated by space.
+ 			BG				- Background bitmap.
+ 			P				- 1-based position of the band. Set to 0 add the band to the end (default).
+ 
+ Band styles:
+ 			break			- The band is on a new line.
+ 			childedge		- The band has an edge at the top and bottom of the child window.
+ 			fixedbmp		- The background bitmap does not move when the band is resized.
+ 			fixedsize		- The band can't be sized. With this style, the sizing grip is not displayed on the band.
+ 			gripperalways	- The band will always have a sizing grip, even if it is the only band in the rebar.
+ 			hidden			- The band will not be visible. Don't use this flag in Insert function. Instead, insert the band without this flag, then use <SetBand> to hide it. To restore it afterwards, use SetBand with "S show" parameter.
+ 			nogripper		- The band will never have a sizing grip, even if there is more than one band in the rebar.
+ 			usechevron		- Show a chevron button if the band is smaller than ideal.
+ 			novert			- Don't show when vertical.
+ 			hidetitle		- Keep band title hidden.
+ 			*				- Default styles for the band. For instance "* break" will set band style to default plus "break" style.
+ 
+ Returns:
+ 			ID of the newly created band or 0 if it fails.
+
+ Remarks:
+			For some reason, using the Gui, Font to change font size before adding ComboBox child to the band will make it buggy in a sense
+			that ComboBox list will not be able to show (although you can still select items using arrows). 
+
+
+	
+ */
+Rebar_Insert(hRebar, hCtrl, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o9=""){
+	static RB_INSERTBANDA=0x401
+
+	if !(hCtrl+0)
+		return A_ThisFunc "> Invalid child handle: " hCtrl
+
+	pos := Rebar_compileBand(BAND, hCtrl, o1, o2, o3, o4, o5, o6, o7, o8, o9)
+	if pos is not Integer
+		return pos
+	
+	SendMessage, RB_INSERTBANDA, pos, &BAND,, ahk_id %hReBar% 
+	ifEqual, ErrorLevel, 0, return 0
+	return 	NumGet(BAND, 52)   ;return ID
+}
+
 
 /*
   Function: Lock
@@ -669,8 +672,7 @@ Rebar_onNotify(Wparam, Lparam, Msg, Hwnd) {
 	static RBN_LAYOUTCHANGED = -833, RBN_HEIGHTCHANGE = -831, RBN_CHEVRONPUSHED = -841, RBN_CHILDSIZE = -839
 
 	if (_ := (NumGet(Lparam+4))) != MODULEID
-	 if _ < 10000	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000. Its unlikely that u will use more then 10K ahk controls.
-		return
+	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000. Its unlikely that u will use more then 10K ahk controls.
 	 else {
 		ifEqual, oldNotify, *, SetEnv, oldNotify, % Rebar("oldNotify")		
 		if oldNotify !=
@@ -689,7 +691,7 @@ Rebar_onNotify(Wparam, Lparam, Msg, Hwnd) {
 	if (code = RBN_LAYOUTCHANGED)
 		%handler%(hw, "L")
 
-;	if (code = RBN_CHILDSIZE)	;spamer msg
+;	if (code = RBN_CHILDSIZE)	;spammer msg
 ;		%handler%(hw, "S")
 
 }
@@ -726,9 +728,9 @@ Rebar(var="", value="~`a") {
 
 	  ;create rebar	
 		hRebar := Rebar_Add(hGui)
-		ReBar_AddBand(hRebar, hEdit, "mw 100", "L 400", "T Log ")	;Add edit band, set lenght of the band to 400
+		ReBar_Insert(hRebar, hEdit, "mw 100", "L 400", "T Log ")	;Insert edit band, set lenght of the band to 400
 																	; minimum width of edit to 100, set text to "Log "
-		ReBar_AddBand(hRebar, hCombo, "L 300", "P 1")				;Add combo band to top, set length of the band to 300
+		ReBar_Insert(hRebar, hCombo, "L 300", "P 1")				;Insert combo band at the top, set length of the band to 300
 
 		Gui, Show
 	return 
@@ -736,7 +738,7 @@ Rebar(var="", value="~`a") {
  */
 
 /* Group: About
-	o Ver 2.0b by majkinetor. 
+	o Ver 2.0c by majkinetor. 
 	o MSDN Reference: <http://msdn.microsoft.com/en-us/library/bb774375(VS.85).aspx>.
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>.
  */
