@@ -822,7 +822,7 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) { 
 	static MODULEID = 80609, oldNotify="*" 
 	static NM_CLICK=-2, NM_RCLICK=-5, NM_LDOWN=-20, TBN_DROPDOWN=-710, TBN_HOTITEMCHANGE=-713, TBN_ENDDRAG=-702, TBN_BEGINADJUST=-703, TBN_GETBUTTONINFOA=-700, TBN_QUERYINSERT=-706, TBN_QUERYDELETE=-707, TBN_BEGINADJUST=-703, TBN_ENDADJUST=-704, TBN_RESET=-705, TBN_TOOLBARCHANGE=-708, TB_COMMANDTOINDEX=0x419
-	static cnt, cnta, cBTN, inDialog, tc
+	static cnt, cnta, cBTN, inDialog, tc=0
 
 	if (_ := (NumGet(Lparam+4))) != MODULEID
 	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
@@ -844,7 +844,6 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 		IfEqual, pos, 4294967296, return 
 		tc := A_TickCount
     } 
-
 
 	if (code=NM_CLICK) { 		
 		IfEqual, pos, 4294967296, return
