@@ -74,6 +74,9 @@
 			However, any little mistake -- an unexpected menu, prompt, MsgBox, etc., and the script will lock up. 
 			Without the Critical command, the function is a lot more forgiving. 
 			The developer should still be careful but the script won't shut down if something unexpected happens.
+
+			One little quirk of toolbar: since its usualy the first control created, upon reactivation of the window, first button will automatically become hot as effect of focusing.
+			You can solve this quickly if you add dummy control to be the first one:    Gui, Add, Text, w0 h0 x0 y0
  */
 Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 	static MODULEID
