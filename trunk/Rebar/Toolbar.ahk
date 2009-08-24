@@ -35,7 +35,7 @@
 
  Handler:
 
- > 			Handler(hCtrl, Event, Txt, Pos, Id)
+ > Handler(hCtrl, Event, Txt, Pos, Id)
 
 			Ctrl	- Handle of the Toolbar that sends the message.
 			Event	- Event name. See bellow.
@@ -53,6 +53,27 @@
 
  Returns: 
 			Control's handle or error message.
+
+
+ Remarks:
+			To avoid lost messages and/or script lockup, events triggered by the toolbar buttons should complete quickly. 
+			If an event takes more than a few milliseconds to complete, consider creating an independent thread to accomplish the task:
+
+ (start code)
+			if event=click
+			    if button=BigFatRoutine 
+			    { 
+			        SetTimer MyBigFatRoutine,0 
+			        return 
+				}
+ (end code)
+
+			If you happen to have unusual control behavior - missing events, redrawing issues etc... try adding _Critical_ command (or better Critical N) at the start of the Toolbar_onNotify function.
+			It helps to improve the odds that no messages are dropped. The drawback of using the command is that the function refuses to be interrupted. 
+			This is not a problem if the developer is very careful not to call any routines or functions that use anything more than a few milliseconds. 
+			However, any little mistake -- an unexpected menu, prompt, MsgBox, etc., and the script will lock up. 
+			Without the Critical command, the function is a lot more forgiving. 
+			The developer should still be careful but the script won't shut down if something unexpected happens.
  */
 Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 	static MODULEID
@@ -183,13 +204,13 @@ Toolbar_Customize(hCtrl) {
 
 /*
  Function:  Define
- 			Get current toolbar definition
+ 			Get the toolbar definition list.
  
  Parameters:
  			pQ	- Query parameter. Specify "c" to get only current buttons, "a" to get only available buttons.
  				  Leave empty to get all buttons.
  Returns:
-			Button definition list.
+			Button definition list. You can use the list directly with <Insert> function.
  */
 Toolbar_Define(hCtrl, pQ="") {
 	if pQ !=
@@ -198,15 +219,15 @@ Toolbar_Define(hCtrl, pQ="") {
 
 	if (pQ = "") or (pQ = "c")
 		loop, % Toolbar_Count(hCtrl)
-			btns .= Toolbar_GetButton(hCtrl, A_Index) "`r`n"
+			btns .= Toolbar_GetButton(hCtrl, A_Index) "`n"
 	ifEqual, pQ, c, return SubStr(btns, 1, -2)
 
 	if (pQ="") or (pQ = "a"){
-		ifEqual, pQ, , SetEnv, btns, %btns%`r`n
+		ifEqual, pQ, , SetEnv, btns, %btns%`n
 
 		cnta := NumGet( Toolbar(hCtrl "aBTN") )
 		loop, %cnta%
-			btns .= Toolbar_GetButton(hCtrl, -A_Index) "`r`n"
+			btns .= Toolbar_GetButton(hCtrl, -A_Index) "`n"
 	
 		return SubStr(btns, 1, -2)
 	}
@@ -238,6 +259,9 @@ Toolbar_DeleteButton(hCtrl, Pos=1) {
 
     SendMessage, TB_DELETEBUTTON, Pos-1, , ,ahk_id %hCtrl%
 	return ErrorLevel
+}
+
+Toolbar_FindButton(hCtrl, Text, ByRef pos, ByRef id="") {
 }
 
 /*
@@ -391,6 +415,25 @@ Toolbar_GetMaxSize(hCtrl, ByRef Width, ByRef Height){
 }
 
 /*
+ Function:  CommandToIndex
+ 			Retrieves the button position given the ID.
+ 
+ Parameters:
+ 			ID	- Button ID, number > 0.
+ 
+ Returns:
+ 			0 if button with that ID doesn't exist, pos > 0 otherwise.
+ */
+
+Toolbar_CommandToIndex( hCtrl, ID ) {
+	static TB_COMMANDTOINDEX=0x419
+
+	SendMessage, TB_COMMANDTOINDEX, ID,, ,ahk_id %hCtrl%
+	ifEqual, ErrorLevel, 4294967295, return 0
+	return ErrorLevel + 1
+}
+
+/*
  Function:  Insert
  			Insert button(s) on the Toolbar. 
  
@@ -423,7 +466,7 @@ Toolbar_GetMaxSize(hCtrl, ByRef Width, ByRef Height){
  			SHOWTEXT	- Specifies that button text should be displayed. All buttons can have text, but only those buttons with the SHOWTEXT button style will display it. 
  						  This button style must be used with the LIST style. If you set text for buttons that do not have the SHOWTEXT style, the toolbar control will 
  						  automatically display it as a ToolTip when the cursor hovers over the button. For this to work you must create the toolbar with TOOLTIPS style.
- 						  You can create multiline tooltips by using $ in the tooltip caption. Each $ will be replaced with new line.
+ 						  You can create multiline tooltips by using `r in the tooltip caption. Each `r will be replaced with new line.
  
  Button States:
  			CHECKED		- The button has the CHECK style and is being clicked.
@@ -470,6 +513,26 @@ Toolbar_MoveButton(hCtrl, OldPos, NewPos) {
 	static TB_MOVEBUTTON = 0x452
     SendMessage, TB_MOVEBUTTON, OldPos-1,NewPos-1, ,ahk_id %hCtrl%
 	return ErrorLevel
+}
+
+
+/*
+ Function:  SetBitmapSize
+ 			Sets the size of the bitmapped images to be added to a toolbar.
+ 
+ Parameters:
+			Width, Height - Width & heightin pixels, of the bitmapped images. Defaults to 0,0
+ 
+ Returns:
+ 			TRUE if successful, or FALSE otherwise.
+
+ Remarks:
+			The size can be set only before adding any bitmaps to the toolbar. 
+			If an application does not explicitly set the bitmap size, the size defaults to 16 by 15 pixels. 
+ */
+Toolbar_SetBitmapSize(hCtrl, Width=0, Height=0) {
+	static TB_SETBITMAPSIZE=1056
+    SendMessage, TB_SETBITMAPSIZE, Width,Height, ,ahk_id %hCtrl%
 }
 
 /*
@@ -553,6 +616,13 @@ Toolbar_SetButtonWidth(hCtrl, Min, Max=""){
 
  	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
 	return ret
+}
+
+;Toolbar_SetDrawTextFlags(hModbar, 3, 2) ;right align text
+Toolbar_SetDrawTextFlags(hCtrl, f1, f2) {
+	static TB_SETDRAWTEXTFLAGS = 1094
+	SendMessage, TB_SETDRAWTEXTFLAGS, f1,f2,,ahk_id %hCtrl%
+
 }
 
 /*
@@ -725,12 +795,13 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 
 	 ;TBBUTTON Structure
 		bid := a5 ? a5 : ++id 					;user id or auto id makes button id
-		NumPut(a2-1,	o+0, 0)					;Zero-based index of the button image. If the button is a separator, determines the width of the separator, in pixels
-		NumPut(bid,	o+0, 4)						;Command identifier associated with the button
+
+		NumPut(a2-1,	o+0, 0, "Int")			;Zero-based index of the button image. If the button is a separator, determines the width of the separator, in pixels
+		NumPut(bid,		o+0, 4, "Int")			;Command identifier associated with the button
 		NumPut(hstate,  o+0, 8, "Char")			;Button state flags
 		NumPut(hStyle,  o+0, 9, "Char")			;Button style
 		NumPut(0,		o+0, 12)				;User data
-		NumPut(sIdx,	o+0, 16)				;Zero-based index of the button string
+		NumPut(sIdx,	o+0, 16, "Int")			;Zero-based index of the button string
 
 		if a
 		{
@@ -749,62 +820,48 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 }
 
 Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) { 
-	critical
 	static MODULEID = 80609, oldNotify="*" 
 	static NM_CLICK=-2, NM_RCLICK=-5, NM_LDOWN=-20, TBN_DROPDOWN=-710, TBN_HOTITEMCHANGE=-713, TBN_ENDDRAG=-702, TBN_BEGINADJUST=-703, TBN_GETBUTTONINFOA=-700, TBN_QUERYINSERT=-706, TBN_QUERYDELETE=-707, TBN_BEGINADJUST=-703, TBN_ENDADJUST=-704, TBN_RESET=-705, TBN_TOOLBARCHANGE=-708, TB_COMMANDTOINDEX=0x419
-	static cnt, cnta, cBTN, inDialog,    s_LDOWNPos:=0, s_HOTITEMCHANGEPos:=0 
-	; If s_LDOWNPos=0, the left mouse button has not been clicked.  If s_LDOWNPos<>0,				--jballi
-	; the left mouse button has been clicked and the variable contains the button position. 
+	static cnt, cnta, cBTN, inDialog, tc
 
-	if ((NumGet(Lparam+4)) != MODULEID){ 
-		ifEqual, oldNotify, *, SetEnv, oldNotify, % Toolbar("OldNotify")       
-		ifNotEqual, oldNotify,,return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
-		return 
-	} 
+	if (_ := (NumGet(Lparam+4))) != MODULEID
+	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
+	 else {
+		ifEqual, oldNotify, *, SetEnv, oldNotify, % Toolbar("oldNotify")		
+		if oldNotify !=
+			return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
+	 }
+    
 	hw :=  NumGet(Lparam+0), code := NumGet(Lparam+8, 0, "Int"),  handler := Toolbar(hw "Handler") 
 	ifEqual, handler,, return 
-
 	iItem  := (code != TBN_HOTITEMCHANGE) ? NumGet(lparam+12) : NumGet(lparam+16) 
 
 	SendMessage, TB_COMMANDTOINDEX,iItem,,,ahk_id %hw%    
-	pos:=ErrorLevel+1 
-	txt := Toolbar_GetButton( hw, pos, "c") 
+	pos := ErrorLevel + 1 , txt := Toolbar_GetButton( hw, pos, "c")
 
-  ;This traps NM_LDOWN (left mouse click down) and assigns the current button pos to s_LDOWNPos		--jballi
-	if (code=NM_LDOWN) {  
-        s_LDOWNPos:=Pos 
-        return 0 
+	
+	if (code=TBN_ENDDRAG) { 		
+		IfEqual, pos, 4294967296, return 
+		tc := A_TickCount
     } 
- 
-  ;New trap for TBN_ENDDRAG.  This replaces the trap for NM_CLICK									--jballi
-	if (code=TBN_ENDDRAG)
-        if (s_LDOWNPos = s_HOTITEMCHANGEPos) { 
-             s_LDOWNPos := 0 
-			 return %handler%(hw, "click",txt,pos,iItem) 
-		} 
-		else return 0 
 
- /* Original NM_CLICK code. Problematic because of bug reported here:								--jballi
-    http://www.autohotkey.com/forum/viewtopic.php?p=283031#283031
-   
-	if (code = NM_CLICK) { 
-      IfEqual, pos, 4294967296, return 
-      return %handler%(hw, "click", txt, pos, iItem) 
-   } 
- */
-	if (code=NM_RCLICK)		;																		--jballi
+
+	if (code=NM_CLICK) { 		
+		IfEqual, pos, 4294967296, return
+		if !(A_TickCount - tc)
+	 		%handler%(hw, "click", txt, pos, iItem)
+    } 
+
+	if (code=NM_RCLICK)
 		ifEqual, pos, 4294967296, return 0 
-        else  return %handler%(hw,"rclick", txt, pos, iItem) 
+        else  %handler%(hw,"rclick", txt, pos, iItem) 
 
 
-	if (code = TBN_DROPDOWN) 
-      return %handler%(hw, "menu", txt, pos, iItem) 
-
+	if (code = TBN_DROPDOWN)
+		%handler%(hw, "menu", txt, pos, iItem)
  
 	if (code = TBN_HOTITEMCHANGE) { 
-        s_HOTITEMCHANGEPos := pos		;s_HOTITEMCHANGEPos contains the last button position		--jballi
-										; of the cursor on the toolbar or 4294967296 if not on a toolbar button. 
-      IfEqual, pos, 4294967296, return 
+      IfEqual, pos, 4294967296, return  
       %handler%(hw, "hot", txt, pos,  iItem) 
       return 0 
    } 
@@ -822,8 +879,8 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 		if (iItem = cnt + cnta)					;iItem is position, not identifier. Win keeps sending incresing numbers until we say "no more" (return 0) 
 			return 0 
        
-		TBB := lparam + 16						;The OS buffer where to put button structure 
-		o := (iItem < cnt) ?  cBTN + 20*iItem : Toolbar( hw "aBTN") + 20*(iItem-cnt) + 4 
+		TBB := lparam + 16						;The OS buffer where to put the button structure 
+		o := (iItem < cnt) ?  cBTN + 20*iItem : Toolbar( hw "aBTN") + 20*(iItem-cnt) + 4
 		Toolbar_memcpy( TBB, o, 20) ;copy the compiled item into notification struct 
 		return 1 
 	} 
@@ -840,7 +897,7 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 		return %handler%(hw, "adjust", "", "", "") 
 	} 
 
-	;This will fire when user is dragging buttons around with adjustable style 
+	;This will fire when user is dragging buttons around with adjustable style
 	if (code = TBN_TOOLBARCHANGE) and !inDialog 
 		return %handler%(hw, "change", "", "", "") 
 }
@@ -998,9 +1055,8 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 
 /*
  Group: About
-	o Ver 2.12 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Ver 2.2 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
 	o Parts of code in Toolbar_onNotify by jballi.
 	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
- */
-
+ */ 
