@@ -32,10 +32,13 @@ DetectHiddenWindows, On
 
   ;create rebar	
 	hRebar := Rebar_Add(hGui, "", hIL, "", "OnRebar")	
-	id := ReBar_AddBand(hRebar, hLog, "mw 500", "L 400", "T Log", "S hidden")
-	ReBar_AddBand(hRebar, hCombo, "L 300", "I 4", "T dir")
-	ReBar_AddBand(hRebar, hToolbar, "mW 45", "S usechevron" )
-	ReBar_AddBand(hRebar, hMenu, "mW 45", "P 1", "S usechevron")
+	id := ReBar_Insert(hRebar, hLog, "mw 500", "L 400", "T Log")
+	ReBar_SetBand(hRebar, id, "S hidden nogripper")
+	ReBar_SetBand(hRebar, id, "S show")
+
+	ReBar_Insert(hRebar, hCombo, "L 300", "I 4", "T dir")
+	ReBar_Insert(hRebar, hToolbar, "mW 45", "S usechevron" )
+	ReBar_Insert(hRebar, hMenu, "mW 45", "P 1", "S usechevron")
 
 	layout := "10002 356 0|10003 214 0|10001 400 1|10004 290 1"
 	Rebar_SetLayout(hRebar, layout)
@@ -46,7 +49,7 @@ DetectHiddenWindows, On
 ;	hNotepad := WinExist("Untitled")
 ;	WinSet, Style, -0xC00000, ahk_id %hNotepad%
 ;	WinSet, Style, -0x40000, ahk_id %hNotepad%
-;	reNotepad := Rebar_AddBand(hRebar, hNotepad, "L 300", "mh 140", "T Note", "I 17")
+;	reNotepad := Rebar_Insert(hRebar, hNotepad, "L 300", "mh 140", "T Note", "I 17")
 
   ;Add other GUI controls
 	h := Rebar_Height(hRebar)+90
@@ -123,6 +126,9 @@ Log(txt){
 	ControlSetText, , %txt%, ahk_id %hLog% 
 }
 
+F6::
+
+return
 
 #include Rebar.ahk
 #include Toolbar.ahk
