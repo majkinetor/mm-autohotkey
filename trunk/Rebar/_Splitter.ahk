@@ -14,7 +14,7 @@ SetBatchLines, -1
 
 	hRebar := Rebar_Add(hGui, "fixedorder", "", "")	
 	ReBar_Insert(hRebar, hLog, "S gripperalways", "T log")
-	ReBar_Insert(hRebar, hCombo, "mW 0", "L 100", "T combo", "BG images\test.bmp")
+	ReBar_Insert(hRebar, hCombo, "mW 0", "L 100", "T combo", "BG bg.bmp")
 
 	Gui, Show
 return
