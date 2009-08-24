@@ -821,17 +821,16 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 
 Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) { 
 	static MODULEID = 80609, oldNotify="*" 
-	static NM_CLICK=-2, NM_RCLICK=-5, NM_DBLCLK=-3, NM_LDOWN=-20, TBN_DROPDOWN=-710, TBN_HOTITEMCHANGE=-713, TBN_ENDDRAG=-702, TBN_BEGINADJUST=-703, TBN_GETBUTTONINFOA=-700, TBN_QUERYINSERT=-706, TBN_QUERYDELETE=-707, TBN_BEGINADJUST=-703, TBN_ENDADJUST=-704, TBN_RESET=-705, TBN_TOOLBARCHANGE=-708, TB_COMMANDTOINDEX=0x419
-	static cnt, cnta, cBTN, inDialog, LDOWN
+	static NM_CLICK=-2, NM_RCLICK=-5, NM_LDOWN=-20, TBN_DROPDOWN=-710, TBN_HOTITEMCHANGE=-713, TBN_ENDDRAG=-702, TBN_BEGINADJUST=-703, TBN_GETBUTTONINFOA=-700, TBN_QUERYINSERT=-706, TBN_QUERYDELETE=-707, TBN_BEGINADJUST=-703, TBN_ENDADJUST=-704, TBN_RESET=-705, TBN_TOOLBARCHANGE=-708, TB_COMMANDTOINDEX=0x419
+	static cnt, cnta, cBTN, inDialog, tc
 
-	
-	; If s_LDOWNPos=0, the left mouse button has not been clicked.  If s_LDOWNPos<>0,				--jballi
-	; the left mouse button has been clicked and the variable contains the button position. 
-	if ((NumGet(Lparam+4)) != MODULEID){ 
-		ifEqual, oldNotify, *, SetEnv, oldNotify, % Toolbar("OldNotify")       
-		ifNotEqual, oldNotify,,return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)       
-		return 
-	} 
+	if (_ := (NumGet(Lparam+4))) != MODULEID
+	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
+	 else {
+		ifEqual, oldNotify, *, SetEnv, oldNotify, % Toolbar("oldNotify")		
+		if oldNotify !=
+			return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
+	 }
     
 	hw :=  NumGet(Lparam+0), code := NumGet(Lparam+8, 0, "Int"),  handler := Toolbar(hw "Handler") 
 	ifEqual, handler,, return 
@@ -840,14 +839,17 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 	SendMessage, TB_COMMANDTOINDEX,iItem,,,ahk_id %hw%    
 	pos := ErrorLevel + 1 , txt := Toolbar_GetButton( hw, pos, "c")
 
-	if (code=NM_LDOWN)
-        LDOWN := LDOWN != -1 ? 1 : 0
+	
+	if (code=TBN_ENDDRAG) { 		
+		IfEqual, pos, 4294967296, return 
+		tc := A_TickCount
+    } 
 
 
 	if (code=NM_CLICK) { 		
-		IfEqual, pos, 4294967296, return 
-		if ((LDOWN>0) && !InStr(Toolbar_GetButton(hw,pos,"s"),"disabled")) || InStr(Toolbar_GetButton(hw,pos,"l"),"check")
-  		  LDOWN := 0, %handler%(hw, "click", txt, pos, iItem)
+		IfEqual, pos, 4294967296, return
+		if !(A_TickCount - tc)
+	 		%handler%(hw, "click", txt, pos, iItem)
     } 
 
 	if (code=NM_RCLICK)
@@ -856,7 +858,7 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 
 
 	if (code = TBN_DROPDOWN)
-		LDOWN := -1, %handler%(hw, "menu", txt, pos, iItem)
+		%handler%(hw, "menu", txt, pos, iItem)
  
 	if (code = TBN_HOTITEMCHANGE) { 
       IfEqual, pos, 4294967296, return  
@@ -1053,7 +1055,7 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 
 /*
  Group: About
-	o Ver 2.15 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Ver 2.2 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
 	o Parts of code in Toolbar_onNotify by jballi.
 	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>

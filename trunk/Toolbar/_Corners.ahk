@@ -27,9 +27,10 @@
 return
 
 OnToolbar(h,e,t,p,i){
-
+	tooltip %e% %t%
 }
 
+GuiEscape:
 GuiClose:
 	exitapp
 return
