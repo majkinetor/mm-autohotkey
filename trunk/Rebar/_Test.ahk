@@ -32,10 +32,7 @@ DetectHiddenWindows, On
 
   ;create rebar	
 	hRebar := Rebar_Add(hGui, "", hIL, "", "OnRebar")	
-	id := ReBar_Insert(hRebar, hLog, "mw 500", "L 400", "T Log")
-	ReBar_SetBand(hRebar, id, "S hidden nogripper")
-	ReBar_SetBand(hRebar, id, "S show")
-
+	ReBar_Insert(hRebar, hLog, "mw 500", "L 400", "T Log")
 	ReBar_Insert(hRebar, hCombo, "L 300", "I 4", "T dir")
 	ReBar_Insert(hRebar, hToolbar, "mW 45", "S usechevron" )
 	ReBar_Insert(hRebar, hMenu, "mW 45", "P 1", "S usechevron")

@@ -13,8 +13,8 @@ SetBatchLines, -1
 	Gui, Add, ComboBox, gOnCombo HWNDhCombo w0, item 1 |item 2|item 3
 
 	hRebar := Rebar_Add(hGui, "fixedorder", "", "")	
-	ReBar_AddBand(hRebar, hLog, "S gripperalways", "T log")
-	ReBar_AddBand(hRebar, hCombo, "mW 0", "L 100", "T combo", "BG images\test.bmp")
+	ReBar_Insert(hRebar, hLog, "S gripperalways", "T log")
+	ReBar_Insert(hRebar, hCombo, "mW 0", "L 100", "T combo", "BG images\test.bmp")
 
 	Gui, Show
 return
