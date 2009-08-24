@@ -26,7 +26,7 @@ DetectHiddenWindows, On
 	Toolbar_AutoSize(hToolbar, "fit")
 
   ;create toolbar menu
-	hMenu := Toolbar_Add(hGui, "OnToolbar", "menu" , 0,"x0")
+	hMenu := Toolbar_Add(hGui, "OnToolbar", "menu transparent" , 0,"x0")
 	Toolbar_Insert(hMenu, "Reload,`nExit`nHelp")
 	Toolbar_AutoSize(hMenu, "fit")
 
@@ -34,7 +34,7 @@ DetectHiddenWindows, On
 	hRebar := Rebar_Add(hGui, "", hIL, "", "OnRebar")	
 	ReBar_Insert(hRebar, hLog, "mw 500", "L 400", "T Log")
 	ReBar_Insert(hRebar, hCombo, "L 300", "I 4", "T dir")
-	ReBar_Insert(hRebar, hToolbar, "mW 45", "S usechevron" )
+	ReBar_Insert(hRebar, hToolbar, "mW 45", "S usechevron", "BG bg.bmp" )
 	ReBar_Insert(hRebar, hMenu, "mW 45", "P 1", "S usechevron")
 
 	layout := "10002 356 0|10003 214 0|10001 400 1|10004 290 1"
