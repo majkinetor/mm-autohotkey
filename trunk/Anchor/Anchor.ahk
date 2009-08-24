@@ -3,7 +3,7 @@ _()
 
 	Gui, Add, Edit, HWNDhe1 w100 h100
 	Anchor(he1, "w.5h", "", "")
-	Gui, Add, Edit, HWNDhe2 w100 x+5 h100
+	Gui, Add, Picture, HWNDhe2 w100 x+5 h100, c:\WINDOWS\Soap Bubbles.bmp 
 	Anchor(he2, "x.5w.5h", "", "")
 
 	Gui, Add, Edit, HWNDhe3 w100 xm h100
@@ -19,7 +19,7 @@ F1::
 	Win_MoveDelta(he1, "", "", -50)
 	Win_MoveDelta(he2, -50, "", 50)
 	Anchor(he1, "w.5h", "", "")
-	Anchor(he2, "x.5w.5h", "", "")
+	Anchor(he2, "x.5w.5hr", "", "")
 	Anchor(he3, "y", "", "")
 	Anchor(he4, "yw", "", "")
 return
@@ -32,7 +32,7 @@ return
 
 Anchor(hCtrl, aDef, r, Hwnd){
 	static
-	static tokens="x,w,y,h", adrSetWindowPos, WM_SIZE = 0x05
+	static tokens="x,w,y,h,r", adrSetWindowPos, WM_SIZE = 0x05
 
 	if Hwnd =
 	{
