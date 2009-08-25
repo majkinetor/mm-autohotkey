@@ -1,3 +1,44 @@
+/*
+	Function:		Anchor
+					Determines how a control is resized with its parent.
+
+	Parameters:		
+					hCtrl	- hWnd of the control.
+					aDef	- Anchor definition string. You can use x,y,w,h and r letters along with coefficients, decimal numbers which can also
+							  be specified in p/q form. "r" option signifies that control should be redrawn.
+
+	Remarks:
+					Anchor can be reset by calling it without any parameters. 
+					You should do so when you programmatically change the position of the controls.
+
+					Function monitors WM_SIZE message to detect parent changes. That means that it can be used with other eventual container controls
+					and not only top level windows.
+
+	Example:
+	(start code)
+		#SingleInstance, force
+			Gui, +Resize
+			Gui, Add, Edit, HWNDhe1 w150 h100
+			Gui, Add, Picture, HWNDhe2 w100 x+5 h100, pic.bmp 
+
+			Gui, Add, Edit, HWNDhe3 w100 xm h100
+			Gui, Add, Edit, HWNDhe4 w100 x+5 h100
+			Gui, Add, Edit, HWNDhe5 w100 yp x+5 h100
+			
+			gosub SetAnchor					;comment this line to disable anchor
+			Gui, Show, autosize			
+		return
+
+		SetAnchor:
+			Anchor(he1, "w.5 h")		
+			Anchor(he2, "x.5 w.5 h r")
+			Anchor(he3, "y w1/3")
+			Anchor(he4, "y x1/3 w1/3")
+			Anchor(he5, "y x2/3 w1/3")
+		return
+	(end code)
+ */
+
 Anchor(hCtrl="", aDef="") {
 	 _Anchor(hCtrl, aDef, "", "")
 }
@@ -5,7 +46,7 @@ Anchor(hCtrl="", aDef="") {
 _Anchor(hCtrl, aDef, Msg, hParent){
 	static
 
-	if (hCtrl = "") {		;reset
+	if (hCtrl = "") {					;reset
 		hParent := hGui
 		loop, parse, %hParent%, %A_Space%
 		{
@@ -16,12 +57,12 @@ _Anchor(hCtrl, aDef, Msg, hParent){
 				StringSplit, z, A_LoopField, :
 				%hCtrl% .= A_LoopField="r" ? "r " : (z1 ":" z2 ":" c%z1% " ")
 			}
-			%hCtrl% := SubStr(%hCtrl%, 1, -1)
+			%hCtrl% := SubStr(%hCtrl%, 1, -1)				
 		}
-		return reset := 1
+		reset := 1
 	}
 
-	if (hParent = ""){		;prepare
+	if (hParent = "") && !reset {		;prepare
 		if !adrSetWindowPos
 			adrSetWindowPos := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "SetWindowPos")
 			,adrWindowInfo  := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "GetWindowInfo")
@@ -39,9 +80,9 @@ _Anchor(hCtrl, aDef, Msg, hParent){
 		}
 		return %hCtrl% := SubStr(%hCtrl%, 1, -1), %hParent% .= InStr(%hParent%, hCtrl) ? "" : (%hParent% = "" ? "" : " ")  hCtrl 
 	}
-	pw := aDef & 0xFFFF, ph := aDef >> 16
-	outputdebug %wparam%
-		
+
+	if !reset
+		pw := aDef & 0xFFFF, ph := aDef >> 16
 	if (%hParent%_s = "") || reset
 		%hParent%_s := pw " " ph, reset := 0
 		
