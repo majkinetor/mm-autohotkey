@@ -3,14 +3,14 @@ _()
 	hGui := WinExist()
 
 	Gui, Add, Edit, HWNDhe1 w100 h100
-	Anchor(he1, "w.5h")
+	Anchor(he1, "w.5 h")
 	Gui, Add, Picture, HWNDhe2 w100 x+5 h100, c:\WINDOWS\Soap Bubbles.bmp 
-	Anchor(he2, "x.5w.5hr")
+	Anchor(he2, "x.5 w.5 h r")
 
 	Gui, Add, Edit, HWNDhe3 w100 xm h100
 	Anchor(he3, "y")
 	Gui, Add, Edit, HWNDhe4 w100 x+5 h100
-	Anchor(he4, "yw")
+	Anchor(he4, "y w")
 
 	Gui, Show, autosize
 return
@@ -49,61 +49,38 @@ Anchor(hCtrl="", aDef="") {
 
 _Anchor(hCtrl, aDef, Msg, hParent){
 	static
-	static tokens="x,w,y,h,r", adrSetWindowPos, WM_SIZE = 0x05
-   
-	if hParent =
-	{
+
+	if (hParent = ""){
 		if !adrSetWindowPos
-		{
 			adrSetWindowPos := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "SetWindowPos")
-			OnMessage(WM_SIZE, A_ThisFunc)
-		}
+			,OnMessage(5, A_ThisFunc)
+
 		hParent := DllCall("GetParent", "uint", hCtrl, "Uint")
 		GetPos(hParent, hCtrl, cx, cy, cw, ch)
 
-	 ;add space between tokens for easier parsing
-		loop, parse, tokens
-			StringReplace, aDef, aDef, %A_LoopField%, %A_Space%%A_LoopField%
-		aDef := SubStr(aDef, 2)
-
-	 ;compile
+		;field : koef : init
 		loop, parse, aDef, %A_Space%
 		{
-			s := A_LoopField,	z := SubStr(s,1,1)
-
-			if z=r
-				continue
-
-			if (j := InStr(s, "/"))
-				j := SubStr(s, 2, j-2) / SubStr(s, j+1), s := SubStr(s,1,1) j
-			else if (SubStr(s,2)="")
-					s .= "1"
-
-			j := SubStr(A_LoopField, 1, 1), j := c%j%
-			StringReplace, s, s, %z%, %z%:
-			StringReplace, aDef, aDef, %A_LoopField%, %s%:%j%
+			l := A_LoopField,	f := SubStr(l,1,1), k := StrLen(l)=1 ? 1 : SubStr(l,2)
+			ifEqual, l, r, continue
+			if (j := InStr(l, "/"))
+				k := SubStr(l, 2, j-2) / SubStr(l, j+1)
+			%hCtrl% .= f ":" k ":" c%f% " "
 		}
-
-		if j := InStr(%hPanel%_a , "`n"  hCtrl " ")
-		{
-			re = `nm)^%hCtrl%.+$
-			%hParent%_a := RegExReplace(%hParent%_a, re, hCtrl " " aDef)
-			reset := 1
-		} else 
-			%hParent%_a .= "`n"  hCtrl " " aDef	;store anchor definition for the control
-		
+		if !InStr(%hParent%, hCtrl)
+			%hParent% .= hCtrl " "
 		return
 	}
+
 	pw := aDef & 0xFFFF, ph := aDef >> 16
 	if (%hParent%_s = "") 
 		%hParent%_s := pw " " ph, reset := 0
 	
 	StringSplit, s, %hParent%_s, %A_Space%
-	loop, parse, %hParent%_a, `n, `n
+	loop, parse, %hParent%, %A_Space%
 	{
 		ifEqual, A_LoopField, , continue
-		j := InStr(A_LoopField, " "), hCtrl := SubStr(A_LoopField, 1, j-1), aDef := SubStr(A_LoopField, j+1)
-
+		hCtrl := A_LoopField, aDef := %hCtrl%
 		GetPos(hParent, hCtrl, cx, cy, cw, ch), r := 0
 		loop, parse, aDef, %A_Space%
 			ifEqual, A_LoopField, r, SetEnv, r, 1
