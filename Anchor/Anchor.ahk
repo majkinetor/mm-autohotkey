@@ -96,8 +96,8 @@ _Anchor(hCtrl, aDef, Msg, Hwnd){
 		
 		return
 	}
-	pw := aDef & 0xFFFF,	ph := aDef >> 16	
-	if (%hwnd%_s = "") || reset 
+	pw := aDef & 0xFFFF, ph := aDef >> 16
+	if (%hwnd%_s = "") 
 		%hwnd%_s := pw " " ph, reset := 0
 	
 	StringSplit, s, %Hwnd%_s, %A_Space%
@@ -106,25 +106,15 @@ _Anchor(hCtrl, aDef, Msg, Hwnd){
 		ifEqual, A_LoopField, , continue
 		j := InStr(A_LoopField, " "), hCtrl := SubStr(A_LoopField, 1, j-1), aDef := SubStr(A_LoopField, j+1)
 
-		GetPos(Hwnd, hCtrl, cx, cy, cw, ch)
-		r := 0
+		GetPos(Hwnd, hCtrl, cx, cy, cw, ch), r := 0
 		loop, parse, aDef, %A_Space%
-		{
-			if (SubStr(A_LoopField, 1, 1) = "r"){
-				r := SubStr(A_LoopField, 2, 1)
-				ifEqual, r, , SetEnv, r, 1
-				continue
+			ifEqual, A_LoopField, r, SetEnv, r, 1
+			else {
+				StringSplit, z, A_LoopField, :
+				c%z1% := z3 + z2 * (z1="x" || z1="w" ? pw-s1 : ph-s2), u%z1% := true
 			}
 
-			StringSplit, z, A_LoopField, :
-			c%z1% := z3+z2*(z1="x" OR z1="w" ? pw-s1 : ph-s2)
-			u%z1% := true
-		}
-		flag := 4 | (r=1 ? 0x100 : 0)	;nocopybits=0x100, nozorder=4
-		flag |= uw OR uh ? 0 : 1		;SWP_NOSIZE=1
-		flag |= ux OR uy ? 0 : 2		;SWP_NOMOVE=2
-
+		flag := 4 | (r=1 ? 0x100 : 0) | uw OR uh ? 0 : 1 | ux OR uy ? 0 : 2			; nozorder=4 nocopybits=0x100 SWP_NOSIZE=1 SWP_NOMOVE=2						
 		DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag) ; SWP_NOZORDER=4
-;		ifEqual, r, 2, % redrawDelayed(hCtrl)
 	}
 }
