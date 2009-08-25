@@ -30,7 +30,7 @@ return
 
 
 
-GetPos(hParent, hCtrl, ByRef x="", ByRef y="", ByRef w="", ByRef h=""){
+GetPos(hParent, hCtrl, ByRef cx="", ByRef cy="", ByRef cw="", ByRef ch=""){
 	static
 	if !adrB
 		VarSetCapacity(B, 60), NumPut(60, B), adrB := &B ,adrWindowInfo := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "GetWindowInfo")
@@ -39,29 +39,27 @@ GetPos(hParent, hCtrl, ByRef x="", ByRef y="", ByRef w="", ByRef h=""){
 	px := NumGet(B, 4), py := NumGet(B, 8), pw := NumGet(B, 12)	- px, ph := NumGet(B, 16)- py,  lx := NumGet(B, 20), ly := NumGet(B, 24)
 
 	DllCall(adrWindowInfo, "uint", hCtrl, "uint", adrB)
-	x := NumGet(B, 4),	y := NumGet(B, 8), w := NumGet(B, 12)-x, h := NumGet(B, 16)-y, x-=lx, y-=ly
+	cx := NumGet(B, 4),	cy := NumGet(B, 8), cw := NumGet(B, 12)-cx, ch := NumGet(B, 16)-cy, cx-=lx, cy-=ly
 }
-
-
 
 
 Anchor(hCtrl="", aDef="") {
 	_Anchor(hCtrl, aDef, "", "")
 }
 
-_Anchor(hCtrl, aDef, Msg, Hwnd){
+_Anchor(hCtrl, aDef, Msg, hParent){
 	static
 	static tokens="x,w,y,h,r", adrSetWindowPos, WM_SIZE = 0x05
-
-	if Hwnd =
+   
+	if hParent =
 	{
 		if !adrSetWindowPos
 		{
 			adrSetWindowPos := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "SetWindowPos")
 			OnMessage(WM_SIZE, A_ThisFunc)
 		}
-		hPanel := DllCall("GetParent", "uint", hCtrl)
-		GetPos(hPanel, hCtrl, cx, cy, cw, ch)
+		hParent := DllCall("GetParent", "uint", hCtrl, "Uint")
+		GetPos(hParent, hCtrl, cx, cy, cw, ch)
 
 	 ;add space between tokens for easier parsing
 		loop, parse, tokens
@@ -89,24 +87,24 @@ _Anchor(hCtrl, aDef, Msg, Hwnd){
 		if j := InStr(%hPanel%_a , "`n"  hCtrl " ")
 		{
 			re = `nm)^%hCtrl%.+$
-			%hPanel%_a := RegExReplace(%hPanel%_a, re, hCtrl " " aDef)
+			%hParent%_a := RegExReplace(%hParent%_a, re, hCtrl " " aDef)
 			reset := 1
 		} else 
-			%hPanel%_a .= "`n"  hCtrl " " aDef	;store anchor definition for the control
+			%hParent%_a .= "`n"  hCtrl " " aDef	;store anchor definition for the control
 		
 		return
 	}
 	pw := aDef & 0xFFFF, ph := aDef >> 16
-	if (%hwnd%_s = "") 
-		%hwnd%_s := pw " " ph, reset := 0
+	if (%hParent%_s = "") 
+		%hParent%_s := pw " " ph, reset := 0
 	
-	StringSplit, s, %Hwnd%_s, %A_Space%
-	loop, parse, %Hwnd%_a, `n, `n
+	StringSplit, s, %hParent%_s, %A_Space%
+	loop, parse, %hParent%_a, `n, `n
 	{
 		ifEqual, A_LoopField, , continue
 		j := InStr(A_LoopField, " "), hCtrl := SubStr(A_LoopField, 1, j-1), aDef := SubStr(A_LoopField, j+1)
 
-		GetPos(Hwnd, hCtrl, cx, cy, cw, ch), r := 0
+		GetPos(hParent, hCtrl, cx, cy, cw, ch), r := 0
 		loop, parse, aDef, %A_Space%
 			ifEqual, A_LoopField, r, SetEnv, r, 1
 			else {
