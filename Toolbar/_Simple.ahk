@@ -2,7 +2,7 @@
    hGui := WinExist()
    Gui, Show , w500 h100 Hide                              ;set gui width & height prior to adding toolbar (mandatory)
  
-   hCtrl := Toolbar_Add(hGui, "OnToolbar", "BORDER FLAT TOOLTIPS", "1L")    ;add the toolbar
+   hCtrl := Toolbar_Add(hGui, "OnToolbar", "nodivider FLAT TOOLTIPS", "1L")    ;add the toolbar
  
    btns =
 	(LTrim
