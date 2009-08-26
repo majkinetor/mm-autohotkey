@@ -30,7 +30,7 @@ Splitter_Add(Opt, Style="sunken") {
 	Style := SS_%STYLE%	
 
 	Opt .= Type = "hor" ? " h" Dim : " w" Dim
-	gui, add, text, HWNDhSep %opt% %Style% %SS_NOTIFY%
+	Gui, Add, Text, HWNDhSep %opt% %Style% %SS_NOTIFY%
 	return hSep
 }
 
@@ -140,6 +140,8 @@ Splitter_move(HSep, type, Delta, Def){
 	}		
 					
 	Win_Redraw(Win_Get(hSep, "A"))
+	if IsFunc("Attach")
+		Attach(DllCall("GetParent", "uint", hSep, "Uint"))
 }
 
 Splitter_updateVisual( HSep="", Type="" ) {
