@@ -7,26 +7,83 @@
 				StdLib loader.
 	
 	Parameters:
-				k	- Script speed, by default -1
-				h	- DetectHiddenWindows on/off, by default 0.
+				opt	- Space separated list of script options.
 	
+	Options:
+				s	- Speed, defaults to -1
+				m	- Affects how <m> function works: mm makes it use MsgBox (default), mo OutputDebug, m alone disables it.
+					  Anything else will use FileAppend; for instance mout.txt! writes to out.txt file. ! at the end is optional
+					  and if present, it will mark the file for deletition on scripts startup.
+				d	- Detect hidden windows.
+				e	- Escape exits the script if any of its Guis are active. Use e2 to exit in all cases.
+				w	- SetWorkingDir %A_ScriptDir%
+				t	- Title match mode: t1 (ts), t2 (tc), t3 (te), tr. 
+
+	Example:	
+		>		_("s100 d e m")	;set speed to 100ms, detect hiden windows and disable m, exit on ESC.
+		>		_("mo w tc)		;set m to use OutputDebug, set working directory to A_ScriptDir, set title match mode to c (contain, 2).
+
 	Remarks:
-				Includes #NoEnv and #SingleInstance force.
+				Includes #NoEnv and #SingleInstance force always.
  */
 
-_(k=-1, h=0) {
+_(opt="") {
 	#NoEnv
 	#Singleinstance, force
-	DetectHiddenWindows, % h ? "on" : "off"
-	SetBatchLines, %k%
+
+	s := -1
+	loop, parse, opt, %A_Space%
+		f := SubStr(A_LoopField,1,1), %f% := SubStr(A_LoopField, 2), %f% .= %f% = "" ? 1 : ""
+
+	ifEqual, d, 1, DetectHiddenWindows, on
+	ifEqual, w, 1, SetWorkingDir %A_ScriptDir%
+	SetBatchLines, %s%
+
+	if m != 
+	{
+		if SubStr(m,0) = "!" {
+			FileDelete, %m%
+			m := SubStr(m, 1, -1)
+		}
+
+		m("~`a" (m = 1 ? "" : m))
+	}
+
+	if e 
+	{
+		Process, Exist
+		if e = 2
+			 Hotkey, IfWinExist, ahk_pid %ErrorLevel%
+		else Hotkey, IfWinActive, ahk_pid %ErrorLevel%
+		HotKey, Esc, __HotkeyEsc
+		if e = 2
+			 Hotkey, IfWinExist 
+		else Hotkey, IfWinActive
+	}
+
+	if t !=
+	{	
+		ts := 1, tc := 2, te := 3, tr := "RegEx"
+		if t not in 1,2,3
+			t := t%t%
+
+		SetTitleMatchMode, %t%
+	}
 }
+
+__HotkeyEsc:
+	ExitApp
+return
 	
 /*	
 	Function: m
-			  MsgBox function
+			  MsgBox function.
 	
 	Parameters:
 			  o1..o8	- Arguments to display.
+	
+	Remarks:
+			  m can use MsgBox, OutputDebug or FileAppend to write messages. See <_> function for details.
 
 	Returns: 
 			  o1.
@@ -35,10 +92,21 @@ _(k=-1, h=0) {
 	>		 if (x - m(y) = z)	; Use m inside expressions for debugging.
 */
 m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a") {
+	static mode="m"
+	if InStr(o1, "~`a")
+		return mode := SubStr(o1, 3)
+	ifEqual, mode,,return o1
+
 	loop, 8
 		ifEqual, o%A_Index%,~`a,break
 		else s .= "'" o%A_Index% "'`n"
-	msgbox %s%
+
+	if mode=m
+			MsgBox %s%
+	else if mode=o
+			OutputDebug %s%
+	else	FileAppend, %s%, %mode%
+
 	return o1
 }
 
@@ -274,6 +342,6 @@ d_(hwnd, msg, id="", time=""){
 
 
 /* Group: About
-	o 0.3 by majkinetor
+	o 0.4 by majkinetor
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
  */
