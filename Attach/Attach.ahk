@@ -87,13 +87,12 @@ _Attach(hCtrl, aDef, Msg, hParent){
 	}
 
 	if !reset {
-		pw := aDef & 0xFFFF, ph := aDef >> 16
-		ifEqual, ph, 0, return		;when u create gui without any control, it will send message with height=0 and scramble the controls ....
-		%hParent%_last := pw " " ph
+		%hParent%_pw := aDef & 0xFFFF, %hParent%_ph := aDef >> 16
+		ifEqual, %hParent%_ph, 0, return		;when u create gui without any control, it will send message with height=0 and scramble the controls ....
 	}
 
 	if (%hParent%_s = "") || reset
-		%hParent%_s := %hParent%_last,  reset := 0
+		%hParent%_s := %hParent%_pw " " %hParent%_ph,  reset := 0
 
 	StringSplit, s, %hParent%_s, %A_Space%
 	loop, parse, %hParent%, %A_Space%
@@ -104,7 +103,7 @@ _Attach(hCtrl, aDef, Msg, hParent){
 			ifEqual, A_LoopField, r, SetEnv, r, 1
 			else {
 				StringSplit, z, A_LoopField, :
-				c%z1% := z3 + z2 * (z1="x" || z1="w" ? pw-s1 : ph-s2), u%z1% := true
+				c%z1% := z3 + z2 * (z1="x" || z1="w" ?  %hParent%_pw-s1 : %hParent%_ph-s2), u%z1% := true
 			}
 		flag := 4 | (r=1 ? 0x100 : 0) | (uw OR uh ? 0 : 1) | (ux OR uy ? 0 : 2)			; nozorder=4 nocopybits=0x100 SWP_NOSIZE=1 SWP_NOMOVE=2						
 		DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag)
