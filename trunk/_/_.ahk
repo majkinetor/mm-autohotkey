@@ -13,7 +13,7 @@
 				s	- Speed, defaults to -1
 				m	- Affects how <m> function works: mm makes it use MsgBox (default), mo OutputDebug, m alone disables it.
 					  Anything else will use FileAppend; for instance mout.txt! writes to out.txt file. ! at the end is optional
-					  and if present, it will mark the file for deletition on scripts startup.
+					  and if present, it will mark the file for deletition on scripts startup. !can be also used with o mode to clear the DebugView log.
 				d	- Detect hidden windows.
 				e	- Escape exits the script if any of its Guis are active. Use e2 to exit in all cases.
 				w	- SetWorkingDir %A_ScriptDir%
@@ -42,8 +42,10 @@ _(opt="") {
 	if m != 
 	{
 		if SubStr(m,0) = "!" {
-			FileDelete, %m%
 			m := SubStr(m, 1, -1)
+			if m = o
+				 ControlSend, , ^x, ahk_class dbgviewClass
+			else FileDelete, %m%
 		}
 
 		m("~`a" (m = 1 ? "" : m))
