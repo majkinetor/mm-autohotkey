@@ -42,7 +42,7 @@
 	(end code)
 
 	About:
-			o 0.4 by majkinetor
+			o 1.0 by majkinetor
 			o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
 
