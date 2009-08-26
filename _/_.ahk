@@ -48,10 +48,12 @@ _(opt="") {
 				 ControlSend, , ^x, ahk_class dbgviewClass
 			else FileDelete, %m%
 		}
-
 		if !WinExist("ahk_class dbgviewClass")
-			Run, DbgView.exe, , UseErrorLevel
-
+		{
+			Run, DbgView.exe, , UseErrorLevel, PID
+			if PID !=
+				WinWaitActive, ahk_pid %PID%
+		}
 		m("~`a" (m = 1 ? "" : m))
 	}
 
