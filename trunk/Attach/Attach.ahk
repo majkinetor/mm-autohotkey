@@ -68,7 +68,7 @@ _Attach(hCtrl, aDef, Msg, hParent){
 		%hParent%_reset := 1
 	}
 
-	if (hParent = "") && !reset {		;initialize
+	if (hParent = "")  {		;initialize
 		if !adrSetWindowPos
 			adrSetWindowPos := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "SetWindowPos")
 			,adrWindowInfo  := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "GetWindowInfo")
