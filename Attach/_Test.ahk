@@ -1,4 +1,4 @@
-;_("mo! e")
+_("mo! e2")
 	goto MakeGui
 return
 
@@ -38,7 +38,7 @@ F4::
 	Win_MoveDelta(he1%n%, "", "", -50)
 	Win_MoveDelta(he2%n%, -50, "", 50)
 	Win_Redraw(he2%n%)
-	Attach("", h)   ;reset Gui with handle h, use Attach() if you have only 1 Gui
+	Attach(h)   ;reset Gui with handle h, use Attach() if you have only 1 Gui
 return
 
 F5::
@@ -46,7 +46,7 @@ F5::
 	Win_MoveDelta(he1%n%, "", "", 50)
 	Win_MoveDelta(he2%n%, 50, "", -50)
 	Win_Redraw(he2%n%)
-	Attach("", h)   ;reset
+	Attach(h)   ;reset
 return
 
 
