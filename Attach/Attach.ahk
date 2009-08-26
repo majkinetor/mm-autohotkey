@@ -4,15 +4,16 @@
 
 	Parameters:		
 					hCtrl	- hWnd of the control. If omited, function will reset its internal data. If you have multiple parents specify which one you want
-							  to reset as this parameter.
+							  to reset as this parameter. You don't have to specify parent if you have only one, in which case Attach() resets the internal storage.
+
 					aDef	- Attach definition string. You can use x,y,w,h and r letters along with coefficients, decimal numbers which can also
-							  be specified in p/q form. "r" option signifies that control should be redrawn (see example below). If first parameter is omited, 
-							  aDef holds the handle of the parent to be reset. You don't have to specify parent if you have only one, in which case Attach() 
-							  resets internal storage.
+							  be specified in p/q form. "r" option signifies that control should be redrawn (see example below). If this parameter is omited, 
+							  hCtrl holds the handle of the parent to be reset.
 
 	Remarks:
-					You should reset Attach when you programmatically change the position of the controls. 
+					You should reset the function when you programmatically change the position of the controls in the parent control.
 					Don't do this while parent is resizing as reseting procedure may be interupted.
+					
 					Function monitors WM_SIZE message to detect parent changes. That means that it can be used with other eventual container controls
 					and not only top level windows.
 

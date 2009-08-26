@@ -1,4 +1,5 @@
-_("mo! e2")
+;_("mo! e2")
+#SingleInstance, force
 	goto MakeGui
 return
 
@@ -17,6 +18,8 @@ MakeGui:
 	
 	gosub SetAttach
 	Gui, %no%:Show, Autosize
+
+	Randomize(no)
 return
 
 
@@ -27,7 +30,6 @@ SetAttach:
 	Attach(he4%no%, "y x1/3 w1/3")
 	Attach(he5%no%, "y x2/3 w1/3")
 return
-
 
 F1::
 	gosub MakeGui
@@ -49,6 +51,19 @@ F5::
 	Attach(h)   ;reset
 return
 
+Randomize(no){
+	ifEqual, no, 1, return
+
+	Random, w, 0, 500
+	Random, h, 0, 500
+	Random, x, 0, A_ScreenWidth - w - 10
+	Random, y, 0, A_ScreenHeight - h - 10
+	Gui, %no%:Show, x%x% y%y% w%w% h%h%, No: %no%
+}
+
+ESC::
+	ExitApp
+return
 
 #include Win.ahk
 #include Attach.ahk
