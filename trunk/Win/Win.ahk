@@ -346,8 +346,8 @@ Win_SetMenu(Hwnd, hMenu=0){
  			Set the titlebar icon for the window.
  
  Parameters:
-			Icon	- Path to the icon. If omited, icon is removed.
-			Flag	- 1 sets the large icon for the window, 0 sets the small icon for the window.
+			Icon	- Path to the icon. If omited, icon is removed. If integer, handle to the already loaded icon.
+			Flag	- 1 sets the large icon for the window, 0 sets the small icon for the window. 
 
  Returns:
 			The return value is a handle to the previous large or small icon, depending on the Flag value.
@@ -360,7 +360,7 @@ Win_SetIcon( Hwnd, Icon="", Flag=1){
 		return A_ThisFunc "> Unsupported Flag: " Flag
 
 	if Icon != 
-		hIcon := DllCall("LoadImage", "Uint", 0, "str", Icon, "uint",IMAGE_ICON, "int", 32, "int", 32, "uint", LR_LOADFROMFILE)  
+		hIcon := Icon+0 != "" ? Icon : DllCall("LoadImage", "Uint", 0, "str", Icon, "uint",IMAGE_ICON, "int", 32, "int", 32, "uint", LR_LOADFROMFILE)  
 
 	SendMessage, WM_SETICON, %Flag%, hIcon, , ahk_id %Hwnd%
 	return ErrorLevel
