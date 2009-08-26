@@ -77,7 +77,7 @@ return
 	
 /*	
 	Function: m
-			  MsgBox function.
+			  Debug function.
 	
 	Parameters:
 			  o1..o8	- Arguments to display.
@@ -302,7 +302,7 @@ t(ByRef v="~`a "){
 }
 /*
 Function:	d
-			Delay/Thread function
+			Delay/Thread function. Thread is not OS thread, but AHK thread.
 			  	
 	Parameters:
 				fun - Function to be executed.
