@@ -65,7 +65,7 @@ _Attach(hCtrl, aDef, Msg, hParent){
 			}
 			%hCtrl% := SubStr(%hCtrl%, 1, -1)				
 		}
-		%hParent%_reset := 1
+		reset := 1
 	}
 
 	if (hParent = "")  {		;initialize
@@ -86,13 +86,14 @@ _Attach(hCtrl, aDef, Msg, hParent){
 		return %hCtrl% := SubStr(%hCtrl%, 1, -1), %hParent% .= InStr(%hParent%, hCtrl) ? "" : (%hParent% = "" ? "" : " ")  hCtrl 
 	}
 
-	if !%hParent%_reset {
-		pw := aDef & 0xFFFF, ph := aDef >> 16, %hParent%_last := pw " " ph
+	if !reset {
+		pw := aDef & 0xFFFF, ph := aDef >> 16
 		ifEqual, ph, 0, return		;when u create gui without any control, it will send message with height=0 and scramble the controls ....
+		%hParent%_last := pw " " ph
 	}
 
-	if (%hParent%_s = "") || %hParent%_reset
-		%hParent%_s := %hParent%_last,  %hParent%_reset := 0
+	if (%hParent%_s = "") || reset
+		%hParent%_s := %hParent%_last,  reset := 0
 
 	StringSplit, s, %hParent%_s, %A_Space%
 	loop, parse, %hParent%, %A_Space%
