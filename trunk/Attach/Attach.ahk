@@ -4,7 +4,7 @@
 
 	Parameters:		
 					hCtrl	- hWnd of the control. If omited, function will reset its internal data. If you have multiple parents specify which one you want
-							  to reset as the second parameter.
+							  to reset as this parameter.
 					aDef	- Attach definition string. You can use x,y,w,h and r letters along with coefficients, decimal numbers which can also
 							  be specified in p/q form. "r" option signifies that control should be redrawn (see example below). If first parameter is omited, 
 							  aDef holds the handle of the parent to be reset. You don't have to specify parent if you have only one, in which case Attach() 
@@ -15,7 +15,6 @@
 					Don't do this while parent is resizing as reseting procedure may be interupted.
 					Function monitors WM_SIZE message to detect parent changes. That means that it can be used with other eventual container controls
 					and not only top level windows.
-
 
 	Example:
 	(start code)
@@ -54,7 +53,7 @@ _Attach(hCtrl, aDef, Msg, hParent){
 	static
 
 	if (aDef = "") {					;reset
-		hParent := hCtrl != "" ? hCtrl : hGui
+		hParent := hCtrl != "" ? hCtrl+0 : hGui
 		loop, parse, %hParent%, %A_Space%
 		{
 			hCtrl := A_LoopField,  aDef := %hCtrl%,  %hCtrl% := ""
@@ -66,10 +65,10 @@ _Attach(hCtrl, aDef, Msg, hParent){
 			}
 			%hCtrl% := SubStr(%hCtrl%, 1, -1)				
 		}
-		reset := 1
+		%hParent%_reset := 1
 	}
 
-	if (hParent = "") && !reset {		;prepare
+	if (hParent = "") && !reset {		;initialize
 		if !adrSetWindowPos
 			adrSetWindowPos := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "SetWindowPos")
 			,adrWindowInfo  := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "GetWindowInfo")
@@ -87,13 +86,13 @@ _Attach(hCtrl, aDef, Msg, hParent){
 		return %hCtrl% := SubStr(%hCtrl%, 1, -1), %hParent% .= InStr(%hParent%, hCtrl) ? "" : (%hParent% = "" ? "" : " ")  hCtrl 
 	}
 
-	if !reset {
-		pw := aDef & 0xFFFF, ph := aDef >> 16
-		ifEqual, ph, 0, return		;when u create gui without any control, it will issue this
+	if !%hParent%_reset {
+		pw := aDef & 0xFFFF, ph := aDef >> 16, %hParent%_last := pw " " ph
+		ifEqual, ph, 0, return		;when u create gui without any control, it will send message with height=0 and scramble the controls ....
 	}
 
-	if (%hParent%_s = "") || reset
-		%hParent%_s := pw " " ph, reset := 0
+	if (%hParent%_s = "") || %hParent%_reset
+		%hParent%_s := %hParent%_last,  %hParent%_reset := 0
 
 	StringSplit, s, %hParent%_s, %A_Space%
 	loop, parse, %hParent%, %A_Space%

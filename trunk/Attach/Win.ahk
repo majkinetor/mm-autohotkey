@@ -346,32 +346,23 @@ Win_SetMenu(Hwnd, hMenu=0){
  			Set the titlebar icon for the window.
  
  Parameters:
-			Icon	- Path to the icon. If omited, icon is removed.
-			Flag	- 1 sets the large icon for the window, 0 sets the small icon for the window, 2 sets both (default).
+			Icon	- Path to the icon. If omited, icon is removed. If integer, handle to the already loaded icon.
+			Flag	- 1 sets the large icon for the window, 0 sets the small icon for the window. 
 
  Returns:
 			The return value is a handle to the previous large or small icon, depending on the Flag value.
-			If Flag=2, big icon handle is returned only.
-
- Remarks:
-			For 3thd party processes you can only set large icon.
 
  */
-Win_SetIcon( Hwnd, Icon="", Flag=2){
+Win_SetIcon( Hwnd, Icon="", Flag=1){
 	static WM_SETICON = 0x80, LR_LOADFROMFILE=0x10, IMAGE_ICON=1
 
-	if Flag not in 0,1,2
+	if Flag not in 0,1
 		return A_ThisFunc "> Unsupported Flag: " Flag
 
 	if Icon != 
-		hIcon := DllCall("LoadImage", "Uint", 0, "str", Icon, "uint",IMAGE_ICON, "int", 32, "int", 32, "uint", LR_LOADFROMFILE)  
+		hIcon := Icon+0 != "" ? Icon : DllCall("LoadImage", "Uint", 0, "str", Icon, "uint",IMAGE_ICON, "int", 32, "int", 32, "uint", LR_LOADFROMFILE)  
 
-	if Flag in 0,2 
-		SendMessage, WM_SETICON, 0, hIcon, , ahk_id %Hwnd%		;ICON_SMALL=0
-
-	if Flag in 1,2
-		SendMessage, WM_SETICON, 1, hIcon, , ahk_id %Hwnd%		;ICON_BIG=1
-
+	SendMessage, WM_SETICON, %Flag%, hIcon, , ahk_id %Hwnd%
 	return ErrorLevel
 }
 
@@ -477,7 +468,7 @@ Win_Subclass(hCtrl, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.0a by majkinetor.
+	o v1.0b by majkinetor.
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*
