@@ -14,6 +14,7 @@
 				m	- Affects how <m> function works: mm makes it use MsgBox (default), mo OutputDebug, m alone disables it.
 					  Anything else will use FileAppend; for instance mout.txt! writes to out.txt file. ! at the end is optional
 					  and if present, it will mark the file for deletition on scripts startup. !can be also used with o mode to clear the DebugView log.
+					  DebugView will be started if it doesn't run, make sure its on the system PATH (there will be no error message if Run fails).
 				d	- Detect hidden windows.
 				e	- Escape exits the script if any of its Guis are active. Use e2 to exit in all cases.
 				w	- SetWorkingDir %A_ScriptDir%
@@ -47,6 +48,9 @@ _(opt="") {
 				 ControlSend, , ^x, ahk_class dbgviewClass
 			else FileDelete, %m%
 		}
+
+		if !WinExist("ahk_class dbgviewClass")
+			Run, DbgView.exe, , UseErrorLevel
 
 		m("~`a" (m = 1 ? "" : m))
 	}
