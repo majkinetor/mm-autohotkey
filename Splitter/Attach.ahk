@@ -3,21 +3,55 @@
 					Determines how a control is resized with its parent.
 
 	Parameters:		
-					hCtrl	- hWnd of the control. If omited, function will reset its internal data. If you have multiple parents specify which one you want
-							  to reset as this parameter. You don't have to specify parent if you have only one, in which case Attach() resets the internal storage.
+					hCtrl	-  - hWnd of the control if aDef is not empty.
+					 		-  - hWnd of the parent to be reset if aDef is empty. If you are using the function with only one parent, you don't have to
+								 specify its handle, its enough to call Attach without any parameters.
+								 With multiple parents you need to specify which one you want to reset.
+					 		-  - Handler name, if parameter is string and aDef is empty. Handler will be called after the function has finished 
+								 moving controls for the parent. Handler receives hWnd of the parent as its only argument.
 
-					aDef	- Attach definition string. You can use x,y,w,h and r letters along with coefficients, decimal numbers which can also
-							  be specified in p/q form. "r" option signifies that control should be redrawn (see example below). If this parameter is omited, 
-							  hCtrl holds the handle of the parent to be reset.
+
+					aDef	- Attach definition string. 
+					 		- You can use x,y,w,h and r letters along with coefficients, decimal numbers which can also
+							  be specified in p/q form (see example below). "r" or "r1" option specifies that control should be redrawn immediately.
+							  Specify "r2" to delay redrawing 100ms for the control. This can be used to prevent redrawing spam which in some situations
+							  may be annoying.
+					 		- If aDef parameter is omitted, function working depends on 1st parameter.
 
 	Remarks:
 					You should reset the function when you programmatically change the position of the controls in the parent control.
-					Don't do this while parent is resizing as reseting procedure may be interupted.
+					Don't do this while parent is resizing as resetting procedure may be interrupted.
 					
 					Function monitors WM_SIZE message to detect parent changes. That means that it can be used with other eventual container controls
 					and not only top level windows.
 
-	Example:
+	Examples:
+	(start code)
+					Attach(h, "w.5 h1/3 r2")	;Attach control's w, h and redraw it with delay.
+					Attach()					;Reset first parent. Use when you have only 1 parent.
+					Attach(hGui2)				;Reset Gui2.
+					Attach("Win_Redraw")		;Use Win_Redraw function as a Handler. Attach will call it with parent's handle as argument.
+
+					
+					; This is how to do delayed refresh of entire window.
+					; To prevent redraw spam which can be annoying in some cases, 
+					; you can choose to redraw entire window only when user has finished resizing it.
+					; This is similar to r2 option for controls, except it works with entire parent.
+					
+					Attach("OnAttach")			;Set Handler to OnAttach function
+					...
+					
+					OnAttach( Hwnd ) {
+						global hGuiToRedraw := hwnd
+						SetTimer, Redraw, -100
+					}
+
+					Redraw:
+						Win_Redraw(hGuiToRedraw)
+					return
+
+	(end code)
+	Full Example:
 	(start code)
 		#SingleInstance, force
 			Gui, +Resize
@@ -47,13 +81,15 @@
  */
 
 Attach(hCtrl="", aDef="") {
-	 _Attach(hCtrl, aDef, "", "")
+	 Attach_(hCtrl, aDef, "", "")
 }
 
-_Attach(hCtrl, aDef, Msg, hParent){
+Attach_(hCtrl, aDef, Msg, hParent){
 	static
 
-	if (aDef = "") {					;reset
+	if (aDef = "") {					;reset if integer, function if string
+		if IsFunc(hCtrl)
+			return Handler := hCtrl
 		hParent := hCtrl != "" ? hCtrl+0 : hGui
 		loop, parse, %hParent%, %A_Space%
 		{
@@ -82,7 +118,7 @@ _Attach(hCtrl, aDef, Msg, hParent){
 			l := A_LoopField,	f := SubStr(l,1,1), k := StrLen(l)=1 ? 1 : SubStr(l,2)
 			if (j := InStr(l, "/"))
 				k := SubStr(l, 2, j-2) / SubStr(l, j+1)
-			%hCtrl% .= l="r" ? "r " : (f ":" k ":" c%f% " ")
+			%hCtrl% .= f ":" k ":" c%f% " "
 		}
 		return %hCtrl% := SubStr(%hCtrl%, 1, -1), %hParent% .= InStr(%hParent%, hCtrl) ? "" : (%hParent% = "" ? "" : " ")  hCtrl 
 	}
@@ -101,18 +137,30 @@ _Attach(hCtrl, aDef, Msg, hParent){
 		hCtrl := A_LoopField, aDef := %hCtrl%, 	uw := uh := ux := uy := r := 0
 		gosub Attach_GetPos
 		loop, parse, aDef, %A_Space%
-			ifEqual, A_LoopField, r, SetEnv, r, 1
-			else {
-				StringSplit, z, A_LoopField, :
-				c%z1% := z3 + z2 * (z1="x" || z1="w" ?  %hParent%_pw-s1 : %hParent%_ph-s2), u%z1% := true
-			}
+		{
+			StringSplit, z, A_LoopField, :
+			ifEqual, z1, r, SetEnv, r, %z2%
+			c%z1% := z3 + z2 * (z1="x" || z1="w" ?  %hParent%_pw-s1 : %hParent%_ph-s2), u%z1% := true
+		}
 		flag := 4 | (r=1 ? 0x100 : 0) | (uw OR uh ? 0 : 1) | (ux OR uy ? 0 : 2)			; nozorder=4 nocopybits=0x100 SWP_NOSIZE=1 SWP_NOMOVE=2						
 		DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag)
+		r+0=2 ? Attach_redrawDelayed(hCtrl) : 
 	}
-	return
+	return Handler != "" ? %Handler%(hParent) : ""
 
  Attach_GetPos:		;hParent & hCtrl must be set up
 		DllCall(adrWindowInfo, "uint", hParent, "uint", adrB), 	lx := NumGet(B, 20), ly := NumGet(B, 24), DllCall(adrWindowInfo, "uint", hCtrl, "uint", adrB)
 		,cx :=NumGet(B, 4),	cy := NumGet(B, 8), cw := NumGet(B, 12)-cx, ch := NumGet(B, 16)-cy, cx-=lx, cy-=ly
  return
+}
+
+Attach_redrawDelayed(hCtrl){
+	static s
+	s .= !InStr(s, hCtrl) ? hCtrl " " : ""
+	SetTimer, %A_ThisFunc%, -100
+	return
+ Attach_redrawDelayed:
+	loop, parse, s, %A_Space%
+		WinSet, Redraw, , ahk_id %A_LoopField%
+ return, s := ""
 }
