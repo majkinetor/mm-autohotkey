@@ -15,10 +15,10 @@
 					 		- You can use x,y,w,h and r letters along with coefficients, decimal numbers which can also
 							  be specified in p/q form (see example below). "r" or "r1" option specifies that control should be redrawn immediately.
 							  Specify "r2" to delay redrawing 100ms for the control. This can be used to prevent redrawing spam which in some situations
-							  may be annoying.
+							  may be annoying. 
 					 		- You can use single letters "+" or "-" to enable or disable function for the control. If control is hidden, you may want to 
 							  disable the function for performance reasons. Its perfectly OK to leave invisible controls attached, but if you have lots of 
-							  them you can use this feature to get faster and more responsive updates. 
+							  them you can use this feature to get faster and more responsive updates.
 							  When you want to show disabled invisible control, make sure you first attach it back so it can take its correct position
 							  and size while in hidden state, then show it.
 					 		- If aDef parameter is omitted, function working depends on 1st parameter.
@@ -93,7 +93,7 @@ Attach(hCtrl="", aDef="") {
 Attach_(hCtrl, aDef, Msg, hParent){
 	static
 
-	if (aDef = "") {					;reset if integer, function if string
+	if (aDef = "") {							;Reset if integer, Handler if string
 		if IsFunc(hCtrl)
 			return Handler := hCtrl
 		hParent := hCtrl != "" ? hCtrl+0 : hGui
@@ -111,7 +111,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		reset := 1
 	}
 
-	if (hParent = "")  {		;initialize
+	if (hParent = "")  {						;Initialize controls 
 		if !adrSetWindowPos
 			adrSetWindowPos		:= DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "SetWindowPos")
 			,adrWindowInfo		:= DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "GetWindowInfo")
@@ -134,12 +134,10 @@ Attach_(hCtrl, aDef, Msg, hParent){
 			return %hCtrl% := SubStr(%hCtrl%, 1, -1), %hParent% .= InStr(%hParent%, hCtrl) ? "" : (%hParent% = "" ? "" : " ")  hCtrl 
 		}
 	}
-
-	if !reset && !enable {
+ 	if !reset && !enable {						;WM_SIZE handler starts here
 		%hParent%_pw := aDef & 0xFFFF, %hParent%_ph := aDef >> 16
 		ifEqual, %hParent%_ph, 0, return		;when u create gui without any control, it will send message with height=0 and scramble the controls ....
 	}
-
 	if (%hParent%_s = "") || reset
 		%hParent%_s := %hParent%_pw " " %hParent%_ph,  reset := 0
 
@@ -162,7 +160,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 
 	return Handler != "" ? %Handler%(hParent) : "", enable := 0
 
- Attach_GetPos:		;hParent & hCtrl must be set up
+ Attach_GetPos:									;hParent & hCtrl must be set up at this point
 		DllCall(adrWindowInfo, "uint", hParent, "uint", adrB), 	lx := NumGet(B, 20), ly := NumGet(B, 24), DllCall(adrWindowInfo, "uint", hCtrl, "uint", adrB)
 		,cx :=NumGet(B, 4),	cy := NumGet(B, 8), cw := NumGet(B, 12)-cx, ch := NumGet(B, 16)-cy, cx-=lx, cy-=ly
  return
