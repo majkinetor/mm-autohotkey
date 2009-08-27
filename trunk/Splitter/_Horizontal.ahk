@@ -35,10 +35,10 @@ GuiClose:
 	h11 := Win_GetRect(hSep, "*y")	
 	spos1 := (h11 + ssize//2)*100//h1
 
-	FileRead, txt, %A_ScriptFullPath%
-	txt := RegExReplace(txt, "`aim)(^\s+spos\s+:= )\d+[ \t]*$", "$1" spos1)
-	FileDelete, %A_ScriptFullPath%
-	FileAppend, %txt%, %A_ScriptFullPath%
+;	FileRead, txt, %A_ScriptFullPath%
+;	txt := RegExReplace(txt, "`aim)(^\s+spos\s+:= )\d+[ \t]*$", "$1" spos1)
+;	FileDelete, %A_ScriptFullPath%
+;	FileAppend, %txt%, %A_ScriptFullPath%
 	ExitApp
 return
 
