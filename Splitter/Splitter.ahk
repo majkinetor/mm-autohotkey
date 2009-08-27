@@ -24,13 +24,13 @@
 			Splitter is inactive until you call <Set> function.
 
  */
-Splitter_Add(Opt, Style="sunken") {
+Splitter_Add(Opt, Style="sunken", Text="") {
 	static SS_NOTIFY=0x100, SS_BLACKFRAME = 7, SS_BLACKRECT = 4,SS_GRAYFRAME = 0x8, SS_GRAYRECT = 0x5, SS_SUNKEN = 0x1000, SS_WHITEFRAME = 9, SS_WHITERECT = 6
 
 	Style := SS_%STYLE%	
 
 	Opt .= Type = "hor" ? " h" Dim : " w" Dim
-	Gui, Add, Text, HWNDhSep %opt% %Style% %SS_NOTIFY%
+	Gui, Add, Text, HWNDhSep %opt% %Style% %SS_NOTIFY%, %Text%	
 	return hSep
 }
 
