@@ -81,10 +81,10 @@
  */
 
 Attach(hCtrl="", aDef="") {
-	 _Attach(hCtrl, aDef, "", "")
+	 Attach_(hCtrl, aDef, "", "")
 }
 
-_Attach(hCtrl, aDef, Msg, hParent){
+Attach_(hCtrl, aDef, Msg, hParent){
 	static
 
 	if (aDef = "") {					;reset if integer, function if string
