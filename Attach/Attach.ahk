@@ -99,7 +99,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		hParent := hCtrl != "" ? hCtrl+0 : hGui
 		loop, parse, %hParent%, %A_Space%
 		{
-			hCtrl := A_LoopField,  aDef := %hCtrl%,  %hCtrl% := ""
+			hCtrl := A_LoopField, SubStr(%hCtrl%,1,1), aDef := SubStr(%hCtrl%,1,1)="-" ? SubStr(%hCtrl%,2) : %hCtrl%,  %hCtrl% := ""
 			gosub Attach_GetPos
 			loop, parse, aDef, %A_Space%
 			{
