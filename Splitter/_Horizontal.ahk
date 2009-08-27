@@ -1,12 +1,12 @@
-_("mo!")
-;#SingleInstance, force
+;_("mo!")
+#SingleInstance, force
 	ssize := 6, _ := " "
 	
 	pos := Win_Pos("<", x,y,w,h) 
 	if pos =
-		w := 600,  h := 500,  spos := h//2 
+		w := 600,  h := 500
 
-	spos := 465
+	spos := 95
 	h1 := spos,	 h2 := h-h1-ssize
 	gui, margin, 0, 0
 	Gui +Resize +LastFound
@@ -19,8 +19,7 @@ _("mo!")
 	Splitter_Set( hSep, hc1 " - " hc2 )
 	Attach( hc1,  "w h r2")
 	Attach( hSep, "y w r2")
-	Attach( hc2,  "y w r2")
-
+	Attach( hc2,  "y w r2")00
 
 	Gui, show, %pos%
 return
@@ -32,16 +31,12 @@ return
 Esc:: 
 GuiClose:
 	Win_Pos(">")
-;	h1 := Win_Get(hGui, "Lh")
-	h11 := Win_GetRect(hSep, "*y")
-	m(h11)
-;	spos1 := (h11 + ssize//2)*100//h1
+	s := Win_GetRect(hSep, "*y")
 	
-
-;	FileRead, txt, %A_ScriptFullPath%
-;	txt := RegExReplace(txt, "`aim)(^\s+spos\s+:= )\d+[ \t]*$", "$1" spos1)
-;	FileDelete, %A_ScriptFullPath%
-;	FileAppend, %txt%, %A_ScriptFullPath%
+	FileRead, txt, %A_ScriptFullPath%
+	txt := RegExReplace(txt, "`aim)(^\s+spos\s+:= ).+[ \t]*$", "$1" s)
+	FileDelete, %A_ScriptFullPath%
+	FileAppend, %txt%, %A_ScriptFullPath%
 	ExitApp
 return
 
