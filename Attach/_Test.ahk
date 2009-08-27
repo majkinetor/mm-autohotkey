@@ -24,7 +24,7 @@ return
 
 SetAttach:
 	Attach(he1%no%, "w.5 h")
-	Attach(he2%no%, "x.5 w.5 h r2")
+	Attach(he2%no%, "x.5 w.5 h r")
 	Attach(he3%no%, "y w1/3")
 	Attach(he4%no%, "y x1/3 w1/3")
 	Attach(he5%no%, "y x2/3 w1/3")
