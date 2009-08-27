@@ -5,7 +5,7 @@
 		w := 600
 		h := 500
 		ssize := 30
-		spos  := 50
+		spos  := 35
 	
 	;==========================
 
@@ -23,7 +23,8 @@
 	Attach( hc1,  "w h r2")
 	Attach( hSep, "y w r2")
 	Attach( hc2,  "y w r2")
-	Gui, show, w%w% h%h%		
+	Gui, show, autosize
+;	Gui, Show, x540 y254 w600 h530
 return
 
 F1::
@@ -32,6 +33,8 @@ return
 
 Esc:: 
 GuiClose:
+	Win_Pos(">")
+	exitapp
 	h1 := Win_Get(hGui, "Lh")
 	h11 := Win_GetRect(hSep, "*y")	
 	spos1 := (h11 + ssize//2)*100//h1
@@ -42,6 +45,19 @@ GuiClose:
 	FileAppend, %txt%, %A_ScriptFullPath%
 	ExitApp
 return
+
+Win_Pos( options ){
+	op := SubStr(A_ScriptFullPath, 1, 1)
+
+	if op = <		;load
+	{
+
+	} else {		;save
+		Gui, +LastFound
+		Win_Get(WinExist(), "Lxywh", x,y,w,h)
+;		m("x" x " y" y " w"w " h" h)
+	}
+}
 
 #include Splitter.ahk
 #include Attach.ahk
