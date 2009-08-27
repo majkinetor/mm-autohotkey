@@ -1,6 +1,17 @@
-;_("mo! e2")
+_("mo! e2")
 #SingleInstance, force
+;	Attach("Win_Redraw")
+;	Attach("OnAttach")
 	goto MakeGui
+return
+
+OnAttach( Hwnd ) {
+	global hGui := hwnd
+	SetTimer, Redraw, -100
+}
+
+Redraw:
+	Win_Redraw(hGui)
 return
 
 MakeGui:
@@ -54,8 +65,8 @@ return
 Randomize(no){
 	ifEqual, no, 1, return
 
-	Random, w, 0, 500
-	Random, h, 0, 500
+	Random, w, 100, 800
+	Random, h, 100, 800
 	Random, x, 0, A_ScreenWidth - w - 10
 	Random, y, 0, A_ScreenHeight - h - 10
 	Gui, %no%:Show, x%x% y%y% w%w% h%h%, No: %no%
