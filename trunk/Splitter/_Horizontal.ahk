@@ -1,13 +1,10 @@
-;_("e")
+_("mo!")
 ;#SingleInstance, force
-
-	;=========== SETUP ========
-		w := 600
-		h := 500
-		ssize := 30
-		spos  := 35
+	ssize := 6, _ := " "
 	
-	;==========================
+	pos := Win_Pos("<", x,y,w,h) 
+	if pos =
+		w := 600,  h := 500,  spos := h/2 - ssize/2
 
 	h1 := h*spos//100 - ssize//2,	 h2 := h-h1
 	gui, margin, 0, 0
@@ -23,8 +20,8 @@
 	Attach( hc1,  "w h r2")
 	Attach( hSep, "y w r2")
 	Attach( hc2,  "y w r2")
-;	Gui, show, autosize
-	Gui, Show, % Win_Pos("<", "autosize")
+
+	Gui, show, %pos%
 return
 
 F1::
@@ -34,7 +31,6 @@ return
 Esc:: 
 GuiClose:
 	Win_Pos(">")
-	exitapp
 	h1 := Win_Get(hGui, "Lh")
 	h11 := Win_GetRect(hSep, "*y")	
 	spos1 := (h11 + ssize//2)*100//h1
@@ -46,21 +42,24 @@ GuiClose:
 	ExitApp
 return
 
-Win_Pos( Default, Options="" ){
+Win_Pos( Options, ByRef x="",ByRef y="",ByRef w="",ByRef h="" ){
 	static key="Software\AutoHotkey\Win"
-	op := SubStr(Default, 1, 1)
+	op := SubStr(Options, 1, 1)
 
 	if op = <		;load
 	{
 		RegRead, pos, REG_SZ,  HKEY_CURRENT_USER, %key%, %A_ScriptFullPath%
-		if ErrorLevel
-			return Options
+		ifEqual, ErrorLevel,1, return
+		StringSplit, p, pos, %A_Space%
+		loop, %p0%
+			f := SubStr(p%A_Index%,1,1), %f% := SubStr(p%A_Index%,2)
 		return pos
 	} else {		;save
 		Gui, +LastFound
-		Win_Get(WinExist(), "Lxywh", x,y,w,h)
+		Win_Get(WinExist(), "RxyLwh", x,y,w,h)
 		pos := "x" x " y" y " w"w " h" h
 		RegWrite, REG_SZ,  HKEY_CURRENT_USER, %key%, %A_ScriptFullPath%, %pos%
+		return pos
 	}
 }
 
