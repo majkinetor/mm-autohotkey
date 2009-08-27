@@ -124,6 +124,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 			SubStr(%hCtrl%,1,1) != "-" ? return : %hCtrl% := SubStr(%hCtrl%, 2), enable := 1 
 		else {
 			gosub Attach_GetPos
+			%hCtrl% := ""
 			loop, parse, aDef, %A_Space%
 			{
 				l := A_LoopField,	f := SubStr(l,1,1), k := StrLen(l)=1 ? 1 : SubStr(l,2)
