@@ -1,19 +1,19 @@
 ;_("mo!")
 #SingleInstance, force
-	ssize := 6, _ := " "
+	ssize := 30, _ := " "
 	
 	pos := Win_Pos("<", x,y,w,h) 
 	if pos =
 		w := 600,  h := 500
 
-	spos := 95
+	spos := 200
 	h1 := spos,	 h2 := h-h1-ssize
 	gui, margin, 0, 0
-	Gui +Resize +LastFound
+	Gui +Resize +LastFound -Caption
 	hGui := WinExist()
 
 	gui, add, edit, HWNDhc1 w%w% h%h1%, Press ESC to exit.`n
-	hSep := Splitter_Add("h" ssize " w" w, "grayrect")
+	hSep := Splitter_Add("h" ssize " w" w, "sunken", "---")
 	gui, add, monthcal, HWNDhc2 w%w% h%h2%
 
 	Splitter_Set( hSep, hc1 " - " hc2 )
