@@ -4,15 +4,16 @@ _()
 	;=========== SETUP ========
 		w := 600
 		h := 500
-		sep := 30
+		ssize := 30
+		spos  := 50
 	;==========================
 
-	h1 := h//3, h2 := h-h1
+	h1 := h*spos//100 - ssize//2,	 h2 := h-h1
 	gui, margin, 0, 0
 	Gui +Resize
 
 	gui, add, edit, HWNDhc1 w%w% h%h1%, Press ESC to exit.`n
-	hSep := Splitter_Add( "h" sep " w" w, "grayrect")
+	hSep := Splitter_Add( "h" ssize " w" w, "grayrect")
 	gui, add, monthcal, HWNDhc2 w%w% h%h2%
 
 	Splitter_Set( hSep, hc1 " - " hc2 )
