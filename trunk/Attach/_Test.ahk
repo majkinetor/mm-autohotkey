@@ -1,4 +1,4 @@
-_("mo! e2")
+;_("mo! e2")
 #SingleInstance, force
 	goto MakeGui
 return
