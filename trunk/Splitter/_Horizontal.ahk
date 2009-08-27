@@ -6,7 +6,8 @@ _("mo!")
 	if pos =
 		w := 600,  h := 500,  spos := h/2 - ssize/2
 
-	h1 := h*spos//100 - ssize//2,	 h2 := h-h1
+	
+	h1 := spos - ssize/2,	 h2 := h-h1
 	gui, margin, 0, 0
 	Gui +Resize +LastFound
 	hGui := WinExist()
