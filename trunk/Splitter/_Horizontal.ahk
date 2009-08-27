@@ -23,8 +23,8 @@
 	Attach( hc1,  "w h r2")
 	Attach( hSep, "y w r2")
 	Attach( hc2,  "y w r2")
-	Gui, show, autosize
-;	Gui, Show, x540 y254 w600 h530
+;	Gui, show, autosize
+	Gui, Show, % Win_Pos("<", "autosize")
 return
 
 F1::
@@ -46,16 +46,21 @@ GuiClose:
 	ExitApp
 return
 
-Win_Pos( options ){
-	op := SubStr(A_ScriptFullPath, 1, 1)
+Win_Pos( Default, Options="" ){
+	static key="Software\AutoHotkey\Win"
+	op := SubStr(Default, 1, 1)
 
 	if op = <		;load
 	{
-
+		RegRead, pos, REG_SZ,  HKEY_CURRENT_USER, %key%, %A_ScriptFullPath%
+		if ErrorLevel
+			return Options
+		return pos
 	} else {		;save
 		Gui, +LastFound
 		Win_Get(WinExist(), "Lxywh", x,y,w,h)
-;		m("x" x " y" y " w"w " h" h)
+		pos := "x" x " y" y " w"w " h" h
+		RegWrite, REG_SZ,  HKEY_CURRENT_USER, %key%, %A_ScriptFullPath%, %pos%
 	}
 }
 
