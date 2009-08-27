@@ -120,6 +120,7 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 }
 
 Splitter_move(HSep, type, Delta, Def){
+	static f := "Attach"
 	Delta -= Win_GetRect(HSep,  type = "ver" ? "w" : "h") // 2
 	j := InStr(Def, "|") or InStr(Def, "-")
 	StringSplit, s, Def, %A_Space%
@@ -140,8 +141,7 @@ Splitter_move(HSep, type, Delta, Def){
 	}		
 					
 	Win_Redraw(Win_Get(hSep, "A"))
-	if IsFunc("Attach")
-		Attach(DllCall("GetParent", "uint", hSep, "Uint"))
+	IsFunc(f) ? %f%(DllCall("GetParent", "uint", hSep, "Uint")) : 
 }
 
 Splitter_updateVisual( HSep="", Type="" ) {
