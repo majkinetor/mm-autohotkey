@@ -778,7 +778,28 @@ if (browserType) {document.write("<div class=" + browserType + ">");if (browserV
 
 
 
-<div id=Content><div class="CFunction"><div class=CTopic id=MainTopic><h1 class=CTitle><a name="Attach"></a>Attach</h1><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Attach(</td><td class=PParameter nowrap>hCtrl</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>aDef</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Determines how a control is resized with its parent.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>hCtrl</td><td class=CDLDescription>hWnd of the control.&nbsp; If omited, function will reset its internal data.&nbsp; If you have multiple parents specify which one you want to reset as this parameter.&nbsp; You don&rsquo;t have to specify parent if you have only one, in which case Attach() resets the internal storage.</td></tr><tr><td class=CDLEntry>aDef</td><td class=CDLDescription>Attach definition string.&nbsp; You can use x,y,w,h and r letters along with coefficients, decimal numbers which can also be specified in p/q form.&nbsp; &ldquo;r&rdquo; option signifies that control should be redrawn (see example below).&nbsp; If this parameter is omited, hCtrl holds the handle of the parent to be reset.</td></tr></table><h4 class=CHeading>Remarks</h4><p>You should reset the function when you programmatically change the position of the controls in the parent control.&nbsp; Don&rsquo;t do this while parent is resizing as reseting procedure may be interupted.</p><p>Function monitors WM_SIZE message to detect parent changes.&nbsp; That means that it can be used with other eventual container controls and not only top level windows.</p><h4 class=CHeading>Example</h4><blockquote><pre>#SingleInstance, force
+<div id=Content><div class="CFunction"><div class=CTopic id=MainTopic><h1 class=CTitle><a name="Attach"></a>Attach</h1><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Attach(</td><td class=PParameter nowrap>hCtrl</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;,</td></tr><tr><td></td><td class=PParameter nowrap>aDef</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Determines how a control is resized with its parent.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>hCtrl</td><td class=CDLDescription>- hWnd of the control if aDef is not empty.</td></tr><tr><td class=CDLEntry> </td><td class=CDLDescription>- hWnd of the parent to be reset if aDef is empty.&nbsp; If you are using the function with only one parent, you don&rsquo;t have to specify its handle, its enough to call Attach without any parameters.&nbsp; With multiple parents you need to specify which one you want to reset.</td></tr><tr><td class=CDLEntry> </td><td class=CDLDescription>- Handler name, if parameter is string and aDef is empty.&nbsp; Handler will be called after the function has finished moving controls for the parent.&nbsp; Handler receives hWnd of the parent as its only argument.</td></tr><tr><td class=CDLEntry>aDef</td><td class=CDLDescription>Attach definition string.</td></tr><tr><td class=CDLEntry> </td><td class=CDLDescription>You can use x,y,w,h and r letters along with coefficients, decimal numbers which can also be specified in p/q form (see example below).&nbsp; &ldquo;r&rdquo; or &ldquo;r1&rdquo; option specifies that control should be redrawn immediately.&nbsp; Specify &ldquo;r2&rdquo; to delay redrawing 100ms for the control.&nbsp; This can be used to prevent redrawing spam which in some situations may be annoying.</td></tr><tr><td class=CDLEntry> </td><td class=CDLDescription>If aDef parameter is omitted, function working depends on 1st parameter.</td></tr></table><h4 class=CHeading>Remarks</h4><p>You should reset the function when you programmatically change the position of the controls in the parent control.&nbsp; Don&rsquo;t do this while parent is resizing as resetting procedure may be interrupted.</p><p>Function monitors WM_SIZE message to detect parent changes.&nbsp; That means that it can be used with other eventual container controls and not only top level windows.</p><h4 class=CHeading>Examples</h4><blockquote><pre>Attach(h, &quot;w.5 h1/3 r2&quot;)    ;Attach control's w, h and redraw it with delay.
+Attach()                    ;Reset first parent. Use when you have only 1 parent.
+Attach(hGui2)               ;Reset Gui2.
+Attach(&quot;Win_Redraw&quot;)        ;Use Win_Redraw function as a Handler. Attach will call it with parent's handle as argument.
+
+
+; This is how to do delayed refresh of entire window.
+; To prevent redraw spam which can be annoying in some cases,
+; you can choose to redraw entire window only when user has finished resizing it.
+; This is similar to r2 option for controls, except it works with entire parent.
+
+Attach(&quot;OnAttach&quot;)          ;Set Handler to OnAttach function
+...
+
+OnAttach( Hwnd ) {
+    global hGuiToRedraw := hwnd
+    SetTimer, Redraw, -100
+}
+
+Redraw:
+    Win_Redraw(hGuiToRedraw)
+return</pre></blockquote><p>Full Example:</p><blockquote><pre>#SingleInstance, force
     Gui, +Resize
     Gui, Add, Edit, HWNDhe1 w150 h100
     Gui, Add, Picture, HWNDhe2 w100 x+5 h100, pic.bmp
