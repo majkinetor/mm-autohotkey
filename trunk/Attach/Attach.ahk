@@ -16,6 +16,11 @@
 							  be specified in p/q form (see example below). "r" or "r1" option specifies that control should be redrawn immediately.
 							  Specify "r2" to delay redrawing 100ms for the control. This can be used to prevent redrawing spam which in some situations
 							  may be annoying.
+					 		- You can use single letters "+" or "-" to enable or disable function for the control. If control is hidden, you may want to 
+							  disable the function for performance reasons. Its perfectly OK to leave invisible controls attached, but if you have lots of 
+							  them you can use this feature to get faster and more responsive updates. 
+							  When you want to show disabled invisible control, make sure you first attach it back so it can take its correct position
+							  and size while in hidden state, then show it.
 					 		- If aDef parameter is omitted, function working depends on 1st parameter.
 
 	Remarks:
@@ -28,6 +33,7 @@
 	Examples:
 	(start code)
 					Attach(h, "w.5 h1/3 r2")	;Attach control's w, h and redraw it with delay.
+					Attach(h, "-")				;Disable function for control h but keep its definition. To enable it latter use "+".
 					Attach()					;Reset first parent. Use when you have only 1 parent.
 					Attach(hGui2)				;Reset Gui2.
 					Attach("Win_Redraw")		;Use Win_Redraw function as a Handler. Attach will call it with parent's handle as argument.
@@ -107,23 +113,29 @@ Attach_(hCtrl, aDef, Msg, hParent){
 
 	if (hParent = "")  {		;initialize
 		if !adrSetWindowPos
-			adrSetWindowPos := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "SetWindowPos")
-			,adrWindowInfo  := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "GetWindowInfo")
+			adrSetWindowPos		:= DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "SetWindowPos")
+			,adrWindowInfo		:= DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "GetWindowInfo")
 			,OnMessage(5, A_ThisFunc),	VarSetCapacity(B, 60), NumPut(60, B), adrB := &B
 
 		hGui := hParent := DllCall("GetParent", "uint", hCtrl, "Uint") 
-		gosub Attach_GetPos
-		loop, parse, aDef, %A_Space%
-		{
-			l := A_LoopField,	f := SubStr(l,1,1), k := StrLen(l)=1 ? 1 : SubStr(l,2)
-			if (j := InStr(l, "/"))
-				k := SubStr(l, 2, j-2) / SubStr(l, j+1)
-			%hCtrl% .= f ":" k ":" c%f% " "
+
+		ifEqual, aDef, -, return SubStr(%hCtrl%,1,1) != "-" ? %hCtrl% := "-" %hCtrl% : 
+		else if (aDef = "+")
+			SubStr(%hCtrl%,1,1) != "-" ? return : %hCtrl% := SubStr(%hCtrl%, 2), enable := 1 
+		else {
+			gosub Attach_GetPos
+			loop, parse, aDef, %A_Space%
+			{
+				l := A_LoopField,	f := SubStr(l,1,1), k := StrLen(l)=1 ? 1 : SubStr(l,2)
+				if (j := InStr(l, "/"))
+					k := SubStr(l, 2, j-2) / SubStr(l, j+1)
+				%hCtrl% .= f ":" k ":" c%f% " "
+			}
+			return %hCtrl% := SubStr(%hCtrl%, 1, -1), %hParent% .= InStr(%hParent%, hCtrl) ? "" : (%hParent% = "" ? "" : " ")  hCtrl 
 		}
-		return %hCtrl% := SubStr(%hCtrl%, 1, -1), %hParent% .= InStr(%hParent%, hCtrl) ? "" : (%hParent% = "" ? "" : " ")  hCtrl 
 	}
 
-	if !reset {
+	if !reset && !enable {
 		%hParent%_pw := aDef & 0xFFFF, %hParent%_ph := aDef >> 16
 		ifEqual, %hParent%_ph, 0, return		;when u create gui without any control, it will send message with height=0 and scramble the controls ....
 	}
@@ -134,7 +146,8 @@ Attach_(hCtrl, aDef, Msg, hParent){
 	StringSplit, s, %hParent%_s, %A_Space%
 	loop, parse, %hParent%, %A_Space%
 	{
-		hCtrl := A_LoopField, aDef := %hCtrl%, 	uw := uh := ux := uy := r := 0
+		hCtrl := A_LoopField, aDef := %hCtrl%, 	uw := uh := ux := uy := r := 0, hCtrl1 := SubStr(%hCtrl%,1,1)
+		ifEqual, hCtrl1, -, continue
 		gosub Attach_GetPos
 		loop, parse, aDef, %A_Space%
 		{
@@ -146,7 +159,8 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag)
 		r+0=2 ? Attach_redrawDelayed(hCtrl) : 
 	}
-	return Handler != "" ? %Handler%(hParent) : ""
+
+	return Handler != "" ? %Handler%(hParent) : "", enable := 0
 
  Attach_GetPos:		;hParent & hCtrl must be set up
 		DllCall(adrWindowInfo, "uint", hParent, "uint", adrB), 	lx := NumGet(B, 20), ly := NumGet(B, 24), DllCall(adrWindowInfo, "uint", hCtrl, "uint", adrB)

@@ -1,17 +1,6 @@
 _("mo! e2")
 #SingleInstance, force
-;	Attach("Win_Redraw")
-;	Attach("OnAttach")
 	goto MakeGui
-return
-
-OnAttach( Hwnd ) {
-	global hGui := hwnd
-	SetTimer, Redraw, -100
-}
-
-Redraw:
-	Win_Redraw(hGui)
 return
 
 MakeGui:
@@ -20,7 +9,7 @@ MakeGui:
 	Gui, %no%:+Resize +LastFound
 	hGui := WinExist(),  %hGui% := no
 
-	Gui, %no%:Add, Edit, HWNDhe1%no% w150 h100 -tabstop, F1 - new Gui `nF4 - move left `nF5 - move right `nESC - exit script
+	Gui, %no%:Add, Edit, HWNDhe1%no% w150 h100 -tabstop, F1 - new Gui `nF2 - hide ctrl`nF3 - show ctrl`nF4 - ctrl left `nF5 - ctrl right `nESC - exit script
 	Gui, %no%:Add, Picture, HWNDhe2%no% w100 x+5 h100, pic.bmp 
 
 	Gui, %no%:Add, Edit, HWNDhe3%no% w100 xm h100
@@ -33,7 +22,6 @@ MakeGui:
 	Randomize(no)
 return
 
-
 SetAttach:
 	Attach(he1%no%, "w.5 h")
 	Attach(he2%no%, "x.5 w.5 h r")
@@ -42,8 +30,21 @@ SetAttach:
 	Attach(he5%no%, "y x2/3 w1/3")
 return
 
+
 F1::
 	gosub MakeGui
+return
+
+F2::
+	h := WinExist("A"), h := "he1" %h%, h := %h%
+	WinHide, ahk_id %h%
+	Attach(h, "-")
+return
+
+F3::
+	h := WinExist("A"),	h := "he1" %h%, h := %h%
+	Attach(h, "+")
+	WinShow, ahk_id %h%
 return
 
 F4::
