@@ -11,11 +11,15 @@
 								 moving controls for the parent. Handler receives hWnd of the parent as its only argument.
 
 
-					aDef	- Attach definition string. 
-					 		- You can use x,y,w,h and r letters along with coefficients, decimal numbers which can also
-							  be specified in p/q form (see example below). "r" or "r1" option specifies that control should be redrawn immediately.
+					aDef	- Attach definition string. Space separated list of attach options.
+					 		- You can use x,y,w,h,r,p letters along with coefficients, decimal numbers which can also
+							  be specified in m/n form (see example below). "r" or "r1" option specifies that control should be redrawn immediately.
 							  Specify "r2" to delay redrawing 100ms for the control. This can be used to prevent redrawing spam which in some situations
 							  may be annoying. 
+							  "p" is special coeficient that can only be used without x-h options. It means "proportional". It will make control always stay 
+							  in the same proportion to its parent (so, pin the control to the parent). Although you can mix pinned and non-pinned controls 
+							  that is rarely what you want. You will generally want to pin every control in the parent.
+
 					 		- You can use single letters "+" or "-" to enable or disable function for the control. If control is hidden, you may want to 
 							  disable the function for performance reasons. Its perfectly OK to leave invisible controls attached, but if you have lots of 
 							  them you can use this feature to get faster and more responsive updates.
@@ -118,7 +122,8 @@ Attach_(hCtrl, aDef, Msg, hParent){
 			,OnMessage(5, A_ThisFunc),	VarSetCapacity(B, 60), NumPut(60, B), adrB := &B
 
 		hGui := hParent := DllCall("GetParent", "uint", hCtrl, "Uint") 
-
+		if aDef contains p
+			aDef := "xp yp wp hp" SubStr(aDef, 2)
 		ifEqual, aDef, -, return SubStr(%hCtrl%,1,1) != "-" ? %hCtrl% := "-" %hCtrl% : 
 		else if (aDef = "+")
 			SubStr(%hCtrl%,1,1) != "-" ? return : %hCtrl% := SubStr(%hCtrl%, 2), enable := 1 
@@ -147,12 +152,15 @@ Attach_(hCtrl, aDef, Msg, hParent){
 	{
 		hCtrl := A_LoopField, aDef := %hCtrl%, 	uw := uh := ux := uy := r := 0, hCtrl1 := SubStr(%hCtrl%,1,1)
 		ifEqual, hCtrl1, -, continue
+		
 		gosub Attach_GetPos
 		loop, parse, aDef, %A_Space%
 		{
-			StringSplit, z, A_LoopField, :
+			StringSplit, z, A_LoopField, :		; opt:coef:initial
 			ifEqual, z1, r, SetEnv, r, %z2%
-			c%z1% := z3 + z2 * (z1="x" || z1="w" ?  %hParent%_pw-s1 : %hParent%_ph-s2), u%z1% := true
+			else if z2=p
+				 c%z1% := z3 * (z1="x" || z1="w" ?  %hParent%_pw/s1 : %hParent%_ph/s2), u%z1% := true
+			else c%z1% := z3 + z2*(z1="x" || z1="w" ?  %hParent%_pw-s1 : %hParent%_ph-s2), 	u%z1% := true
 		}
 		flag := 4 | (r=1 ? 0x100 : 0) | (uw OR uh ? 0 : 1) | (ux OR uy ? 0 : 2)			; nozorder=4 nocopybits=0x100 SWP_NOSIZE=1 SWP_NOMOVE=2						
 		DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag)
