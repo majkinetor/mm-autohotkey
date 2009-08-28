@@ -152,13 +152,12 @@ Attach_(hCtrl, aDef, Msg, hParent){
 	{
 		hCtrl := A_LoopField, aDef := %hCtrl%, 	uw := uh := ux := uy := r := 0, hCtrl1 := SubStr(%hCtrl%,1,1)
 		ifEqual, hCtrl1, -, continue
-		
 		gosub Attach_GetPos
 		loop, parse, aDef, %A_Space%
 		{
 			StringSplit, z, A_LoopField, :		; opt:coef:initial
 			ifEqual, z1, r, SetEnv, r, %z2%
-			else if z2=p
+			if z2=p
 				 c%z1% := z3 * (z1="x" || z1="w" ?  %hParent%_pw/s1 : %hParent%_ph/s2), u%z1% := true
 			else c%z1% := z3 + z2*(z1="x" || z1="w" ?  %hParent%_pw-s1 : %hParent%_ph-s2), 	u%z1% := true
 		}

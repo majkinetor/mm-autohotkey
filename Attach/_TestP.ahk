@@ -1,4 +1,5 @@
-;_("mo! e2")
+;_("mo! e2 d")
+DetectHiddenWindows, on
 #SingleInstance, force
 	goto MakeGui
 return
@@ -16,9 +17,9 @@ MakeGui:
 	Gui, %no%:Add, Edit, HWNDhe3%no% w100 xm h100
 	Gui, %no%:Add, Edit, HWNDhe4%no% w100 x+0 h100
 	Gui, %no%:Add, Edit, HWNDhe5%no% w100 yp x+0 h100
-	
-	Gui, %no%:Show, Autosize
+
 	Pin( hGui )
+	Gui, %no%:Show, Autosize
 	Randomize(no)
 return
 
