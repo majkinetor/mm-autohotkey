@@ -261,9 +261,6 @@ Toolbar_DeleteButton(hCtrl, Pos=1) {
 	return ErrorLevel
 }
 
-Toolbar_FindButton(hCtrl, Text, ByRef pos, ByRef id="") {
-}
-
 /*
 	Function:  GetButton
 			Get button information
@@ -619,10 +616,24 @@ Toolbar_SetButtonWidth(hCtrl, Min, Max=""){
 }
 
 ;Toolbar_SetDrawTextFlags(hModbar, 3, 2) ;right align text
-Toolbar_SetDrawTextFlags(hCtrl, f1, f2) {
-	static TB_SETDRAWTEXTFLAGS = 1094
-	SendMessage, TB_SETDRAWTEXTFLAGS, f1,f2,,ahk_id %hCtrl%
+/*
+ Function:  SetDrawTextFlags
+ 			Sets the text drawing flags for the toolbar.
+ 
+ Parameters:
+			Mask  - One or more of the DT_ flags, specified in DrawText, that indicate which bits in dwDTFlags will be used when drawing the text.
+			Flags - One or more of the DT_ flags, specified in DrawText, that indicate how the button text will be drawn. 
+					This value will be passed to the DrawText API when the button text is drawn. 
+ Returns:
+ 			Returns the previous text drawing flags.
 
+ Remarks:
+			See <http://msdn.microsoft.com/en-us/library/bb787425(VS.85).aspx> for more info.
+ */
+Toolbar_SetDrawTextFlags(hCtrl, Mask, Flags) {
+	static TB_SETDRAWTEXTFLAGS = 1094
+	SendMessage, TB_SETDRAWTEXTFLAGS, Mask,Flags,,ahk_id %hCtrl%
+	return ErrorLevel
 }
 
 /*
@@ -637,9 +648,9 @@ Toolbar_SetDrawTextFlags(hCtrl, f1, f2) {
  */
 Toolbar_SetButtonSize(hCtrl, W, H="") {
 	static TB_SETBUTTONSIZE = 0x41F
-	IfEqual, h, , SetEnv, h, %W%
-	SendMessage, TB_SETBUTTONSIZE, 0,(H<<16) | W,,ahk_id %hCtrl%
-	SendMessage, 0x421, , ,,ahk_id %hCtrl%	;autosize
+	IfEqual, H, ,SetEnv, H, %W%
+	SendMessage, TB_SETBUTTONSIZE, ,(H<<16)|W ,,ahk_id %hCtrl%
+	SendMessage, 0x421,,,,ahk_id %hCtrl%	;autosize
 }
 
 /*
