@@ -53,23 +53,25 @@ Splitter_Add(Opt, Style="sunken", Text="") {
  */
 Splitter_Set( HSep, Def ) {
 	type := InStr(Def, "|") ? "ver" : "hor"
-	Splitter_wndProc(0, type, DEF, 0)
+	Splitter_wndProc(0, type, Def, HSep)
 	Win_subclass(HSep, "Splitter_wndProc")
 }
 
 
 Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {	
+	static
 	static WM_SETCURSOR := 0x20, WM_MOUSEMOVE := 0x200, WM_LBUTTONDOWN=0x201, WM_LBUTTONUP=0x202, WM_LBUTTONDBLCLK=0x203
 	static SIZENS := 32645,  SIZEWE := 32644
-	static cursor, delta, moving, type, def
+
+	critical 100
 
 	if !Hwnd{
-		type := Umsg, def := WParam, 
-		cursor := DllCall("LoadCursor", "Uint", 0, "Int", type="hor" ? SIZENS : SIZEWE, "Uint")	
+		hwnd := Lparam+0
+		%hwnd%_type := Umsg, %hwnd%_def := WParam, %hwnd%_cursor := DllCall("LoadCursor", "Uint", 0, "Int", Umsg="hor" ? SIZENS : SIZEWE, "Uint")	
 		return
 	}
-		
-	If (UMsg = WM_SETCURSOR) 
+	type := %Hwnd%_type
+	If (UMsg = WM_SETCURSOR)
 	  return 1 
 
 	if (UMsg =  WM_LBUTTONDBLCLK)
@@ -78,19 +80,19 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 	}
 	
 	if (UMsg = WM_MOUSEMOVE) {
-		DllCall("SetCursor", "uint", cursor)
+		DllCall("SetCursor", "uint", %Hwnd%_cursor)
 		if moving 
-			Splitter_UpdateVisual(Hwnd, type)
+			Splitter_updateVisual(Hwnd, %Hwnd%_type)
 	}
 
 	if (UMsg = WM_LBUTTONDOWN)
 	{
-		DllCall("SetCapture", "uint", Hwnd)
+		DllCall("SetCapture", "uint", Hwnd), parent := DllCall("GetParent", "uint", Hwnd)
 		VarSetCapacity(RECT, 16)
-		DllCall("GetWindowRect", "uint", DllCall("GetParent", "uint", Hwnd) , "uint", &RECT)
+		DllCall("GetWindowRect", "uint", parent, "uint", &RECT)
 
 		sz := Win_GetRect(Hwnd,  type = "ver" ? "w" : "h") // 2			
-		capy := Win_Get(DllCall("GetParent", "uint", Hwnd), "Nh" )		;get caption size of parent window
+		capy := Win_Get(parent, "Nh" )		;get caption size of parent window
 		if capy > 1000 ;-caption
 			capy := 0
 
@@ -102,7 +104,7 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 		NumPut( NumGet(RECT, 12)- sz	,RECT, 12)
 		
 		DllCall("ClipCursor", "uint", &RECT)
-		DllCall("SetCursor", "uint", cursor)
+		DllCall("SetCursor", "uint", %Hwnd%_cursor)
 		moving := true
 	}
 	if (UMsg = WM_LBUTTONUP)
@@ -115,7 +117,7 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 		
 		DllCall("SetCursor", "uint", cursor)
 		moving := false, Splitter_UpdateVisual()
-		Splitter_move(Hwnd, type, delta, def)
+		Splitter_move(Hwnd, type, delta, %Hwnd%_def)
 	}
 
 	return DllCall("CallWindowProc","uint",A_EventInfo,"uint",hwnd,"uint",uMsg,"uint",wParam,"uint",lParam)
@@ -148,7 +150,6 @@ Splitter_move(HSep, type, Delta, Def){
 
 Splitter_updateVisual( HSep="", Type="" ) {
 	static sz, dc, RECT, parent, capy, adrDrawFocusRect
-	critical 100
 
 	if !HSep
 		return dc := 0
@@ -159,7 +160,8 @@ Splitter_updateVisual( HSep="", Type="" ) {
 		adrDrawFocusRect := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "DrawFocusRect")
 		parent := DllCall("GetParent", "uint", HSep)
 		capy := Win_Get(parent, "Nh" ) + 4					;get caption size of parent window
-		ifEqual, capy, 4269746180, SetEnv, capy, 0
+		if capy > 1000
+			SetEnv, capy, 0
 		dc := DllCall("GetDC", "uint", parent)
 
 		VarSetCapacity(RECT, 16)

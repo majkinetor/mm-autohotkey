@@ -3,15 +3,15 @@
 	;=========== SETUP ========
 		w := 800
 		h := 600
-		sep := 5
+		sep := 8
 	;==========================
 
 	w1 := w//3, w2 := w-w1 , h1 := h // 2, h2 := h // 3
 	gui, margin, 0, 0
-	Gui, +Resize
+	Gui, +Resize -caption
 
 	gui, add, edit, HWNDc11 w%w1% h%h1%
-	hSepH := Splitter_Add( "x y w" w1 " h10" )
+	hSepH := Splitter_Add( "x y w" w1 " h" sep )
 	h1-=10
 	gui, add, edit, HWNDc12 w%w1% h%h1%
 
@@ -30,10 +30,10 @@
 	Attach(c11, "h.5")
 	Attach(hSepH,"y.5")
 	Attach(c12, "y.5 h.5")
-
-	Attach(c21, "w h1/3")
-	Attach(c22, "y1/3 h1/3 w")
-	Attach(c23, "y2/3 h1/3 w")
+	Attach(hSepV, "h")
+	Attach(c21, "w h.5")
+	Attach(c22, "y.5 h.5 w")
+	Attach(c23, "y w")
 
 
 	gui, show, w%w% h%h%
