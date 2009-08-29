@@ -91,6 +91,8 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 
 		sz := Win_GetRect(Hwnd,  type = "ver" ? "w" : "h") // 2			
 		capy := Win_Get(DllCall("GetParent", "uint", Hwnd), "Nh" )		;get caption size of parent window
+		if capy > 1000 ;-caption
+			capy := 0
 
 	  ;prevent user from going offscreen with separator
 	  ; let the separator always be visible a little if it is pulled up to the edge
@@ -145,39 +147,41 @@ Splitter_move(HSep, type, Delta, Def){
 }
 
 Splitter_updateVisual( HSep="", Type="" ) {
-	static sz, dc, RECT, parent
+	static sz, dc, RECT, parent, capy, adrDrawFocusRect
+	critical 100
 
 	if !HSep
 		return dc := 0
-
+	
 	MouseGetPos, mx, my
 	if !dc
 	{
-		capy := Win_Get(DllCall("GetParent", "uint", HSep), "Nh" )		;get caption size of parent window
+		adrDrawFocusRect := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "DrawFocusRect")
 		parent := DllCall("GetParent", "uint", HSep)
+		capy := Win_Get(parent, "Nh" ) + 4					;get caption size of parent window
+		ifEqual, capy, 4269746180, SetEnv, capy, 0
 		dc := DllCall("GetDC", "uint", parent)
+
 		VarSetCapacity(RECT, 16)
-				
 	 	DllCall("GetClientRect", "uint", parent, "uint", &RECT)
 		sz := Win_GetRect(HSep, Type = "ver" ? "w" : "h") // 2
-
 
 		my -= capy
 		if (Type = "ver")
 			 NumPut(mx-sz, RECT, 0),	 NumPut(mx+sz, RECT, 8)
 		else NumPut(my-sz, RECT, 4),	 NumPut(my+sz, RECT, 12)
 
-		DllCall("DrawFocusRect", "uint", dc, "uint", &RECT)	
+		DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)	
 		return
 	}
-	DllCall("DrawFocusRect", "uint", dc, "uint", &RECT)
+	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 
 	my -= capy
 	if (Type = "ver")
 		 NumPut(mx-sz, RECT, 0),	 NumPut(mx+sz, RECT, 8)
 	else NumPut(my-sz, RECT, 4),	 NumPut(my+sz, RECT, 12)
 
-	DllCall("DrawFocusRect", "uint", dc, "uint", &RECT)
+	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 }
 
 #include Win.ahk
