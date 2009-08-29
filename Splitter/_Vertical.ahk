@@ -12,8 +12,15 @@
 
 	gui, add, edit, HWNDhc1 w%w1% h%h%
 	hSep := Splitter_Add( "x+0 h" h " w" sep)
+
 	gui, add, monthcal, HWNDhc2 w%w2% h%h% x+0
-			Splitter_Set( hSep, hc1 " | " hc2 )
+
+	Splitter_Set( hSep, hc1 " | " hc2 )
+
+
+	Attach(hc1, "h w")
+	Attach(hc2, "x h")
+	Attach(hSep,"x h")
 
 	gui, show, w%w% h%h%
 		
@@ -25,12 +32,4 @@ GuiClose:
 return
 
 #include Splitter.ahk
-
-
-GuiSize:
-
-	Anchor(hc1, "hw"	)
-	Anchor(hc2, "xh"	)
-	Anchor(hSep,"xh")
-return
-
+#include Attach.ahk
