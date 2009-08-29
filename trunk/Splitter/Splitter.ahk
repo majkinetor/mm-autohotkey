@@ -163,7 +163,7 @@ Splitter_updateVisual( HSep="", Type="" ) {
 		dc := DllCall("GetDC", "uint", parent)
 
 		VarSetCapacity(RECT, 16)
-	 	DllCall("GetClientRect", "uint", parent, "uint", &RECT)
+	 	DllCall("GetClientRect", "uint", HSep, "uint", &RECT)
 		sz := Win_GetRect(HSep, Type = "ver" ? "w" : "h") // 2
 
 		my -= capy

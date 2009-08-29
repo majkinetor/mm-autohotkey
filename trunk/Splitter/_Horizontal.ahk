@@ -6,7 +6,7 @@
 	if pos =
 		w := 600,  h := 500
 
-	spos := 215
+	spos := 188
 	h1 := spos,	 h2 := h-h1-ssize
 	gui, margin, 0, 0
 	Gui +Resize +LastFound ;-caption
