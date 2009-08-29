@@ -6,14 +6,14 @@
 	if pos =
 		w := 600,  h := 500
 
-	spos := 188
+	spos := 340
 	h1 := spos,	 h2 := h-h1-ssize
 	gui, margin, 0, 0
 	Gui +Resize +LastFound ;-caption
 	hGui := WinExist()
 
 	gui, add, edit, HWNDhc1 w%w% h%h1%, Press ESC to exit.`n
-	hSep := Splitter_Add("h" ssize "y+10 w" w , "sunken", "Mover")
+	hSep := Splitter_Add("h" ssize "y+10 w" w , "sunken")
 
 	w := w//2
 	gui, add, monthcal, HWNDhc2 w%w% h%h2%

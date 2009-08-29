@@ -27,14 +27,13 @@
 	sdef2 = %c11% - %c12%
 	Splitter_Set( hSepH, sdef2 )
 
-	Attach(c11, "h.5")
+	Attach(c11,  "h.5")
 	Attach(hSepH,"y.5")
-	Attach(c12, "y.5 h.5")
-	Attach(hSepV, "h")
-	Attach(c21, "w h.5")
-	Attach(c22, "y.5 h.5 w")
-	Attach(c23, "y w")
-
+	Attach(c12,  "y.5 h.5")
+	Attach(hSepV,"h")
+	Attach(c21,  "w h.5")
+	Attach(c22,  "y.5 h.5 w")
+	Attach(c23,  "y w")
 
 	gui, show, w%w% h%h%
 		
