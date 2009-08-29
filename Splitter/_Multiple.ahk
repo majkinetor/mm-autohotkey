@@ -1,3 +1,4 @@
+_("mo!")
 #SingleInstance, force
 
 	;=========== SETUP ========
@@ -13,7 +14,7 @@
 	gui, add, edit, HWNDc11 w%w1% h%h1%
 	hSepH := Splitter_Add( "x y w" w1 " h" sep )
 	h1-=10
-	gui, add, edit, HWNDc12 w%w1% h%h1%
+	gui, add, edit, HWNDc12 w%w1% h%h1%, F1 toggle ver splitter off, F2 toggle on
 
 
 	hSepV := Splitter_Add( "x+0 y0 h" h " w" sep )
@@ -37,6 +38,15 @@
 
 	gui, show, w%w% h%h%
 		
+return
+
+
+F1::
+	Splitter_Set(hSepV, "off")
+return
+
+F2::
+	Splitter_Set(hSepV, "on")
 return
 
 Esc:: 

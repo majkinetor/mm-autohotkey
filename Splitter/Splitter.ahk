@@ -5,19 +5,23 @@
 			Both Windows and AHK don't have splitter control. 
 			With this module you can add splitters to your GUIs. 
 			
+
 			(see splitter.gif)
+
+ Dependency:
+			Win ver >= 1.0
  */
 
 /*---------------------------------------------------------------------------------
  Function:	Add
- 			Add new Splitter
+ 			Add new Splitter.
  
  Parameters:
  			Opt	  - Splitter Gui options. Splitter is subclassed Text control (Static), so it accepts any Text options.
 			Style - blackframe , blackrect , grayframe , grayrect , sunken , whiteframe , whiterect
 
  Returns:
-			Splitter handle
+			Splitter handle.
 
  Remarks:
 			This function adds a new splitter on the given position. User is responsible for correct position of the splitter.
@@ -36,25 +40,32 @@ Splitter_Add(Opt, Style="sunken", Text="") {
 
 /*---------------------------------------------------------------------------------
  Function:	Set
- 			Initiates separation of controls
+ 			Initiates separation of controls.
  
  Parameters:
- 			hSep - Splitter handle
+ 			hSep - Splitter handle.
 			Def	 - Splitter definition. The syntax is:
 
  >		c11 c12 c13 ... Type c21 c22 c23 ...
 		
-		c1n - Controls left or top of the Splitter
-		Type - Denotates Splitter type: " | " vertical or " - " horizontal
-		c2n	- Controls right or bottom of the Splitter
+		c1n - Controls left or top of the splitter.
+		Type - Splitter type: " | " vertical or " - " horizontal.
+		c2n	- Controls right or bottom of the splitter.
 							
  Returns:
 		Splitter handle
  */
 Splitter_Set( HSep, Def ) {
+	static
+
+	if Def=off
+		return Win_subclass(HSep, old)
+	else if Def=on
+		return Win_subclass(HSep, wndProc)
+
 	type := InStr(Def, "|") ? "ver" : "hor"
 	Splitter_wndProc(0, type, Def, HSep)
-	Win_subclass(HSep, "Splitter_wndProc")
+	old := Win_subclass(HSep, wnadProc = "" ? "Splitter_wndProc" : wndProc, "", wndProc)
 }
 
 
@@ -202,7 +213,7 @@ Splitter_updateVisual( HSep="", Type="" ) {
 		gui, add, ListView, HWNDc22 w%w2% h%h2%, c1|c2|c3
 		gui, add, ListBox, HWNDc23 w%w2% h%h2% , 1|2|3
 
-		sdef = %c11% %c12% | %c21% %c22% %c23%
+		sdef = %c11% %c12% | %c21% %c22% %c23%			;vertical splitter.
 		Splitter_Set( hSepV, sdef )
 
 		gui, show, w%w% h%h%	
