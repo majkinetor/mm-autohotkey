@@ -615,7 +615,6 @@ Toolbar_SetButtonWidth(hCtrl, Min, Max=""){
 	return ret
 }
 
-;Toolbar_SetDrawTextFlags(hModbar, 3, 2) ;right align text
 /*
  Function:  SetDrawTextFlags
  			Sets the text drawing flags for the toolbar.
@@ -629,6 +628,9 @@ Toolbar_SetButtonWidth(hCtrl, Min, Max=""){
 
  Remarks:
 			See <http://msdn.microsoft.com/en-us/library/bb787425(VS.85).aspx> for more info.
+
+ Example:
+			Toolbar_SetDrawTextFlags(hToolbar, 3, 2) ;right align text
  */
 Toolbar_SetDrawTextFlags(hCtrl, Mask, Flags) {
 	static TB_SETDRAWTEXTFLAGS = 1094
