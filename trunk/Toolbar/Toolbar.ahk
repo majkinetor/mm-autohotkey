@@ -638,7 +638,7 @@ Toolbar_SetDrawTextFlags(hCtrl, f1, f2) {
 Toolbar_SetButtonSize(hCtrl, W, H="") {
 	static TB_SETBUTTONSIZE = 0x41F
 	IfEqual, h, , SetEnv, h, %W%
-	SendMessage, TB_SETBUTTONSIZE, 0,(W<<16) | H,,ahk_id %hCtrl%
+	SendMessage, TB_SETBUTTONSIZE, 0,(H<<16) | W,,ahk_id %hCtrl%
 	SendMessage, 0x421, , ,,ahk_id %hCtrl%	;autosize
 }
 
@@ -1054,7 +1054,7 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 
 /*
  Group: About
-	o Ver 2.2 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Ver 2.21 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
 	o Parts of code in Toolbar_onNotify by jballi.
 	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
