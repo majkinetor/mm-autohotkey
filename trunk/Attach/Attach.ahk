@@ -16,11 +16,10 @@
 							  be specified in m/n form (see example below). "r" or "r1" option specifies that control should be redrawn immediately.
 							  Specify "r2" to delay redrawing 100ms for the control. This can be used to prevent redrawing spam which in some situations
 							  may be annoying. 
-							  "p" is special coeficient that can only be used without x-h options and it must be first option. 
+					 		- "p" is special coeficient that can only be used without x-h options and it must be first option. 
 							  It means "proportional". It will make control always stay in the same proportion to its parent 
 							  (so, pin the control to the parent). Although you can mix pinned and non-pinned controls 
 							  that is rarely what you want. You will generally want to pin every control in the parent.
-
 					 		- You can use single letters "+" or "-" to enable or disable function for the control. If control is hidden, you may want to 
 							  disable the function for performance reasons. Its perfectly OK to leave invisible controls attached, but if you have lots of 
 							  them you can use this feature to get faster and more responsive updates.
@@ -42,6 +41,7 @@
 					Attach()					;Reset first parent. Use when you have only 1 parent.
 					Attach(hGui2)				;Reset Gui2.
 					Attach("Win_Redraw")		;Use Win_Redraw function as a Handler. Attach will call it with parent's handle as argument.
+					Attach(h, "p r2")			;Pin control with delayed refreshing.
 
 					
 					; This is how to do delayed refresh of entire window.
