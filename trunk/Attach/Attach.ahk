@@ -2,30 +2,37 @@
 	Function:		Attach
 					Determines how a control is resized with its parent.
 
-	Parameters:		
-					hCtrl	-  - hWnd of the control if aDef is not empty.
-					 		-  - hWnd of the parent to be reset if aDef is empty. If you are using the function with only one parent, you don't have to
-								 specify its handle, its enough to call Attach without any parameters.
-								 With multiple parents you need to specify which one you want to reset.
-					 		-  - Handler name, if parameter is string and aDef is empty. Handler will be called after the function has finished 
-								 moving controls for the parent. Handler receives hWnd of the parent as its only argument.
+	hCtrl:			
+					- hWnd of the control if aDef is not empty.
+					
+					- hWnd of the parent to be reset if aDef is empty. If you are using the function with only one parent, you don't have to
+					pecify its handle, its enough to call Attach without any parameters.
+					With multiple parents you need to specify which one you want to reset.
+					
+					- Handler name, if parameter is string and aDef is empty. Handler will be called after the function has finished 
+					moving controls for the parent. Handler receives hWnd of the parent as its only argument.
 
 
-					aDef	- Attach definition string. Space separated list of attach options.
-					 		- You can use x,y,w,h,r,p letters along with coefficients, decimal numbers which can also
-							  be specified in m/n form (see example below). "r" or "r1" option specifies that control should be redrawn immediately.
-							  Specify "r2" to delay redrawing 100ms for the control. This can be used to prevent redrawing spam which in some situations
-							  may be annoying. 
-					 		- "p" is special coeficient that can only be used without x-h options and it must be first option. 
-							  It means "proportional". It will make control always stay in the same proportion to its parent 
-							  (so, pin the control to the parent). Although you can mix pinned and non-pinned controls 
-							  that is rarely what you want. You will generally want to pin every control in the parent.
-					 		- You can use single letters "+" or "-" to enable or disable function for the control. If control is hidden, you may want to 
-							  disable the function for performance reasons. Its perfectly OK to leave invisible controls attached, but if you have lots of 
-							  them you can use this feature to get faster and more responsive updates.
-							  When you want to show disabled invisible control, make sure you first attach it back so it can take its correct position
-							  and size while in hidden state, then show it.
-					 		- If aDef parameter is omitted, function working depends on 1st parameter.
+	aDef:			
+					Attach definition string. Space separated list of attach options. If omitted, function working depends on hCtrl parameter.
+					
+					-  	You can use x,y,w,h,r,p letters along with coefficients, decimal numbers which can also
+						be specified in m/n form (see example below). "r" or "r1" option specifies that control should be redrawn immediately.
+						Specify "r2" to delay redrawing 100ms for the control. This can be used to prevent redrawing spam which in some situations
+						may be annoying. 
+
+					-	"p" is special coeficient that can only be used without x-h options and it must be first option. 
+						It means "proportional". It will make control always stay in the same proportion to its parent 
+						(so, pin the control to the parent). Although you can mix pinned and non-pinned controls 
+						that is rarely what you want. You will generally want to pin every control in the parent.
+					 	
+					-	You can use single letters "+" or "-" to enable or disable function for the control. If control is hidden, you may want to 
+						disable the function for performance reasons. Its perfectly OK to leave invisible controls attached, but if you have lots of 
+						them you can use this feature to get faster and more responsive updates.
+						When you want to show disabled invisible control, make sure you first attach it back so it can take its correct position
+						and size while in hidden state, then show it.
+					 		
+						
 
 	Remarks:
 					You should reset the function when you programmatically change the position of the controls in the parent control.
@@ -62,7 +69,7 @@
 					return
 
 	(end code)
-	Full Example:
+	Working sample:
 	(start code)
 		#SingleInstance, force
 			Gui, +Resize
