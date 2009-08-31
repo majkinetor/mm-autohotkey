@@ -1,4 +1,4 @@
-;_("mo! e2")
+_("mo! e2")
 #SingleInstance, force
 	goto MakeGui
 return
@@ -30,6 +30,13 @@ SetAttach:
 	Attach(he5%no%, "y x2/3 w1/3")
 return
 
+
+F6::
+	Attach(he11, "-")
+return
+F7::
+	Attach(he11, "+")
+return
 
 F1::
 	gosub MakeGui
