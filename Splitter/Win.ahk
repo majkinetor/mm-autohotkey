@@ -84,67 +84,67 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
 		if (_ := SubStr(pQ, k, 1)) = ""
 			break
 
-		if !IsLabel("Window_Get_" _ )
+		if !IsLabel("Win_Get_" _ )
 			return A_ThisFunc "> Invalid query parameter: " _
-		Goto Window_Get_%_%
+		Goto %A_ThisFunc%_%_%
 
-		Window_Get_C:
+		Win_Get_C:
 				WinGetClass, o%i%, ahk_id %hwnd%		
 		continue
 
-		Window_Get_I:
+		Win_Get_I:
 				WinGet, o%i%, PID, ahk_id20/08/2009 %hwnd%		
 		continue
 
-		Window_Get_N:
+		Win_Get_N:
 				rect := "title"
 				VarSetCapacity(TBI, 44, 0), NumPut(44, TBI, 0), DllCall("GetTitleBarInfo", "uint", hwnd, "str", TBI)
-				title_x := NumGet(TBI, 4, "Int"), title_y := NumGet(TBI, 8, "Int"), title_w := NumGet(TBI, 12) - title_x, title_h := NumGet(TBI, 16) - title_y	
-				goto Window_Get_Rect
-		Window_Get_B:
+				title_x := NumGet(TBI, 4, "Int"), title_y := NumGet(TBI, 8, "Int"), title_w := NumGet(TBI, 12) - title_x, title_h := NumGet(TBI, 16) - title_y 
+				goto Win_Get_Rect
+		Win_Get_B:
 				rect := "border"
 				border_x := NumGet(WI, 48, "UInt"),  border_y := NumGet(WI, 52, "UInt")	
-				goto Window_Get_Rect
-		Window_Get_R:
+				goto Win_Get_Rect
+		Win_Get_R:
 				rect := "window"
 				window_x := NumGet(WI, 4,  "Int"),  window_y := NumGet(WI, 8,  "Int"),  window_w := NumGet(WI, 12, "Int") - window_x,  window_h := NumGet(WI, 16, "Int") - window_y
-				goto Window_Get_Rect
-		Window_Get_L: 
+				goto Win_Get_Rect
+		Win_Get_L: 
 				client_x := NumGet(WI, 20, "Int"),  client_y := NumGet(WI, 24, "Int"),  client_w := NumGet(WI, 28, "Int") - client_x,  client_h := NumGet(WI, 32, "Int") - client_y
 				rect := "client"
-		Window_Get_Rect:
+		Win_Get_Rect:
 				k++, arg := SubStr(pQ, k, 1)
 				if arg in x,y,w,h
 				{
 					o%i% := %rect%_%arg%, j := i++
-					goto Window_Get_Rect
+					goto Win_Get_Rect
 				}
 				else if !j
 						  o%i% := %rect%_x " " %rect%_y  (_ = "B" ? "" : " " %rect%_w " " %rect%_h)
 				
 		rect := "", k--, i--, j := 0
 		continue
-		Window_Get_S:
+		Win_Get_S:
 			WinGet, o%i%, Style, ahk_id %Hwnd%
 		continue
-		Window_Get_E: 
+		Win_Get_E: 
 			WinGet, o%i%, ExStyle, ahk_id %Hwnd%
 		continue
-		Window_Get_P: 
+		Win_Get_P: 
 			o%i% := DllCall("GetParent", "uint", Hwnd)
 		continue
-		Window_Get_A: 
+		Win_Get_A: 
 			o%i% := DllCall("GetAncestor", "uint", Hwnd, "uint", 2) ; GA_ROOT
 		continue
-		Window_Get_O: 
+		Win_Get_O: 
 			o%i% := DllCall("GetWindowLong", "uint", Hwnd, "int", -8) ; GWL_HWNDPARENT
 		continue
-		Window_Get_T:
+		Win_Get_T:
 			if DllCall("IsChild", "uint", hwnd)
 				 WinGetText, o%i%, ahk_id %hwnd%
 			else WinGetTitle, o%i%, ahk_id %hwnd%
 		continue
-		Window_Get_M: 
+		Win_Get_M: 
 			WinGet, _, PID, ahk_id %hwnd%
 			hp := DllCall( "OpenProcess", "uint", 0x10|0x400, "int", false, "uint", _ ) 
 			if (ErrorLevel or !hp) 
@@ -261,21 +261,6 @@ Win_Is(Hwnd, pQ="win") {
 			In order to do that you must get the current position of the control. That can be done with ControlGetPos which works in pair with ControlMove hence it is not relative to the client rect or WinGetPos which returns screen coordinates of child control so those can not 
 			be imediatelly used in WinMove as it positions child window relative to the parents client rect. This scenario can be additionaly complicated by the fact that each window may have its own theme which influences the size of its borders, non client area, etc...
 
- Example:
-			Difference between ControlMove and Win_Move:
-			(start code)
-   				Gui, Add, Edit, h40 hwndhEdit w100
-  				gui, show, w200 h300
-  			return
-  
-  			F1::
-  				ControlMove, ,0,0, , , ahk_id %hEdit%
-  			return
-  
-  			F2::
-  				Win_Move(hEdit, 0, 0)
-  			return
-			(end code)
  */
 Win_Move(Hwnd, X="", Y="", W="", H="", Flags="") {
 ;	static SWP_NOMOVE=2, SWP_NOREDRAW=8, SWP_NOSIZE=1, SWP_NOZORDER=4, SWP_NOACTIVATE = 0x10, SWP_ASYNCWINDOWPOS=0x4000, HWND_BOTTOM=1, HWND_TOPMOST=-1, HWND_NOTOPMOST = -2
@@ -322,6 +307,153 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 	return Win_Move( Hwnd, cx+Xd, cy+Yd, cw+Wd, ch+Hd, flags)
 }
 
+/* 
+  Function:	Recall
+			Store & recall window position, size and/or state.
+
+  Parameters:
+		Options		- White space separated list of options. See bellow.		
+		Hwnd		- Hwnd of the window for which to store data or Gui number if AHK window. 
+					If omitted, function will use Hwnd of the default AHK Gui. You can also use Gui, N:Default 
+					prior to calling the function. For 3td party windows this option is mandatory. For 3td party windows, 
+					this parameter is mandatory. 
+					Set 0 as hwnd to return position string without applying it to any window. This can be used for AHK Guis to
+					calculate size of controls based on window size and position, when needed. 
+
+		IniFileName	- Ini file to use as storage. Function will save the data under the [Recall] section.
+					If omited, Windows Registry key HKEY_CURRENT_USER\AutoHotKey\Win is used. Each script is uniquely determined by its full path 
+					so same scripts with different name will not share the storage.
+					
+  Options:
+		">", "<", "-", "--" - Operation, mandatory option. Use ">" to store or "<" to recall window position.
+					It can be optionally followed by the string representing the name of the storage location for that window.
+					You need to use name if your script stores more then one window, otherwise it will be saved under unnamed location.
+					">" and "<" are special names that can be used to store or recall all AHK Guis.
+					"-"	operation is used alone as an argument to delete Registry entries belonging to the script.
+					"--" operation is used alone as an argument to delete all Registry entries for all scripts.
+
+		
+		-Min	  - Don't save minimize state.
+		-Max	  - Don't save maximized state.		
+					
+  Returns:
+			Position string, space separated list of syntax "left top right bottom state cw ch" of the window. 
+			Empty if no recall data is stored for the window.
+			State can be 1 (normal) 2 (minimized) or 3 (maximized).
+			cw & ch numbers are present only for AHK Guis and represent client width & height which can be used 
+			without modifications in Gui, Show command.
+
+			You can get only position if you specify 
+
+  Examples:
+		Single Gui Example:
+		(start code)
+			Gui, +Resize +LastFound
+			WinSetTitle, MyGui
+			if !Win_Recall("<")						;Recall gui if its position is already saved
+				Gui, %n%:Show, h300 w300, MyGui		; otherwise use these defaults.
+			
+			GuiClose:
+				Win_Recall(">")						;Store the Gui.
+			return
+		(end code)
+
+		Snippets:
+		(start code)
+			Win_Recall(">MyGui")					;Save position for default Gui under name MyGui.
+			Win_Recall("<MyGui")					;Recall position for MyGui for default Gui
+			
+			Win_Recall(">MyGui2", Hwnd)				;Save window position under MyGui2 name, given the window handle or Gui number.
+			Win_Recall(">>")						;Save all Guis. The names will be given by their number.
+			Win_Recall("<<")						;Recall all Guis.
+
+			Win_Recall("-")							;Delete all Registry enteries for the script.
+			Win_Recall("--")						;Delete all Registry enteries for all scripts.
+
+			pos := Win_Recall("<MyWin", 0)			;Return position string only for window saved under the "MyWin" name.
+		(end code)
+ */
+Win_Recall(Options, Hwnd="", IniFileName=""){
+	static key="Software\AutoHotkey\Win", section="Recall"
+
+	if (Options = "-"){
+		loop, HKEY_CURRENT_USER, %key%
+			InStr(A_LoopRegName, A_ScriptFullPath) ? 
+				RegDelete, HKEY_CURRENT_USER, %key%, %A_LoopRegName%		
+		return
+	} else if (Options = "--") {
+		RegDelete, HKEY_CURRENT_USER, %key%
+		return
+	}
+	
+	loop, parse, Options, %A_Space%%A_Tab%, %A_Space%%A_Tab%
+	{
+		ifEqual, A_LoopField, ,continue	
+		f := SubStr(A_LoopField, 1, 1),  p := SubStr(A_LoopField, 2)
+
+		ifEqual, f, >, SetEnv, op, % ">", name := p
+		else ifEqual, f, <, SetEnv, op, % "<", name := p
+
+		else ifEqual, A_LoopField, -Min, SetEnv, noMin, 1
+		else ifEqual, A_LoopField, -Max, SetEnv, noMax, 1
+		else ifEqual, A_LoopField, Show, SetEnv, bShow, 1
+	}
+
+	if (Hwnd = "") || (Hwnd>0 && Hwnd <= 99) {
+		ifEqual, Hwnd,, Gui, +LastFoundExist
+		else Gui, %Hwnd%:+LastFound
+		Hwnd := WinExist()
+	}
+
+	if name in <,>
+	{		
+		Loop, 99 {
+			Gui, %A_Index%:+LastFoundExist
+			if WinExist()
+			{
+				name := A_Index, Hwnd := WinExist()
+				gosub %A_ThisFunc%
+			}
+		}
+		return
+	}	
+
+ Win_Recall:
+	if (op = "<") {
+		if IniFileName !=
+			 IniRead, pos, %IniFileName%, %section%, !%name%, %A_Space%
+		else RegRead, pos, REG_SZ,  HKEY_CURRENT_USER, %key%, %A_ScriptFullPath%!%name%
+		if (pos = "") or !Hwnd 
+			return pos
+		
+		VarSetCapacity(WP, 44, 0),  NumPut(44,WP)
+		StringSplit p, pos, %A_Space%
+		p5 := (p5=2 && noMin) || (p5=3 && noMax) ? 1 : p5
+		loop, 4
+			NumPut(p%A_Index%, WP, (A_Index+6)*4, "Int")
+		NumPut(p5, WP, 8, "UInt")
+		DllCall("SetWindowPlacement", "uint", Hwnd, "uint", &WP)
+	} 
+	else if (op = ">"){			
+		VarSetCapacity(WP, 44, 0),  NumPut(44,WP)
+		DllCall("GetWindowPlacement", "uint", Hwnd, "uint", &WP)
+		WinGetClass, cls, ahk_id %hwnd%
+		if (cls="AutoHotkeyGUI")
+			Win_Get(Hwnd, "Lwh",w,h),   szAHK := " " w " " h		;this is to store AHK Gui width & height so it can be used asap with Gui, Show.
+
+		pos := ""
+		loop, 4
+			pos .= NumGet(WP, (A_Index+6)*4, "Int") " "
+		s := NumGet(WP, 8, "UInt") 
+		pos	.= (s != 0 ? s : 1) szAHK
+		
+		if IniFileName !=
+			 IniWrite, %pos%, %IniFileName%, %section%, !%name%
+		else RegWrite, REG_SZ,  HKEY_CURRENT_USER, %key%, %A_ScriptFullPath%!%name%, %pos%
+	}	
+  return pos
+}
+
 /*
  Function:	Redraw
  			Redraws the window.
@@ -361,28 +493,23 @@ Win_SetMenu(Hwnd, hMenu=0){
  			Set the titlebar icon for the window.
  
  Parameters:
-			Icon	- Path to the icon. If omited, icon is removed.
-			Flag	- 1 sets the large icon for the window, 0 sets the small icon for the window, 2 sets both (default).
+			Icon	- Path to the icon. If omited, icon is removed. If integer, handle to the already loaded icon.
+			Flag	- 1 sets the large icon for the window, 0 sets the small icon for the window. 
 
  Returns:
 			The return value is a handle to the previous large or small icon, depending on the Flag value.
-			If Flag=2, big icon handle is returned only.
+
  */
-Win_SetIcon( Hwnd, Icon="", Flag=2){
+Win_SetIcon( Hwnd, Icon="", Flag=1){
 	static WM_SETICON = 0x80, LR_LOADFROMFILE=0x10, IMAGE_ICON=1
 
-	if Flag not in 0,1,2
+	if Flag not in 0,1
 		return A_ThisFunc "> Unsupported Flag: " Flag
 
 	if Icon != 
-		hIcon := DllCall("LoadImage", "Uint", 0, "str", Icon, "uint",IMAGE_ICON, "int", 32, "int", 32, "uint", LR_LOADFROMFILE)  
+		hIcon := Icon+0 != "" ? Icon : DllCall("LoadImage", "Uint", 0, "str", Icon, "uint",IMAGE_ICON, "int", 32, "int", 32, "uint", LR_LOADFROMFILE)  
 
-	if Flag in 0,2 
-		SendMessage, WM_SETICON, 0, hIcon, , ahk_id %Hwnd%		;ICON_SMALL=0
-
-	if Flag in 1,2
-		SendMessage, WM_SETICON, 1, hIcon, , ahk_id %Hwnd%		;ICON_BIG=1
-
+	SendMessage, WM_SETICON, %Flag%, hIcon, , ahk_id %Hwnd%
 	return ErrorLevel
 }
 
@@ -422,9 +549,9 @@ Win_SetParent(Hwnd, hParent=0){
 ;GWL_HWNDPARENT should have been called GWL_HWNDOWNER, but nobody noticed it until after a bazillion copies of the SDK had gone out. This is what happens 
 ;when the the dev team lives on M&Ms and CocaCola for to long. Too bad. Live with it.
 ;
-Win_SetOwner(hwnd, hOwner){
+Win_SetOwner(Hwnd, hOwner){
 	static GWL_HWNDPARENT = -8
-	return DllCall("SetWindowLong", "uint", hwnd, "int", GWL_HWNDPARENT, "uint", hOwner)		
+	return DllCall("SetWindowLong", "uint", Hwnd, "int", GWL_HWNDPARENT, "uint", hOwner)		
 }
 
 /*
@@ -438,8 +565,8 @@ Win_SetOwner(hwnd, hOwner){
 		If the window was previously visible, the return value is nonzero. 
 		If the window was previously hidden, the return value is zero.
  */
-Win_Show(hwnd, bShow=true) {
-	return DllCall("ShowWindow", "uint", hwnd, "uint", bShow ? 5:0)
+Win_Show(Hwnd, bShow=true) {
+	return DllCall("ShowWindow", "uint", Hwnd, "uint", bShow ? 5:0)
 }
 
 /*
@@ -457,7 +584,7 @@ Win_Show(hwnd, bShow=true) {
 			The addresss of to the previous window procedure or 0 on error	
 
  Remarks:
-			Works only for controls created in the autohotkey process
+			Works only for controls created in the autohotkey process.
 
  Example:
 	(start code)
@@ -488,7 +615,7 @@ Win_Subclass(hCtrl, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.0 by majkinetor.
+	o v1.1 by majkinetor.
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*
