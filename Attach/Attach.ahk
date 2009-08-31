@@ -144,13 +144,15 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		ifEqual, %hParent%_ph, 0, return		;when u create gui without any control, it will send message with height=0 and scramble the controls ....
 	}
 	if (%hParent%_s = "") || reset
-		%hParent%_s := %hParent%_pw " " %hParent%_ph,  reset := 0
+		%hParent%_s := %hParent%_pw " " %hParent%_ph
 
 	StringSplit, s, %hParent%_s, %A_Space%
 	loop, parse, %hParent%, %A_Space%
 	{
 		hCtrl := A_LoopField, aDef := %hCtrl%, 	uw := uh := ux := uy := r := 0, hCtrl1 := SubStr(%hCtrl%,1,1)
-		ifEqual, hCtrl1, -, continue
+		if (hCtrl1 = "-")
+			ifEqual, reset, 1, continue
+			else aDef := SubStr(aDef, 2)			
 		gosub Attach_GetPos
 		loop, parse, aDef, %A_Space%
 		{
@@ -165,7 +167,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		r+0=2 ? Attach_redrawDelayed(hCtrl) : 
 	}
 
-	return Handler != "" ? %Handler%(hParent) : "", enable := 0
+	return Handler != "" ? %Handler%(hParent) : "", reset := enable := 0
 
  Attach_GetPos:									;hParent & hCtrl must be set up at this point
 		DllCall(adrWindowInfo, "uint", hParent, "uint", adrB), 	lx := NumGet(B, 20), ly := NumGet(B, 24), DllCall(adrWindowInfo, "uint", hCtrl, "uint", adrB)

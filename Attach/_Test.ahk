@@ -39,12 +39,12 @@ return
 F2::
 	h := WinExist("A"), h := "he1" %h%, h := %h%
 	WinHide, ahk_id %h%
-;	Attach(h, "-")
+	Attach(h, "-")
 return
 
 F3::
 	h := WinExist("A"),	h := "he1" %h%, h := %h%
-;	Attach(h, "+")
+	Attach(h, "+")
 	WinShow, ahk_id %h%
 return
 
