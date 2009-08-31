@@ -44,7 +44,7 @@ Splitter_Add(Opt, Style="sunken", Text="") {
  
  Parameters:
  			hSep - Splitter handle.
-			Def	 - Splitter definition. The syntax is:
+			Def	 - Splitter definition or words "off" or "on". The syntax of splitter definition is:
 
  >		c11 c12 c13 ... Type c21 c22 c23 ...
 		
