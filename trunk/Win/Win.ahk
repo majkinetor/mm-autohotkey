@@ -307,139 +307,137 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 	return Win_Move( Hwnd, cx+Xd, cy+Yd, cw+Wd, ch+Hd, flags)
 }
 
-
 /* 
-  Function:	Pos
-			Store/Get window's position, size and maximize state using Windows Registry.
+  Function:	Recall
+			Store & recall window position, size and/or state.
 
 
   Parameters:
-
-		Options		 - White space separated list of options. 		
-		X-H, MinMax  - Reference to output variables, if needed. Optional.
-
-  Options:
-		">", "<", "-", "--" - Operation, ">" (store) or "<"(get). This is mandatory option.
-					It can be optionally followed by the string representing the name of the window for which to do operation.					
-					">" is a special name that can be used to save all AHK Guis.
-					"-"	is used alone as argument to delete Registry entries  belonging to the script.
-					"--" is used alone as argument to delete all Registry entries for all scripts.
-		Hwnd	  - Hwnd of the window for which to store data or Gui number (if AHK window). Valid only for ">" operation. 
+		Options		- White space separated list of options. See bellow.		
+		Hwnd		- Hwnd of the window for which to store data or Gui number if AHK window. 
 					If omitted, function will use Hwnd of the default AHK Gui. You can also use Gui, N:Default 
-					prior to calling the function. 
-					For 3td party windows this option must be set.
-		!		  - Ignore windows which state is minimized or maximized. In this case function will simply return without saving anything.
-					Valid only with ">" operation mode.
+					prior to calling the function. For 3td party windows this option is mandatory. For 3td party windows, 
+					this parameter is mandatory.
+		IniFileName	- Ini file to use as storage. Function will save the data under the [Recall] section.
+					If omited, Windows Registry key HKEY_CURRENT_USER\AutoHotKey\Win is used. Each script is uniquely determined by its full path 
+					so same scripts with different name will not share the storage.
+					
+  Options:
+		">", "<", "-", "--" - Operation, mandatory option. Use ">" to store or "<" to recall window position.
+					It can be optionally followed by the string representing the name of the storage location for that window.
+					You need to use name if your script stores more then one window, otherwise it will be saved under unnamed location.
+					">" and "<" are special names that can be used to store or recall all AHK Guis.
+					"-"	operation is used alone as an argument to delete Registry entries belonging to the script.
+					"--" operation is used alone as an argument to delete all Registry entries for all scripts.
 
-		?		  - Everything else found in options will be sent back from the function in case there is no previous save. This can be used
-					to set up default position for AHK Guis.
 		
-
-  Remarks:
-			Position is saved in the Registry under AutoHotKey\Win section.
-			If window which position is to be stored is in maximized or minimized state, function will restore the window to get its
-			position in normal state. If this is undesirable use ! option to ignore windows in states.
-
+		-Min	  - Don't save minimize state.
+		-Max	  - Don't save maximized state.		
+					
   Returns:
-			Position string in AHK form which can be used for AHK Gui's.
+			Position string consisting of "x y w h state" of the window. Empty if no recall data is stored for the window.
+			State can be 1 (normal) 2 (minimized) or 3 (maximized).
 
   Examples:
+		Single Gui Example:
 		(start code)
-			pos := Win_Pos("< w300 h100")			;Get the previous window position if present. If not, use w300 h100.
-			Gui, Show, %pos%
+			Gui, +Resize +LastFound
+			WinSetTitle, MyGui
+			if !Win_Recall("<")						;Recall gui if its position is already saved
+				Gui, %n%:Show, h300 w300, MyGui		; otherwise use these defaults.
 			
-			Win_Pos(">")							;Save position for default AHK Gui.
-			Win_Pos(">MyGui")						;Save position for default AHK Gui under name MyGui.
-			Win_Pos("<MyGui autosize")				;Restore position for MyGui, return autosize if there is no previous save.
-
-			Win_Pos(">MyGui2 hwnd2")				;Save gui2 position under MyGui2 name. AHK only.
-			Win_Pos(">MyGui2 hwnd" hWnd)			;Save window position under MyGui2 name, given the window handle.
-			Win_Pos(">>")							;Save all guis. The names will be given by their number. AHK only.
-			Win_Pos(">> !")							;Save all guis but ignore windows in min/max state. AHK only.
-
-			Win_Pos("-")							;Delete all Registry enteries for the script.
+			GuiClose:
+				Win_Recall(">")						;Store the Gui.
+			return
 		(end code)
 
+		Snippets:
+		(start code)
+			Win_Recall(">MyGui")					;Save position for default Gui under name MyGui.
+			Win_Recall("<MyGui")					;Recall position for MyGui for default Gui
+			
+			Win_Recall(">MyGui2", Hwnd)				;Save window position under MyGui2 name, given the window handle or Gui number.
+			Win_Recall(">>")						;Save all Guis. The names will be given by their number.
+			Win_Recall("<<")						;Recall all Guis.
+
+			Win_Recall("-")							;Delete all Registry enteries for the script.
+			Win_Recall("--")						;Delete all Registry enteries for all scripts.
+		(end code)
  */
-Win_Pos( Options, ByRef X="",ByRef Y="",ByRef W="",ByRef H="", ByRef MinMax="" ){
-	static key="Software\AutoHotkey\Win"
-	
+Win_Recall(Options, Hwnd="", IniFileName=""){
+	static key="Software\AutoHotkey\Win", section="Recall"
+
 	if (Options = "-"){
 		loop, HKEY_CURRENT_USER, %key%
-			if InStr(A_LoopRegName, A_ScriptFullPath)
+			InStr(A_LoopRegName, A_ScriptFullPath) ? 
 				RegDelete, HKEY_CURRENT_USER, %key%, %A_LoopRegName%		
 		return
 	} else if (Options = "--") {
 		RegDelete, HKEY_CURRENT_USER, %key%
 		return
 	}
-
-	oldDetect := A_DetectHiddenWindows
-	DetectHiddenWindows, on
+	
 	loop, parse, Options, %A_Space%%A_Tab%, %A_Space%%A_Tab%
 	{
-		ifEqual, A_LoopField, , continue
+		ifEqual, A_LoopField, ,continue	
 		f := SubStr(A_LoopField, 1, 1),  p := SubStr(A_LoopField, 2)
 
-		if (f = ">")
-			 op := ">", name := p
-		else if (f = "<")
-			 op := "<", name := p
-		else if (f = "!")
-			 ignore := true
-		else if InStr(A_LoopField, "Hwnd")
-			 hwnd := SubStr(A_LoopField, 5)		
-		else def .= A_LoopField " "	
+		ifEqual, f, >, SetEnv, op, % ">", name := p
+		else ifEqual, f, <, SetEnv, op, % "<", name := p
+		else ifEqual, A_LoopField, -Min, SetEnv, noMin, 1
+		else ifEqual, A_LoopField, -Max, SetEnv, noMax, 1
+		else ifEqual, A_LoopField, Show, SetEnv, bShow, 1
 	}
 
-	if (op = "<") {
-		RegRead, pos, REG_SZ,  HKEY_CURRENT_USER, %key%, %A_ScriptFullPath%!%name%
-		ifEqual, ErrorLevel, 1, SetEnv, pos, %def%
-	
-		StringSplit, p, pos, %A_Space%
-		loop, %p0%
-			f := SubStr(p%A_Index%,1,1), %f% := SubStr(p%A_Index%,2)
-		MinMax := m != "" ? "m" m : ""
-	} 
-	else if (op = ">") {
-		if (name = ">") {		;save all guis
-			Loop, 99
+	if (Hwnd = "") || (Hwnd <= 99) {
+		ifEqual, Hwnd,, Gui, +LastFound
+		else Gui, %Hwnd%:+LastFound
+		Hwnd := WinExist()
+	}
+
+	if name in <,>
+	{		
+		Loop, 99 {
+			Gui, %A_Index%:+LastFoundExist
+			if WinExist()
 			{
-				Gui, %A_Index%:+LastFoundExist
-				ifWinExist
-					Win_Pos(">" A_Index " hwnd" A_Index (ignore ? " !" : ""))
+				name := A_Index, Hwnd := WinExist()
+				gosub %A_ThisFunc%
 			}
-			DetectHiddenWindows, %oldDetect%
-			return
 		}
-	
-		if (hwnd = "") || (hwnd <= 99) {
-			ifEqual, hwnd,, Gui, +LastFound
-			else Gui, %hwnd%:+LastFound
-			hwnd := WinExist()
-		}
+		return
+	}	
 
-		WinGet, mm0, MinMax, ahk_id %hwnd%				
-		if (mm0 != 0) && ignore
-			return
+ Win_Recall:
+	if (op = "<") {
+		if IniFileName !=
+			 IniRead, pos, %IniFileName%, %section%, !%name%, %A_Space%
+		else RegRead, pos, REG_SZ,  HKEY_CURRENT_USER, %key%, %A_ScriptFullPath%!%name%
+		ifEqual, pos, ,return
+		
+		VarSetCapacity(WP, 44, 0),  NumPut(44,WP)
+		StringSplit p, pos, %A_Space%
+		p5 := (p5=2 && noMin) || (p5=3 && noMax) ? 1 : p5
+		loop, 4
+			NumPut(p%A_Index%, WP, (A_Index+6)*4, "Int")
+		NumPut(p5, WP, 8, "UInt")
+		DllCall("SetWindowPlacement", "uint", Hwnd, "uint", &WP)
+	} 
+	else if (op = ">"){			
+		VarSetCapacity(WP, 44, 0),  NumPut(44,WP)
+		DllCall("GetWindowPlacement", "uint", Hwnd, "uint", &WP)
 
-		ifNotEqual, mm0, 0,  WinRestore, ahk_id %hwnd%			;do it twice, window can be maximized then minimized.
-		WinGet, mm1, MinMax, ahk_id %hwnd%
-		ifNotEqual, mm1, 0,  WinRestore, ahk_id %hwnd%
-
-		WinGetClass, class, ahk_id %hwnd%
-		if (class = "AutoHotkeyGUI")
-			  Win_Get(Hwnd, "RxyLwh", x,y,w,h)
-		else  WinGetPos, x, y, w, h, ahk_id %hwnd%
-
-		m := mm0=-1 ? "minimized" : mm0 ? "maximize" : ""
-		pos := "x" x " y" y " w" w " h" h " " m
-
-	
-		RegWrite, REG_SZ,  HKEY_CURRENT_USER, %key%, %A_ScriptFullPath%!%name%, %pos%
-	}
-	DetectHiddenWindows, %oldDetect%
-	return pos
+		pos := ""
+		loop, 4
+			pos .= NumGet(WP, (A_Index+6)*4, "Int") " "
+		s := NumGet(WP, 8, "UInt") 
+		pos	.= s != 0 ? s : 1
+		
+		if IniFileName !=
+			 IniWrite, %pos%, %IniFileName%, %section%, !%name%
+		else RegWrite, REG_SZ,  HKEY_CURRENT_USER, %key%, %A_ScriptFullPath%!%name%, %pos%
+	}	
+  return pos
 }
 
 /*
@@ -603,7 +601,7 @@ Win_Subclass(hCtrl, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.0c by majkinetor.
+	o v1.1 by majkinetor.
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*
