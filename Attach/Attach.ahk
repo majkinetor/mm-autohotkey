@@ -16,8 +16,9 @@
 							  be specified in m/n form (see example below). "r" or "r1" option specifies that control should be redrawn immediately.
 							  Specify "r2" to delay redrawing 100ms for the control. This can be used to prevent redrawing spam which in some situations
 							  may be annoying. 
-							  "p" is special coeficient that can only be used without x-h options. It means "proportional". It will make control always stay 
-							  in the same proportion to its parent (so, pin the control to the parent). Although you can mix pinned and non-pinned controls 
+							  "p" is special coeficient that can only be used without x-h options and it must be first option. 
+							  It means "proportional". It will make control always stay in the same proportion to its parent 
+							  (so, pin the control to the parent). Although you can mix pinned and non-pinned controls 
 							  that is rarely what you want. You will generally want to pin every control in the parent.
 
 					 		- You can use single letters "+" or "-" to enable or disable function for the control. If control is hidden, you may want to 
@@ -124,9 +125,13 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		hGui := hParent := DllCall("GetParent", "uint", hCtrl, "Uint") 
 		if aDef contains p
 			aDef := "xp yp wp hp" SubStr(aDef, 2)
-		ifEqual, aDef, -, return SubStr(%hCtrl%,1,1) != "-" ? %hCtrl% := "-" %hCtrl% : 
+		if (aDef = "-") {
+			StringReplace, %hParent%, %hParent%, %hCtrl%%A_Space%
+			StringReplace, %hParent%, %hParent%, %A_Space%%hCtrl%
+			return
+		}
 		else if (aDef = "+")
-			SubStr(%hCtrl%,1,1) != "-" ? return : %hCtrl% := SubStr(%hCtrl%, 2), enable := 1 
+			return %hParent% .= !InStr(%hParent%, hCtrl) ? .= " " hCtrl : ""
 		else {
 			gosub Attach_GetPos
 			%hCtrl% := ""
@@ -150,8 +155,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 	StringSplit, s, %hParent%_s, %A_Space%
 	loop, parse, %hParent%, %A_Space%
 	{
-		hCtrl := A_LoopField, aDef := %hCtrl%, 	uw := uh := ux := uy := r := 0, hCtrl1 := SubStr(%hCtrl%,1,1)
-		ifEqual, hCtrl1, -, continue
+		hCtrl := A_LoopField, aDef := %hCtrl%, 	uw := uh := ux := uy := r := 0
 		gosub Attach_GetPos
 		loop, parse, aDef, %A_Space%
 		{
@@ -165,7 +169,6 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag)
 		r+0=2 ? Attach_redrawDelayed(hCtrl) : 
 	}
-
 	return Handler != "" ? %Handler%(hParent) : "", enable := 0
 
  Attach_GetPos:									;hParent & hCtrl must be set up at this point
