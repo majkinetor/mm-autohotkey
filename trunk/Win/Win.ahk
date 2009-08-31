@@ -311,13 +311,15 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
   Function:	Recall
 			Store & recall window position, size and/or state.
 
-
   Parameters:
 		Options		- White space separated list of options. See bellow.		
 		Hwnd		- Hwnd of the window for which to store data or Gui number if AHK window. 
 					If omitted, function will use Hwnd of the default AHK Gui. You can also use Gui, N:Default 
 					prior to calling the function. For 3td party windows this option is mandatory. For 3td party windows, 
-					this parameter is mandatory.
+					this parameter is mandatory. 
+					Set 0 as hwnd to return position string without applying it to any window. This can be used for AHK Guis to
+					calculate size of controls based on window size and position, when needed. 
+
 		IniFileName	- Ini file to use as storage. Function will save the data under the [Recall] section.
 					If omited, Windows Registry key HKEY_CURRENT_USER\AutoHotKey\Win is used. Each script is uniquely determined by its full path 
 					so same scripts with different name will not share the storage.
@@ -335,8 +337,13 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 		-Max	  - Don't save maximized state.		
 					
   Returns:
-			Position string consisting of "x y w h state" of the window. Empty if no recall data is stored for the window.
+			Position string, space separated list of syntax "left top right bottom state cw ch" of the window. 
+			Empty if no recall data is stored for the window.
 			State can be 1 (normal) 2 (minimized) or 3 (maximized).
+			cw & ch numbers are present only for AHK Guis and represent client width & height which can be used 
+			without modifications in Gui, Show command.
+
+			You can get only position if you specify 
 
   Examples:
 		Single Gui Example:
@@ -362,6 +369,8 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 
 			Win_Recall("-")							;Delete all Registry enteries for the script.
 			Win_Recall("--")						;Delete all Registry enteries for all scripts.
+
+			pos := Win_Recall("<MyWin", 0)			;Return position string only for window saved under the "MyWin" name.
 		(end code)
  */
 Win_Recall(Options, Hwnd="", IniFileName=""){
@@ -384,13 +393,14 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
 
 		ifEqual, f, >, SetEnv, op, % ">", name := p
 		else ifEqual, f, <, SetEnv, op, % "<", name := p
+
 		else ifEqual, A_LoopField, -Min, SetEnv, noMin, 1
 		else ifEqual, A_LoopField, -Max, SetEnv, noMax, 1
 		else ifEqual, A_LoopField, Show, SetEnv, bShow, 1
 	}
 
-	if (Hwnd = "") || (Hwnd <= 99) {
-		ifEqual, Hwnd,, Gui, +LastFound
+	if (Hwnd = "") || (Hwnd>0 && Hwnd <= 99) {
+		ifEqual, Hwnd,, Gui, +LastFoundExist
 		else Gui, %Hwnd%:+LastFound
 		Hwnd := WinExist()
 	}
@@ -413,7 +423,8 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
 		if IniFileName !=
 			 IniRead, pos, %IniFileName%, %section%, !%name%, %A_Space%
 		else RegRead, pos, REG_SZ,  HKEY_CURRENT_USER, %key%, %A_ScriptFullPath%!%name%
-		ifEqual, pos, ,return
+		if (pos = "") or !Hwnd 
+			return pos
 		
 		VarSetCapacity(WP, 44, 0),  NumPut(44,WP)
 		StringSplit p, pos, %A_Space%
@@ -426,12 +437,15 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
 	else if (op = ">"){			
 		VarSetCapacity(WP, 44, 0),  NumPut(44,WP)
 		DllCall("GetWindowPlacement", "uint", Hwnd, "uint", &WP)
+		WinGetClass, cls, ahk_id %hwnd%
+		if (cls="AutoHotkeyGUI")
+			Win_Get(Hwnd, "Lwh",w,h),   szAHK := " " w " " h		;this is to store AHK Gui width & height so it can be used asap with Gui, Show.
 
 		pos := ""
 		loop, 4
 			pos .= NumGet(WP, (A_Index+6)*4, "Int") " "
 		s := NumGet(WP, 8, "UInt") 
-		pos	.= s != 0 ? s : 1
+		pos	.= (s != 0 ? s : 1) szAHK
 		
 		if IniFileName !=
 			 IniWrite, %pos%, %IniFileName%, %section%, !%name%
