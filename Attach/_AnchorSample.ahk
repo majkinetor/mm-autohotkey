@@ -17,11 +17,11 @@
 	Gui, 1:Default
 
 	gosub SetAttach
-	Gui, Show, , Anchor Examplew
+	Gui, Show, , Anchor (Attach) Example
 Return
 
 F10::
-	GuiControl, Move, MyEdit1, w100 h200 ; move control to a size relative to current Gui dimensions
+	GuiControl, Move, MyEdit1, w100 h140 ; move control to a size relative to current Gui dimensions
 	Attach(hGui) 
 Return
 
