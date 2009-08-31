@@ -130,7 +130,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 			return
 		}
 		else if (aDef = "+")
-			return %hParent% .= !InStr(%hParent%, hCtrl) ? .= " " hCtrl : ""
+			 enable := 1, %hParent% .= !InStr(%hParent%, hCtrl) ? .= " " hCtrl : ""
 		else {
 			gosub Attach_GetPos
 			%hCtrl% := ""
