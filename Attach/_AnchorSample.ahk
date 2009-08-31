@@ -38,7 +38,7 @@ OnAttach(Hwnd) {
 }
 
 Redraw:
-	Win_Redraw(hWinToRedraw)
+	WinSet, Redraw, ,ahk_id %hWinToRedraw%
 return
 
 
@@ -54,5 +54,4 @@ SetAttach:
 	Attach(CloseButton,	"x0.75 y")
 Return
 
-#include Win.ahk
 #include Attach.ahk
