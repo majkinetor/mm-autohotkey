@@ -29,7 +29,7 @@
 
 	Remarks:
 					You should reset the function when you programmatically change the position of the controls in the parent control.
-					Don't do this while parent is resizing as resetting procedure may be interrupted.
+					Don't do this while parent is resizing as resetting procedure may be interrupted (this is also true for "+" & "-" options.
 					
 					Function monitors WM_SIZE message to detect parent changes. That means that it can be used with other eventual container controls
 					and not only top level windows.
