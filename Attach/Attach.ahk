@@ -89,7 +89,6 @@
 			o 1.0 by majkinetor
 			o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
- 
 Attach(hCtrl="", aDef="") {
 	 Attach_(hCtrl, aDef, "", "")
 }
@@ -124,13 +123,9 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		hGui := hParent := DllCall("GetParent", "uint", hCtrl, "Uint") 
 		if aDef contains p
 			aDef := "xp yp wp hp" SubStr(aDef, 2)
-		if (aDef = "-") {
-			StringReplace, %hParent%, %hParent%, %hCtrl%%A_Space%
-			StringReplace, %hParent%, %hParent%, %A_Space%%hCtrl%
-			return
-		}
+		ifEqual, aDef, -, return SubStr(%hCtrl%,1,1) != "-" ? %hCtrl% := "-" %hCtrl% : 
 		else if (aDef = "+")
-			 enable := 1, %hParent% .= !InStr(%hParent%, hCtrl) ? .= " " hCtrl : ""
+			SubStr(%hCtrl%,1,1) != "-" ? return : %hCtrl% := SubStr(%hCtrl%, 2), enable := 1 
 		else {
 			gosub Attach_GetPos
 			%hCtrl% := ""
@@ -141,7 +136,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 					k := SubStr(l, 2, j-2) / SubStr(l, j+1)
 				%hCtrl% .= f ":" k ":" c%f% " "
 			}
-			return %hCtrl% := SubStr(%hCtrl%, 1, -1), %hParent% .= InStr(%hParent%, hCtrl) ? "" : (%hParent% = "" ? "" : " ")  hCtrl 
+ 			return %hCtrl% := SubStr(%hCtrl%, 1, -1), %hParent% .= InStr(%hParent%, hCtrl) ? "" : (%hParent% = "" ? "" : " ")  hCtrl 
 		}
 	}
  	if !reset && !enable {						;WM_SIZE handler starts here
@@ -154,7 +149,8 @@ Attach_(hCtrl, aDef, Msg, hParent){
 	StringSplit, s, %hParent%_s, %A_Space%
 	loop, parse, %hParent%, %A_Space%
 	{
-		hCtrl := A_LoopField, aDef := %hCtrl%, 	uw := uh := ux := uy := r := 0
+		hCtrl := A_LoopField, aDef := %hCtrl%, 	uw := uh := ux := uy := r := 0, hCtrl1 := SubStr(%hCtrl%,1,1)
+		ifEqual, hCtrl1, -, continue
 		gosub Attach_GetPos
 		loop, parse, aDef, %A_Space%
 		{
@@ -168,6 +164,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag)
 		r+0=2 ? Attach_redrawDelayed(hCtrl) : 
 	}
+
 	return Handler != "" ? %Handler%(hParent) : "", enable := 0
 
  Attach_GetPos:									;hParent & hCtrl must be set up at this point
