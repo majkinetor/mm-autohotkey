@@ -1,4 +1,4 @@
-_("mo!")
+;_("mo!")
 #SingleInstance, force
 
 	;=========== SETUP ========
@@ -9,7 +9,7 @@ _("mo!")
 
 	w1 := w//3, w2 := w-w1 , h1 := h // 2, h2 := h // 3
 	gui, margin, 0, 0
-	Gui, +Resize -caption
+	Gui, +Resize
 
 	gui, add, edit, HWNDc11 w%w1% h%h1%
 	hSepH := Splitter_Add( "x y w" w1 " h" sep )
