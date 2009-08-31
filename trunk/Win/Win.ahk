@@ -84,67 +84,67 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
 		if (_ := SubStr(pQ, k, 1)) = ""
 			break
 
-		if !IsLabel("Window_Get_" _ )
+		if !IsLabel("Win_Get_" _ )
 			return A_ThisFunc "> Invalid query parameter: " _
-		Goto Window_Get_%_%
+		Goto %A_ThisFunc%_%_%
 
-		Window_Get_C:
+		Win_Get_C:
 				WinGetClass, o%i%, ahk_id %hwnd%		
 		continue
 
-		Window_Get_I:
+		Win_Get_I:
 				WinGet, o%i%, PID, ahk_id20/08/2009 %hwnd%		
 		continue
 
-		Window_Get_N:
+		Win_Get_N:
 				rect := "title"
 				VarSetCapacity(TBI, 44, 0), NumPut(44, TBI, 0), DllCall("GetTitleBarInfo", "uint", hwnd, "str", TBI)
 				title_x := NumGet(TBI, 4, "Int"), title_y := NumGet(TBI, 8, "Int"), title_w := NumGet(TBI, 12) - title_x, title_h := NumGet(TBI, 16) - title_y 
-				goto Window_Get_Rect
-		Window_Get_B:
+				goto Win_Get_Rect
+		Win_Get_B:
 				rect := "border"
 				border_x := NumGet(WI, 48, "UInt"),  border_y := NumGet(WI, 52, "UInt")	
-				goto Window_Get_Rect
-		Window_Get_R:
+				goto Win_Get_Rect
+		Win_Get_R:
 				rect := "window"
 				window_x := NumGet(WI, 4,  "Int"),  window_y := NumGet(WI, 8,  "Int"),  window_w := NumGet(WI, 12, "Int") - window_x,  window_h := NumGet(WI, 16, "Int") - window_y
-				goto Window_Get_Rect
-		Window_Get_L: 
+				goto Win_Get_Rect
+		Win_Get_L: 
 				client_x := NumGet(WI, 20, "Int"),  client_y := NumGet(WI, 24, "Int"),  client_w := NumGet(WI, 28, "Int") - client_x,  client_h := NumGet(WI, 32, "Int") - client_y
 				rect := "client"
-		Window_Get_Rect:
+		Win_Get_Rect:
 				k++, arg := SubStr(pQ, k, 1)
 				if arg in x,y,w,h
 				{
 					o%i% := %rect%_%arg%, j := i++
-					goto Window_Get_Rect
+					goto Win_Get_Rect
 				}
 				else if !j
 						  o%i% := %rect%_x " " %rect%_y  (_ = "B" ? "" : " " %rect%_w " " %rect%_h)
 				
 		rect := "", k--, i--, j := 0
 		continue
-		Window_Get_S:
+		Win_Get_S:
 			WinGet, o%i%, Style, ahk_id %Hwnd%
 		continue
-		Window_Get_E: 
+		Win_Get_E: 
 			WinGet, o%i%, ExStyle, ahk_id %Hwnd%
 		continue
-		Window_Get_P: 
+		Win_Get_P: 
 			o%i% := DllCall("GetParent", "uint", Hwnd)
 		continue
-		Window_Get_A: 
+		Win_Get_A: 
 			o%i% := DllCall("GetAncestor", "uint", Hwnd, "uint", 2) ; GA_ROOT
 		continue
-		Window_Get_O: 
+		Win_Get_O: 
 			o%i% := DllCall("GetWindowLong", "uint", Hwnd, "int", -8) ; GWL_HWNDPARENT
 		continue
-		Window_Get_T:
+		Win_Get_T:
 			if DllCall("IsChild", "uint", hwnd)
 				 WinGetText, o%i%, ahk_id %hwnd%
 			else WinGetTitle, o%i%, ahk_id %hwnd%
 		continue
-		Window_Get_M: 
+		Win_Get_M: 
 			WinGet, _, PID, ahk_id %hwnd%
 			hp := DllCall( "OpenProcess", "uint", 0x10|0x400, "int", false, "uint", _ ) 
 			if (ErrorLevel or !hp) 

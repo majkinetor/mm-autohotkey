@@ -1,13 +1,16 @@
-;_("e")
+;_()
 	goto MakeGui
 return
 
 MakeGui:
 	n++
+	pos := Win_Pos("w300 h100 <" n)
+	
 	Gui, %n%:+Resize +LastFound
 	hGui := WinExist()
-	pos := Win_Pos("w300 h100 <" n)
-	Gui, %n%:Show, %pos%, %pos% %hGui%
+	Gui, %n%:Add, Text, ,F1 - create new Gui
+	Gui, %n%:Add, Text, y+50,%pos%
+	Gui, %n%:Show, %pos%, %no%
 return
 
 
