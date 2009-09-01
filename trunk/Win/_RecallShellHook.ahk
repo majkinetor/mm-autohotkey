@@ -1,6 +1,6 @@
 #Persistent 
 SetBatchLines, -1 
-	if !RegisterShellHook("OnShell"){
+	if !Shell_SetHook("OnShell"){
 		 msgbox Can't register hook. Aborting!
 		 ExitApp
 	}
@@ -30,7 +30,7 @@ OnShell(Reason, Param) {
 
 
 /*
-	Function:	RegisterShellHook
+	Function:	Shell_SetHook
 
 	Parameter:
 				Handler	- Name of the function to call on shell events.
@@ -58,7 +58,7 @@ OnShell(Reason, Param) {
 	Returns:
 		0 on failure, name of the previous hook procedure on success.
  */
-RegisterShellHook(Handler) {
+Shell_SetHook(Handler) {
 	oldDetect := A_DetectHiddenWindows
 	DetectHiddenWindows, on
 	Process, Exist

@@ -465,6 +465,7 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
  Function:	Redraw
  			Redraws the window.
 
+ Parameters:
 			Hwnd - Handle of the window. If this parameter is omited, Redraw updates the desktop window.
  
  Returns:
@@ -477,6 +478,20 @@ Win_Redraw( Hwnd=0 ) {
 	static RDW_ALLCHILDREN:=0x80, RDW_ERASE:=0x4, RDW_ERASENOW:=0x200, RDW_FRAME:=0x400, RDW_INTERNALPAINT:=0x2, RDW_INVALIDATE:=0x1, RDW_NOCHILDREN:=0x40, RDW_NOERASE:=0x20, RDW_NOFRAME:=0x800, RDW_NOINTERNALPAINT:=0x10, RDW_UPDATENOW:=0x100, RDW_VALIDATE:=0x8
 	return DllCall("RedrawWindow", "uint", Hwnd, "uint", 0, "uint", 0, "uint"
 		      ,RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ERASENOW | RDW_UPDATENOW | RDW_ALLCHILDREN)
+}
+
+/*
+ Function:	SetCaption
+ 			Set visibility of the window caption.
+
+ Parameters:
+			Flag	- Set + to show the caption or - otherwise. If omited, caption will be toggled.
+ */
+Win_SetCaption(Hwnd, Flag="^"){
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+	WinSet, Style, %Flag%0xC00000
+	DetectHiddenWindows, %oldDetect%
 }
 
 /*
