@@ -30,6 +30,56 @@ Shell_GetCount( pHwnd, flag="") {
 }
 
 /*
+  Function:		GetCommonPath
+ 				Return location of standard system folders.
+ 
+  Parameters:	
+				Name	- Name of the sysetem folder.
+
+  Folders:
+				Bellow is the list of available folders and their typical locations :
+
+				APPDATA                -  C:\Documents and Settings\username\Application Data.
+				COOKIES				   -  C:\Documents and Settings\username\Cookies.
+                COMMON_APPDATA         -  C:\Documents and Settings\All Users\Application Data. 
+                COMMON_DOCUMENTS       -  C:\Documents and Settings\All Users\Documents.
+				COMMON_PROGRAMS		   -  C:\Documents and Settings\All Users\Start Menu\Programs.
+				COMMON_STARTMENU	   -  C:\Documents and Settings\All Users\Start Menu.
+                DESKTOP                -  C:\Documents and Settings\username\Desktop. 
+                FONTS                  -  C:\Windows\Fonts. 
+				FAVORITES			   -  C:\Documents and Settings\username\Favorites.
+                LOCAL_APPDATA          -  C:\Documents and Settings\username\Local Settings\Application Data.
+                MYMUSIC                -  C:\Documents and Settings\User\My Documents\My Music.
+                MYPICTURES             -  C:\Documents and Settings\username\My Documents\My Pictures.
+				MYVIDEO				   -  C:\Documents and Settings\username\My Documents\My Videos.
+                PERSONAL               -  C:\Documents and Settings\username\My Documents.
+                PROGRAM_FILES_COMMON   -  C:\Program Files\Common. 
+                PROGRAM_FILES          -  C:\Program Files. 
+                PROGRAMS               -  C:\Documents and Settings\username\Start Menu\Programs. 
+				PROFILE				   -  C:\Documents and Settings\username.
+				PROFILES			   -  C:\Documents and Settings.
+                RESOURCES              -  C:\WINDOWS\Resources\ (For theme and other windows resources). 
+				SENDTO				   -  C:\Documents and Settings\username\SendTo.
+                STARTMENU              -  C:\Documents and Settings\username\Start Menu. 
+                STARTUP                -  C:\Documents and Settings\username\Start Menu\Programs\Startup. 
+                SYSTEM                 -  C:\Windows\System32.
+                WINDOWS                -  C:\Windows.
+
+
+  Returns:		
+				Full path
+ 				
+ */
+Shell_GetCommonPath( Name ) { 
+		static  APPDATA=0x001A, COOKIES=0x0021, COMMON_APPDATA=0x0023, COMMON_DOCUMENTS=0x002e, COMMON_PROGRAMS=0x0017, COMMON_STARTMENU=0x0016
+				,COMMON_STARTUP=0x0018,DESKTOP=0x0010, FONTS=0x0014, FAVORITES=0x0006, LOCAL_APPDATA=0x001C, MYMUSIC=0x000d, MYVIDEO=0x000e
+				,MYPICTURES=0x0027, PERSONAL=0x0005,PROGRAM_FILES_COMMON=0x002b, PROGRAM_FILES=0x0026, PROGRAMS=0x0002, PROFILE=0x0028, PROFILES=0x003e
+				,RESOURCES=0x0038, STARTMENU=0x000b,STARTUP=0x0007, SYSTEM=0x0025, SENDTO=0x0009, WINDOWS=0x0024             
+    VarSetCapacity(fpath, 512), DllCall( "shell32\SHGetFolderPathA", "uint", 0, "int", %Name%, "uint", 0, "int", 0, "str", fpath), VarSetCapacity(fpath, -1)
+    return fpath
+}
+
+/*
   Function: GetIEObject
  			Get IWebBrowser2 interface pointer from open explorer windows
  

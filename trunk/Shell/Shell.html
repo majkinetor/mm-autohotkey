@@ -1,0 +1,834 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+
+<html><head><title>Shell</title><style>/*
+   IMPORTANT: If you're editing this file in the output directory of one of
+   your projects, your changes will be overwritten the next time you run
+   Natural Docs.  Instead, copy this file to your project directory, make your
+   changes, and you can use it with -s.  Even better would be to make a CSS
+   file in your project directory with only your changes, which you can then
+   use with -s [original style] [your changes].
+
+   On the other hand, if you're editing this file in the Natural Docs styles
+   directory, the changes will automatically be applied to all your projects
+   that use this style the next time Natural Docs is run on them.
+
+   This file is part of Natural Docs, which is Copyright (C) 2003-2008 Greg Valure
+   Natural Docs is licensed under the GPL
+*/
+
+body {
+    font: 10pt Verdana, Arial, sans-serif;
+    color: #000000;
+    margin: 0; padding: 0;
+    }
+
+.ContentPage,
+.IndexPage,
+.FramedMenuPage {
+    background-color: #E8E8E8;
+    }
+.FramedContentPage,
+.FramedIndexPage,
+.FramedSearchResultsPage,
+.PopupSearchResultsPage {
+    background-color: #FFFFFF;
+    }
+
+
+a:link,
+a:visited { color: #900000; text-decoration: none }
+a:hover { color: #900000; text-decoration: underline }
+a:active { color: #FF0000; text-decoration: underline }
+
+td {
+    vertical-align: top }
+
+img { border: 0;  }
+
+
+/*
+    Comment out this line to use web-style paragraphs (blank line between
+    paragraphs, no indent) instead of print-style paragraphs (no blank line,
+    indented.)
+*/
+p {
+    text-indent: 5ex; margin: 0 }
+
+
+/*  Opera doesn't break with just wbr, but will if you add this.  */
+.Opera wbr:after {
+	content: "\00200B";
+	}
+
+
+/*  Blockquotes are used as containers for things that may need to scroll.  */
+blockquote {
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+    }
+
+
+.Firefox1 blockquote {
+    padding-bottom: .5em;
+    }
+
+/*  Turn off scrolling when printing.  */
+@media print {
+    blockquote {
+        overflow: visible;
+        }
+    .IE blockquote {
+        width: auto;
+        }
+    }
+
+
+
+#Menu {
+    font-size: 9pt;
+    padding: 10px 0 0 0;
+    }
+.ContentPage #Menu,
+.IndexPage #Menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 31ex;
+    overflow: hidden;
+    }
+.ContentPage .Firefox #Menu,
+.IndexPage .Firefox #Menu {
+    width: 27ex;
+    }
+
+
+    .MTitle {
+        font-size: 16pt; font-weight: bold; font-variant: small-caps;
+        text-align: center;
+        padding: 5px 10px 15px 10px;
+        border-bottom: 1px dotted #000000;
+        margin-bottom: 15px }
+
+    .MSubTitle {
+        font-size: 9pt; font-weight: normal; font-variant: normal;
+        margin-top: 1ex; margin-bottom: 5px }
+
+
+    .MEntry a:link,
+    .MEntry a:hover,
+    .MEntry a:visited { color: #606060; margin-right: 0 }
+    .MEntry a:active { color: #A00000; margin-right: 0 }
+
+
+    .MGroup {
+        font-variant: small-caps; font-weight: bold;
+        margin: 1em 0 1em 10px;
+        }
+
+    .MGroupContent {
+        font-variant: normal; font-weight: normal }
+
+    .MGroup a:link,
+    .MGroup a:hover,
+    .MGroup a:visited { color: #545454; margin-right: 10px }
+    .MGroup a:active { color: #A00000; margin-right: 10px }
+
+
+    .MFile,
+    .MText,
+    .MLink,
+    .MIndex {
+        padding: 1px 17px 2px 10px;
+        margin: .25em 0 .25em 0;
+        }
+
+    .MText {
+        font-size: 8pt; font-style: italic }
+
+    .MLink {
+        font-style: italic }
+
+    #MSelected {
+        color: #000000; background-color: #FFFFFF;
+        /*  Replace padding with border.  */
+        padding: 0 10px 0 10px;
+        border-width: 1px 2px 2px 0; border-style: solid; border-color: #000000;
+        margin-right: 5px;
+        }
+
+    /*  Close off the left side when its in a group.  */
+    .MGroup #MSelected {
+        padding-left: 9px; border-left-width: 1px }
+
+    /*  A treat for Mozilla users.  Blatantly non-standard.  Will be replaced with CSS 3 attributes when finalized/supported.  */
+    .Firefox #MSelected {
+        -moz-border-radius-topright: 10px;
+        -moz-border-radius-bottomright: 10px }
+    .Firefox .MGroup #MSelected {
+        -moz-border-radius-topleft: 10px;
+        -moz-border-radius-bottomleft: 10px }
+
+
+    #MSearchPanel {
+        padding: 0px 6px;
+        margin: .25em 0;
+        }
+
+
+    #MSearchField {
+        font: italic 9pt Verdana, sans-serif;
+        color: #606060;
+        background-color: #E8E8E8;
+        border: none;
+        padding: 2px 4px;
+        width: 100%;
+        }
+    /* Only Opera gets it right. */
+    .Firefox #MSearchField,
+    .IE #MSearchField,
+    .Safari #MSearchField {
+        width: 94%;
+        }
+    .Opera9 #MSearchField,
+    .Konqueror #MSearchField {
+        width: 97%;
+        }
+    .FramedMenuPage .Firefox #MSearchField,
+    .FramedMenuPage .Safari #MSearchField,
+    .FramedMenuPage .Konqueror #MSearchField {
+        width: 98%;
+        }
+
+    /* Firefox doesn't do this right in frames without #MSearchPanel added on.
+        It's presence doesn't hurt anything other browsers. */
+    #MSearchPanel.MSearchPanelInactive:hover #MSearchField {
+        background-color: #FFFFFF;
+        border: 1px solid #C0C0C0;
+        padding: 1px 3px;
+        }
+    .MSearchPanelActive #MSearchField {
+        background-color: #FFFFFF;
+        border: 1px solid #C0C0C0;
+        font-style: normal;
+        padding: 1px 3px;
+        }
+
+    #MSearchType {
+        visibility: hidden;
+        font: 8pt Verdana, sans-serif;
+        width: 98%;
+        padding: 0;
+        border: 1px solid #C0C0C0;
+        }
+    .MSearchPanelActive #MSearchType,
+    /*  As mentioned above, Firefox doesn't do this right in frames without #MSearchPanel added on. */
+    #MSearchPanel.MSearchPanelInactive:hover #MSearchType,
+    #MSearchType:focus {
+        visibility: visible;
+        color: #606060;
+        }
+    #MSearchType option#MSearchEverything {
+        font-weight: bold;
+        }
+
+    .Opera8 .MSearchPanelInactive:hover,
+    .Opera8 .MSearchPanelActive {
+        margin-left: -1px;
+        }
+
+
+    iframe#MSearchResults {
+        width: 60ex;
+        height: 15em;
+        }
+    #MSearchResultsWindow {
+        display: none;
+        position: absolute;
+        left: 0; top: 0;
+        border: 1px solid #000000;
+        background-color: #E8E8E8;
+        }
+    #MSearchResultsWindowClose {
+        font-weight: bold;
+        font-size: 8pt;
+        display: block;
+        padding: 2px 5px;
+        }
+    #MSearchResultsWindowClose:link,
+    #MSearchResultsWindowClose:visited {
+        color: #000000;
+        text-decoration: none;
+        }
+    #MSearchResultsWindowClose:active,
+    #MSearchResultsWindowClose:hover {
+        color: #800000;
+        text-decoration: none;
+        background-color: #F4F4F4;
+        }
+
+
+
+
+#Content {
+    padding-bottom: 15px;
+    }
+
+.ContentPage #Content {
+    border-width: 0 0 1px 1px;
+    border-style: solid;
+    border-color: #000000;
+    background-color: #FFFFFF;
+    font-size: 9pt;  /* To make 31ex match the menu's 31ex. */
+    
+    }
+.ContentPage .Firefox #Content {
+    margin-left: 27ex;
+    }
+
+
+
+    .CTopic {
+        font-size: 10pt;
+        margin-bottom: 3em;
+        }
+
+
+    .CTitle {
+        font-size: 12pt; font-weight: bold;
+        border-width: 0 0 1px 0; border-style: solid; border-color: #A0A0A0;
+        margin: 0 15px .5em 15px }
+
+    .CGroup .CTitle {
+        font-size: 16pt; font-variant: small-caps;
+        padding-left: 15px; padding-right: 15px;
+        border-width: 0 0 2px 0; border-color: #000000;
+        margin-left: 0; margin-right: 0 }
+
+    .CClass .CTitle,
+    .CInterface .CTitle,
+    .CDatabase .CTitle,
+    .CDatabaseTable .CTitle,
+    .CSection .CTitle {
+        font-size: 18pt;
+        color: #FFFFFF; background-color: #A0A0A0;
+        padding: 10px 15px 10px 15px;
+        border-width: 2px 0; border-color: #000000;
+        margin-left: 0; margin-right: 0 }
+
+    #MainTopic .CTitle {
+        font-size: 20pt;
+        color: #FFFFFF; background-color: #7070C0;
+        padding: 10px 15px 10px 15px;
+        border-width: 0 0 3px 0; border-color: #000000;
+        margin-left: 0; margin-right: 0 }
+
+    .CBody {
+        margin-left: 15px; margin-right: 15px }
+
+
+    .CToolTip {
+        position: absolute; visibility: hidden;
+        left: 0; top: 0;
+        background-color: #FFFFE0;
+        padding: 5px;
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #000000;
+        font-size: 8pt;
+        }
+
+    .Opera .CToolTip {
+        max-width: 98%;
+        }
+
+    /*  Scrollbars would be useless.  */
+    .CToolTip blockquote {
+        overflow: hidden;
+        }
+    .IE6 .CToolTip blockquote {
+        overflow: visible;
+        }
+
+    .CHeading {
+        font-weight: bold; font-size: 10pt;
+        margin: 1.5em 0 .5em 0;
+        }
+
+    .CBody pre {
+        font: 10pt "Courier New", Courier, monospace;
+        margin: 1em 0;
+        }
+
+    .CBody ul {
+        /*  I don't know why CBody's margin doesn't apply, but it's consistent across browsers so whatever.
+             Reapply it here as padding.  */
+        padding-left: 15px; padding-right: 15px;
+        margin: .5em 5ex .5em 5ex;
+        }
+
+    .CDescriptionList {
+        margin: .5em 5ex 0 5ex }
+
+        .CDLEntry {
+            font: 10pt "Courier New", Courier, monospace; color: #808080;
+            padding-bottom: .25em;
+            white-space: nowrap }
+
+        .CDLDescription {
+            font-size: 10pt;  /*  For browsers that don't inherit correctly, like Opera 5.  */
+            padding-bottom: .5em; padding-left: 5ex }
+
+
+    .CTopic img {
+        text-align: center;
+        display: block;
+        margin: 1em auto;
+        }
+    .CImageCaption {
+        font-variant: small-caps;
+        font-size: 8pt;
+        color: #808080;
+        text-align: center;
+        position: relative;
+        top: 1em;
+        }
+
+    .CImageLink {
+        color: #808080;
+        font-style: italic;
+        }
+    a.CImageLink:link,
+    a.CImageLink:visited,
+    a.CImageLink:hover { color: #808080 }
+
+
+
+
+
+.Prototype {
+    font: 10pt "Courier New", Courier, monospace;
+    padding: 5px 3ex;
+    border-width: 1px; border-style: solid;
+    margin: 0 5ex 1.5em 5ex;
+    }
+
+    .Prototype td {
+        font-size: 10pt;
+        }
+
+    .PDefaultValue,
+    .PDefaultValuePrefix,
+    .PTypePrefix {
+        color: #8F8F8F;
+        }
+    .PTypePrefix {
+        text-align: right;
+        }
+    .PAfterParameters {
+        vertical-align: bottom;
+        }
+
+    .IE .Prototype table {
+        padding: 0;
+        }
+
+    .CFunction .Prototype {
+        background-color: #F4F4F4; border-color: #D0D0D0 }
+    .CProperty .Prototype {
+        background-color: #F4F4FF; border-color: #C0C0E8 }
+    .CVariable .Prototype {
+        background-color: #FFFFF0; border-color: #E0E0A0 }
+
+    .CClass .Prototype {
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #A0A0A0;
+        background-color: #F4F4F4;
+        }
+    .CInterface .Prototype {
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #A0A0D0;
+        background-color: #F4F4FF;
+        }
+
+    .CDatabaseIndex .Prototype,
+    .CConstant .Prototype {
+        background-color: #D0D0D0; border-color: #000000 }
+    .CType .Prototype,
+    .CEnumeration .Prototype {
+        background-color: #FAF0F0; border-color: #E0B0B0;
+        }
+    .CDatabaseTrigger .Prototype,
+    .CEvent .Prototype,
+    .CDelegate .Prototype {
+        background-color: #F0FCF0; border-color: #B8E4B8 }
+
+    .CToolTip .Prototype {
+        margin: 0 0 .5em 0;
+        white-space: nowrap;
+        }
+
+
+
+
+
+.Summary {
+    margin: 1.5em 5ex 0 5ex }
+
+    .STitle {
+        font-size: 12pt; font-weight: bold;
+        margin-bottom: .5em }
+
+
+    .SBorder {
+        background-color: #FFFFF0;
+        padding: 15px;
+        border: 1px solid #C0C060 }
+
+    /* In a frame IE 6 will make them too long unless you set the width to 100%.  Without frames it will be correct without a width
+        or slightly too long (but not enough to scroll) with a width.  This arbitrary weirdness simply astounds me.  IE 7 has the same
+        problem with frames, haven't tested it without.  */
+    .FramedContentPage .IE .SBorder {
+        width: 100% }
+
+    /*  A treat for Mozilla users.  Blatantly non-standard.  Will be replaced with CSS 3 attributes when finalized/supported.  */
+    .Firefox .SBorder {
+        -moz-border-radius: 20px }
+
+
+    .STable {
+        font-size: 9pt; width: 100% }
+
+    .SEntry {
+        width: 30% }
+    .SDescription {
+        width: 70% }
+
+
+    .SMarked {
+        background-color: #F8F8D8 }
+
+    .SDescription { padding-left: 2ex }
+    .SIndent1 .SEntry { padding-left: 1.5ex }   .SIndent1 .SDescription { padding-left: 3.5ex }
+    .SIndent2 .SEntry { padding-left: 3.0ex }   .SIndent2 .SDescription { padding-left: 5.0ex }
+    .SIndent3 .SEntry { padding-left: 4.5ex }   .SIndent3 .SDescription { padding-left: 6.5ex }
+    .SIndent4 .SEntry { padding-left: 6.0ex }   .SIndent4 .SDescription { padding-left: 8.0ex }
+    .SIndent5 .SEntry { padding-left: 7.5ex }   .SIndent5 .SDescription { padding-left: 9.5ex }
+
+    .SDescription a { color: #800000}
+    .SDescription a:active { color: #A00000 }
+
+    .SGroup td {
+        padding-top: .5em; padding-bottom: .25em }
+
+    .SGroup .SEntry {
+        font-weight: bold; font-variant: small-caps }
+
+    .SGroup .SEntry a { color: #800000 }
+    .SGroup .SEntry a:active { color: #F00000 }
+
+
+    .SMain td,
+    .SClass td,
+    .SDatabase td,
+    .SDatabaseTable td,
+    .SSection td {
+        font-size: 10pt;
+        padding-bottom: .25em }
+
+    .SClass td,
+    .SDatabase td,
+    .SDatabaseTable td,
+    .SSection td {
+        padding-top: 1em }
+
+    .SMain .SEntry,
+    .SClass .SEntry,
+    .SDatabase .SEntry,
+    .SDatabaseTable .SEntry,
+    .SSection .SEntry {
+        font-weight: bold;
+        }
+
+    .SMain .SEntry a,
+    .SClass .SEntry a,
+    .SDatabase .SEntry a,
+    .SDatabaseTable .SEntry a,
+    .SSection .SEntry a { color: #000000 }
+
+    .SMain .SEntry a:active,
+    .SClass .SEntry a:active,
+    .SDatabase .SEntry a:active,
+    .SDatabaseTable .SEntry a:active,
+    .SSection .SEntry a:active { color: #A00000 }
+
+
+
+
+
+.ClassHierarchy {
+    margin: 0 15px 1em 15px }
+
+    .CHEntry {
+        border-width: 1px 2px 2px 1px; border-style: solid; border-color: #A0A0A0;
+        margin-bottom: 3px;
+        padding: 2px 2ex;
+        font-size: 10pt;
+        background-color: #F4F4F4; color: #606060;
+        }
+
+    .Firefox .CHEntry {
+        -moz-border-radius: 4px;
+        }
+
+    .CHCurrent .CHEntry {
+        font-weight: bold;
+        border-color: #000000;
+        color: #000000;
+        }
+
+    .CHChildNote .CHEntry {
+        font-style: italic;
+        font-size: 8pt;
+        }
+
+    .CHIndent {
+        margin-left: 3ex;
+        }
+
+    .CHEntry a:link,
+    .CHEntry a:visited,
+    .CHEntry a:hover {
+        color: #606060;
+        }
+    .CHEntry a:active {
+        color: #800000;
+        }
+
+
+
+
+
+#Index {
+    background-color: #FFFFFF;
+    }
+
+/*  As opposed to .PopupSearchResultsPage #Index  */
+.IndexPage #Index,
+.FramedIndexPage #Index,
+.FramedSearchResultsPage #Index {
+    padding: 15px;
+    }
+
+.IndexPage #Index {
+    border-width: 0 0 1px 1px;
+    border-style: solid;
+    border-color: #000000;
+    font-size: 9pt;  /* To make 27ex match the menu's 27ex. */
+    margin-left: 27ex;
+    }
+
+
+    .IPageTitle {
+        font-size: 20pt; font-weight: bold;
+        color: #FFFFFF; background-color: #7070C0;
+        padding: 10px 15px 10px 15px;
+        border-width: 0 0 3px 0; border-color: #000000; border-style: solid;
+        margin: -15px -15px 0 -15px }
+
+    .FramedSearchResultsPage .IPageTitle {
+        margin-bottom: 15px;
+        }
+
+    .INavigationBar {
+        font-size: 10pt;
+        text-align: center;
+        background-color: #FFFFF0;
+        padding: 5px;
+        border-bottom: solid 1px black;
+        margin: 0 -15px 15px -15px;
+        }
+
+    .INavigationBar a {
+        font-weight: bold }
+
+    .IHeading {
+        font-size: 16pt; font-weight: bold;
+        padding: 2.5em 0 .5em 0;
+        text-align: center;
+        width: 3.5ex;
+        }
+    #IFirstHeading {
+        padding-top: 0;
+        }
+
+    .IEntry {
+        font-size: 10pt;
+        padding-left: 1ex;
+        }
+    .PopupSearchResultsPage .IEntry {
+        font-size: 8pt;
+        padding: 1px 5px;
+        }
+    .PopupSearchResultsPage .Opera9 .IEntry,
+    .FramedSearchResultsPage .Opera9 .IEntry {
+        text-align: left;
+        }
+    .FramedSearchResultsPage .IEntry {
+        padding: 0;
+        }
+
+    .ISubIndex {
+        padding-left: 3ex; padding-bottom: .5em }
+    .PopupSearchResultsPage .ISubIndex {
+        display: none;
+        }
+
+    /*  While it may cause some entries to look like links when they aren't, I found it's much easier to read the
+         index if everything's the same color.  */
+    .ISymbol {
+        font-weight: bold; color: #900000  }
+
+    .IndexPage .ISymbolPrefix,
+    .FramedIndexPage .ISymbolPrefix {
+        font-size: 10pt;
+        text-align: right;
+        color: #C47C7C;
+        background-color: #F8F8F8;
+        border-right: 3px solid #E0E0E0;
+        border-left: 1px solid #E0E0E0;
+        padding: 0 1px 0 2px;
+        }
+    .PopupSearchResultsPage .ISymbolPrefix,
+    .FramedSearchResultsPage .ISymbolPrefix {
+        color: #900000;
+        }
+    .PopupSearchResultsPage .ISymbolPrefix {
+        font-size: 8pt;
+        }
+
+    .IndexPage #IFirstSymbolPrefix,
+    .FramedIndexPage #IFirstSymbolPrefix {
+        border-top: 1px solid #E0E0E0;
+        }
+    .IndexPage #ILastSymbolPrefix,
+    .FramedIndexPage #ILastSymbolPrefix {
+        border-bottom: 1px solid #E0E0E0;
+        }
+    .IndexPage #IOnlySymbolPrefix,
+    .FramedIndexPage #IOnlySymbolPrefix {
+        border-top: 1px solid #E0E0E0;
+        border-bottom: 1px solid #E0E0E0;
+        }
+
+    a.IParent,
+    a.IFile {
+        display: block;
+        }
+
+    .PopupSearchResultsPage .SRStatus {
+        padding: 2px 5px;
+        font-size: 8pt;
+        font-style: italic;
+        }
+    .FramedSearchResultsPage .SRStatus {
+        font-size: 10pt;
+        font-style: italic;
+        }
+
+    .SRResult {
+        display: none;
+        }
+
+
+
+#Footer {
+    font-size: 8pt;
+    color: #989898;
+    text-align: right;
+    }
+
+#Footer p {
+    text-indent: 0;
+    margin-bottom: .5em;
+    }
+
+.ContentPage #Footer,
+.IndexPage #Footer {
+    text-align: right;
+    margin: 2px;
+    }
+
+.FramedMenuPage #Footer {
+    text-align: center;
+    margin: 5em 10px 10px 10px;
+    padding-top: 1em;
+    border-top: 1px solid #C8C8C8;
+    }
+
+    #Footer a:link,
+    #Footer a:hover,
+    #Footer a:visited { color: #989898 }
+    #Footer a:active { color: #A00000 }
+
+</style><script language=JavaScript src="../javascript/main.js"></script><script language=JavaScript src="../javascript/searchdata.js"></script></head><body class="ContentPage" onLoad="NDOnLoad()"><script language=JavaScript><!--
+if (browserType) {document.write("<div class=" + browserType + ">");if (browserVer) {document.write("<div class=" + browserVer + ">"); }}// --></script>
+
+<!--  Generated by Natural Docs, version 1.4 -->
+<!--  http://www.naturaldocs.org  -->
+
+<!-- saved from url=(0026)http://www.naturaldocs.org -->
+
+
+
+
+<div id=Content><div class="CSection"><div class=CTopic id=MainTopic><h1 class=CTitle><a name="Shell"></a>Shell</h1><div class=CBody><p><b>Controls the Explorer windows.</b></p><!--START_ND_SUMMARY--><div class=Summary><div class=STitle>Summary</div><div class=SBorder><table border=0 cellspacing=0 cellpadding=0 class=STable><tr class="SMain"><td class=SEntry><a href="#Shell" >Shell</a></td><td class=SDescription><b>Controls the Explorer windows.</b></td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetCount" id=link1 onMouseOver="ShowTip(event, 'tt1', 'link1')" onMouseOut="HideTip('tt1')">GetCount</a></td><td class=SDescription>Get the number of items in the view.</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GetCommonPath" id=link2 onMouseOver="ShowTip(event, 'tt2', 'link2')" onMouseOut="HideTip('tt2')">GetCommonPath</a></td><td class=SDescription>Return location of standard system folders.</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetIEObject" id=link3 onMouseOver="ShowTip(event, 'tt3', 'link3')" onMouseOut="HideTip('tt3')">GetIEObject</a></td><td class=SDescription>Get IWebBrowser2 interface pointer from open explorer windows</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GetPath" id=link4 onMouseOver="ShowTip(event, 'tt4', 'link4')" onMouseOut="HideTip('tt4')">GetPath</a></td><td class=SDescription>Returns the currently open file system path in the given explorer window</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#GetSelection" id=link5 onMouseOver="ShowTip(event, 'tt5', 'link5')" onMouseOut="HideTip('tt5')">GetSelection</a></td><td class=SDescription>Get selected item(s)</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#GetView" id=link6 onMouseOver="ShowTip(event, 'tt6', 'link6')" onMouseOut="HideTip('tt6')">GetView</a></td><td class=SDescription>Gets the current view of desired Explorer window</td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#SelectItem" id=link7 onMouseOver="ShowTip(event, 'tt7', 'link7')" onMouseOut="HideTip('tt7')">SelectItem</a></td><td class=SDescription>Select item by index</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SetHook" id=link8 onMouseOver="ShowTip(event, 'tt8', 'link8')" onMouseOut="HideTip('tt8')">SetHook</a></td><td class=SDescription></td></tr><tr class="SFunction SIndent1 SMarked"><td class=SEntry><a href="#SetPath" id=link9 onMouseOver="ShowTip(event, 'tt9', 'link9')" onMouseOut="HideTip('tt9')">SetPath</a></td><td class=SDescription>Open the folder in given explorer window</td></tr><tr class="SFunction SIndent1"><td class=SEntry><a href="#SetView" id=link10 onMouseOver="ShowTip(event, 'tt10', 'link10')" onMouseOut="HideTip('tt10')">SetView</a></td><td class=SDescription>Sets the view in desired Explorer window</td></tr><tr class="SGroup SIndent1"><td class=SEntry><a href="#Examples" >Examples</a></td><td class=SDescription>Display info about active Explorer window</td></tr><tr class="SGroup SIndent1"><td class=SEntry><a href="#About" >About</a></td><td class=SDescription></td></tr></table></div></div><!--END_ND_SUMMARY--></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetCount"></a>GetCount</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_GetCount(</td><td class=PParameter nowrap>pHwnd,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>flag</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get the number of items in the view.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pHwnd</td><td class=CDLDescription>Handle to windows explorer instance.</td></tr><tr><td class=CDLEntry>flag</td><td class=CDLDescription>set &ldquo;sel&rdquo; to get number of selected items.</td></tr></table><h4 class=CHeading>Returns</h4><p>Number of items, or -1 on failure.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetCommonPath"></a>GetCommonPath</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_GetCommonPath(</td><td class=PParameter nowrap>Name</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Return location of standard system folders.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Name</td><td class=CDLDescription>Name of the sysetem folder.</td></tr></table><h4 class=CHeading>Folders</h4><p>Bellow is the list of available folders and their typical paths.</p><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>APPDATA</td><td class=CDLDescription>C:\Documents and Settings\username\Application Data.</td></tr><tr><td class=CDLEntry>COOKIES</td><td class=CDLDescription>C:\Documents and Settings\username\Cookies.</td></tr><tr><td class=CDLEntry>COMMON_APPDATA</td><td class=CDLDescription>C:\Documents and Settings\All Users\Application Data.</td></tr><tr><td class=CDLEntry>COMMON_DOCUMENTS</td><td class=CDLDescription>C:\Documents and Settings\All Users\Documents.</td></tr><tr><td class=CDLEntry>COMMON_PROGRAMS</td><td class=CDLDescription>C:\Documents and Settings\All Users\Start Menu\Programs.</td></tr><tr><td class=CDLEntry>COMMON_STARTMENU</td><td class=CDLDescription>C:\Documents and Settings\All Users\Start Menu.</td></tr><tr><td class=CDLEntry>DESKTOP</td><td class=CDLDescription>C:\Documents and Settings\username\Desktop.</td></tr><tr><td class=CDLEntry>FONTS</td><td class=CDLDescription>C:\Windows\Fonts.</td></tr><tr><td class=CDLEntry>FAVORITES</td><td class=CDLDescription>C:\Documents and Settings\username\Favorites.</td></tr><tr><td class=CDLEntry>LOCAL_APPDATA</td><td class=CDLDescription>C:\Documents and Settings\username\Local Settings\Application Data.</td></tr><tr><td class=CDLEntry>MYMUSIC</td><td class=CDLDescription>C:\Documents and Settings\User\My Documents\My Music.</td></tr><tr><td class=CDLEntry>MYPICTURES</td><td class=CDLDescription>C:\Documents and Settings\username\My Documents\My Pictures.</td></tr><tr><td class=CDLEntry>MYVIDEO</td><td class=CDLDescription>C:\Documents and Settings\username\My Documents\My Videos.</td></tr><tr><td class=CDLEntry>PERSONAL</td><td class=CDLDescription>C:\Documents and Settings\username\My Documents.</td></tr><tr><td class=CDLEntry>PROGRAM_FILES_COMMON</td><td class=CDLDescription>C:\Program Files\Common.</td></tr><tr><td class=CDLEntry>PROGRAM_FILES</td><td class=CDLDescription>C:\Program Files.</td></tr><tr><td class=CDLEntry>PROGRAMS</td><td class=CDLDescription>C:\Documents and Settings\username\Start Menu\Programs.</td></tr><tr><td class=CDLEntry>PROFILE</td><td class=CDLDescription>C:\Documents and Settings\username.</td></tr><tr><td class=CDLEntry>PROFILES</td><td class=CDLDescription>C:\Documents and Settings.</td></tr><tr><td class=CDLEntry>RESOURCES</td><td class=CDLDescription>C:\WINDOWS\Resources\ (For theme and other windows resources).</td></tr><tr><td class=CDLEntry>SENDTO</td><td class=CDLDescription>C:\Documents and Settings\username\SendTo.</td></tr><tr><td class=CDLEntry>STARTMENU</td><td class=CDLDescription>C:\Documents and Settings\username\Start Menu.</td></tr><tr><td class=CDLEntry>STARTUP</td><td class=CDLDescription>C:\Documents and Settings\username\Start Menu\Programs\Startup.</td></tr><tr><td class=CDLEntry>SYSTEM</td><td class=CDLDescription>C:\Windows\System32.</td></tr><tr><td class=CDLEntry>WINDOWS</td><td class=CDLDescription>C:\Windows.</td></tr></table><h4 class=CHeading>Returns</h4><p>Full path</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetIEObject"></a>GetIEObject</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_GetIEObject(</td><td class=PParameter nowrap>hwndFind</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get IWebBrowser2 interface pointer from open explorer windows</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>hwndFind</td><td class=CDLDescription>Return interface pointer for instance with given hwnd.</td></tr></table><h4 class=CHeading>Returns</h4><p>IWebBrowser2 interface pointer</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetPath"></a>GetPath</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_GetPath(</td><td class=PParameter nowrap>pHwnd</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Returns the currently open file system path in the given explorer window</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pHwnd</td><td class=CDLDescription>Handle to windows explorer instance</td></tr></table><h4 class=CHeading>Returns</h4><p>Path of currently open folder.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetSelection"></a>GetSelection</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_GetSelection(</td><td class=PParameter nowrap>pHwnd</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Get selected item(s)</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>hwnd</td><td class=CDLDescription>Handle of Explorer window</td></tr></table><h4 class=CHeading>Returns</h4><p>Path of each selected item.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="GetView"></a>GetView</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_GetView(</td><td class=PParameter nowrap>pHwnd</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Gets the current view of desired Explorer window</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pHwnd</td><td class=CDLDescription>Handle to windows explorer instance</td></tr></table><p>Returns:      View mode type, see <a href="#SetView" class=LFunction id=link11 onMouseOver="ShowTip(event, 'tt10', 'link11')" onMouseOut="HideTip('tt10')">SetView</a></p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SelectItem"></a>SelectItem</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_SelectItem(</td><td class=PParameter nowrap>hwnd,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx1,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Select item by index</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>hwnd</td><td class=CDLDescription>Handle of Explorer window</td></tr><tr><td class=CDLEntry>idx1</td><td class=CDLDescription>0 based index of item to select</td></tr><tr><td class=CDLEntry>idx2</td><td class=CDLDescription>All items up to the idx2 will be selected.&nbsp; Keep in mind that this method selects items 1 by 1 thus selecting large amount of items isn&rsquo;t efficient.</td></tr></table></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetHook"></a>SetHook</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_SetHook(</td><td class=PParameter nowrap>Handler</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><h4 class=CHeading>Parameter</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Handler</td><td class=CDLDescription>Name of the function to call on shell events.</td></tr></table><h4 class=CHeading>Handler</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>Reason</td><td class=CDLDescription>Reason for which handler is called.</td></tr><tr><td class=CDLEntry>Param</td><td class=CDLDescription>Parameter of the handler.&nbsp; Parameters are given bellow for each reason.</td></tr></table><blockquote><pre>OnShell(Reason, Param) {
+    static WINDOWCREATED=1, WINDOWDESTROYED=2, WINDOWACTIVATED=4, GETMINRECT=5, REDRAW=6, TASKMAN=7, APPCOMMAND=12
+}</pre></blockquote><h4 class=CHeading>Param</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>WINDOWACTIVATED</td><td class=CDLDescription>The HWND handle of the activated window.</td></tr><tr><td class=CDLEntry>WINDOWREPLACING</td><td class=CDLDescription>The HWND handle of the window replacing the top-level window.</td></tr><tr><td class=CDLEntry>WINDOWCREATED</td><td class=CDLDescription>The HWND handle of the window being created.</td></tr><tr><td class=CDLEntry>WINDOWDESTROYED</td><td class=CDLDescription>The HWND handle of the top-level window being destroyed.</td></tr><tr><td class=CDLEntry>GETMINRECT</td><td class=CDLDescription>A pointer to a RECT structure.</td></tr><tr><td class=CDLEntry>TASKMAN</td><td class=CDLDescription>Can be ignored.</td></tr><tr><td class=CDLEntry>REDRAW</td><td class=CDLDescription>The HWND handle of the window that needs to be redrawn.</td></tr></table><h4 class=CHeading>Remarks</h4><p>Requires explorer to be set as a shell in order to work.</p><h4 class=CHeading>Returns</h4><p>0 on failure, name of the previous hook procedure on success.</p></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetPath"></a>SetPath</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_SetPath(</td><td class=PParameter nowrap>pHwnd,</td></tr><tr><td></td><td class=PParameter nowrap>pPath</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Open the folder in given explorer window</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pHwnd</td><td class=CDLDescription>Handle to windows explorer instance</td></tr><tr><td class=CDLEntry>pPath</td><td class=CDLDescription>path to be set or one of the tree symbols:</td></tr></table><ul><li>&gt;  go forward</li><li>&lt;  go back</li><li>|  go up Returns: True on success</li></ul></div></div></div>
+
+<div class="CFunction"><div class=CTopic><h3 class=CTitle><a name="SetView"></a>SetView</h3><div class=CBody><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_SetView(</td><td class=PParameter nowrap>pHwnd,</td></tr><tr><td></td><td class=PParameter nowrap>pView</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote><p>Sets the view in desired Explorer window</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>pHwnd</td><td class=CDLDescription>Handle to windows explorer instance</td></tr><tr><td class=CDLEntry>pView</td><td class=CDLDescription>Number, view mode type</td></tr></table><h4 class=CHeading>View Mode Types</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>ICON</td><td class=CDLDescription>1</td></tr><tr><td class=CDLEntry>SMALLICON</td><td class=CDLDescription>2</td></tr><tr><td class=CDLEntry>LIST</td><td class=CDLDescription>3</td></tr><tr><td class=CDLEntry>DETAILS</td><td class=CDLDescription>4</td></tr><tr><td class=CDLEntry>THUMBNAIL</td><td class=CDLDescription>5</td></tr><tr><td class=CDLEntry>TILE</td><td class=CDLDescription>6</td></tr><tr><td class=CDLEntry>THUMBSTRIP</td><td class=CDLDescription>7</td></tr></table></div></div></div>
+
+<div class="CGroup"><div class=CTopic><h3 class=CTitle><a name="Examples"></a>Examples</h3><div class=CBody><p>Display info about active Explorer window</p><blockquote><pre>       h := WinExist(&quot;ahk_class ExploreWClass&quot;)
+
+       p := &quot;Path: &quot; Shell_GetPath( h )
+       s := &quot;Sel:`n&quot; Shell_GetSelection( hwnd)
+
+       msgbox %p%`n%s%</pre></blockquote></div></div></div>
+
+<div class="CGroup"><div class=CTopic><h3 class=CTitle><a name="About"></a>About</h3><div class=CBody><ul><li>Ver 1.0 by majkinetor.&nbsp; See <a href="http://www.autohotkey.com/forum/topic19400.html" class=LURL target=_top>http://www.autohotkey.com/forum/topic19400.html</a></li><li>Licenced under GNU GPL <a href="http://creativecommons.org/licenses/GPL/2.0/" class=LURL target=_top>http://creativecommons.org/licenses/GPL/2.0/</a></li></ul></div></div></div>
+
+</div><!--Content-->
+
+
+<div id=Footer><a href="http://www.naturaldocs.org">Generated by Natural Docs</a></div><!--Footer-->
+
+
+
+
+
+
+<!--START_ND_TOOLTIPS-->
+<div class=CToolTip id="tt1"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_GetCount(</td><td class=PParameter nowrap>pHwnd,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>flag</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get the number of items in the view.</div></div><div class=CToolTip id="tt2"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_GetCommonPath(</td><td class=PParameter nowrap>Name</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Return location of standard system folders.</div></div><div class=CToolTip id="tt3"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_GetIEObject(</td><td class=PParameter nowrap>hwndFind</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get IWebBrowser2 interface pointer from open explorer windows</div></div><div class=CToolTip id="tt4"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_GetPath(</td><td class=PParameter nowrap>pHwnd</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Returns the currently open file system path in the given explorer window</div></div><div class=CToolTip id="tt5"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_GetSelection(</td><td class=PParameter nowrap>pHwnd</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Get selected item(s)</div></div><div class=CToolTip id="tt6"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_GetView(</td><td class=PParameter nowrap>pHwnd</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Gets the current view of desired Explorer window</div></div><div class=CToolTip id="tt7"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_SelectItem(</td><td class=PParameter nowrap>hwnd,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx1,</td><td class=PDefaultValuePrefix>&nbsp;&nbsp;</td><td class=PDefaultValue width=100%></td></tr><tr><td></td><td class=PParameter nowrap>idx2</td><td class=PDefaultValuePrefix>&nbsp;=&nbsp;</td><td class=PDefaultValue width=100%>&quot;&quot;</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Select item by index</div></div><div class=CToolTip id="tt8"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_SetHook(</td><td class=PParameter nowrap>Handler</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote></div></div><div class=CToolTip id="tt9"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_SetPath(</td><td class=PParameter nowrap>pHwnd,</td></tr><tr><td></td><td class=PParameter nowrap>pPath</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Open the folder in given explorer window</div></div><div class=CToolTip id="tt10"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class=Prototype><tr><td><table border=0 cellspacing=0 cellpadding=0><tr><td class=PBeforeParameters nowrap>Shell_SetView(</td><td class=PParameter nowrap>pHwnd,</td></tr><tr><td></td><td class=PParameter nowrap>pView</td><td class=PAfterParameters nowrap>)</td></tr></table></td></tr></table></blockquote>Sets the view in desired Explorer window</div></div><!--END_ND_TOOLTIPS-->
+
+
+
+
+<div id=MSearchResultsWindow><iframe src="" frameborder=0 name=MSearchResults id=MSearchResults></iframe><a href="javascript:searchPanel.CloseResultsWindow()" id=MSearchResultsWindowClose>Close</a></div>
+
+
+<script language=JavaScript><!--
+if (browserType) {if (browserVer) {document.write("</div>"); }document.write("</div>");}// --></script></body></html>
