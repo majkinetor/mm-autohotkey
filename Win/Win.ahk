@@ -361,7 +361,7 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 			Gui, +Resize +LastFound
 			WinSetTitle, MyGui
 			if !Win_Recall("<")						;Recall gui if its position is already saved
-				Gui, %n%:Show, h300 w300, MyGui		; otherwise use these defaults.
+				Gui, Show, h300 w300, MyGui			; otherwise use these defaults.
 			
 			GuiClose:
 				Win_Recall(">")						;Store the Gui.
