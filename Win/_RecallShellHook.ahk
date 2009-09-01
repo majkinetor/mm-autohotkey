@@ -65,7 +65,7 @@ RegisterShellHook(Handler) {
 	h := WinExist("ahk_pid " ErrorLevel)
 	DetectHiddenWindows, %oldDetect%
 
-	if DllCall("RegisterShellHookWindow", "UInt", h) 
+	if !DllCall("RegisterShellHookWindow", "UInt", h) 
 		return 0
 	return OnMessage(DllCall( "RegisterWindowMessage", "str", "SHELLHOOK") , Handler)
 }
