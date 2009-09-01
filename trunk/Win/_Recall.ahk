@@ -27,6 +27,7 @@ F1:: goto MakeGui
 F2:: Hwnd := WinExist("A"), Win_Recall(">" %Hwnd%  Hwnd, "config.ini")
 F3:: Hwnd := WinExist("A"), Win_Recall("<" %Hwnd%, Hwnd, "config.ini")
 F4:: Win_Recall("<<")
+F5:: Reload
 
 OnButton:
 	if A_GuiControl contains F1
