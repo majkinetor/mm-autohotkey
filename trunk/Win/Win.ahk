@@ -353,8 +353,6 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 			cw & ch numbers are present only for AHK Guis and represent client width & height which can be used 
 			without modifications in Gui, Show command.
 
-			You can get only position if you specify 
-
   Examples:
 		Single Gui Example:
 		(start code)
