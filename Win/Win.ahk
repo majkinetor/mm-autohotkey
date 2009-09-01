@@ -358,14 +358,16 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
   Examples:
 		Single Gui Example:
 		(start code)
-			Gui, +Resize +LastFound
-			WinSetTitle, MyGui
-			if !Win_Recall("<")						;Recall gui if its position is already saved
-				Gui, Show, h300 w300, MyGui			; otherwise use these defaults.
-			
-			GuiClose:
-				Win_Recall(">")						;Store the Gui.
-			return
+		 Gui, +Resize +LastFound
+		 WinSetTitle, MyGui
+		 if !Win_Recall("<")                     ;Recall gui if its position is already saved
+			Gui, Show, h300 w300, MyGui         ; otherwise use these defaults.
+		return
+
+		GuiClose:
+			Win_Recall(">")                     ;Store the Gui.
+			ExitApp
+		return
 		(end code)
 
 		Snippets:
