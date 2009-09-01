@@ -23,8 +23,18 @@
 			hpos		- Animates the window from left to right. This flag can be used with roll or slide animation. It is ignored when used with CENTER or BLEND.
 			vneg		- Animates the window from top to bottom. This flag can be used with roll or slide animation. It is ignored when used with CENTER or BLEND.
 			vpos		- Animates the window from bottom to top. This flag can be used with roll or slide animation. It is ignored when used with CENTER or BLEND.
+
+ Remarks:
+			When using slide or roll animation, you must specify the direction.
+			You can combine HPOS or HNEG with VPOS or VNEG to animate a window diagonally.
+			If a child window is displayed partially clipped, when it is animated it will have holes where it is clipped.
+			Avoid animating a window that has a drop shadow because it produces visually distracting, jerky animations.
+
  Returns:
  			If the function succeeds, the return value is nonzero.
+ 
+ Example:
+		>  Win_Animate(hWnd, "hide blend", 500)
  
  */
 Win_Animate(Hwnd, Type="", Time=100){
@@ -613,7 +623,7 @@ Win_Subclass(hCtrl, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.1 by majkinetor.
+	o v1.1  by majkinetor.
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*
