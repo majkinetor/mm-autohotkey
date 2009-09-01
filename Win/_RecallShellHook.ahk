@@ -9,46 +9,6 @@ return
 
 ESC:: ExitApp
 
-/*
-	Function:	RegisterShellHook
-
-	Parameter:
-				Handler	- Function to call.
-
-	Handler:
-		
- >	OnShell(Reason, Param) {	
- >		static WINDOWCREATED=1, WINDOWDESTROYED=2, WINDOWACTIVATED=4, GETMINRECT=5, REDRAW=6, TASKMAN=7, APPCOMMAND=12
- >	} 
-		
-	Handler Parameters:
-		Reason		- Reason for which handler is called. 
-		Param		- Parameter of the handler. Parameters are given bellow for each reason.
-
-	
-		WINDOWACTIVATED	-	The HWND handle of the activated window.
-		WINDOWREPLACING	-	The HWND handle of the window replacing the top-level window.
-		WINDOWCREATED	-	The HWND handle of the window being created.
-		WINDOWDESTROYED	-	The HWND handle of the top-level window being destroyed.		
-		GETMINRECT		-	A pointer to a RECT structure.
-		TASKMAN			-	Can be ignored.
-		REDRAW			-	The HWND handle of the window that needs to be redrawn.
-		
-	Returns:
-		0 on failure, name of the previous hook procedure on success.
- */
-RegisterShellHook(Handler) {
-	oldDetect := A_DetectHiddenWindows
-	DetectHiddenWindows, on
-	Process, Exist
-	h := WinExist("ahk_pid " ErrorLevel)
-	DetectHiddenWindows, %oldDetect%
-
-	if !DllCall("RegisterShellHookWindow", "UInt", h) 
-		return 0
-	return OnMessage(DllCall( "RegisterWindowMessage", "str", "SHELLHOOK") , Handler)
-}
-
 F2::
 	hwnd := WinExist("A")
 	WinGetClass, cls, ahk_id %hwnd%
@@ -64,8 +24,50 @@ OnShell(Reason, Param) {
 		WinGetClass, cls, ahk_id %Param%
 		p := Win_Recall("<" cls, Param, "config.ini")
 		if p != 
-			m("recalled: " Param)
+			msgbox recalled:  %cls%
 	} 
 } 
+
+
+/*
+	Function:	RegisterShellHook
+
+	Parameter:
+				Handler	- Name of the function to call on shell events.
+
+	Handler:
+		Reason		- Reason for which handler is called. 
+		Param		- Parameter of the handler. Parameters are given bellow for each reason.
+
+ >	OnShell(Reason, Param) {	
+ >		static WINDOWCREATED=1, WINDOWDESTROYED=2, WINDOWACTIVATED=4, GETMINRECT=5, REDRAW=6, TASKMAN=7, APPCOMMAND=12
+ >	} 
+		
+	Param:		
+		WINDOWACTIVATED	-	The HWND handle of the activated window.
+		WINDOWREPLACING	-	The HWND handle of the window replacing the top-level window.
+		WINDOWCREATED	-	The HWND handle of the window being created.
+		WINDOWDESTROYED	-	The HWND handle of the top-level window being destroyed.		
+		GETMINRECT		-	A pointer to a RECT structure.
+		TASKMAN			-	Can be ignored.
+		REDRAW			-	The HWND handle of the window that needs to be redrawn.
+
+	Remarks:
+		Requires explorer to be set as a shell in order to work.
+
+	Returns:
+		0 on failure, name of the previous hook procedure on success.
+ */
+RegisterShellHook(Handler) {
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+	Process, Exist
+	h := WinExist("ahk_pid " ErrorLevel)
+	DetectHiddenWindows, %oldDetect%
+
+	if DllCall("RegisterShellHookWindow", "UInt", h) 
+		return 0
+	return OnMessage(DllCall( "RegisterWindowMessage", "str", "SHELLHOOK") , Handler)
+}
 
 #include Win.ahk

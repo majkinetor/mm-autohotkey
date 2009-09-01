@@ -329,7 +329,7 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 					It can be optionally followed by the string representing the name of the storage location for that window.
 					You need to use name if your script stores more then one window, otherwise it will be saved under unnamed location.
 					">" and "<" are special names that can be used to store or recall all AHK Guis.
-					"-"	operation is used alone as an argument to delete Registry entries belonging to the script.
+					"-"	operation is used alone as an argument to delete Registry or Ini sections belonging to the script.
 					"--" operation is used alone as an argument to delete all Registry entries for all scripts.
 
 		
@@ -377,8 +377,9 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
 	static key="Software\AutoHotkey\Win", section="Recall"
 
 	if (Options = "-"){
-		loop, HKEY_CURRENT_USER, %key%
-			InStr(A_LoopRegName, A_ScriptFullPath) ? 
+		ifNotEqual, IniFileName,, IniDelete, %IniFileName%, %section%
+		else loop, HKEY_CURRENT_USER, %key%
+			 InStr(A_LoopRegName, A_ScriptFullPath) ? 
 				RegDelete, HKEY_CURRENT_USER, %key%, %A_LoopRegName%		
 		return
 	} else if (Options = "--") {
@@ -393,10 +394,8 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
 
 		ifEqual, f, >, SetEnv, op, % ">", name := p
 		else ifEqual, f, <, SetEnv, op, % "<", name := p
-
 		else ifEqual, A_LoopField, -Min, SetEnv, noMin, 1
 		else ifEqual, A_LoopField, -Max, SetEnv, noMax, 1
-		else ifEqual, A_LoopField, Show, SetEnv, bShow, 1
 	}
 
 	if (Hwnd = "") || (Hwnd>0 && Hwnd <= 99) {
@@ -409,8 +408,7 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
 	{		
 		Loop, 99 {
 			Gui, %A_Index%:+LastFoundExist
-			if WinExist()
-			{
+			if WinExist() {
 				name := A_Index, Hwnd := WinExist()
 				gosub %A_ThisFunc%
 			}
@@ -439,7 +437,7 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
 		DllCall("GetWindowPlacement", "uint", Hwnd, "uint", &WP)
 		WinGetClass, cls, ahk_id %hwnd%
 		if (cls="AutoHotkeyGUI")
-			Win_Get(Hwnd, "Lwh",w,h),   szAHK := " " w " " h		;this is to store AHK Gui width & height so it can be used asap with Gui, Show.
+			Win_Get(Hwnd, "Lwh",w,h),   szAHK := " " w " " h		;Store AHK client width & height so it can be used with Gui, Show.
 
 		pos := ""
 		loop, 4
