@@ -325,8 +325,7 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 		Options		- White space separated list of options. See bellow.		
 		Hwnd		- Hwnd of the window for which to store data or Gui number if AHK window. 
 					If omitted, function will use Hwnd of the default AHK Gui. You can also use Gui, N:Default 
-					prior to calling the function. For 3td party windows this option is mandatory. For 3td party windows, 
-					this parameter is mandatory. 
+					prior to calling the function. For 3td party windows, this parameter is mandatory. 
 					Set 0 as hwnd to return position string without applying it to any window. This can be used for AHK Guis to
 					calculate size of controls based on window size and position, when needed. 
 
