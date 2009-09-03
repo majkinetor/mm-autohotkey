@@ -23,13 +23,13 @@ OnSet:
 	ControlGetText, txt3, edit4, A
 
 	if txt1 != 
-		Shell_SetPath(THIS, txt1)
+		Shell_ESetPath(THIS, txt1)
 	
 	if txt2 !=
-		Shell_SetVIew(THIS, txt2)
+		Shell_ESetVIew(THIS, txt2)
 
 	if txt3 !=
-		 s := Shell_SelectItem(THIS, txt3)
+		 s := Shell_ESelectItem(THIS, txt3)
 
 
 	Refresh()
@@ -39,11 +39,11 @@ return
 GetInfo(hwnd){
 
 	res := "HWND: " hwnd "`r`n"
-		.  "PATH: " Shell_GetPath( Hwnd ) "`r`n"
-		.  "ITEM COUNT: " Shell_GetCount(hwnd) "`r`n"
-		.  "VIEW: " View(v:=Shell_GetView( Hwnd ))	 "(" v ")`r`n"
+		.  "PATH: " Shell_EGetPath( Hwnd ) "`r`n"
+		.  "ITEM COUNT: " Shell_EGetCount(hwnd) "`r`n"
+		.  "VIEW: " View(v:=Shell_EGetView( Hwnd ))	 "(" v ")`r`n"
 		.  "SELECTED: `r`n`r`n" 
-	s :=  Shell_GetSelection( Hwnd ) 
+	s :=  Shell_EGetSelection( Hwnd ) 
 	STringReplace, s, s, `n, `r`n, A
 	res .= s
 	
@@ -82,7 +82,7 @@ Refresh() {
 		id := explorer_e%A_Index%
 
 		WinGetTitle, t, ahk_id %id%
-		LV_Add("", id, t, Shell_GetPath( id ))
+		LV_Add("", id, t, Shell_EGetPath( id ))
 	}
 
 	loop, %cabinet_c%
@@ -90,7 +90,7 @@ Refresh() {
 		id := cabinet_c%A_Index%
 
 		WinGetTitle, t, ahk_id %id%
-		LV_Add("", id, t, Shell_GetPath( id ))
+		LV_Add("", id, t, Shell_EGetPath( id ))
 	}
 
 	LV_ModifyCol()

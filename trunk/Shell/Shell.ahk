@@ -3,30 +3,113 @@
  */
 
 /*
-  Function:		GetCount
- 				Get the number of items in the view.
- 
-  Parameters:	
- 				pHwnd	- Handle to windows explorer instance.
- 				flag	- set "sel" to get number of selected items.
- 
-  Returns:		
- 				Number of items, or -1 on failure.
- 				
+	Function: Restart
+			  Restarts shell.
+
+	Remarks:
+			  The effect is the same as killing the explorer.exe using task manager and starting it again.
+			  Function will try to prevent execution of start-up group when explorer is started again.
+
+	Returns:
+			  Pid of the new shell instance.			
  */
-Shell_GetCount( pHwnd, flag="") {
+Shell_Restart() {
+	static WM_QUIT=0x12
+	oldDetect := A_DetectHiddenWIndows
+	DetectHiddenWIndows, on	
+	
+	PostMessage, WM_QUIT,,,, ahk_class Progman 
+	loop {
+		Process, Exist, explorer.exe
+		pid := ErrorLevel
+		if !pid || (A_Index > 20)
+			break
+		while (WinExist("ahk_pid " pid) != 0) {
+			WinKill, ahk_pid %pid%
+			Sleep 200
+			if (bBreak := A_Index > 20)
+				break
+		}
+		ifNotEqual, bBreak, 0, 	break
+	}
+	DetectHiddenWIndows, %oldDetect%
 
-	ieObj := Shell_GetIEObject( pHwnd ) 
-	fvObj := Shell_GetFolderView( ieObj )
-	if !fvObj
-		return -1
+	Run, explorer.exe, , , pid
+	WinWait, ahk_class Shell_TrayWnd
+	Send {SHIFT down}
+	Send {SHIFT up}
+	return pid
+}
 
-	if (flag="all") or flag = ""
-		param := 0x00000002 ;SVGIO_ALLVIEW 
-	else if (flag="sel")
-		param := 0x00000001
+/*
+	Function: SMShow
+			  Show start menu on particular location.
 
-	return IFolderView_ItemCount(fvobj, param)
+	Parameters:
+			 X, Y	 - Coordinate on which to show Start Menu. Omit both parameters to simulate click on the Start Menu button.
+					   Pass "mouse" as only parameter to show it on mouse position.
+
+			 Transparency - Window transparency, by default 255.
+			 bHideShadow - Hide Start Menu Shadow. On some systems showing the menu on non-default position will bug up shadow.
+						   Enabled by default.
+
+	Remarks:
+			ESC key will not close the window if you used X and Y parameters. To close the window you can use the following code:
+ >			ESC:: WinHide, ahk_class DV2ControlHost
+ */
+Shell_SMShow(X="", Y="", Transparency="", bHideShadow=1) {
+	
+	if X=mouse
+		VarSetCapacity(POINT, 8), DllCall("GetCursorPos", "uint", &POINT), X := NumGet(POINT), Y := NumGet(POINT, 4)
+
+	if (X Y = "")
+		Send {LWin}
+	else {		
+		oldDetect := A_DetectHiddenWIndows
+		DetectHiddenWIndows, on	
+		hSM := WinExist("ahk_class DV2ControlHost")
+		WinSet, Transparent, % Transparency != "" ? Transparency : 255
+		WinMove, X, Y
+		DllCall("ShowWindow", "uint", hSM, "uint", 5)				;use dllcall so setwindelay doesn't delay.		    
+		ifEqual, bHideShadow, 1, WinHide, ahk_class SysShadow		;makes problems when user clicks the start menu button regular way, stays up
+		DetectHiddenWIndows, %oldDetect%
+	}
+	WinActivate,  ahk_id %hSM%
+	ControlFocus, Edit1, ahk_id %hSM%								;focus search field on Vista.
+}
+
+/*
+	Function: SMAdd
+			  Add shortcuts to start menu programs group.
+
+	Parameters:
+			 Parent	   - Name of the parent folder, relative to the Programs folder. Specify "!" to add file to the StartUp group.
+			 FileName  - Name of the file. If omited, only Parent will be created. If starts with the "!", file will be added to the Start Menu for all users.
+						 FileName doesn't have to exist.
+			 o1..o7	   - Named parameters: Name, WDir, Args, Desc, Icon, Shortcut, IconNumber, RunState. Those parameters will be passed 
+						 to FileCrateShortuct. If Name is not present function will use name of the input file.
+ */
+Shell_SMAdd( Parent, FileName="", o1="", o2="", o3="", o4="", o5="", o6="", o7="") {
+	if SubStr(FileName, 1, 1) = "!"
+		FileName := SubStr(FileName, 2), bAllUsers := true
+	
+	ifEqual, Parent, !, SetEnv, Parent, % Shell_GetCommonPath(bAllUsers ? "COMMON_STARTUP" : "STARTUP")
+	else Parent := Shell_GetCommonPath( bAllUsers ? "COMMON_PROGRAMS" : "PROGRAMS") "\" Parent 
+
+	loop, 7	{
+		v := o%A_Index%
+		ifEqual, v, ,break
+		j := InStr(v, "="), n := SubStr(v, 1, j-1), %n% := SubStr(v, j+1)
+	}
+	IfEqual, Name,, SplitPath, FileName,,,,Name
+
+
+	if !FileExist(Parent) {
+		FileCreateDir, %Parent%
+		ifEqual, ErrorLevel,1, return 0
+	}
+
+	FileCreateShortcut, %FileName%, %Parent%\%Name%.lnk, %WDir%, %Args%, %Desc%, %Icon%, %Shortcut%, %IconNumber%, %RunState%
 }
 
 /*
@@ -45,6 +128,7 @@ Shell_GetCount( pHwnd, flag="") {
                 COMMON_DOCUMENTS       -  C:\Documents and Settings\All Users\Documents.
 				COMMON_PROGRAMS		   -  C:\Documents and Settings\All Users\Start Menu\Programs.
 				COMMON_STARTMENU	   -  C:\Documents and Settings\All Users\Start Menu.
+				COMMON_STARTUP		   -  C:\Documents and Settings\All Users\Start Menu\Programs\Startup.
                 DESKTOP                -  C:\Documents and Settings\username\Desktop. 
                 FONTS                  -  C:\Windows\Fonts. 
 				FAVORITES			   -  C:\Documents and Settings\username\Favorites.
@@ -68,140 +152,18 @@ Shell_GetCount( pHwnd, flag="") {
 
   Returns:		
 				Full path
+
+  Reference:
+			   <http://msdn.microsoft.com/en-us/library/bb762494(VS.85).aspx>
  				
  */
 Shell_GetCommonPath( Name ) { 
-		static  APPDATA=0x001A, COOKIES=0x0021, COMMON_APPDATA=0x0023, COMMON_DOCUMENTS=0x002e, COMMON_PROGRAMS=0x0017, COMMON_STARTMENU=0x0016
-				,COMMON_STARTUP=0x0018,DESKTOP=0x0010, FONTS=0x0014, FAVORITES=0x0006, LOCAL_APPDATA=0x001C, MYMUSIC=0x000d, MYVIDEO=0x000e
-				,MYPICTURES=0x0027, PERSONAL=0x0005,PROGRAM_FILES_COMMON=0x002b, PROGRAM_FILES=0x0026, PROGRAMS=0x0002, PROFILE=0x0028, PROFILES=0x003e
-				,RESOURCES=0x0038, STARTMENU=0x000b,STARTUP=0x0007, SYSTEM=0x0025, SENDTO=0x0009, WINDOWS=0x0024             
+		static  APPDATA=0x1A, COOKIES=0x21, COMMON_APPDATA=0x23, COMMON_DOCUMENTS=0x2e, COMMON_PROGRAMS=0x17, COMMON_STARTMENU=0x16
+				,COMMON_STARTUP=0x18,DESKTOP=0x10, FONTS=0x14, FAVORITES=0x6, LOCAL_APPDATA=0x1C, MYMUSIC=0xd, MYVIDEO=0xe
+				,MYPICTURES=0x27, PERSONAL=0x5,PROGRAM_FILES_COMMON=0x2b, PROGRAM_FILES=0x26, PROGRAMS=0x02, PROFILE=0x28, PROFILES=0x3e
+				,RESOURCES=0x38, STARTMENU=0xb,STARTUP=0x7, SYSTEM=0x25, SENDTO=0x9, WINDOWS=0x24             
     VarSetCapacity(fpath, 512), DllCall( "shell32\SHGetFolderPathA", "uint", 0, "int", %Name%, "uint", 0, "int", 0, "str", fpath), VarSetCapacity(fpath, -1)
     return fpath
-}
-
-/*
-  Function: GetIEObject
- 			Get IWebBrowser2 interface pointer from open explorer windows
- 
-  Parameters: 
-             hwndFind - Return interface pointer for instance with given hwnd.
- 
-  Returns:
- 			IWebBrowser2 interface pointer
- */
-Shell_GetIEObject( hwndFind="" ) {
-	static 	IID_IWebBrowser2  := "{D30C1661-CDAF-11D0-8A3E-00C04FC9E26E}"
-
-	sw := ShellWindows_Create()
-	loop, % ShellWindows_Count(sw)
-	{
-		COM_Release(dispObj)
-
-		dispObj := ShellWindows_Item( sw, A_Index-1 )					;get Dispatcher interface
-		if !(ieObj := COM_QueryInterface(dispObj, IID_IWebBrowser2))	;get IWebBrowser2 interface
-			continue
-		
-		if WebBrowser2_HWND(ieObj) = hwndFind
-			break
-
-		COM_Release(ieObj), ieObj := 0
-	}
-
-	return ieObj
-}
-
-/*
- Function:		GetPath
-				Returns the currently open file system path in the given explorer window
-
- Parameters:	
-				pHwnd	- Handle to windows explorer instance
-
- Returns:
-				Path of currently open folder.
- */
-Shell_GetPath( pHwnd ) {
-	static IID_IPersistFolder2	:= "{1AC3D9F0-175C-11d1-95BE-00609797EA4F}"
-
-	ieObj := Shell_GetIEObject( pHwnd ) 
-
-	;get folder view automatition object
-	fvObj := Shell_GetFolderView(ieObj)
-
-	pf2Obj := IFolderView_GetFolder(fvObj, IID_IPersistFolder2)
-	pidl := IPersistFolder2_GetCurFolder(pf2Obj)
-
-	COM_Release(pfd2Obj), COM_Release(fvObj), COM_Release(ieObj)
-
-	if API_SHGetPathFromIDList(pidl, fpath)
-		return fpath
-}
-
-/*
-  Function:		GetSelection
- 				Get selected item(s)
- 
-  Parameters:
- 				hwnd	- Handle of Explorer window
-  
-  Returns:
- 				Path of each selected item.
- */
-Shell_GetSelection( pHwnd ) {
-	ieObj := Shell_GetIEObject( pHwnd )
-	fvObj := Shell_GetFolderView( ieObj )
-
-	elObj := IFolderView_Items(fvObj)
-	loop
-	{
-		pidl := IEnumIdList_Next(elObj)
-		ifEqual, pidl, 0, break
-		API_SHGetPathFromIDList(pidl, fpath)
-		res .= fpath "`n"
-	}
-	COM_Release(fvObj),	 COM_Release(ieObj)
-	return res
-}
-
-/*
-  Function:		GetView
- 				Gets the current view of desired Explorer window
- 
-  Parameters:	
- 				pHwnd	- Handle to windows explorer instance
- 
-  Returns:		View mode type, see <SetView>
- */
-Shell_GetView( pHwnd) {
-
-	ieObj := Shell_GetIEObject( pHwnd ) 
-	fvObj := Shell_GetFolderView( ieObj )
-
-	r := IFolderView_GetCurrentViewMode( fvObj )
-	COM_Release(fvObj), COM_Release(ieObj)
-
-	return r
-}
-
-/*
-  Function:		SelectItem
- 				Select item by index
-  
-  Parameters:
- 				hwnd	- Handle of Explorer window
- 				idx1	- 0 based index of item to select
- 				idx2	- All items up to the idx2 will be selected. Keep in mind that this method selects items 1 by 1 thus selecting large amount 
- 						  of items isn't efficient.
- */
-Shell_SelectItem(hwnd, idx1, idx2="") {
-	ieObj := Shell_GetIEObject( Hwnd )
-	fvObj := Shell_GetFolderView( ieObj )
-
-	if idx2 is not Integer
-		return IFolderView_SelectItem(fvObj, idx1)
-	
-	loop,  % idx2 - idx1 + 1
-		 IFolderView_SelectItem(fvObj, idx1+A_Index)	
 }
 
 /*
@@ -246,24 +208,173 @@ Shell_SetHook(Handler) {
 }
 
 /*
+  Function:		EGetCount
+ 				Get the number of items in the view.
+ 
+  Parameters:	
+ 				pHwnd	- Handle to windows explorer instance.
+ 				flag	- set "sel" to get number of selected items.
+ 
+  Returns:		
+ 				Number of items, or -1 on failure.
+ 				
+ */
+Shell_EGetCount( pHwnd, flag="") {
+
+	ieObj := Shell_EGetIEObject( pHwnd ) 
+	fvObj := Shell_GetFolderView( ieObj )
+	if !fvObj
+		return -1
+
+	if (flag="all") or flag = ""
+		param := 0x00000002 ;SVGIO_ALLVIEW 
+	else if (flag="sel")
+		param := 0x00000001
+
+	return IFolderView_ItemCount(fvobj, param)
+}
+
+/*
+  Function: EGetIEObject
+ 			Get IWebBrowser2 interface pointer from open explorer windows.
+ 
+  Parameters: 
+             hwndFind - Return interface pointer for instance with given hwnd.
+ 
+  Returns:
+ 			IWebBrowser2 interface pointer.
+ */
+Shell_EGetIEObject( hwndFind="" ) {
+	static 	IID_IWebBrowser2  := "{D30C1661-CDAF-11D0-8A3E-00C04FC9E26E}"
+
+	sw := ShellWindows_Create()
+	loop, % ShellWindows_Count(sw)
+	{
+		COM_Release(dispObj)
+
+		dispObj := ShellWindows_Item( sw, A_Index-1 )					;get Dispatcher interface
+		if !(ieObj := COM_QueryInterface(dispObj, IID_IWebBrowser2))	;get IWebBrowser2 interface
+			continue
+		
+		if WebBrowser2_HWND(ieObj) = hwndFind
+			break
+
+		COM_Release(ieObj), ieObj := 0
+	}
+
+	return ieObj
+}
+
+/*
+ Function:		GetPath
+				Returns the currently open file system path in the given explorer window.
+
+ Parameters:	
+				pHwnd	- Handle to windows explorer instance.
+
+ Returns:
+				Path of currently open folder.
+ */
+Shell_EGetPath( pHwnd ) {
+	static IID_IPersistFolder2	:= "{1AC3D9F0-175C-11d1-95BE-00609797EA4F}"
+
+	ieObj := Shell_EGetIEObject( pHwnd ) 
+
+	;get folder view automatition object
+	fvObj := Shell_GetFolderView(ieObj)
+
+	pf2Obj := IFolderView_GetFolder(fvObj, IID_IPersistFolder2)
+	pidl := IPersistFolder2_GetCurFolder(pf2Obj)
+
+	COM_Release(pfd2Obj), COM_Release(fvObj), COM_Release(ieObj)
+
+	if API_SHGetPathFromIDList(pidl, fpath)
+		return fpath
+}
+
+/*
+  Function:		GetSelection
+ 				Get selected item(s)
+ 
+  Parameters:
+ 				hwnd	- Handle of Explorer window.
+  
+  Returns:
+ 				Path of each selected item.
+ */
+Shell_EGetSelection( pHwnd ) {
+	ieObj := Shell_EGetIEObject( pHwnd )
+	fvObj := Shell_GetFolderView( ieObj )
+
+	elObj := IFolderView_Items(fvObj)
+	loop
+	{
+		pidl := IEnumIdList_Next(elObj)
+		ifEqual, pidl, 0, break
+		API_SHGetPathFromIDList(pidl, fpath)
+		res .= fpath "`n"
+	}
+	COM_Release(fvObj),	 COM_Release(ieObj)
+	return res
+}
+
+/*
+  Function:		GetView
+ 				Gets the current view of desired Explorer window.
+ 
+  Parameters:	
+ 				pHwnd	- Handle to windows explorer instance.
+ 
+  Returns:		View mode type, see <SetView>
+ */
+Shell_EGetView( pHwnd) {
+
+	ieObj := Shell_EGetIEObject( pHwnd ) 
+	fvObj := Shell_GetFolderView( ieObj )
+
+	r := IFolderView_GetCurrentViewMode( fvObj )
+	COM_Release(fvObj), COM_Release(ieObj)
+
+	return r
+}
+
+/*
+  Function:		ESelectItem
+ 				Select item by index.
+  
+  Parameters:
+ 				hwnd	- Handle of Explorer window.
+ 				idx1	- 0 based index of item to select.
+ 				idx2	- All items up to the idx2 will be selected. Keep in mind that this method selects items 1 by 1 thus selecting large amount 
+ 						  of items isn't efficient.
+ */
+Shell_ESelectItem(hwnd, idx1, idx2="") {
+	ieObj := Shell_EGetIEObject( Hwnd )
+	fvObj := Shell_GetFolderView( ieObj )
+
+	if idx2 is not Integer
+		return IFolderView_SelectItem(fvObj, idx1)
+	
+	loop,  % idx2 - idx1 + 1
+		 IFolderView_SelectItem(fvObj, idx1+A_Index)	
+}
+
+/*
   Function:		SetPath
 				Open the folder in given explorer window
 
  Parameters:	
 				pHwnd	- Handle to windows explorer instance
-				pPath	- path to be set or one of the tree symbols:
-								o >  go forward
-								o <  go back
-								o |  go up
+				pPath	- path to be set or one of the tree symbols: > (go forward), < (go back), | (go up)
  Returns:
 				True on success
  */
-Shell_SetPath( pHwnd, pPath ) {
+Shell_ESetPath( pHwnd, pPath ) {
 	static IID_IShellBrowser	:= "{000214E2-0000-0000-C000-000000000046}"
 	static SID_STopLevelBrowser := "{4C96BE40-915C-11CF-99D3-00AA004AE837}"
 	static SBSP_PARENT := 0x2000, SBSP_NAVIGATEBACK := 0x4000, SBSP_NAVIGATEFORWARD := 0x8000
 
-	ieObj := Shell_GetIEObject( pHwnd ) 
+	ieObj := Shell_EGetIEObject( pHwnd ) 
 	sbObj := COM_QueryService(ieObj, SID_STopLevelBrowser, IID_IShellBrowser)
 
 	COM_Ansi2Unicode(pPath, wPath)
@@ -285,22 +396,12 @@ Shell_SetPath( pHwnd, pPath ) {
  				Sets the view in desired Explorer window
  
   Parameters:	
- 				pHwnd	- Handle to windows explorer instance
- 				pView	- Number, view mode type
- 
-  View Mode Types:
- 
-     ICON		- 1
-     SMALLICON	- 2
-     LIST		- 3
-     DETAILS	- 4
-     THUMBNAIL	- 5
-     TILE		- 6
-     THUMBSTRIP - 7
+ 				pHwnd	- Handle to windows explorer instance.
+ 				pView	- Number, view mode type. ICON (1), SMALLICON (2), LIST (3), DETAILS (4), THUMBNAIL (5), TILE (6), THUMBSTRIP (7)
  
  */
-Shell_SetView( pHwnd, pView ) {
-	ieObj := Shell_GetIEObject( pHwnd ) 
+Shell_ESetView( pHwnd, pView ) {
+	ieObj := Shell_EGetIEObject( pHwnd ) 
 	fvObj := Shell_GetFolderView( ieObj )
 
 	r := IFolderView_SetCurrentViewMode( fvObj, pView )
@@ -308,6 +409,10 @@ Shell_SetView( pHwnd, pView ) {
 
 	return r
 }
+
+;============================================== PRIVATE ===================================
+
+
 
 Shell_getFolderView( ieObj ) {
 	static IID_IShellBrowser	:= "{000214E2-0000-0000-C000-000000000046}"
@@ -321,8 +426,6 @@ Shell_getFolderView( ieObj ) {
 	COM_Release(sbObj), COM_Release(svObj)
 	return fvObj
 }
-
-;============================================== PRIVATE ===================================
 
 ShellWindows_Create(){
 	static CLSID_ShellWindows := "{9BA05972-F6A8-11CF-A442-00A0C90A8F39}"
