@@ -1,16 +1,17 @@
-#Persistent
-#SingleInstance Force
-sPath = %A_ScriptDir%   ; Specify the path here.
+/*
+	Function: ContextMenu
+			  Show context menu for path.
 
-ShellContextMenu(sPath<>"" ? sPath : 0x0011)
-Return
+	Parameters:
+			  Path	 - File system path or PIDL.
+ */
 
-ShellContextMenu(sPath)
-{
+Shell_ContextMenu(Path) {
    COM_Init()
-   If   sPath Is Not Integer
-      DllCall("shell32\SHParseDisplayName", "Uint", COM_Unicode4Ansi(wPath,sPath), "Uint", 0, "UintP", pidl, "Uint", 0, "Uint", 0)
-   Else   DllCall("shell32\SHGetFolderLocation", "Uint", 0, "int", sPath, "Uint", 0, "Uint", 0, "UintP", pidl)
+   If Path is not Integer
+		DllCall("shell32\SHParseDisplayName", "Uint", COM_Unicode4Ansi(wPath,Path), "Uint", 0, "UintP", pidl, "Uint", 0, "Uint", 0)
+   else DllCall("shell32\SHGetFolderLocation", "Uint", 0, "int", sPath, "Uint", 0, "Uint", 0, "UintP", pidl)
+
    DllCall("shell32\SHBindToParent", "Uint", pidl, "Uint", COM_GUID4String(IID_IShellFolder,"{000214E6-0000-0000-C000-000000000046}"), "UintP", psf, "UintP", pidlChild)
    DllCall(NumGet(NumGet(1*psf)+40), "Uint", psf, "Uint", 0, "Uint", 1, "UintP", pidlChild, "Uint",COM_GUID4String(IID_IContextMenu,"{000214E4-0000-0000-C000-000000000046}"), "Uint", 0, "UintP", pcm)
    COM_Release(psf)

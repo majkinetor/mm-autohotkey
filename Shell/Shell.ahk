@@ -1,5 +1,5 @@
 /* Title:	Shell
-			*Controls the Explorer windows.*
+			*Shell automation module.*
  */
 
 /*
@@ -164,6 +164,18 @@ Shell_GetCommonPath( Name ) {
 				,RESOURCES=0x38, STARTMENU=0xb,STARTUP=0x7, SYSTEM=0x25, SENDTO=0x9, WINDOWS=0x24             
     VarSetCapacity(fpath, 512), DllCall( "shell32\SHGetFolderPathA", "uint", 0, "int", %Name%, "uint", 0, "int", 0, "str", fpath), VarSetCapacity(fpath, -1)
     return fpath
+}
+
+/*
+  Function:		GetQuickLaunch
+ 				Returns files from the quick launch location.
+ */
+Shell_GetQuickLaunch(){
+	path := Shell_GetCommonPath("APPDATA") "\Microsoft\Internet Explorer\Quick Launch"
+	loop, %path%\*.*
+		if !InStr(A_LoopFileAttrib, "H")
+			s .= A_LoopFileFullPath "`n"
+	return SubStr(s, 1, -1)
 }
 
 /*
@@ -553,6 +565,6 @@ API_SHParseDisplayName( ByRef path ) {
 
 /*
   Group: About 
-       o Ver 1.0 by majkinetor. See http://www.autohotkey.com/forum/topic19400.html
+       o Ver 2.0 by majkinetor. See http://www.autohotkey.com/forum/topic19400.html
        o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
  */
