@@ -1,8 +1,5 @@
 _("e2")
-	n := Shell_ABNew(32)
-	hGui := WinExist()
 
-	Gui, %n%:Add, Button, 0x8000 x4 w50 y2, Start
 return
 
 Shell_ABNew(Dim=25, Edge="top", AutoHide=0, OnTop=1){
@@ -131,3 +128,4 @@ Shell_SetTaskBar(State="", Hwnd=""){
 }
 
 #include Toolbar.ahk
+#include Shell.ahk
