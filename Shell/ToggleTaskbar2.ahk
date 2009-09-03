@@ -2,27 +2,7 @@ _("e2")
 	n := Shell_ABNew(32)
 	hGui := WinExist()
 
-	Gui, %n%:Add, Button, gOnBtn 0x8000 x4 w50 y2, Start
-	ht := Toolbar_Add(hGui, "OnToolbar", "FLAT LIST TOOLTIPS", "1L", "x60")  
-	btns = 
-		(LTrim
-			cut, 
-			copy,
-			paste, 
-			undo,
-			redo,
-		 )
-	Toolbar_Insert(ht, btns)
-	Toolbar_Autosize(ht)
-return
-
-OnToolbar(h,e,t,p,i){
-	ifEqual, e, hot, return		
-	msgbox %e%
-}
-
-OnBtn:
-	Send ^{Esc}
+	Gui, %n%:Add, Button, 0x8000 x4 w50 y2, Start
 return
 
 Shell_ABNew(Dim=25, Edge="top", AutoHide=0, OnTop=1){

@@ -1,9 +1,9 @@
-;#Persistent
-;#SingleInstance Force
-;sPath = %A_ScriptDir%   ; Specify the path here.
-;
-;ShellContextMenu(sPath<>"" ? sPath : 0x0011)
-;Return
+#Persistent
+#SingleInstance Force
+sPath = %A_ScriptDir%   ; Specify the path here.
+
+ShellContextMenu(sPath<>"" ? sPath : 0x0011)
+Return
 
 ShellContextMenu(sPath)
 {
