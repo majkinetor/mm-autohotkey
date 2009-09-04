@@ -13,7 +13,7 @@
 				s	- Speed, defaults to -1
 				m	- Affects how <m> function works: mm makes it use MsgBox (default), mo OutputDebug, m alone disables it.
 					  Anything else will use FileAppend; for instance mout.txt! writes to out.txt file. ! at the end is optional
-					  and if present, it will mark the file for deletition on scripts startup. ! can be also used with o mode to clear the DebugView log.
+					  and if present, it will mark the file for deletition on scripts startup. !can be also used with o mode to clear the DebugView log.
 					  DebugView will be started if it doesn't run, make sure its on the system PATH (there will be no error message if Run fails).
 				d	- Detect hidden windows.
 				e	- Escape exits the script if any of its Guis are active. Use e2 to exit in all cases.
@@ -23,12 +23,17 @@
 	Example:	
 		>		_("s100 d e m")	;set speed to 100ms, detect hiden windows and disable m, exit on ESC.
 		>		_("mo w tc)		;set m to use OutputDebug, set working directory to A_ScriptDir, set title match mode to c (contain, 2).
+		>		_("mout.txt!")	;set m to use File out.txt and to clear it each time script is started.
 
 	Remarks:
 				Includes #NoEnv and #SingleInstance force always.
+				Registers global variable _ to contain A_Space.
  */
 
 _(opt="") {
+	global _
+	_ := A_Space
+
 	#NoEnv
 	#Singleinstance, force
 
@@ -48,12 +53,10 @@ _(opt="") {
 				 ControlSend, , ^x, ahk_class dbgviewClass
 			else FileDelete, %m%
 		}
-		if !WinExist("ahk_class dbgviewClass")
-		{
+		if (m="o") && !WinExist("ahk_class dbgviewClass"){
 			Run, DbgView.exe, , UseErrorLevel, PID
-			if PID !=
-				WinWaitActive, ahk_pid %PID%
-		}
+			ifNotEqual, PID,, WinWaitActive, ahk_pid %PID%
+		} else WinRestore, ahk_class dbgviewClass
 		m("~`a" (m = 1 ? "" : m))
 	}
 
@@ -91,13 +94,14 @@ return
 			  o1..o8	- Arguments to display.
 	
 	Remarks:
-			  m can use MsgBox, OutputDebug or FileAppend to write messages. See <_> function for details.
+			  m can use MsgBox (m mode), OutputDebug (o mode) or FileAppend to write messages. See <_> function for details.
+			  In o mode, all arguments will be joined in single line.
 
 	Returns: 
 			  o1.
 
 	Examples:
-	>		 if (x - m(y) = z)	; Use m inside expressions for debugging.
+	>		 if (x - m(y) = z)	; Use m inside expressions for debugging.			
 */
 m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a") {
 	static mode="m"
@@ -107,7 +111,7 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 
 	loop, 8
 		ifEqual, o%A_Index%,~`a,break
-		else s .= "'" o%A_Index% "'`n"
+		else s .= "'" o%A_Index% "'"  (mode="o" ? " , " : "`n")
 
 	if mode=m
 			MsgBox %s%
