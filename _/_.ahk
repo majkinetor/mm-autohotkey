@@ -83,6 +83,8 @@ _(opt="") {
 }
 
 __HotkeyEsc:
+	WinMinimize, ahk_class dbgviewClass
+	Sleep 100
 	ExitApp
 return
 	
@@ -111,7 +113,7 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 
 	loop, 8
 		ifEqual, o%A_Index%,~`a,break
-		else s .= "'" o%A_Index% "'"  (mode="o" ? " , " : "`n")
+		else s .= "'" o%A_Index% "'"  (mode="o" ? " " : "`n")
 
 	if mode=m
 			MsgBox %s%
