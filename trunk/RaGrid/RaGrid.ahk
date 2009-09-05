@@ -3,8 +3,6 @@
 			
  */
 
-
-
 RG_ScrollCell(hGrd){
 	static GM_SCROLLCELL=0x413	;wParam=0, lParam=0
 	SendMessage,GM_SCROLLCELL,,,, ahk_id %hGrd% 
@@ -41,7 +39,7 @@ RG_AddRow(hGrd, aColName, nRow=""){
 
 	VarSetCapacity(RAW, 4 * colCount, 0) 
 	Loop %colCount% 
-	  InsertInteger(&%aColName%%A_Index%, RAW, (A_Index - 1) * 4) 
+	  NumPut(&%aColName%%A_Index%, RAW, (A_Index - 1) * 4) 
 	
 	if (nRow = "")
 			SendMessage,GM_ADDROW,0,&RAW,, ahk_id %hGrd% 
@@ -178,15 +176,15 @@ RG_AddColumn(hGrd, o1="", o2="", o3="", o4="", o5="", o6="", o7=""){
 	
 	type := %TYPE%, sort := %SORT%
 	VarSetCapacity(COL, 48, 0)
-	InsertInteger(w,		COL, 0)
-	InsertInteger(&cap,		COL, 4)
-	InsertInteger(ha,		COL, 8)
-	InsertInteger(ca,		COL, 12)
-	InsertInteger(type,		COL, 16)
-	InsertInteger(maxt,		COL, 20)
-;	InsertInteger(format,	COL, 24)	;not used now
-;	InsertInteger(il,		COL, 28)	;NOT USED NOW
-	InsertInteger(sort,		COL, 32)
+	NumPut(w,		COL, 0)
+	NumPut(&cap,	COL, 4)
+	NumPut(ha,		COL, 8)
+	NumPut(ca,		COL, 12)
+	NumPut(type,	COL, 16)
+	NumPut(maxt,	COL, 20)
+;	NumPut(format,	COL, 24)	;not used now
+;	NumPut(il,		COL, 28)	;NOT USED NOW
+	NumPut(sort,	COL, 32)
 	
 	SendMessage,GM_ADDCOL,0, &col,, ahk_id %hGrd%
 	return ErrorLevel
@@ -336,18 +334,15 @@ RG_GetCellNum(hGrd, nRow=0, nCol=0) {
 
 	nRowCol := (nRow << 16) + nCol
 	SendMessage, GM_GETCELLDATA, nRowCol, &buf,, ahk_id %hGrd%
-	return ExtractInteger(buf)
+	return NumGet(buf)
 }
 
 ;numeric values are for combo and checkbox (index of element)
 RG_SetCellText(hGrd, nRow=0, nCol=0, data="") {
 	static GM_SETCELLDATA=0x411		;wParam=nRowCol, lParam=lpData (can be NULL)
 	
-	if (numeric) {
-		num := data
-		VarSetCapacity(data, 4)
-		InsertInteger(num, data, 0)
-	}
+	if (numeric)
+		num := data, VarSetCapacity(data, 4), NumPut(num, data)
 
 	nRowCol := (nRow << 16) + nCol
 	SendMessage, GM_SETCELLDATA, nRowCol, &data,, ahk_id %hGrd%
@@ -357,8 +352,7 @@ RG_SetCellText(hGrd, nRow=0, nCol=0, data="") {
 RG_SetCellNum(hGrd, nRow=0, nCol=0, num=0) {
 	static GM_SETCELLDATA=0x411		;wParam=nRowCol, lParam=lpData (can be NULL)
 	
-	VarSetCapacity(data, 4)
-	InsertInteger(num, data, 0)
+	VarSetCapacity(data, 4), NumPut(num, data)
 
 	nRowCol := (nRow << 16) + nCol
 	SendMessage, GM_SETCELLDATA, nRowCol, &data,, ahk_id %hGrd%
@@ -397,10 +391,7 @@ RG_SetCurCol(hGrd, nCol=0) {				;wParam=nCol, lParam=0
 RG_SetRowColor(hGrd, back, text, nRow=0) {				;wParam=nRow, lParam=lpROWCOLOR
 	static GM_SETROWCOLOR=0x42B
 
-	VarSetCapacity(RC, 8)
-	InsertInteger(back, RC, 0)
-	InsertInteger(text, RC, 4)
-	
+	VarSetCapacity(RC, 8), NumPut(back, RC), NumPut(text, RC, 4)	
 	SendMessage, GM_SETROWCOLOR, nRow, &RC,,ahk_id %hGrd%
 	return ERRORLEVEL
 }
