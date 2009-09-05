@@ -46,6 +46,8 @@
 	RG_SetRowHeight(hGrd, 22)
 
 	RG_SetHdrText(hGrd, 0, "Some Text")
+
+    Attach("RaGrid1", "w h")
 	Gui, Show, h300 w500
 return 
 
@@ -90,9 +92,6 @@ OnBtn:
 		msgbox %txt%
 	}
 
-	if A_GuiControl=?
-		msgbox % RG_About()
-
 	if A_GuiControl = Set Colors
 		RG_SetColors(hGrd, "B1 GFFFFFF TFFFFFF")
 
@@ -100,68 +99,6 @@ OnBtn:
 	ControlFocus,, ahk_id %hGrd%
 return
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-InsertInteger(pInteger, ByRef pDest, pOffset = 0, pSize = 4)
-{
-    Loop %pSize%  ; Copy each byte in the integer into the structure as raw binary data.
-        DllCall("RtlFillMemory", "UInt", &pDest + pOffset + A_Index-1, "UInt", 1, "UChar", pInteger >> 8*(A_Index-1) & 0xFF)
-}
-
-ExtractInteger(ByRef pSource, pOffset = 0, pIsSigned = false, pSize = 4)
-{
-    Loop %pSize%  ; Build the integer by adding up its bytes.
-        result += *(&pSource + pOffset + A_Index-1) << 8*(A_Index-1)
-    if (!pIsSigned OR pSize > 4 OR result < 0x80000000)
-        return result  ; Signed vs. unsigned doesn't matter in these cases.
-    ; Otherwise, convert the value (now known to be 32-bit) to its signed counterpart:
-    return -(0xFFFFFFFF - result + 1)
-}
-
-
-Anchor(c, a = "", r = false) { ; v3.6 - Titan
-	static d
-	GuiControlGet, p, Pos, %c%
-	If ex := ErrorLevel {
-		Gui, %A_Gui%:+LastFound
-		ControlGetPos, px, py, pw, ph, %c%
-	}
-	If !(A_Gui or px) and a
-		Return
-	i = x.w.y.h./.7.%A_GuiWidth%.%A_GuiHeight%.`n%A_Gui%:%c%=
-	StringSplit, i, i, .
-	d := a ? d . ((n := !InStr(d, i9)) ? i9 : "")
-		: RegExReplace(d, "\n\d+:" . c . "=[\-\.\d\/]+")
-	Loop, 4
-		x := A_Index, j := i%x%, i6 += x = 3
-		, k := !RegExMatch(a, j . "([\d.]+)", v) + (v1 ? v1 : 0)
-		, e := p%j% - i%i6% * k, d .= n ? e . i5 : ""
-		, RegExMatch(d, "\Q" . i9 . "\E(?:([\d.\-]+)/){" . x . "}", v)
-		, l .= p%j% := InStr(a, j) ? (ex ? "" : j) . v1 + i%i6% * k : ""
-	If r
-		rx = Draw
-	If ex
-		ControlMove, %c%, px, py, pw, ph
-	Else GuiControl, Move%rx%, %c%, %l%
-}
-
-
-GuiSize:
-  Anchor("RaGrid1", "wh")
-return
 
 #Include RaGrid.ahk
 

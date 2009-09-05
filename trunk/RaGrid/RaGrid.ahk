@@ -1,5 +1,9 @@
-;RaGrid wrapper 2.0.1.5-0.9
-;By majkinetor
+/*
+	Title:	RaGrid
+			
+ */
+
+
 
 RG_ScrollCell(hGrd){
 	static GM_SCROLLCELL=0x413	;wParam=0, lParam=0
