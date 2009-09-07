@@ -203,6 +203,33 @@ Toolbar_Customize(hCtrl) {
 }
 
 /*
+Function:  GetButton
+			Get button information
+
+	Parameters:
+			WhichButtton - One of the ways to identify the button: 1-based button position or button ID.
+						  If WhichButton is negative, the information about available (*) button on position -WhichButton will be returned.	
+			bCheck		 - Set to 1 to check the button (default). 
+
+	Returns:
+			Returns TRUE if successful, or FALSE otherwise.
+
+	Remarks:
+			With groupcheck use this function to check button. Using <SetButton> function will not uncheck other buttons in the group.
+ */
+Toolbar_CheckButton(hCtrl, WhichButton, bCheck=1) {
+	static TB_CHECKBUTTON = 0x402
+
+    if (WhichButton >= 1){
+		VarSetCapacity(TBB, 20)
+		SendMessage, TB_GETBUTTON, --WhichButton, &TBB,,ahk_id %hCtrl%
+		WhichButton := NumGet(&TBB+0, 4)
+	} else WhichButton := SubStr(WhichButton, 2)
+
+	SendMessage, TB_CHECKBUTTON, WhichButton, bCheck, ,ahk_id %hCtrl%
+}
+
+/*
  Function:  Define
  			Get the toolbar definition list.
  
@@ -865,7 +892,7 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
     } 
 
 	if (code=NM_RCLICK)
-		ifEqual, pos, 4294967296, return 0 
+		ifEqual, pos, 4294967296, return
         else  %handler%(hw,"rclick", txt, pos, iItem) 
 
 
@@ -874,8 +901,7 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
  
 	if (code = TBN_HOTITEMCHANGE) { 
       IfEqual, pos, 4294967296, return  
-      %handler%(hw, "hot", txt, pos,  iItem) 
-      return 0 
+      return %handler%(hw, "hot", txt, pos,  iItem) 
    } 
 
   ;=================== CUSTOMIZATION NOTIFICATIONS =========================== 
