@@ -30,13 +30,14 @@ Refresh() {
 
 
 OnShell(Event, Param) {	
+	global
 	static WINDOWCREATED=1, WINDOWDESTROYED=2, WINDOWACTIVATED=4, GETMINRECT=5, REDRAW=6, TASKMAN=7, LANGUAGE=8, SYSMENU=9, ENDTASK=10, APPCOMMAND=12, ENDTASK
 
 	if Event in %WINDOWCREATED%,%WINDOWDESTROYED%
 		Refresh()		
 
-;	if Event=WINDOWACTIVATED		-- doesn't work
-;		should check the button
+	if Event = 4
+		Toolbar_CheckButton(hTaskbar, "." Param)
 }
 
 OnQuickLaunch(hCtrl, Event, Txt, Pos, Id)){
@@ -76,6 +77,8 @@ OnExit:
 	AppBar_Remove(hGui)
 	if oldTaskbar
 		AppBar_SetTaskbar(oldTaskbar)
+
+	Shell_SetHook()
 	ExitApp
 return
 
@@ -96,9 +99,11 @@ MakeTaskBar(hGui, refresh=0) {
 		if StrLen(k2) > 20
 			k2 := SubStr(k2, 1, 20) "..."
 		k3 := GetWindowIcon(k1)
-		i := ImageList_AddIcon( hIL, k3 ), b .= k2 ",,,CHECKGROUP showtext," k1 "`n"
+		StringReplace, k2, k2,`,,,A
+		i := ImageList_AddIcon( hIL, k3 ), b .= k2 ",,,CHECKGROUP SHOWTEXT," k1 "`n"
 	}
 	Toolbar_Insert(hT, b)
+	Toolbar_SetButtonWidth(ht, 200)
 	return hT
 }
 

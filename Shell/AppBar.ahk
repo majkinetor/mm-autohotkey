@@ -27,10 +27,11 @@ AppBar_New(ByRef Hwnd, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o
 		}
 		Gui, %n%:+LastFound -Caption +ToolWindow +Label%Label%
 		Hwnd := WinExist()
-		if Show {
+	}
+
+	if Show {
 			WinShow, ahk_id %Hwnd%
 			WinActivate, ahk_id %Hwnd%
-		}
 	}
 
 	VarSetCapacity(ABD,36,0), NumPut(36, ABD), NumPut(Hwnd, ABD, 4), NumPut(%Edge%, ABD, 12), NumPut(CALLBACKMSG, ABD, 8) 
@@ -81,54 +82,24 @@ AppBar_timer(Hwnd="", Edge="", Anim1="", Anim2="", Width="", Height="") {
 
 		bVisible := DllCall("IsWindowVisible", "uint", Hwnd)
 		
-		animOn := Anim1
-		animOff := Anim2
+		animOn := Anim1, animOff := Anim2
 		e := Edge="Top" || Edge="Left"		
 		d := Edge="Top" || Edge="Bottom"
 		v1 := d ? "y" : "x",  v2 := d ? "x" : "y"
 		d1 := d ? Height : Width,  d2 := d ? Width : Height
 		Wnd := Hwnd
-		w := width
-		h := height
+		w := width, h := height
 	}
+
 	ifWinActive ahk_group AppBar
 		return
 	DllCall(adrGetCursorPos, "uint", &POINT), x := NumGet(POINT), y := NumGet(POINT, 4)
 	
 	p := %v1%,  q := %v2%,	 dp := d1,  dq := d2,  Sp := S%v1%, Sq := S%v2%
-;	m(v1, v2, d1, d2, sp, sq)
 	if ((e && p<5) || (!e && p>Sp-5)) && (q>(Sq-dq)//2 && q<(Sq+dq)//2)
 		Win_Animate(Wnd, animOn), bVisible := true
 	else if (bVisible) && (e && p>dp) || (!e && p<Sp-dp) || (q<(Sq-dq)//2) || (q > (Sq+dq)//2)
 		Win_Animate(Wnd, animOff), bVisible := false
-
-;	if (E="Top") {
-;		if (Y < 5) && (X>(W-Width//2) && X < (W+Width)//2)
-;			Win_Animate(H, animOn), visible := true
-;		else if  visible && (Y>Height) || !(X>(W-Width//2) && X < (W+Width)//2)
-;			Win_Animate(H, animOff)
-;	} 
-;	if (E="Left") {
-;		if (X < 5)  && (Y>(H-Height//2) && Y<(H+Height)//2
-;			 Win_Animate(H, animOn), visible := true
-;		else if (X>Width) && visible
-;			Win_Animate(H, animOff)
-;	}
-;
-;	if (E="Bottom") 
-;		if (Y > SH - 5)	&& (X>(W-Width//2) && X < (W+Width)//2)
-;			 Win_Animate(H, animOn), visible := true
-;		else if (Y < SH-30) && visible
-;			Win_Animate(H, animOff)
-;	}
-;
-;	if (E="Right") {
-;		if (X > SW - 5)	 
-;			 Win_Animate(H, animOn), visible := true
-;		else if (X < SW-30) && visible
-;			Win_Animate(H, animOff)
-;	}
-	   		
 }
 
 AppBar_setPos(Hwnd, Edge, Width, Height){
