@@ -478,8 +478,9 @@ Toolbar_CommandToIndex( hCtrl, ID ) {
  			ID			- Button ID, unique number you choose to identify button. On customizable toolbars position can't be used to set button information.
  						  If you need to setup button information using <SetButton> function or obtain information using <GetButton>, you need to use button ID 
  						  as user can change button position any time.
- 						  ID *must be* number between 1 and 10,000. Numbers > 10,000 are reserved for auto ID that module does on its own. In most
- 						  typical scenarios you don't need to use ID to identify the button.
+ 						  It can by any number. Numbers > 10,000 are choosen by module as auto ID feature, that module does on its own when you don't use this option. 
+						  In most typical scenarios you don't need to use ID or think about them to identify the button. To specify ID in functions that accept it
+						  put dot infront of it, for instance .427 represents ID=427. This must be done in order to differentiate IDs from button position.
  
  Button Styles:
  			AUTOSIZE	- Specifies that the toolbar control should not assign the standard width to the button. Instead, the button's width will be calculated based on the width of the text plus the image of the button. 
