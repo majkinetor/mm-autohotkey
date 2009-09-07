@@ -592,6 +592,36 @@ Win_Show(Hwnd, bShow=true) {
 }
 
 /*
+ Function:	ShowSysMenu
+ 			Show system menu for a window (ALT + SPACE menu).
+ 
+ Parameters:
+			X, Y	- Coordinates on which to show menu. Pass word "mouse" as X (default) to use mouse coordinates.
+
+
+ Returns:
+			True if menu has been shown, False otherwise.
+ */
+Win_ShowSysMenu(Hwnd, X="mouse", Y="") {
+	static WM_SYSCOMMAND = 0x112, TPM_RETURNCMD=0x100
+
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+	Process, Exist
+	h := WinExist("ahk_pid " ErrorLevel)
+	DetectHiddenWindows, %oldDetect%
+
+	if X=mouse
+		VarSetCapacity(POINT, 8), DllCall("GetCursorPos", "uint", &POINT), X := NumGet(POINT), Y := NumGet(POINT, 4)
+
+	hSysMenu := DllCall("GetSystemMenu", "Uint", Hwnd, "int", False) 
+	r := DllCall("TrackPopupMenu", "uint", hSysMenu, "uint", TPM_RETURNCMD, "int", X, "int", Y, "int", 0, "uint", h, "uint", 0)
+	ifEqual, r, 0, return
+	PostMessage, WM_SYSCOMMAND, r,,,ahk_id %Hwnd%
+	return 1
+}
+
+/*
  Function:	Subclass 
 			Subclass child window (control)
  
