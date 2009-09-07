@@ -103,7 +103,6 @@ MakeTaskBar(hGui, refresh=0) {
 		i := ImageList_AddIcon( hIL, k3 ), b .= k2 ",,,CHECKGROUP SHOWTEXT," k1 "`n"
 	}
 	Toolbar_Insert(hT, b)
-	Toolbar_SetButtonWidth(ht, 200)
 	return hT
 }
 
