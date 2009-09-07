@@ -29,35 +29,6 @@ OnShell(Reason, Param) {
 } 
 
 
-/*
-	Function:	Shell_SetHook
-
-	Parameter:
-				Handler	- Name of the function to call on shell events.
-
-	Handler:
-		Reason		- Reason for which handler is called. 
-		Param		- Parameter of the handler. Parameters are given bellow for each reason.
-
- >	OnShell(Reason, Param) {	
- >		static WINDOWCREATED=1, WINDOWDESTROYED=2, WINDOWACTIVATED=4, GETMINRECT=5, REDRAW=6, TASKMAN=7, APPCOMMAND=12
- >	} 
-		
-	Param:		
-		WINDOWACTIVATED	-	The HWND handle of the activated window.
-		WINDOWREPLACING	-	The HWND handle of the window replacing the top-level window.
-		WINDOWCREATED	-	The HWND handle of the window being created.
-		WINDOWDESTROYED	-	The HWND handle of the top-level window being destroyed.		
-		GETMINRECT		-	A pointer to a RECT structure.
-		TASKMAN			-	Can be ignored.
-		REDRAW			-	The HWND handle of the window that needs to be redrawn.
-
-	Remarks:
-		Requires explorer to be set as a shell in order to work.
-
-	Returns:
-		0 on failure, name of the previous hook procedure on success.
- */
 Shell_SetHook(Handler) {
 	oldDetect := A_DetectHiddenWindows
 	DetectHiddenWindows, on

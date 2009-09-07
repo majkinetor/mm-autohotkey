@@ -503,6 +503,7 @@ Win_SetCaption(Hwnd, Flag="^"){
 
  Returns:
 			Handle of the previous menu.
+
  */
 Win_SetMenu(Hwnd, hMenu=0){
 	hPrevMenu := DllCall("GetMenu", "uint", hwnd, "Uint")
