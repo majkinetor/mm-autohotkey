@@ -203,6 +203,33 @@ Toolbar_Customize(hCtrl) {
 }
 
 /*
+Function:  GetButton
+			Get button information
+
+	Parameters:
+			WhichButtton - One of the ways to identify the button: 1-based button position or button ID.
+						  If WhichButton is negative, the information about available (*) button on position -WhichButton will be returned.	
+			bCheck		 - Set to 1 to check the button (default). 
+
+	Returns:
+			Returns TRUE if successful, or FALSE otherwise.
+
+	Remarks:
+			With groupcheck use this function to check button. Using <SetButton> function will not uncheck other buttons in the group.
+ */
+Toolbar_CheckButton(hCtrl, WhichButton, bCheck=1) {
+	static TB_CHECKBUTTON = 0x402
+
+    if (WhichButton >= 1){
+		VarSetCapacity(TBB, 20)
+		SendMessage, TB_GETBUTTON, --WhichButton, &TBB,,ahk_id %hCtrl%
+		WhichButton := NumGet(&TBB+0, 4)
+	} else WhichButton := SubStr(WhichButton, 2)
+
+	SendMessage, TB_CHECKBUTTON, WhichButton, bCheck, ,ahk_id %hCtrl%
+}
+
+/*
  Function:  Define
  			Get the toolbar definition list.
  
@@ -451,8 +478,9 @@ Toolbar_CommandToIndex( hCtrl, ID ) {
  			ID			- Button ID, unique number you choose to identify button. On customizable toolbars position can't be used to set button information.
  						  If you need to setup button information using <SetButton> function or obtain information using <GetButton>, you need to use button ID 
  						  as user can change button position any time.
- 						  ID *must be* number between 1 and 10,000. Numbers > 10,000 are reserved for auto ID that module does on its own. In most
- 						  typical scenarios you don't need to use ID to identify the button.
+ 						  It can by any number. Numbers > 10,000 are choosen by module as auto ID feature, that module does on its own when you don't use this option. 
+						  In most typical scenarios you don't need to use ID or think about them to identify the button. To specify ID in functions that accept it
+						  put dot infront of it, for instance .427 represents ID=427. This must be done in order to differentiate IDs from button position.
  
  Button Styles:
  			AUTOSIZE	- Specifies that the toolbar control should not assign the standard width to the button. Instead, the button's width will be calculated based on the width of the text plus the image of the button. 
@@ -777,6 +805,7 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 		hState := InStr(a3, "disabled") ? 0 : TBSTATE_ENABLED
 		loop, parse, a3, %A_Tab%%A_Space%, %A_Tab%%A_Space%
 		{
+			m(Btns)
 			ifEqual, A_LoopField,,continue
 			hState |= TBSTATE_%A_LOOPFIELD%
 		}
