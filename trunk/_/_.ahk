@@ -63,13 +63,9 @@ _(opt="") {
 	if e 
 	{
 		Process, Exist
-		if e = a
-			 Hotkey, IfWinActive, ahk_pid %ErrorLevel%
-		else Hotkey, IfWinExist,  ahk_pid %ErrorLevel%
+		ifEqual, e, a, Hotkey, IfWinActive, ahk_pid %ErrorLevel%
 		HotKey, Esc, __HotkeyEsc
-		if e = a
-			 Hotkey, IfWinExist 
-		else Hotkey, IfWinActive
+		ifEqual, e, a, Hotkey, IfWinActive
 	}
 
 	if t !=
