@@ -8,7 +8,10 @@ _("mo! e")
 	n := AppBar_New(hGui,  "Edge=Top", "Style=OnTop Show Pin")
 	Fatal("Can't create Appbar", n=0)
 	
-	k := AppBar_New(hApp2,  "Edge=Right", "Style=Show Pin")
+	k := AppBar_New(hApp2,  "Edge=Bottom", "Style=Show Pin")
+	Fatal("Can't create Appbar", k=0)
+
+	j := AppBar_New(hApp3,  "Edge=Left", "AutoHide=Slide", "Pos=w100 h100 p300")
 	Fatal("Can't create Appbar", k=0)
 
 	Gui, %n%:Add, Text, HWNDhDummy
