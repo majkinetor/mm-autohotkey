@@ -5,10 +5,10 @@ _("mo! e")
 
 	GroupAdd, AppBar, ahk_class DV2ControlHost		;add start menu so first appbar doesn't close when we launch it.
 
-	n := AppBar_New(hApp1, "AutoHide=Slide")
+	n := AppBar_New(hApp1)
 	Fatal("Can't create Appbar", n=0)
 	
-	AppBar_New(hApp2,  "Edge=Left", "Pos=p-300 h100", "Style=Show OnTop", "AutoHide=Slide", "Label=AppBar2")
+	AppBar_New(hApp2,  "Edge=Left", "Pos=p-300 h100", "Style=Show OnTop", "Label=AppBar2")
 	Fatal("Can't create Appbar", k=0)
 
 	AppBar_New(hApp3,  "Edge=Left", "AutoHide=Slide", "Pos=w100 h100 p300", "Label=AppBar3")
@@ -37,6 +37,7 @@ _("mo! e")
 
 	Shell_SetHook("OnShell")
 return
+
 
 Refresh() {
 	global
@@ -76,7 +77,35 @@ OnTaskBar(hCtrl, Event, Txt, Pos, Id)){
 }
 
 OnTray(hCtrl, Event, Txt, Pos, Id){
-	IfEqual, Event, hot, return 1		;prevent hot item showing, the same as windows tray
+	static lastpos
+	IfEqual, Event, hot
+	{
+		if (lastpos != pos)
+			ShowTooltip( Tray_GetTooltip( pos ) )
+		lastpos := pos
+		return 1		;prevent hot item showing, the same as windows tray
+	}
+}
+
+ShowTooltip( Msg, X="" ,Y="", TimeIn=500, TimeOut=1500){
+	static 
+	_Msg := Msg, _X:=X, _Y:=Y
+	MouseGetPos, , , , _ctrl
+
+	t1 := -TimeIn, t2 := -TimeOut
+	SetTimer, ShowTooltipOn, %t1%
+	return
+
+ ShowTooltipOff:
+	Tooltip, , , , 19
+ return
+
+ ShowTooltipOn:
+	SetTimer, ShowTooltipOff, %t2%
+	MouseGetPos, , , , ctrl
+	ifNotEqual, ctrl, %_ctrl%, return
+	Tooltip,%_Msg% , _X, _Y, 19
+ return
 }
 
 ;AppBarContextMenu:

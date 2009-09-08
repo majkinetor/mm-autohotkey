@@ -73,9 +73,10 @@ Appbar_New(ByRef Hwnd, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o
 		}
 		Gui, %n%:+LastFound -Caption +ToolWindow +Label%Label%
 		Hwnd := WinExist()
+		WinSet, Style, 0x400000	;WS_DLGFRAME
 	} else WinGetPos, x, y, w, h, ahk_id %Hwnd%	
 
-	ifEqual, h, ,SetEnv, h, % Edge="Top"  || Edge="Bottom" ? 32 : A_ScreenHeight
+	ifEqual, h, ,SetEnv, h, % Edge="Top"  || Edge="Bottom" ? 36 : A_ScreenHeight
 	ifEqual, w, ,SetEnv, w, % Edge="Left" || Edge="Right"  ? 50 : A_ScreenWidth
 
 	VarSetCapacity(ABD,36,0), NumPut(36, ABD), NumPut(Hwnd, ABD, 4), NumPut(CALLBACKMSG, ABD, 8) 
@@ -83,11 +84,8 @@ Appbar_New(ByRef Hwnd, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o
 		 r := DllCall("Shell32.dll\SHAppBarMessage", "UInt", ABM_SETAUTOHIDEBAR, "UInt", &ABD)
 	else r := DllCall("Shell32.dll\SHAppBarMessage", "UInt", ABM_NEW, "UInt", &ABD)
 
-	if OnTop
-		WinSet, AlwaysOnTop, on, ahk_id %Hwnd%
-
 	if !r {
-		ifNotEqual, n,, Gui, %n%:Destroy
+		ifNotEqual,n,, Gui, %n%:Destroy
 		return 0
 	} 
 
@@ -101,8 +99,24 @@ Appbar_New(ByRef Hwnd, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o
 	if AutoHide
 		Appbar_setAutoHideBar(Hwnd, Edge, AutoHide, Label)
 
+	if OnTop
+		WinSet, AlwaysOnTop, on, ahk_id %Hwnd%
+
+;	OnMessage(12345, "AppBar_onMessage")
 	DetectHiddenWIndows, %oldDetect%
 	return n
+}
+
+;wpaaram msg
+;lparam, msg param
+AppBar_onMessage(Wparam, Lparam, Msg, Hwnd){
+	static ABN_POSCHANGED=1, ABN_FULLSCREENAPP=2
+	
+	ifEqual, Wparam, ABN_FULLSCREENAPP, return		;shell keeps spamming this msg for some reason all the time ?!
+	
+	if (Wparam = ABN_POSCHANGED){
+		Appbar_setPos(Hwnd, Edge, w, h, p)
+	}
 }
 
 Appbar_setAutoHideBar(Hwnd, Edge, AnimType, Label){
@@ -205,6 +219,7 @@ Appbar_setPos(Hwnd, Edge, Width, Height, Pos){
 
 	DllCall("Shell32.dll\SHAppBarMessage", "UInt", ABM_SETPOS, "UInt", &ABD)
 	DllCall("MoveWindow", "uint", Hwnd, "int", r1, "int", r2, "int", r3-r1, "int", r4-r2, "uint", 1)
+
 }
 /*	Function:	Remove
 				Unregisters an appbar by removing it from the system's internal list. 
@@ -265,31 +280,6 @@ Appbar_SetTaskBar(State=""){
 	WinShow, ahk_class Shell_TrayWnd
 	return (%curState%)
 }
-
-;Appbar_send( ABMsg, ByRef Hwnd="", CallbackMessage="", Edge="", Rect="", LParam="" ){
-;	static ABM_NEW=0, ABM_REMOVE=1, ABM_QUERYPOS=2, ABM_SETPOS=3,ABM_GETSTATE=4, ABM_GETTASKBARPOS=5, ABM_ACTIVATE=6, ABM_GETAUTOHIDEBAR=7, ABM_SETAUTOHIDEBAR=8, ABM_WINDOWPOSCHANGED=9, ABM_SETSTATE=10
-;	static LEFT=0,TOP=1,RIGHT=2,BOTTOM=3, init
-;
-;	if !init 
-;		init := VarSetCapacity(ABD,36,0), NumPut(36, ABD)
-;	
-;	IfEqual Hwnd, , SetEnv, Hwnd, % WinExist( "ahk_class Shell_TrayWnd" )
-;	NumPut(Hwnd, ABD, 4)
-;
-;	CallbackMessage ? NumPut(CallbackMessage, ABD, 8) : 
-;	LParam ? NumPut(LParam, ABD, 32) : 
-;	Edge != "" ? NumPut(%Edge%, ABD, 12) : 
-;	if (Rect != "") {
-;		StringSplit, r, Rect, %A_Space%
-;		loop, 4
-;			NumPut(r%A_Index%, ABD, 12+A_Index*4, "Int")
-;	}
-;	msg := "ABM_" ABMsg
-;	r := DllCall("Shell32.dll\SHAppBarMessage", "UInt", %msg%, "UInt", &ABD),
-;	if ABMsg in QUERYPOS
-;		Hwnd := &ABD
-;	return r
-;}
 
 /* Group: About
 	o v1.0 by majkinetor 
