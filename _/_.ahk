@@ -16,7 +16,7 @@
 					  and if present, it will mark the file for deletition on scripts startup. !can be also used with o mode to clear the DebugView log.
 					  DebugView will be started if it doesn't run, make sure its on the system PATH (there will be no error message if Run fails).
 				d	- Detect hidden windows.
-				e	- Escape exits the script if any of its Guis are active. Use e2 to exit in all cases.
+				e	- Escape exits the script. Use ea to exit the script only if its window is active.
 				w	- SetWorkingDir %A_ScriptDir%
 				t	- Title match mode: t1 (ts), t2 (tc), t3 (te), tr. 
 
@@ -63,11 +63,11 @@ _(opt="") {
 	if e 
 	{
 		Process, Exist
-		if e = 2
-			 Hotkey, IfWinExist, ahk_pid %ErrorLevel%
-		else Hotkey, IfWinActive, ahk_pid %ErrorLevel%
+		if e = a
+			 Hotkey, IfWinActive, ahk_pid %ErrorLevel%
+		else Hotkey, IfWinExist,  ahk_pid %ErrorLevel%
 		HotKey, Esc, __HotkeyEsc
-		if e = 2
+		if e = a
 			 Hotkey, IfWinExist 
 		else Hotkey, IfWinActive
 	}
@@ -358,10 +358,13 @@ d_(hwnd, msg, id="", time=""){
 				Exits the script with the message.
 
 	Parameters:
-				Message		- Message to show
+				E			- Expression. By default 1. The function will exit the script only when E is True.
+				Message		- Message to show.
 				ExitCode	- Exit code to return to the caller.
  */
-Fatal(Message, ExitCode="") {
+Fatal(Message, E=1, ExitCode="") {
+	if !E
+		return
 	MsgBox, 16, Fatal Error, %Message%
 	ExitApp, %ExitCode%
 }
