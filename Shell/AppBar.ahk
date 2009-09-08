@@ -78,10 +78,10 @@ Appbar_New(ByRef Hwnd, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o
 	ifEqual, h, ,SetEnv, h, % Edge="Top"  || Edge="Bottom" ? 32 : A_ScreenHeight
 	ifEqual, w, ,SetEnv, w, % Edge="Left" || Edge="Right"  ? 50 : A_ScreenWidth
 
-	VarSetCapacity(ABD,36,0), NumPut(36, ABD), NumPut(Hwnd, ABD, 4), NumPut(%Edge%, ABD, 12), NumPut(CALLBACKMSG, ABD, 8) 
+	VarSetCapacity(ABD,36,0), NumPut(36, ABD), NumPut(Hwnd, ABD, 4), NumPut(CALLBACKMSG, ABD, 8) 
 	if (AutoHide || !Pin)
-		 r := DllCall("Shell32.dll\SHAppbarMessage", "UInt", ABM_SETAUTOHIDEBAR, "UInt", &ABD)
-	else r := DllCall("Shell32.dll\SHAppbarMessage", "UInt", ABM_NEW, "UInt", &ABD)
+		 r := DllCall("Shell32.dll\SHAppBarMessage", "UInt", ABM_SETAUTOHIDEBAR, "UInt", &ABD)
+	else r := DllCall("Shell32.dll\SHAppBarMessage", "UInt", ABM_NEW, "UInt", &ABD)
 
 	if OnTop
 		WinSet, AlwaysOnTop, on, ahk_id %Hwnd%
@@ -214,7 +214,7 @@ Appbar_setPos(Hwnd, Edge, Width, Height, Pos){
 	loop, 4                                          
 		NumPut(r%A_Index%, ABD, 12+A_Index*4, "Int") 
 
-	DllCall("Shell32.dll\SHAppbarMessage", "UInt", ABM_QUERYPOS, "UInt", &ABD)
+	DllCall("Shell32.dll\SHAppBarMessage", "UInt", ABM_QUERYPOS, "UInt", &ABD)
 	loop, 4
 		r%A_Index% := NumGet(ABD, 12 + 4*A_Index, "Int")
                                                
@@ -228,37 +228,9 @@ Appbar_setPos(Hwnd, Edge, Width, Height, Pos){
 	loop, 48
 		NumPut(r%A_Index%, ABD, 12+A_Index*4, "Int") 
 
-	DllCall("Shell32.dll\SHAppbarMessage", "UInt", ABM_SETPOS, "UInt", &ABD)
+	DllCall("Shell32.dll\SHAppBarMessage", "UInt", ABM_SETPOS, "UInt", &ABD)
 	DllCall("MoveWindow", "uint", Hwnd, "int", r1, "int", r2, "int", r3-r1, "int", r4-r2, "uint", 1)
 }
-
-
-
-;Appbar_send( ABMsg, ByRef Hwnd="", CallbackMessage="", Edge="", Rect="", LParam="" ){
-;	static ABM_NEW=0, ABM_REMOVE=1, ABM_QUERYPOS=2, ABM_SETPOS=3,ABM_GETSTATE=4, ABM_GETTASKBARPOS=5, ABM_ACTIVATE=6, ABM_GETAUTOHIDEBAR=7, , ABM_WINDOWPOSCHANGED=9, ABM_SETSTATE=10
-;	static LEFT=0,TOP=1,RIGHT=2,BOTTOM=3, init
-;
-;	if !init 
-;		init := VarSetCapacity(ABD,36,0), NumPut(36, ABD)
-;	
-;	IfEqual Hwnd, , SetEnv, Hwnd, % WinExist( "ahk_class Shell_TrayWnd" )
-;	NumPut(Hwnd, ABD, 4)
-;
-;	CallbackMessage ? NumPut(CallbackMessage, ABD, 8) : 
-;	LParam ? NumPut(LParam, ABD, 32) : 
-;	Edge != "" ? NumPut(%Edge%, ABD, 12) : 
-;	if (Rect != "") {
-;		StringSplit, r, Rect, %A_Space%
-;		loop, 4
-;			NumPut(r%A_Index%, ABD, 12+A_Index*4, "Int")
-;	}
-;	msg := "ABM_" ABMsg
-;	r := DllCall("Shell32.dll\SHAppbarMessage", "UInt", %msg%, "UInt", &ABD),
-;	if ABMsg in QUERYPOS
-;		Hwnd := &ABD
-;	return r
-;}
-
 /*	Function:	Remove
 				Unregisters an appbar by removing it from the system's internal list. 
 				The system no longer sends notification messages to the appbar or prevents other applications from using the screen area occupied 
@@ -267,7 +239,7 @@ Appbar_setPos(Hwnd, Edge, Width, Height, Pos){
 Appbar_Remove(Hwnd){
 	static ABM_REMOVE=1
 	VarSetCapacity(ABD,36,0), NumPut(36, ABD), NumPut(Hwnd, ABD, 4)
-	DllCall("Shell32.dll\SHAppbarMessage", "UInt", ABM_REMOVE, "UInt", &ABD)
+	DllCall("Shell32.dll\SHAppBarMessage", "UInt", ABM_REMOVE, "UInt", &ABD)
 }
 
 /*	Function: SetTaskBar
@@ -302,7 +274,7 @@ Appbar_SetTaskBar(State=""){
 	}
 		
 	VarSetCapacity(ABD,36,0), NumPut(36, ABD), NumPut(Hwnd, ABD, 4)
-	curState := DllCall("Shell32.dll\SHAppbarMessage", "UInt", ABM_GETSTATE, "UInt", &ABD)
+	curState := DllCall("Shell32.dll\SHAppBarMessage", "UInt", ABM_GETSTATE, "UInt", &ABD)
 	c := SubStr(State, 1, 1)
 	if (bToggle :=  c = "^") || (bDisable := c = "-") || (c = "+")
 		State := SubStr(State, 2), b := 1
@@ -313,36 +285,36 @@ Appbar_SetTaskBar(State=""){
 	sd := curState & ~State, sa := curState | State
 	if (b)
 		State := bToggle ? (curState & State ? sd : sa) : bDisable ? sd : sa 
-	NumPut(State, ABD, 32), DllCall("Shell32.dll\SHAppbarMessage", "UInt", ABM_SETSTATE, "UInt", &ABD)
+	NumPut(State, ABD, 32), DllCall("Shell32.dll\SHAppBarMessage", "UInt", ABM_SETSTATE, "UInt", &ABD)
 
 	WinShow, ahk_class Shell_TrayWnd
 	return (%curState%)
 }
 
-Appbar_send( ABMsg, ByRef Hwnd="", CallbackMessage="", Edge="", Rect="", LParam="" ){
-	static ABM_NEW=0, ABM_REMOVE=1, ABM_QUERYPOS=2, ABM_SETPOS=3,ABM_GETSTATE=4, ABM_GETTASKBARPOS=5, ABM_ACTIVATE=6, ABM_GETAUTOHIDEBAR=7, ABM_SETAUTOHIDEBAR=8, ABM_WINDOWPOSCHANGED=9, ABM_SETSTATE=10
-	static LEFT=0,TOP=1,RIGHT=2,BOTTOM=3, init
-
-	if !init 
-		init := VarSetCapacity(ABD,36,0), NumPut(36, ABD)
-	
-	IfEqual Hwnd, , SetEnv, Hwnd, % WinExist( "ahk_class Shell_TrayWnd" )
-	NumPut(Hwnd, ABD, 4)
-
-	CallbackMessage ? NumPut(CallbackMessage, ABD, 8) : 
-	LParam ? NumPut(LParam, ABD, 32) : 
-	Edge != "" ? NumPut(%Edge%, ABD, 12) : 
-	if (Rect != "") {
-		StringSplit, r, Rect, %A_Space%
-		loop, 4
-			NumPut(r%A_Index%, ABD, 12+A_Index*4, "Int")
-	}
-	msg := "ABM_" ABMsg
-	r := DllCall("Shell32.dll\SHAppbarMessage", "UInt", %msg%, "UInt", &ABD),
-	if ABMsg in QUERYPOS
-		Hwnd := &ABD
-	return r
-}
+;Appbar_send( ABMsg, ByRef Hwnd="", CallbackMessage="", Edge="", Rect="", LParam="" ){
+;	static ABM_NEW=0, ABM_REMOVE=1, ABM_QUERYPOS=2, ABM_SETPOS=3,ABM_GETSTATE=4, ABM_GETTASKBARPOS=5, ABM_ACTIVATE=6, ABM_GETAUTOHIDEBAR=7, ABM_SETAUTOHIDEBAR=8, ABM_WINDOWPOSCHANGED=9, ABM_SETSTATE=10
+;	static LEFT=0,TOP=1,RIGHT=2,BOTTOM=3, init
+;
+;	if !init 
+;		init := VarSetCapacity(ABD,36,0), NumPut(36, ABD)
+;	
+;	IfEqual Hwnd, , SetEnv, Hwnd, % WinExist( "ahk_class Shell_TrayWnd" )
+;	NumPut(Hwnd, ABD, 4)
+;
+;	CallbackMessage ? NumPut(CallbackMessage, ABD, 8) : 
+;	LParam ? NumPut(LParam, ABD, 32) : 
+;	Edge != "" ? NumPut(%Edge%, ABD, 12) : 
+;	if (Rect != "") {
+;		StringSplit, r, Rect, %A_Space%
+;		loop, 4
+;			NumPut(r%A_Index%, ABD, 12+A_Index*4, "Int")
+;	}
+;	msg := "ABM_" ABMsg
+;	r := DllCall("Shell32.dll\SHAppBarMessage", "UInt", %msg%, "UInt", &ABD),
+;	if ABMsg in QUERYPOS
+;		Hwnd := &ABD
+;	return r
+;}
 
 /* Group: About
 	o v1.0 by majkinetor
