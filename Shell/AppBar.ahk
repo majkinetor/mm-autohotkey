@@ -35,8 +35,8 @@
 				OnTop	 -  Sets the Appbar alaways on top.
 				Show	 -  Show the Appbar. If not present the Appbar will not be shown or visibility settings of passed window will not be changed.
 						    By default "OnTop Show Reserve".
-				Pin		-   Pin the Appbar to the Desktop (reserve the destop space for the Appbar). Influences maximization dimension 
-							of all windows in the system. This style is ignored if Appbar has AutoHide attribute.
+				Pin		-   Pin the Appbar to the Desktop (reserve the destop space for the Appbar). 
+							The system prevents other applications from using the screen area occupied by the appbar. Ignored with AutoHide.
 
   Returns:
 				Gui number if function created Gui.
@@ -259,12 +259,19 @@ Appbar_setPos(Hwnd, Edge, Width, Height, Pos){
 ;	return r
 ;}
 
+/*	Function:	Remove
+				Unregisters an appbar by removing it from the system's internal list. 
+				The system no longer sends notification messages to the appbar or prevents other applications from using the screen area occupied 
+				by the appbar.
+ */
 Appbar_Remove(Hwnd){
-	Appbar_send("REMOVE", Hwnd)
+	static ABM_REMOVE=1
+	VarSetCapacity(ABD,36,0), NumPut(36, ABD), NumPut(Hwnd, ABD, 4)
+	DllCall("Shell32.dll\SHAppbarMessage", "UInt", ABM_REMOVE, "UInt", &ABD)
 }
 
 /*	Function: SetTaskBar
-			  Set state of the Taskbar.
+			  Set the state of the Taskbar.
 
 	Parameters:
 			State - "autohide", "ontop", "all". You can also remove (-), add (+) or toggle (^) state. Omit to disable all states.
