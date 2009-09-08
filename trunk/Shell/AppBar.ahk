@@ -139,18 +139,15 @@ Appbar_timer(Hwnd="", Edge="", Anim1="", Anim2="") {
 		DetectHiddenWIndows, on
 		WinGetPos, wx, wy, ww, wh, ahk_id %Hwnd%
 		DetectHiddenWIndows, %oldDetect%
-
-		bVisible := DllCall("IsWindowVisible", "uint", Hwnd)
-
-		m(animOn := Anim1, animOff := Anim2)
-		e := Edge="Top" || Edge="Left"									
 		bVert := Edge="Left" || Edge="Right"
 
-		d1 :=  bVert ? ww : wh,		d2 := bVert ? wh : ww				;d - dimension , widht or height depending on style
-		v1 :=  bVert ? "x" : "y",	v2 := bVert ? "y" : "x"				;v - affected variable for autohide , x or y depending on style.
-		pos1 := bVert ? wy : wx,	pos2:= pos1 + (bVert ? wh : ww)	    ;limits for variable v.
+		animOn := Anim1, animOff := Anim2					
+		bVisible := DllCall("IsWindowVisible", "uint", Hwnd)
+		e := Edge="Top" || Edge="Left"		
+		d1 :=  bVert ? ww : wh,		d2 := bVert ? wh : ww				;d1 - dimension , width or height depending on edge, d2 - the other one.
+		v1 :=  bVert ? "x" : "y",	v2 := bVert ? "y" : "x"				;v1- affected variable for autohide, x or y depending on edge, v2 - the other one.
+		pos1 := bVert ? wy : wx,	pos2:= pos1 + (bVert ? wh : ww)	    ;limits for variable %v1% (x or y depending on edge)
 		Wnd := Hwnd
-		w := width, h := height
 	}
 
 	ifWinActive ahk_group Appbar

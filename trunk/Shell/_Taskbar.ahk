@@ -5,7 +5,7 @@ _("mo! e")
 
 	GroupAdd, AppBar, ahk_class DV2ControlHost		;add start menu 
 
-	n := AppBar_New(hGui,  "Edge=Left", "Pos=w400 h400 p100", "Style=OnTop Show Pin", "AutoHide=Slide")
+	n := AppBar_New(hGui,  "Edge=Top", "Style=OnTop Show Pin", "AutoHide=Slide")
 	Fatal("Can't create Appbar", n=0)
 	
 	Gui, %n%:Add, Text, HWNDhDummy
