@@ -353,6 +353,19 @@ d_(hwnd, msg, id="", time=""){
 	fun := %id%, %fun%( %id%_1, %id%_2 )
 }
 
+/*
+	Function:	Fatal
+				Exits the script with the message.
+
+	Parameters:
+				Message		- Message to show
+				ExitCode	- Exit code to return to the caller.
+ */
+Fatal(Message, ExitCode="") {
+	MsgBox, 16, Fatal Error, %Message%
+	ExitApp, %ExitCode%
+}
+
 
 
 /* Group: About
