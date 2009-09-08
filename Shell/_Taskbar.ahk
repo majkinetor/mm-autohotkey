@@ -5,7 +5,7 @@ _("mo! e2")
 
 	GroupAdd, AppBar, ahk_class DV2ControlHost		;add start menu 
 
-	n := AppBar_New(hGui,  "Edge=Top", "Style=OnTop Show")
+	n := AppBar_New(hGui,  "Edge=Top", "Pos=w400 p50", "Style=OnTop Show", "AutoHide=Slide")
 	Gui, %n%:Add, Text, HWNDhDummy
 	Gui, %n%:Add, Button, HWNDhStart gOnStart x4 w50 y2, Start
 	hRebar := Rebar_Add(hGui, "", "", "x60 h32 w" A_ScreenWidth-60)	
@@ -36,7 +36,7 @@ OnShell(Event, Param) {
 	if Event in %WINDOWCREATED%,%WINDOWDESTROYED%
 		Refresh()		
 
-	if Event = 4
+	if Event = 4		;event doesn't work on Vista.
 		Toolbar_CheckButton(hTaskbar, "." Param)
 }
 

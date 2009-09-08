@@ -1,22 +1,55 @@
-;AutoHide=blend,center,slide
+/* 
+	Function:	New
+				Creates new AppBar
+	
+	Parameters:
+				Hwnd	- Reference to the handle of the existing window. If variable is empty, function will create Gui
+						  and you will get its handle returned in this parameter. 
+				o1..o9	- Named arguments. All named arguments are optional.
+
+	Named Arguments:
+				Edge	 - Screen edge to glue window to. Possible values are "Top" (default), "Right", "Left", "Bottom". 
+				AutoHide - Makes window autohide. Value represents animation type. Can be 0, 1, "Slide", "Blend" or "Center".
+						   Window will be shown only if mouse is its in hot area. When window is activated, it will not autohide
+						   until its deactivated again. By default AutoHide is turned off. Without this argument, the space on screen
+						   will be reserved for the window and all other windows will not be able to maximize over it the same as with
+						   Taskbar which is set ontop without autohide.
+				Pos		 - Position. String similar to AHK format without X and Y and with p instead. For instance "w300 h30 p10". "p" 
+						   means position and it represents X for Edge type Top/Bottom or Y for Edge type Left/Right. If "p" is omited
+						   AppBar will be put in center. If "p" is negative, window is positioned the oposite end.
+				Style	 - Space separted list of AppBar styles. Can be "OnTop" (puts window alaways on top) and "Show" (show the AppBar).
+						   By default "Ontop Show".
+				Label	 - Used when function creates Gui, and for making an AHK Group. By default Hwnd is added to the group. You can add
+						   more windows in the group that are part of the taskbar. AppBar with autohide style will not be hidden when 
+						   window belonging to its group is activated. By default "AppBar".
+						  
+
+  Returns:
+				Gui number if function created Gui.
+ */
+
 AppBar_New(ByRef Hwnd, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o9=""){
 	static CALLBACKMSG := 12345, ABM_SETAUTOHIDEBAR=8, ABM_NEW=0
 
 	oldDetect := A_DetectHiddenWIndows
 	DetectHiddenWIndows, on
 
+   ;- handle args ------------
 	Edge:="Top", AutoHide := Show := 0, Style := "OnTop Show", Label := "AppBar"
 	loop, 9	{
 		f := o%A_Index%
 		ifEqual, f,,break
 		j := InStr(f, "="), n := SubStr(f, 1, j-1), %n% := SubStr(f,j+1)
 	}
+
 	StringSplit, s, Style, %A_Space%
 	loop, %s0%
 		s := s%A_Index%, %s% := 1
 
-	ifEqual, Height, ,SetEnv, Height, % Edge="Top"  || Edge="Bottom" ? 32 : A_ScreenHeight
-	ifEqual, Width,  ,SetEnv, Width,  % Edge="Left" || Edge="Right"  ? 50 : A_ScreenWidth
+	StringSplit, s, Pos, %A_Space%
+	loop, %s0%
+		d := SubStr(s%A_Index%, 1, 1),	%d% := SubStr(s%A_Index%, 2)
+   ;--------------------------
 
 	if (Hwnd = "") {
 		k := 1
@@ -27,45 +60,52 @@ AppBar_New(ByRef Hwnd, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o
 		}
 		Gui, %n%:+LastFound -Caption +ToolWindow +Label%Label%
 		Hwnd := WinExist()
-	}
+	} else WinGetPos, x, y, w, h, ahk_id %Hwnd%	
 
-	if Show {
-			WinShow, ahk_id %Hwnd%
-			WinActivate, ahk_id %Hwnd%
-	}
+	ifEqual, h, ,SetEnv, h, % Edge="Top"  || Edge="Bottom" ? 32 : A_ScreenHeight
+	ifEqual, w, ,SetEnv, w, % Edge="Left" || Edge="Right"  ? 50 : A_ScreenWidth
 
 	VarSetCapacity(ABD,36,0), NumPut(36, ABD), NumPut(Hwnd, ABD, 4), NumPut(%Edge%, ABD, 12), NumPut(CALLBACKMSG, ABD, 8) 
 	if AutoHide
-		 r := DllCall("Shell32.dll\SHAppBarMessage", "UInt", ABM_SETAUTOHIDEBAR, "UInt", &ABD)	; r := AppBar_send("SETAUTOHIDEBAR", hGui, "", Edge)
-	else r := DllCall("Shell32.dll\SHAppBarMessage", "UInt", ABM_NEW, "UInt", &ABD)				; AppBar_send("NEW", hGui, AB_CALLBACK)
+		 r := DllCall("Shell32.dll\SHAppBarMessage", "UInt", ABM_SETAUTOHIDEBAR, "UInt", &ABD)
+	else r := DllCall("Shell32.dll\SHAppBarMessage", "UInt", ABM_NEW, "UInt", &ABD)
 
 	if OnTop
 		WinSet, AlwaysOnTop, on, ahk_id %Hwnd%
 
 	if !r {
-		if n
-			Gui, %n%:Destroy
+		ifNotEqual, n,, Gui, %n%:Destroy
 		return 0
 	} 
-	AppBar_setPos(Hwnd, Edge, Width, Height)
+
+	AppBar_setPos(Hwnd, Edge, w, h, p)
+	if Show {
+		WinShow, ahk_id %Hwnd%
+		WinActivate, ahk_id %Hwnd%
+	}
 	
-	GroupAdd, AppBar, ahk_id %Hwnd%
+	GroupAdd, %Label%, ahk_id %Hwnd%
 	if AutoHide
-		AppBar_setAutoHideBar(Hwnd, Edge, AutoHide, Width, Height)
+		AppBar_setAutoHideBar(Hwnd, Edge, AutoHide)
 
 	DetectHiddenWIndows, %oldDetect%
 	return n
 }
 
-AppBar_setAutoHideBar(Hwnd, Edge, AnimType, Width, Height){
+AppBar_setAutoHideBar(Hwnd, Edge, AnimType){
 	static timer := 500
-
+	
 	d1 := Edge="Top" ? "vpos" : Edge="Left" ? "hpos" : Edge ="Right" ? "hneg" : "vneg"
 	d2 := Edge="Top" ? "vneg" : Edge="Left" ? "hneg" : Edge ="Right" ? "hpos" : "vpos"
 	animOn := AnimType " " d1, animOff := AnimType " hide " d2
-	SetTimer, %A_ThisFunc%, %timer%
 	
-	AppBar_timer(Hwnd, Edge, animOn, animOff, Width, Height)
+	oldDetect := A_DetectHiddenWIndows
+	DetectHiddenWIndows, on
+	WinGetPos, x, y, w, h, ahk_id %Hwnd%
+	DetectHiddenWIndows, %oldDetect%
+
+	AppBar_timer(Hwnd, Edge, animOn, animOff)
+	SetTimer, %A_ThisFunc%, %timer%
 	return
 	
  AppBar_setAutoHideBar:
@@ -94,7 +134,7 @@ AppBar_timer(Hwnd="", Edge="", Anim1="", Anim2="", Width="", Height="") {
 	ifWinActive ahk_group AppBar
 		return
 	DllCall(adrGetCursorPos, "uint", &POINT), x := NumGet(POINT), y := NumGet(POINT, 4)
-	
+
 	p := %v1%,  q := %v2%,	 dp := d1,  dq := d2,  Sp := S%v1%, Sq := S%v2%
 	if ((e && p<5) || (!e && p>Sp-5)) && (q>(Sq-dq)//2 && q<(Sq+dq)//2)
 		Win_Animate(Wnd, animOn), bVisible := true
@@ -102,22 +142,24 @@ AppBar_timer(Hwnd="", Edge="", Anim1="", Anim2="", Width="", Height="") {
 		Win_Animate(Wnd, animOff), bVisible := false
 }
 
-AppBar_setPos(Hwnd, Edge, Width, Height){
-		static ABM_QUERYPOS=2, ABM_SETPOS=3, LEFT=0, TOP=1, RIGHT=2, BOTTOM=3
+AppBar_setPos(Hwnd, Edge, Width, Height, Pos){
+	static ABM_QUERYPOS=2, ABM_SETPOS=3, LEFT=0, TOP=1, RIGHT=2, BOTTOM=3
 
-	H := A_ScreenHeight, W := A_ScreenWidth
+	H := A_ScreenHeight, W := A_ScreenWidth,  bVert := InStr("Left,Right", Edge)
 
-	Height.= !Height ? H : ""
-	Width .= !Width  ? W : ""
-
+	Height .= !Height ? H : ""
+	Width  .= !Width  ? W : ""
+	Pos	   .= !Pos	  ? bVert ? (H-Height)//2 : (W-Width)//2 : ""
+	ifLess, Pos, 0, SetEnv, Pos, % bVert ? H + Pos : W + Pos
+		
 	VarSetCapacity(ABD,36,0), NumPut(36, ABD), NumPut(Hwnd, ABD, 4), NumPut(%Edge%, ABD, 12)
 	if Edge = LEFT
-		 r1 := 0, r2 := (H-Height)//2, r3 := Width, r4 := r2 + Height
+		 r1 := 0, r2 := Pos, r3 := Width, r4 := r2 + Height
 	else if Edge = RIGHT
-		 r1 := W - Width, r2 := (H-Height)//2, r3 := W, r4 := r2 + Height
+		 r1 := W - Width, r2 := Pos, r3 := W, r4 := r2 + Height
 	else if Edge = Top
-		 r1 := (W - Width)//2, r2 :=0, r3 := r1+Width, r4 := Height
-	else r1 := (W - Width)//2, r2 :=H-Height, r3 := r1+Width, r4 := H
+		 r1 := Pos, r2 :=0, r3 := r1+Width, r4 := Height
+	else r1 := Pos, r2 :=H-Height, r3 := r1+Width, r4 := H
 	loop, 4                                          
 		NumPut(r%A_Index%, ABD, 12+A_Index*4, "Int") 
 
@@ -132,7 +174,7 @@ AppBar_setPos(Hwnd, Edge, Width, Height){
 	else if Edge = TOP
 		 r4 := r2+Height
 	else r2 := r4-Height
-	loop, 4
+	loop, 48
 		NumPut(r%A_Index%, ABD, 12+A_Index*4, "Int") 
 
 	DllCall("Shell32.dll\SHAppBarMessage", "UInt", ABM_SETPOS, "UInt", &ABD)
