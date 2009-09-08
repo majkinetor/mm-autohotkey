@@ -66,9 +66,9 @@ Appbar_New(ByRef Hwnd, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o
 
 	if (Hwnd = "") {
 		k := 1
-		while (k) {					;find available gui number
+		while (k != 0) {					;find available gui number
 			n := 100 - A_Index
-			Gui %k%:+LastFoundExist
+			Gui %n%:+LastFoundExist
 			k := WinExist()
 		}
 		Gui, %n%:+LastFound -Caption +ToolWindow +Label%Label%
@@ -99,13 +99,13 @@ Appbar_New(ByRef Hwnd, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o
 	
 	GroupAdd, %Label%, ahk_id %Hwnd%
 	if AutoHide
-		Appbar_setAutoHideBar(Hwnd, Edge, AutoHide)
+		Appbar_setAutoHideBar(Hwnd, Edge, AutoHide, Label)
 
 	DetectHiddenWIndows, %oldDetect%
 	return n
 }
 
-Appbar_setAutoHideBar(Hwnd, Edge, AnimType){
+Appbar_setAutoHideBar(Hwnd, Edge, AnimType, Label){
 	static timer := 500
 	
 	d1 := Edge="Top" ? "vpos" : Edge="Left" ? "hpos" : Edge ="Right" ? "hneg" : "vneg"
@@ -117,7 +117,7 @@ Appbar_setAutoHideBar(Hwnd, Edge, AnimType){
 	WinGetPos, x, y, w, h, ahk_id %Hwnd%
 	DetectHiddenWIndows, %oldDetect%
 
-	Appbar_timer(Hwnd, Edge, animOn, animOff)
+	Appbar_timer(Hwnd, Edge, animOn, animOff, Label)
 	SetTimer, %A_ThisFunc%, %timer%
 	return
 	
@@ -126,68 +126,47 @@ Appbar_setAutoHideBar(Hwnd, Edge, AnimType){
  return
 }
 
-Appbar_timer(Hwnd="", Edge="", Anim1="", Anim2="") {
-	static 
+Appbar_timer(Hwnd="", Edge="", Anim1="", Anim2="", Label="") {
+	static
 
 	if (Hwnd != "") {
+		critical 50
 		if !SX
 			VarSetCapacity(POINT, 8)
 			,adrGetCursorPos := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "GetCursorPos")
 			,SY := A_ScreenHeight - 5, SX := A_ScreenWidth - 5, 
 
+		Hwnd += 0
 		oldDetect := A_DetectHiddenWindows
 		DetectHiddenWIndows, on
 		WinGetPos, wx, wy, ww, wh, ahk_id %Hwnd%
 		DetectHiddenWIndows, %oldDetect%
 		bVert := Edge="Left" || Edge="Right"
 
-		animOn := Anim1, animOff := Anim2					
-		bVisible := DllCall("IsWindowVisible", "uint", Hwnd)
-		e := Edge="Top" || Edge="Left"		
-		d1 :=  bVert ? ww : wh,		d2 := bVert ? wh : ww				;d1 - dimension , width or height depending on edge, d2 - the other one.
-		v1 :=  bVert ? "x" : "y",	v2 := bVert ? "y" : "x"				;v1- affected variable for autohide, x or y depending on edge, v2 - the other one.
-		pos1 := bVert ? wy : wx,	pos2:= pos1 + (bVert ? wh : ww)	    ;limits for variable %v1% (x or y depending on edge)
-		Wnd := Hwnd
-	}
-
-	ifWinActive ahk_group Appbar
+		%Hwnd%animOn := Anim1, %Hwnd%animOff := Anim2					
+		%Hwnd%bVisible := DllCall("IsWindowVisible", "uint", Hwnd)
+		%Hwnd%e := Edge="Top" || Edge="Left"		
+		%Hwnd%d1 :=  bVert ? ww : wh,	%Hwnd%d2 := bVert ? wh : ww					;d1 - dimension , width or height depending on edge, d2 - the other one.
+		%Hwnd%v1 :=  bVert ? "x" : "y",	%Hwnd%v2 := bVert ? "y" : "x"				;v1- affected variable for autohide, x or y depending on edge, v2 - the other one.
+		%Hwnd%pos1 := bVert ? wy : wx,	%Hwnd%pos2:= %Hwnd%pos1 + (bVert ? wh : ww)	    ;limits for variable %v1% (x or y depending on edge)
+		%Hwnd%HWnd := Hwnd, %Hwnd%Label := Label
+		BARLIST .= (BARLIST != "" ? " " : "") Hwnd
 		return
-	DllCall(adrGetCursorPos, "uint", &POINT), x := NumGet(POINT), y := NumGet(POINT, 4)
-
-	p := %v1%,  q := %v2%,	 dp := d1,  dq := d2,  Sp := S%v1%, Sq := S%v2%		;For TOP, p=mY, q=mX, d1=Width, d2=Height, Sp=SY, Sq=SX
-	if ((e && p<5) || (!e && p>Sp-5))  && (q>pos1 && q<pos2)
-		Win_Animate(Wnd, animOn), bVisible := true
-	else if (bVisible) && (e && p>dp) || (!e && p<Sp-dp) || (q<pos1) || (q > pos2)
-		Win_Animate(Wnd, animOff), bVisible := false
-
-/*
-	if (E="Top") {
-		if (Y < 5) && (X>(W-Width//2) && X < (W+Width)//2)
-			Win_Animate(H, animOn), visible := true
-		else if  visible && (Y>Height) || !(X>(W-Width//2) && X < (W+Width)//2)
-			Win_Animate(H, animOff)
-	} 
-	if (E="Left") {
-		if (X < 5)  && (Y>(H-Height//2) && Y<(H+Height)//2
-			 Win_Animate(H, animOn), visible := true
-		else if (X>Width) && visible
-			Win_Animate(H, animOff)
 	}
+	DllCall(adrGetCursorPos, "uint", &POINT), x := NumGet(POINT, 0, "Int"), y := NumGet(POINT, 4, "Int")
 
-	if (E="Bottom") 
-		if (Y > SH - 5)	&& (X>(W-Width//2) && X < (W+Width)//2)
-			 Win_Animate(H, animOn), visible := true
-		else if visible && (Y < SY-Height) || (X> W-Width//2) && X < (W+Width)//2)
-			Win_Animate(H, animOff)
+	loop, parse, BARLIST, %A_Space%
+	{
+		ifWinActive ahk_group %Lbl%
+			return
+		j := A_LoopField
+		p := %j%v1,  q := %j%v2,  dp := %j%d1,  dq := %j%d2, Sp := S%p%, Sq := S%q%,  pos1 := %j%pos1,  pos2 := %j%pos2, e := %j%e
+		p :=%p%, q:=%q%
+		if ((e && p<5) || (!e && p>Sp-5))  && (q>pos1 && q<pos2)
+			Win_Animate(%j%Hwnd, %j%animOn), %j%bVisible := true
+		else if (%j%bVisible) && (e && p>dp) || (!e && p<Sp-dp) || (q<pos1) || (q > pos2)
+			Win_Animate(%j%Hwnd, %j%animOff), %j%bVisible := false
 	}
-
-	if (E="Right") {
-		if (X > SW - 5)	 
-			 Win_Animate(H, animOn), visible := true
-		else if (X < SW-30) && visible
-			Win_Animate(H, animOff)
-	}
- */
 }
 
 Appbar_setPos(Hwnd, Edge, Width, Height, Pos){
