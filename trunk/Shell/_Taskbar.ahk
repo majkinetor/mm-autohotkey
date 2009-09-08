@@ -5,9 +5,12 @@ _("mo! e")
 
 	GroupAdd, AppBar, ahk_class DV2ControlHost		;add start menu 
 
-	n := AppBar_New(hGui,  "Edge=Top", "Style=OnTop Show Pin", "AutoHide=Slide")
+	n := AppBar_New(hGui,  "Edge=Top", "Style=OnTop Show Pin")
 	Fatal("Can't create Appbar", n=0)
 	
+	k := AppBar_New(hApp2,  "Edge=Right", "Style=Show Pin")
+	Fatal("Can't create Appbar", k=0)
+
 	Gui, %n%:Add, Text, HWNDhDummy
 	Gui, %n%:Add, Button, HWNDhStart gOnStart x4 w50 y2, Start
 	hRebar := Rebar_Add(hGui, "", "", "x60 h32 w" A_ScreenWidth-60)	
