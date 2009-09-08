@@ -317,7 +317,7 @@ Appbar_SetTaskBar(State=""){
 ;}
 
 /* Group: About
-	o v1.0 by majkinetor
+	o v1.0 by majkinetor 
 	o Reference: <http://msdn.microsoft.com/en-us/library/cc144177(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*
