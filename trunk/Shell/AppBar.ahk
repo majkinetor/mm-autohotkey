@@ -148,18 +148,17 @@ Appbar_timer(Hwnd="", Edge="", Anim1="", Anim2="", Label="") {
 		%Hwnd%e := Edge="Top" || Edge="Left"		
 		%Hwnd%d1 :=  bVert ? ww : wh,	%Hwnd%d2 := bVert ? wh : ww					;d1 - dimension , width or height depending on edge, d2 - the other one.
 		%Hwnd%v1 :=  bVert ? "x" : "y",	%Hwnd%v2 := bVert ? "y" : "x"				;v1- affected variable for autohide, x or y depending on edge, v2 - the other one.
-		%Hwnd%pos1 := bVert ? wy : wx,	%Hwnd%pos2:= %Hwnd%pos1 + (bVert ? wh : ww)	    ;limits for variable %v1% (x or y depending on edge)
+		%Hwnd%pos1 := bVert ? wy : wx,	%Hwnd%pos2:= %Hwnd%pos1 + (bVert ? wh : ww)	;limits for variable %v1% (x or y depending on edge)
 		%Hwnd%HWnd := Hwnd, %Hwnd%Label := Label
 		BARLIST .= (BARLIST != "" ? " " : "") Hwnd
 		return
 	}
 	DllCall(adrGetCursorPos, "uint", &POINT), x := NumGet(POINT, 0, "Int"), y := NumGet(POINT, 4, "Int")
-
 	loop, parse, BARLIST, %A_Space%
 	{
+		j := A_LoopField, Lbl := %j%Label
 		ifWinActive ahk_group %Lbl%
-			return
-		j := A_LoopField
+			continue
 		p := %j%v1,  q := %j%v2,  dp := %j%d1,  dq := %j%d2, Sp := S%p%, Sq := S%q%,  pos1 := %j%pos1,  pos2 := %j%pos2, e := %j%e
 		p :=%p%, q:=%q%
 		if ((e && p<5) || (!e && p>Sp-5))  && (q>pos1 && q<pos2)

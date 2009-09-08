@@ -3,24 +3,32 @@ _("mo! e")
 	;oldTaskbar := AppBar_SetTaskbar("+autohide")
 	Shell_GetQuickLaunch()
 
-	GroupAdd, AppBar, ahk_class DV2ControlHost		;add start menu 
+	GroupAdd, AppBar, ahk_class DV2ControlHost		;add start menu so first appbar doesn't close when we launch it.
 
-	n := AppBar_New(hGui,  "Edge=Top", "Style=OnTop Show Pin")
+	n := AppBar_New(hApp1, "AutoHide=Slide")
 	Fatal("Can't create Appbar", n=0)
 	
-	k := AppBar_New(hApp2,  "Edge=Bottom", "Style=Show Pin")
+	AppBar_New(hApp2,  "Edge=Left", "Pos=p-300 h100", "Style=Show OnTop", "AutoHide=Slide", "Label=AppBar2")
 	Fatal("Can't create Appbar", k=0)
 
-	j := AppBar_New(hApp3,  "Edge=Left", "AutoHide=Slide", "Pos=w100 h100 p300")
+	AppBar_New(hApp3,  "Edge=Left", "AutoHide=Slide", "Pos=w100 h100 p300", "Label=AppBar3")
 	Fatal("Can't create Appbar", k=0)
+
+; This works too :)
+;	Run, Notepad
+;	WinWait, Untitled
+;	WinSet, Style, 
+;	hApp3 := WinExist("Untitled")
+;	AppBar_New(hApp3,  "Edge=Right", "AutoHide=Blend", "Pos=w100 h100 p300", "Label=AppBar3")
+
 
 	Gui, %n%:Add, Text, HWNDhDummy
 	Gui, %n%:Add, Button, HWNDhStart gOnStart x4 w50 y2, Start
-	hRebar := Rebar_Add(hGui, "", "", "x60 h32 w" A_ScreenWidth-60)	
+	hRebar := Rebar_Add(hApp1, "", "", "x60 h32 w" A_ScreenWidth-60)	
 	
-	hQuickLaunch := MakeQuickLaunch(hGui, w)	
-	hTaskBar := MakeTaskBar(hGui)
-	hTray	:= MakeTray(hGui, w2)
+	hQuickLaunch := MakeQuickLaunch(hApp1, w)	
+	hTaskBar := MakeTaskBar(hApp1)
+	hTray	:= MakeTray(hApp1, w2)
 
 ;	ReBar_Insert(hRebar, hDummy)	;put this dummy one so next one can be moved.
 	ReBar_Insert(hRebar, hQuickLaunch, "L " w+20 , "S gripperalways usechevron")
@@ -58,7 +66,7 @@ OnQuickLaunch(hCtrl, Event, Txt, Pos, Id)){
 }
 
 OnTaskBar(hCtrl, Event, Txt, Pos, Id)){
-	global hGui
+	global hApp1
 
 	if Event=click
 		WinActivate, ahk_id %id%
@@ -82,7 +90,9 @@ return
 
 
 OnExit:
-	AppBar_Remove(hGui)
+	AppBar_Remove(hApp1)
+	AppBar_Remove(hApp2)
+	AppBar_Remove(hApp3)
 	if oldTaskbar
 		AppBar_SetTaskbar(oldTaskbar)
 
@@ -154,7 +164,7 @@ MakeQuickLaunch( hGui, ByRef w ) {
 }
 
 OnStart:
-	WinGetPos, x , , , h, ahk_id %hGui%
+	WinGetPos, x , , , h, ahk_id %hApp1%
 	Shell_SMShow(x, h)
 return
 
