@@ -1,3 +1,12 @@
+/*
+	Title:	Appbar
+
+			An application desktop toolbar (also called an appbar) is a window that is similar to the Microsoft Windows taskbar. 
+			It is anchored to an edge of the screen, and it typically contains buttons that give the user quick access to other applications and windows. 
+			The system prevents other applications from using the desktop area occupied by an appbar. 
+			Any number of appbars can exist on the desktop at any given time.
+ */
+
 /* 
 	Function:	New
 				Creates new Appbar
@@ -32,7 +41,6 @@
   Returns:
 				Gui number if function created Gui.
  */
-
 Appbar_New(ByRef Hwnd, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o9=""){
 	static CALLBACKMSG := 12345, ABM_SETAUTOHIDEBAR=8, ABM_NEW=0
 
@@ -328,3 +336,9 @@ Appbar_send( ABMsg, ByRef Hwnd="", CallbackMessage="", Edge="", Rect="", LParam=
 		Hwnd := &ABD
 	return r
 }
+
+/* Group: About
+	o v1.0 by majkinetor
+	o Reference: <http://msdn.microsoft.com/en-us/library/cc144177(VS.85).aspx>
+	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
+/*
