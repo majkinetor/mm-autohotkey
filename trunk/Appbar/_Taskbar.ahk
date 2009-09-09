@@ -1,12 +1,10 @@
 _("m e")
 	OnExit OnExit
 	;oldTaskbar := AppBar_SetTaskbar("+autohide")
-	Shell_GetQuickLaunch()
-
-	GroupAdd, AppBar, ahk_class DV2ControlHost		;add start menu so first appbar doesn't close when we launch it.
 
 	n := AppBar_New(hApp1)
 	Fatal("Can't create Appbar", n=0)
+	GroupAdd, AppBar, ahk_class DV2ControlHost		;add start menu so first appbar doesn't close when we launch it.
 
 ; This works too :)
 ;	Run, Notepad
