@@ -18,12 +18,10 @@
 
 	Named Arguments:
 				Edge	 - Screen edge to glue Appbar to. Possible values are "Top" (default), "Right", "Left", "Bottom". 
-				AutoHide - Makes Appbar autohide (off by default). Value represents animation type. Can be 0, 1, "Slide", "Blend" or "Center".
-						   Window will be shown only if mouse is its in hot area. When Appbar is activated, it will not auto hide
-						   until its deactivated again. 
-						   Without this argument, the space on the screen will be reserved for the Appbar and all other windows will not be able to maximize over it the same as with
-						   Taskbar which is set ontop without autohide.
-				Pos		 - Position. String similar to AHK format without X and Y and with p instead. For instance "w300 h30 p10". "p" 
+				AutoHide - Makes Appbar autohide (off by default). Value represents animation type. Can be "Slide", "Blend" or "Center".
+						   Window will be shown only if mouse is in its hot area. When Appbar is activated, it will not auto hide
+						   until its deactivated again. 						   
+				Pos		 - Position. String similar to AHK format without X and Y but with P instead. For instance "w300 h30 p10". "p" 
 						   means position and it represents X for Edge type Top/Bottom or Y for Edge type Left/Right. If "p" is omitted
 						   Appbar will be put in center. If "p" is negative, window is positioned the opposite end.
 				Style	 - Space separated list of Appbar styles. See below.
