@@ -1,2 +1,0 @@
-- Win_Get(hGui, "Lw") != Win_GetRect(hGui, "*w")
-- WinGetRect can be optimised.
