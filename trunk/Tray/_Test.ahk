@@ -1,5 +1,14 @@
+_("mo! e d")
 SetBatchLines, -1
+CoordMode, mouse, screen
 #singleinstance, force
+;	old := Appbar_SetTaskBar("disable")
+
+	Process, Exist
+	pid := ErrorLevel
+	hAhk := WinExist("ahk_pid " ErrorLevel) +0
+
+
 	OnExit, OnExit
 	Gui,  +LastFound +AlwaysOnTop Toolwindow
 	hGui := WinExist() + 0
@@ -9,13 +18,15 @@ SetBatchLines, -1
 	OnMessage(0x200, "OnMouseMove")
 
 	loop, 20
-		Gui, Add, Picture, yp x+5 w32 h32 0x3 HWNDh%A_Index% gOnPicture
+		Gui, Add, Picture, yp x+20 w20 h20 0x3 HWNDh%A_Index% gOnPicture
 
 	RefreshTray()
 	SetTimer, RefreshTray, 1000
 
-	gui, show, y0 w400 h50
+	gui, show, y0 w600 h50
 return
+
+ESC:: GoSub OnExit
 
 
 RefreshTray(){
@@ -37,9 +48,13 @@ OnPicture:
 	StringReplace, c, c, static
 ;	Tray_Click(	c, "R" )	;worked only for this script icons.
 
-	Tray_Define(c, "inhw", pos, name, handle, parent)
-	tip := Tray_GetTooltip(c)
-	msgbox Pos: %pos%  Handle: %handle%  Parent: %parent%  Name: %name%`nTooltip:%tip%
+
+	Tray_Define(c, "inhwm", pos, name, handle, parent, msg)
+;	tip := Tray_GetTooltip(c)
+;	msgbox Pos: %pos%  Handle: %handle%  Parent: %parent%  Name: %name%`nMsg:%msg%`nTooltip:%tip% 
+	t = Pos: %pos%  Handle: %handle%  Parent: %parent%  Name: %name%`nMsg:%msg%`nTooltip:%tip% 
+	btn := GetKeyState("LButton")
+	Tray_Click(pos)
 return	
 
 
@@ -70,14 +85,18 @@ OnTrayIcon(Hwnd, Event) {
 	if event not in R,M,L	;return if event is not right click
 		return                                                                       
 					
-	MsgBox, ,Icon %n%, %EVENT% Button clicked.`n`nPress F1 to exit script 
+	MsgBox, ,Icon %Hwnd%, %EVENT% Button clicked.`n`nPress ESC to exit script. Press F2 to remove all script tray icons.
+	Tray_Focus(hGui, Hwnd)
 }                 
 
-F1::
 OnExit:
+	if old != 
+		Appbar_SetTaskBar( old )
 	Tray_Remove(hGui)
 	ExitApp
 return
+
+F1::
 
 F2::
 	Tray_Remove(hGui)
@@ -100,3 +119,5 @@ MoveAhkIcons(){
 }
 
 #include Tray.ahk
+#include Appbar.ahk
+#include Shell.ahk
