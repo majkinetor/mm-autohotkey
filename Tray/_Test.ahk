@@ -23,10 +23,6 @@ return
 ESC:: GoSub OnExit
 
 
-F3::
-	Tray_Disable(false)
-return
-
 RefreshTray(){
 	s := Tray_Define("", "o")
 	loop, parse, s, `n
