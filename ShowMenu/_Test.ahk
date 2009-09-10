@@ -4,7 +4,7 @@
 	Gui, Add, Button, w22 h22 x+130 gonBtnAbout 0x8000, ?
 	Gui, Add, Text, xm yp+45,Menu definition:
 	Gui, Font,, Courier New
-	Gui, Add, Edit, veMenu xm w300 h200, [Main]`nfirst item`nsecond item`n-`nthird item=[Sub1]`n`n[Sub1]`nsub menu 1=data1`nsub menu 2=data2`n
+	Gui, Add, Edit, veMenu xm w300 h200, [Main]`n*first item`n+second item`n-`nthird item=[Sub1]`n`n[Sub1]`nsub menu 1=www.google.com`nsub menu 2=www.autohotkey.com`n
 	Gui, Add, Text, xm w300 h100 vtxtResult,Return value:
 	Gui, Show
 return
@@ -18,11 +18,8 @@ onButton:
 return						  
 
 OnMenu:
-	j := InStr(eMenu, A_ThisMenuItem "=")
-	if j>0
-		j += StrLen(A_ThisMenuitem)+1, data := " - "SubStr(emenu, j, InStr(emenu, "`n", false, j)-j)
-	Tooltip %A_ThisMenu%  -  %A_ThisMenuItem% %data%, 0, 0
-	data =
+	data := ShowMenu_Data(eMenu)
+	Tooltip %A_ThisMenu%  -  %A_ThisMenuItem%`nUser data: "%data%", 0, 0
 return
 
 OnBtnAbout:
