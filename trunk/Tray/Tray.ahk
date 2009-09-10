@@ -68,12 +68,17 @@ Tray_Add( hGui, Handler, Icon, Tooltip="") {
 Tray_Click(Position, Button="L") {
 	static L=513, R=516, M=520, Ld=515
 
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+
 	Tray_Define(Position, "mhw", msg, htray, hwnd)
 	mDown := %Button%, mUp := mDown+1
 
 	PostMessage, msg, hTray, mDown, ,ahk_id %hwnd%
 	if Button != Ld
 		PostMessage, msg, hTray, mUp, ,ahk_id %hwnd%
+	
+	DetectHiddenWindows,  %oldDetect%
 }
 
 /*Function:		Count
