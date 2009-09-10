@@ -12,6 +12,8 @@ return
 OnIcon(){
 }
 
+ESC:: GoSub OnExit
+
 Rotate:
 	i++
 	n := Tray_Count()

@@ -59,13 +59,34 @@ Tray_Add( hGui, Handler, Icon, Tooltip="") {
 
 /*Function:		Count
  				Get the number of icons in the notificaiton area.
-
  */
 Tray_Count() {
 	static TB_BUTTONCOUNT = 0x418
-	idxTB := Tray_getTrayBar()
-	SendMessage,TB_BUTTONCOUNT,,,ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
+	tid := Tray_getTrayBar()
+	SendMessage,TB_BUTTONCOUNT,,,, ahk_id %tid%
 	return ErrorLevel
+}
+
+Tray_Click(Position, Button="LEFT", No=1 ) {
+	Tray_GetRect(-Position, ix, iy, iw), ix+=2, iy+=2
+	ifEqual, iw, 0, return 0		;hidden icon
+	ht := Tray_getTrayBar()
+	ControlClick, x%ix% y%iy%, ahk_id %ht%,,%Button%,%No%
+	return !ErrorLevel
+
+;	PostMessage, Msg, hTray, 513, ,ahk_id %hGui%											
+;
+;	VarSetCapacity(POINT, 8), DllCall("GetCursorPos", "uint", &POINT), X := NumGet(POINT, 0, "Int"), Y := NumGet(POINT, 4, "Int")	
+;
+;	oldSpeed := A_DefaultMouseSpeed 
+;	SetDefaultMouseSpeed, 0
+;
+;
+;	DllCall("SetCursorPos", "Int", xx+4, "Int", yy+4)				;moving the cursor using screen coordinates in Tray_GetRect works but clanky.
+;	Sleep 20
+;	Click
+;	DllCall("SetCursorPos", "Int", X, "Int", Y)
+;	SetDefaultMouseSpeed, %oldSpeed%
 }
 
 /*Function:		Define
@@ -75,7 +96,7 @@ Tray_Count() {
 				Filter  - Contains process name, ahk_pid, ahk_id or 1-based position for which to return information.
 						  If you specify position as Filter, you can use output variables to store information.
 				pQ		- Query parameter, by default "ihw".
-				o1 .. o4 - Refernce to output variables.
+				o1..o4  - Reference to output variables.
 
   Query:
 				h	- Handle.
@@ -89,7 +110,7 @@ Tray_Count() {
   Returns:
 				String containing icon information per line. 
  */
-Tray_Define(Filter="", pQ="", ByRef o1="~`a ", ByRef o2="", ByRef o3="", ByRef o4=""){
+Tray_Define(Filter="", pQ="", ByRef o1="~`a ", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="", ByRef o7=""){
 	static TB_BUTTONCOUNT = 0x418, TB_GETBUTTON=0x417, sep="|"
 	ifEqual, pQ,, SetEnv, pQ, ihw
 
@@ -105,15 +126,15 @@ Tray_Define(Filter="", pQ="", ByRef o1="~`a ", ByRef o2="", ByRef o3="", ByRef o
 	WinGet,	pidTaskbar, PID, ahk_class Shell_TrayWnd
 	hProc := DllCall("OpenProcess", "Uint", 0x38, "int", 0, "Uint", pidTaskbar)
 	pProc := DllCall("VirtualAllocEx", "Uint", hProc, "Uint", 0, "Uint", 32, "Uint", 0x1000, "Uint", 0x4)
-	idxTB := Tray_getTrayBar()
-	SendMessage,TB_BUTTONCOUNT,,,ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
+	tid := Tray_getTrayBar()
+	SendMessage,TB_BUTTONCOUNT,,,,ahk_id %tid%
 	
 	i := bPos ? bPos-1 : 0
 	cnt := bPos ?  1 : ErrorLevel
 	Loop, %cnt%
 	{
 		i++
-		SendMessage, TB_GETBUTTON, i-1, pProc, ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
+		SendMessage, TB_GETBUTTON, i-1, pProc,, ahk_id %tId%
 
 		VarSetCapacity(BTN,32), DllCall("ReadProcessMemory", "Uint", hProc, "Uint", pProc, "Uint", &BTN, "Uint", 32, "Uint", 0)
 		if !(dwData := NumGet(BTN,12))
@@ -142,6 +163,77 @@ Tray_Define(Filter="", pQ="", ByRef o1="~`a ", ByRef o2="", ByRef o3="", ByRef o
 	return SubStr(res, 1, -1)
 }
 
+/* Function:	Focus
+ 				Focus notification icon or window.
+
+   Parameters:
+				hGui - Handle of the parent window.
+				hTray - Tray icon handle. This icon will be focused. As a consequence, you can use SPACEBAR or ENTER instead left click and
+				windows popup keyboard button as rclick. 
+				Arrows can be used to select other icons. However, there is no visual representation of selection apart from the tooltip
+				that is shown after few moments.
+
+   Remarks:
+				If both parameters are missing, function will focus Notification area.
+  */
+Tray_Focus(hGui="", hTray="") {
+	static NIM_SETFOCUS=0x3
+
+	if (hGui hTray = "") {
+		hwnd := WinExist("ahk_class Shell_TrayWnd")
+		WinActivate, ahk_id %hwnd%
+		WinWaitActive, ahk_id %hwnd%
+		ControlSend,, ^{TAB}, ahk_class Shell_TrayWnd
+		return
+	}
+
+	VarSetCapacity( NID, 88, 0) 
+	 ,NumPut(88,	NID)
+	 ,NumPut(hGui,	NID, 4)	
+	 ,NumPut(hTray,	NID, 8)
+	
+	r := DllCall("shell32.dll\Shell_NotifyIconA", "uint", NIM_SETFOCUS, "uint", &NID)
+}
+
+/* Function:	GetRect
+ 				Get tray icon rect.
+
+   Parameters:
+				Position	- Position of the tray icon. Use negative position to retreive client coordinates.
+				x-h			- Refrence to outuptu variables, optional.
+	
+   Returns:
+				String containing all outuput variables.
+
+   Remarks:
+				This function can be used to determine if tray icon is hidden. Such tray icons will have string "0 0 0 0" returned.
+  */
+Tray_GetRect( Position, ByRef x="", ByRef y="", ByRef w="", ByRef h="" ) {
+	static TB_GETITEMRECT := 0x41D
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+
+	If (Position < 0)
+		Position := -Position, bClient := true
+
+	tid := Tray_getTrayBar()
+	WinGetPos, xp, yp, ,, ahk_id %tid%
+	VarSetCapacity(RECT, 16)
+
+	WinGet,	pidTaskbar, PID, ahk_id %tid%
+	hProc := DllCall("OpenProcess", "Uint", 0x38, "int", 0, "Uint", pidTaskbar)
+	pProc := DllCall("VirtualAllocEx", "Uint", hProc, "Uint", 0, "Uint", 16, "Uint", 0x1000, "Uint", 0x4)
+	
+	SendMessage, TB_GETITEMRECT, Position-1, pProc, , ahk_id %tid%
+	DllCall("ReadProcessMemory", "Uint", hProc, "Uint", pProc, "Uint", &RECT, "Uint", 16, "Uint", 0)	
+	x := NumGet(RECT, 0, "Int"), y := NumGet(RECT, 4, "Int"),  w := NumGet(RECT, 8, "Int")-x,  h := NumGet(RECT, 12, "Int") - y
+	if !bClient
+		x+=xp, y+=yp
+
+	DetectHiddenWindows,  %oldDetect%
+	return x " " y " " w " " h
+}
+
 /* Function:	GetTooltip
  				Get tooltip of the tray icon.
 
@@ -157,8 +249,8 @@ Tray_GetTooltip(Position){
 	WinGet,	pidTaskbar, PID, ahk_class Shell_TrayWnd
 	hProc := DllCall("OpenProcess", "Uint", 0x38, "int", 0, "Uint", pidTaskbar)
 	pProc := DllCall("VirtualAllocEx", "Uint", hProc, "Uint", 0, "Uint", 32, "Uint", 0x1000, "Uint", 0x4)
-	idxTB := Tray_getTrayBar()
-	SendMessage, TB_GETBUTTON, Position-1, pProc, ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
+	tid := Tray_getTrayBar()
+	SendMessage, TB_GETBUTTON, Position-1, pProc, , ahk_id %tid%
 	VarSetCapacity(BTN,32), DllCall("ReadProcessMemory", "Uint", hProc, "Uint", pProc, "Uint", &BTN, "Uint", 32, "Uint", 0)
 	If	dwData	:= NumGet(BTN,12)
 		 iString := NumGet(BTN,16)
@@ -172,6 +264,45 @@ Tray_GetTooltip(Position){
 
 	DetectHiddenWindows,  %oldDetect%
 	return sTooltip
+}
+
+/*	Function:	Disable
+ 				Disable the notification area.
+	
+	Remarks:
+				The shell must be restarted for the changes to take effect. See <Shell_Restart> for details.
+ */
+Tray_Disable(bDisable=true) {
+	static key="Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
+	
+	RegWrite,REG_DWORD, HKEY_CURRENT_USER, %key%, NoTrayItemsDisplay, %bDisable%
+
+	/* This works but any app that interacts with tray will return it back. 
+	   The function is made so it canbe spammed in timer to re-hide. One option was to SetParent of the Not. Toolbar to seomthing else
+	   in which case icons are not shown but space is not reserved.
+
+	static ht, hr, hp
+
+	if !ht {
+		hp := WinExist("ahk_class Shell_TrayWnd")
+		ControlGet, ht, HWND,,TrayNotifyWnd1, ahk_id %hp%
+		ControlGet, hr, HWND,,ReBarWindow321, ahk_id %hp%
+	}
+	bVisible := DllCall("IsWindowVisible", "uint", ht)
+	if (bHide && !bVisible) || (!bHide && bVisible)
+		return
+
+	ControlGetPos,,,wt,,,ahk_id %ht%
+	ControlGetPos,,,wr,,,ahk_id %hr%
+
+	if !bHide {
+		ControlMove,,,,wr-wt,,ahk_id %hr%
+		WinShow, ahk_id %ht%
+	} else {
+		ControlMove,,,,wr+wt,,ahk_id %hr%
+		WinHide, ahk_id %ht%
+	}
+	*/
 }
 
 /*	Function:	Modify
@@ -225,14 +356,14 @@ Tray_Modify( hGui, hTray, Icon, Tooltip="~`a " ) {
  */
 Tray_Move(Pos, NewPos=""){
 	static TB_MOVEBUTTON = 0x452
-	idxTB := Tray_getTrayBar()
+	tid := Tray_getTrayBar()
 
 	if (NewPos = "") {
-		SendMessage,TB_BUTTONCOUNT,,,ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
+		SendMessage,TB_BUTTONCOUNT,,,, ahk_id %tid%
 		NewPos := ErrorLevel
 	}
 
-	SendMessage,TB_MOVEBUTTON, Pos-1, NewPos-1, ToolbarWindow32%idxTB%, ahk_class Shell_TrayWnd
+	SendMessage,TB_MOVEBUTTON, Pos-1, NewPos-1,, ahk_id %tid%
 }
 
 /* Function:	Remove
@@ -275,21 +406,17 @@ Tray_Refresh(){
 
 	ControlGetPos,,,w,h,ToolbarWindow321, AHK_class Shell_TrayWnd 
 	width:=w, hight:=h 
-	while % ((h:=h-5)>0 and w:=width)
-		while % ((w:=w-5)>0)
-			PostMessage, WM_MOUSEMOVE,0,% ((hight-h) >> 16)+width-w,ToolbarWindow321, AHK_class Shell_TrayWnd 
+	while ((h:=h-5)>0 and w:=width)
+		while ((w:=w-5)>0)
+			PostMessage, WM_MOUSEMOVE,0, ((hight-h) >> 16)+width-w, ToolbarWindow321, AHK_class Shell_TrayWnd 
 }
 
 ;======================================== PRIVATE ====================================
 
 Tray_getTrayBar(){
-	ControlGet, hParent, hWnd,, TrayNotifyWnd1  , ahk_class Shell_TrayWnd
-	ControlGet, hChild , hWnd,, ToolbarWindow321, ahk_id %hParent%
-	Loop {
-		ControlGet, hwnd, HWND,, ToolbarWindow32%A_Index%, ahk_class Shell_TrayWnd
-		IfEqual, hwnd, 0, return
-		IfEqual, hwnd, %hChild%, return A_Index
-	}
+	ControlGet, h, HWND,, TrayNotifyWnd1  , ahk_class Shell_TrayWnd
+	ControlGet, h, HWND,, ToolbarWindow321, ahk_id %h%
+	return h
 }
 
 
@@ -310,9 +437,9 @@ Tray_loadIcon(pPath, pSize=32){
 Tray_onShellIcon(Wparam, Lparam) {
 	static EVENT_512="P", EVENT_513="L", EVENT_514="Lu", EVENT_515="Ld", EVENT_516="R", EVENT_517="Ru", EVENT_518="Rd", EVENT_519="M", EVENT_520="Mu", EVENT_521="Md"
 
-	handler := Tray(Wparam "handler")
-	 ,event := (Lparam & 0xFFFF)  
-	 ,%handler%(Wparam, EVENT_%event%)
+	;wparam = uid, ; msg = lparam loword
+	handler := Tray(Wparam "handler")  ,event := (Lparam & 0xFFFF)
+	return %handler%(Wparam, EVENT_%event%)
 }
 
 
@@ -346,6 +473,6 @@ Tray(var="", value="~`a ") {
 	o v2.0a by majkinetor. See <http://www.autohotkey.com/forum/topic26042.html>.
 	o Tray_Refresh by HotKeyIt <http://www.autohotkey.com/forum/topic36966.html>.
 	o Parts of the code are modifications of the Sean's work <http://www.autohotkey.com/forum/topic17314.html>.
-	o MSDN Reference: <http://msdn2.microsoft.com/en-us/library/aa453686.aspx> .
+	o MSDN Reference: <http://msdn.microsoft.com/en-us/library/ee330740(VS.85).aspx> .
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> .
  */
