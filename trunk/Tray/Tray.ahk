@@ -57,18 +57,12 @@ Tray_Add( hGui, Handler, Icon, Tooltip="") {
 	return uid
 }
 
-/*Function:		Count
- 				Get the number of icons in the notificaiton area.
- */
-Tray_Count() {
-	static TB_BUTTONCOUNT = 0x418
-	tid := Tray_getTrayBar()
-	SendMessage,TB_BUTTONCOUNT,,,, ahk_id %tid%
-	return ErrorLevel
-}
-
 /*Function:		Click
  				Click the tray icon.
+
+ Parameters:
+				Position	- Position of the tray icon.
+				Button		- "L", "R", "M" or "Ld".
  */
 Tray_Click(Position, Button="L") {
 	static L=513, R=516, M=520, Ld=515
@@ -79,32 +73,19 @@ Tray_Click(Position, Button="L") {
 	PostMessage, msg, hTray, mDown, ,ahk_id %hwnd%
 	if Button != Ld
 		PostMessage, msg, hTray, mUp, ,ahk_id %hwnd%
-
-;	PostMessage, Msg, hTray, 513, ,ahk_id %hwnd%
-;	PostMessage, Msg, hTray, 513, ,ahk_id %hwnd%
-
-;	Tray_GetRect(-Position, ix, iy, iw), ix+=0, iy+=0
-;	ifEqual, iw, 0, return 0		;hidden icon
-;	ht := Tray_getTrayBar()
-;	ControlClick, x%ix% y%iy%, ahk_id %ht%,,%Button%, %No%, NA Pos
-;	return !ErrorLevel
-
-;	PostMessage, Msg, hTray, 513, ,ahk_id %hGui%											
-;
-;	VarSetCapacity(POINT, 8), DllCall("GetCursorPos", "uint", &POINT), X := NumGet(POINT, 0, "Int"), Y := NumGet(POINT, 4, "Int")	
-;
-;	oldSpeed := A_DefaultMouseSpeed 
-;	SetDefaultMouseSpeed, 0
-;
-;
-;	DllCall("SetCursorPos", "Int", xx+4, "Int", yy+4)				;moving the cursor using screen coordinates in Tray_GetRect works but clanky.
-;	Sleep 20
-;	Click
-;	DllCall("SetCursorPos", "Int", X, "Int", Y)
-;	SetDefaultMouseSpeed, %oldSpeed%
 }
 
-/*Function:		Define
+/*Function:		Count
+ 				Get the number of icons in the notificaiton area.
+ */
+Tray_Count() {
+	static TB_BUTTONCOUNT = 0x418
+	tid := Tray_getTrayBar()
+	SendMessage,TB_BUTTONCOUNT,,,, ahk_id %tid%
+	return ErrorLevel
+}
+
+/* Function:	Define
  				Get information about system tray icons.
  
   Parameters:

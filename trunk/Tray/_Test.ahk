@@ -2,7 +2,7 @@ _("mo! e d")
 SetBatchLines, -1
 CoordMode, mouse, screen
 #singleinstance, force
-
+;	old := AppBar_SetTaskbar("disable")
 	OnExit, OnExit
 	Gui,  +LastFound +AlwaysOnTop Toolwindow
 	hGui := WinExist() + 0
@@ -79,8 +79,8 @@ OnTrayIcon(Hwnd, Event) {
 }                 
 
 OnExit:
-	if old != 
-		Appbar_SetTaskBar( old )
+;	if old != 
+;		Appbar_SetTaskBar( old )
 	Tray_Remove(hGui)
 	ExitApp
 return
@@ -130,4 +130,3 @@ ShowTooltip( Msg, X="" ,Y="", TimeIn=500, TimeOut=1500){
 
 #include Tray.ahk
 #include Appbar.ahk
-#include Shell.ahk
