@@ -2,12 +2,6 @@ _("mo! e d")
 SetBatchLines, -1
 CoordMode, mouse, screen
 #singleinstance, force
-;	old := Appbar_SetTaskBar("disable")
-
-	Process, Exist
-	pid := ErrorLevel
-	hAhk := WinExist("ahk_pid " ErrorLevel) +0
-
 
 	OnExit, OnExit
 	Gui,  +LastFound +AlwaysOnTop Toolwindow
@@ -43,18 +37,17 @@ RefreshTray:
 	RefreshTray()
 return
 
+GuiContextMenu:
 OnPicture:
 	MouseGetPos,,,,c
 	StringReplace, c, c, static
-;	Tray_Click(	c, "R" )	;worked only for this script icons.
-
-
 	Tray_Define(c, "inhwm", pos, name, handle, parent, msg)
 ;	tip := Tray_GetTooltip(c)
 ;	msgbox Pos: %pos%  Handle: %handle%  Parent: %parent%  Name: %name%`nMsg:%msg%`nTooltip:%tip% 
-	t = Pos: %pos%  Handle: %handle%  Parent: %parent%  Name: %name%`nMsg:%msg%`nTooltip:%tip% 
-	btn := GetKeyState("LButton")
-	Tray_Click(pos)
+
+	dbl := GetKeyState("Shift")
+	button := dbl ? "Ld" : A_ThisLabel="OnPicture" ? "L" : "R"
+	Tray_Click(pos,  button) 
 return	
 
 
@@ -64,14 +57,10 @@ OnMouseMove(wparam, lparam){
 	if c contains Static
 	{
 		StringReplace, c, c, static
-		c := Tray_GetTooltip(c)
-		SetTimer, ShowTooltip, -200
-	} else Tooltip
+		ShowTooltip( Tray_GetTooltip(c) )
+	}
 }
 
-ShowTooltip:
-	Tooltip, %c%
-return
 
 SetIcon(Pos, hIcon){
 	global
@@ -116,6 +105,27 @@ MoveAhkIcons(){
 	s := Tray_Define("autohotkey.exe", "i")
 	loop, parse, s, `n
 		Tray_Move(A_LoopField+1 - A_Index)
+}
+
+ShowTooltip( Msg, X="" ,Y="", TimeIn=500, TimeOut=1500){
+	static 
+	_Msg := Msg, _X:=X, _Y:=Y
+	MouseGetPos, , , , _ctrl
+
+	t1 := -TimeIn, t2 := -TimeOut
+	SetTimer, ShowTooltipOn, %t1%
+	return
+
+ ShowTooltipOff:
+	Tooltip, , , , 19
+ return
+
+ ShowTooltipOn:
+	SetTimer, ShowTooltipOff, %t2%
+	MouseGetPos, , , , ctrl
+	ifNotEqual, ctrl, %_ctrl%, return
+	Tooltip,%_Msg% , _X, _Y, 19
+ return
 }
 
 #include Tray.ahk
