@@ -270,35 +270,9 @@ Tray_GetTooltip(Position){
  */
 Tray_Disable(bDisable=true) {
 	static key="Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
-	
 	RegWrite,REG_DWORD, HKEY_CURRENT_USER, %key%, NoTrayItemsDisplay, %bDisable%
-
-	/* This works but any app that interacts with tray will return it back. 
-	   The function is made so it canbe spammed in timer to re-hide. One option was to SetParent of the Not. Toolbar to seomthing else
-	   in which case icons are not shown but space is not reserved.
-
-	static ht, hr, hp
-
-	if !ht {
-		hp := WinExist("ahk_class Shell_TrayWnd")
-		ControlGet, ht, HWND,,TrayNotifyWnd1, ahk_id %hp%
-		ControlGet, hr, HWND,,ReBarWindow321, ahk_id %hp%
-	}
-	bVisible := DllCall("IsWindowVisible", "uint", ht)
-	if (bHide && !bVisible) || (!bHide && bVisible)
-		return
-
-	ControlGetPos,,,wt,,,ahk_id %ht%
-	ControlGetPos,,,wr,,,ahk_id %hr%
-
-	if !bHide {
-		ControlMove,,,,wr-wt,,ahk_id %hr%
-		WinShow, ahk_id %ht%
-	} else {
-		ControlMove,,,,wr+wt,,ahk_id %hr%
-		WinHide, ahk_id %ht%
-	}
-	*/
+	;this is try to reset explorer on the run but it doesn't work
+    ;r := DllCall("SendMessageTimeoutA", "uint", WM_SETTINGCHANGE:=0xFFFF, "uint", 0x1A, "uint", 0, "str", "Policy", "uint", 1, "int", 10, "uintp", var)
 }
 
 /*	Function:	Modify
@@ -394,8 +368,7 @@ Tray_Remove( hGui, hTray="") {
 
 	Remarks:
 				If process exits forcefully, its tray icons wont be removed.
-				Call this function to refresh the notification area in such cases.
- 
+				Call this function to refresh the notification area in such cases. 
  */
 Tray_Refresh(){ 
 	static WM_MOUSEMOVE = 0x200
