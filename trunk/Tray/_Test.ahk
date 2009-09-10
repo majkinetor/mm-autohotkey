@@ -23,6 +23,10 @@ return
 ESC:: GoSub OnExit
 
 
+F3::
+	Tray_Disable(false)
+return
+
 RefreshTray(){
 	s := Tray_Define("", "o")
 	loop, parse, s, `n
@@ -129,4 +133,3 @@ ShowTooltip( Msg, X="" ,Y="", TimeIn=500, TimeOut=1500){
 }
 
 #include Tray.ahk
-#include Appbar.ahk
