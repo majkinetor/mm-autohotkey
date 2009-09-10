@@ -57,7 +57,8 @@ Tray_Add( hGui, Handler, Icon, Tooltip="") {
 	return uid
 }
 
-/*Function:		Click
+/*
+ Function:		Click
  				Click the tray icon.
 
  Parameters:
@@ -157,6 +158,18 @@ Tray_Define(Filter="", pQ="", ByRef o1="~`a ", ByRef o2="", ByRef o3="", ByRef o
 
 	DetectHiddenWindows,  %oldDetect%
 	return SubStr(res, 1, -1)
+}
+
+/*	
+	Function:	Disable
+ 				Disable the notification area.
+	
+	Remarks:
+				The shell must be restarted for the changes to take effect. See <Shell_Restart> for details.
+ */
+Tray_Disable(bDisable=true) {
+	static key="Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
+	RegWrite,REG_DWORD, HKEY_CURRENT_USER, %key%, NoTrayItemsDisplay, %bDisable%
 }
 
 /* Function:	Focus
@@ -260,17 +273,6 @@ Tray_GetTooltip(Position){
 
 	DetectHiddenWindows,  %oldDetect%
 	return sTooltip
-}
-
-/*	Function:	Disable
- 				Disable the notification area.
-	
-	Remarks:
-				The shell must be restarted for the changes to take effect. See <Shell_Restart> for details.
- */
-Tray_Disable(bDisable=true) {
-	static key="Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
-	RegWrite,REG_DWORD, HKEY_CURRENT_USER, %key%, NoTrayItemsDisplay, %bDisable%
 }
 
 /*	Function:	Modify
