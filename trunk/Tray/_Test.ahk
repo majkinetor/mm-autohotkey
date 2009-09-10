@@ -1,4 +1,4 @@
-_("mo! e d")
+;_("mo! e d")
 SetBatchLines, -1
 CoordMode, mouse, screen
 #singleinstance, force
@@ -85,11 +85,9 @@ OnExit:
 	ExitApp
 return
 
-F1::
-
-F2::
-	Tray_Remove(hGui)
-return
+F1:: MoveAhkIcons()
+F2:: Tray_Remove(hGui)
+F3:: ShowAllTooltips()
 
 
 
