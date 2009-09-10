@@ -67,12 +67,27 @@ Tray_Count() {
 	return ErrorLevel
 }
 
-Tray_Click(Position, Button="LEFT", No=1 ) {
-	Tray_GetRect(-Position, ix, iy, iw), ix+=2, iy+=2
-	ifEqual, iw, 0, return 0		;hidden icon
-	ht := Tray_getTrayBar()
-	ControlClick, x%ix% y%iy%, ahk_id %ht%,,%Button%,%No%
-	return !ErrorLevel
+/*Function:		Click
+ 				Click the tray icon.
+ */
+Tray_Click(Position, Button="L") {
+	static L=513, R=516, M=520, Ld=515
+
+	Tray_Define(Position, "mhw", msg, htray, hwnd)
+	mDown := %Button%, mUp := mDown+1
+
+	PostMessage, msg, hTray, mDown, ,ahk_id %hwnd%
+	if Button != Ld
+		PostMessage, msg, hTray, mUp, ,ahk_id %hwnd%
+
+;	PostMessage, Msg, hTray, 513, ,ahk_id %hwnd%
+;	PostMessage, Msg, hTray, 513, ,ahk_id %hwnd%
+
+;	Tray_GetRect(-Position, ix, iy, iw), ix+=0, iy+=0
+;	ifEqual, iw, 0, return 0		;hidden icon
+;	ht := Tray_getTrayBar()
+;	ControlClick, x%ix% y%iy%, ahk_id %ht%,,%Button%, %No%, NA Pos
+;	return !ErrorLevel
 
 ;	PostMessage, Msg, hTray, 513, ,ahk_id %hGui%											
 ;
