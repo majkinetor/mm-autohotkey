@@ -271,8 +271,6 @@ Tray_GetTooltip(Position){
 Tray_Disable(bDisable=true) {
 	static key="Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
 	RegWrite,REG_DWORD, HKEY_CURRENT_USER, %key%, NoTrayItemsDisplay, %bDisable%
-	;this is try to reset explorer on the run but it doesn't work
-    ;r := DllCall("SendMessageTimeoutA", "uint", WM_SETTINGCHANGE:=0xFFFF, "uint", 0x1A, "uint", 0, "str", "Policy", "uint", 1, "int", 10, "uintp", var)
 }
 
 /*	Function:	Modify
@@ -368,7 +366,8 @@ Tray_Remove( hGui, hTray="") {
 
 	Remarks:
 				If process exits forcefully, its tray icons wont be removed.
-				Call this function to refresh the notification area in such cases. 
+				Call this function to refresh the notification area in such cases.
+ 
  */
 Tray_Refresh(){ 
 	static WM_MOUSEMOVE = 0x200
@@ -439,7 +438,7 @@ Tray(var="", value="~`a ") {
 */
 
 /* Group: About
-	o v2.0a by majkinetor. See <http://www.autohotkey.com/forum/topic26042.html>.
+	o v2.1 by majkinetor. See <http://www.autohotkey.com/forum/topic26042.html>.
 	o Tray_Refresh by HotKeyIt <http://www.autohotkey.com/forum/topic36966.html>.
 	o Parts of the code are modifications of the Sean's work <http://www.autohotkey.com/forum/topic17314.html>.
 	o MSDN Reference: <http://msdn.microsoft.com/en-us/library/ee330740(VS.85).aspx> .
