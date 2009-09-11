@@ -165,7 +165,23 @@ Appbar_SetTaskBar(State=""){
 	return (%curState%)
 }
 
-;wpaaram msg, ;lparam, msg param
+;=========================================== PRIVATE ================================================
+;Copy of Win_Animate
+AppBar_animate(Hwnd, Type="", Time=100){
+	static AW_ACTIVATE = 0x20000, AW_BLEND=0x80000, AW_CENTER=0x10, AW_HIDE=0x10000,AW_HNEG=0x2, AW_HPOS=0x1, AW_SLIDE=0x40000, AW_VNEG=0x8, AW_VPOS=0x4
+
+	hFlags := 0
+	loop, parse, Type, %A_Tab%%A_Space%, %A_Tab%%A_Space%
+		ifEqual, A_LoopField,,continue
+		else hFlags |= AW_%A_LoopField%
+
+	ifEqual, hFlags, ,return "Err: Some of the types are invalid"
+	DllCall("AnimateWindow", "uint", Hwnd, "uint", Time, "uint", hFlags)
+}
+
+
+;not used atm. Should be used to repositin bar when other bars are created so there is no overalapping.
+;wparam msg, lparam, msg parameter
 AppBar_onMessage(Wparam, Lparam, Msg, Hwnd){
 	static ABN_POSCHANGED=1, ABN_FULLSCREENAPP=2
 	
@@ -232,9 +248,9 @@ Appbar_timer(Hwnd="", Edge="", Anim1="", Anim2="", Label="") {
 		p := %j%v1,  q := %j%v2,  dp := %j%d1,  dq := %j%d2, Sp := S%p%, Sq := S%q%,  pos1 := %j%pos1,  pos2 := %j%pos2, e := %j%e
 		p :=%p%, q:=%q%
 		if ((e && p<5) || (!e && p>Sp-5))  && (q>pos1 && q<pos2)
-			Win_Animate(%j%Hwnd, %j%animOn), %j%bVisible := true
+			Appbar_animate(%j%Hwnd, %j%animOn), %j%bVisible := true
 		else if (%j%bVisible) && (e && p>dp) || (!e && p<Sp-dp) || (q<pos1) || (q > pos2)
-			Win_Animate(%j%Hwnd, %j%animOff), %j%bVisible := false
+			Appbar_animate(%j%Hwnd, %j%animOff), %j%bVisible := false
 	}
 }
 
