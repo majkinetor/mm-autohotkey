@@ -13,7 +13,7 @@
  */ 
 ShowTooltip( Msg, X="" ,Y="", TimeIn=500, TimeOut=1500){
 	static 
-	_Msg := Msg, _X:=X, _Y:=Y,, _TimeOut := TimeOut
+	_Msg := Msg, _X:=X, _Y:=Y, _TimeOut := TimeOut
 	MouseGetPos,,,_win,_ctrl
 	SetTimer, ShowTooltipOn, % -TimeIn
 	return
@@ -21,11 +21,11 @@ ShowTooltip( Msg, X="" ,Y="", TimeIn=500, TimeOut=1500){
 	Tooltip,,,,19
  return
  ShowTooltipOn:
-	if (_TimeOut)
-		SetTimer, ShowTooltipOff, % -_TimeOut
 	MouseGetPos,,,win,ctrl
 	if (win != _win) || (ctrl != _ctrl)
 		return
+	if (_TimeOut)
+		SetTimer, ShowTooltipOff, % -_TimeOut
 	Tooltip,%_Msg% , _X, _Y, 19
  return
 }
