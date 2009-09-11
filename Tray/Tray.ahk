@@ -96,7 +96,8 @@ Tray_Count() {
  
   Parameters:
 				Filter  - Contains process name, ahk_pid, ahk_id or 1-based position for which to return information.
-						  If you specify position as Filter, you can use output variables to store information.
+						  If you specify position as Filter, you can use output variables to store information since in that 
+						  case its guarnateed that only 1 item is returned. Omit to return information about all icons.
 				pQ		- Query parameter, by default "ihw".
 				o1..o4  - Reference to output variables.
 
