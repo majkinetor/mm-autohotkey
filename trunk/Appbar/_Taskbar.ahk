@@ -1,4 +1,4 @@
-_("m e")
+_("mo! e")
 	OnExit OnExit
 	;oldTaskbar := AppBar_SetTaskbar("+autohide")
 
@@ -6,13 +6,11 @@ _("m e")
 	Fatal("Can't create Appbar", n=0)
 	GroupAdd, AppBar, ahk_class DV2ControlHost		;add start menu so first appbar doesn't close when we launch it.
 
-; This works too :)
+; This works too, on some systems animation is jerky :)
 ;	Run, Notepad
 ;	WinWait, Untitled
-;	WinSet, Style, 
 ;	hApp3 := WinExist("Untitled")
-;	AppBar_New(hApp3,  "Edge=Right", "AutoHide=Blend", "Pos=w100 h100 p300", "Label=AppBar3")
-
+;	AppBar_New(hApp3,  "Edge=Right", "AutoHide=Blend", "Label=AppBar3")
 
 	Gui, %n%:Add, Text, HWNDhDummy
 	Gui, %n%:Add, Button, HWNDhStart gOnStart x4 w50 y2, Start
@@ -30,13 +28,11 @@ _("m e")
 	Shell_SetHook("OnShell")
 return
 
-
 Refresh() {
 	global
 	MakeTaskbar(hTaskBar, true)
 	MakeTray(hTray, w, true)
 }
-
 
 OnShell(Event, Param) {	
 	global
@@ -69,16 +65,13 @@ OnTaskBar(hCtrl, Event, Txt, Pos, Id)){
 }
 
 OnTray(hCtrl, Event, Txt, Pos, Id){
-	static lastpos
-	IfEqual, Event, hot
+	If Event = hot
 	{
-		if (lastpos != pos)
-			ShowTooltip( Tray_GetTooltip( pos ) )
-		lastpos := pos
-		return 1		;prevent hot item showing, the same as windows tray
+		ShowTooltip( Tray_GetTooltip( pos ) )
+		return 1		;prevent hot item showing, the same as windows tray.
 	}
+	else Tray_Click(pos, Event="click" ? "L" : "R")
 }
-
 
 ;AppBarContextMenu:
 ;	ShowMenu("[Menu]`nToggle Lock")
@@ -88,7 +81,6 @@ Menu:
 	if A_ThisMenuItem contains Lock
 		Rebar_Lock(hRebar, "~")
 return
-
 
 OnExit:
 	AppBar_Remove(hApp1)
@@ -100,7 +92,6 @@ OnExit:
 	Shell_SetHook()
 	ExitApp
 return
-
 
 MakeTaskBar(hGui, refresh=0) {
 	static hIL, hT
@@ -190,22 +181,21 @@ GetWindowIcon(pHandle, pLarge=true){
 }
 
 ShowTooltip( Msg, X="" ,Y="", TimeIn=500, TimeOut=1500){
-	static 
-	_Msg := Msg, _X:=X, _Y:=Y
-	MouseGetPos, , , , _ctrl
-
-	t1 := -TimeIn, t2 := -TimeOut
-	SetTimer, ShowTooltipOn, %t1%
+	static 		
+	_Msg := Msg, _X:=X, _Y:=Y,, _TimeOut := TimeOut
+	MouseGetPos,,,_win,_ctrl
+	SetTimer, ShowTooltipOn, % -TimeIn
 	return
 
  ShowTooltipOff:
-	Tooltip, , , , 19
+	Tooltip,,,,19
  return
 
  ShowTooltipOn:
-	SetTimer, ShowTooltipOff, %t2%
-	MouseGetPos, , , , ctrl
-	ifNotEqual, ctrl, %_ctrl%, return
+	SetTimer, ShowTooltipOff, % -_TimeOut
+	MouseGetPos,,,win,ctrl
+	if (win != _win) || (ctrl != _ctrl)
+		return
 	Tooltip,%_Msg% , _X, _Y, 19
  return
 }
@@ -213,14 +203,14 @@ ShowTooltip( Msg, X="" ,Y="", TimeIn=500, TimeOut=1500){
 #include AppBar.ahk
 
 #include Taskbar
-#include Rebar.ahk
-#include Toolbar.ahk
-#include Shell.ahk
-#include ShellContextMenu.ahk
-#include Tray.ahk
-#include ShowMenu.ahk
-#include IL.ahk
-#include Win.ahk
-#include Taskbar.ahk
-#include _.ahk
-#include COM.ahk
+ #include Rebar.ahk
+ #include Toolbar.ahk
+ #include Shell.ahk
+ #include ShellContextMenu.ahk
+ #include Tray.ahk
+ #include ShowMenu.ahk
+ #include IL.ahk
+ #include Win.ahk
+ #include Taskbar.ahk
+ #include _.ahk
+ #include COM.ahk
