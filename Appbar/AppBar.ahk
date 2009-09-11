@@ -295,7 +295,7 @@ Appbar_setPos(Hwnd, Edge="", Width="", Height="", Pos=""){
 }
 
 /* Group: About
-	o v0.9 by majkinetor 
+	o v0.91 by majkinetor 
 	o Reference: <http://msdn.microsoft.com/en-us/library/cc144177(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*
