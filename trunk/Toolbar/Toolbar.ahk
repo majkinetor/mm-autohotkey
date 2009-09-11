@@ -528,15 +528,15 @@ Toolbar_Insert(hCtrl, Btns, Pos=""){
  			Moves a button from one position to another.
  
  Parameters:
- 			OldPos		- 1-based postion of the button to be moved.
- 			NewPos		- 1-based postion where the button will be moved.
+ 			Pos		- 1-based postion of the button to be moved.
+ 			NewPos	- 1-based postion where the button will be moved.
  
  Returns:
  			Returns nonzero if successful, or zero otherwise.
  */
-Toolbar_MoveButton(hCtrl, OldPos, NewPos) {
+Toolbar_MoveButton(hCtrl, Pos, NewPos) {
 	static TB_MOVEBUTTON = 0x452
-    SendMessage, TB_MOVEBUTTON, OldPos-1,NewPos-1, ,ahk_id %hCtrl%
+    SendMessage, TB_MOVEBUTTON, Pos-1, NewPos-1, ,ahk_id %hCtrl%
 	return ErrorLevel
 }
 
