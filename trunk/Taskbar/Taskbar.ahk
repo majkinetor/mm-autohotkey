@@ -6,8 +6,24 @@
 				as well as hide, delete or move its buttons.
  */
 
+/*  
+ Function:		Count
+				Get the number of buttons in the Taskbar.
+ 
+ Returns:
+				Number. This includes hidden buttons. 	
+ */
+
+Taskbar_Count() {
+	static TB_BUTTONCOUNT=0x418
+	h := Taskbar_GetHandle()
+	SendMessage,TB_BUTTONCOUNT,,,,ahk_id %h%
+	return ErrorLevel
+}
+
+
 /* Function:	Define
- 				Get information about toolbar buttons.
+ 				Get information about Taskbar buttons.
  
   Parameters:
 				Filter  - Contains process name, ahk_pid, ahk_id or 1-based position for which to return information.
@@ -23,7 +39,11 @@
 				p	- Process Pid.
 				n	- Process Name.
 				o	- IcOn handle.
+				t	- Title of the parent window.
  
+  Remarks:
+				Keep in mind that taskbar contains hidden buttons.
+
   Returns:
 				String containing icon information per line. 
  */
@@ -43,7 +63,7 @@ Taskbar_Define(Filter="", pQ="", ByRef o1="~`a ", ByRef o2="", ByRef o3="", ByRe
 	WinGet,	pidTaskbar, PID, ahk_class Shell_TrayWnd
 	hProc := DllCall("OpenProcess", "Uint", 0x38, "int", 0, "Uint", pidTaskbar)
 	pProc := DllCall("VirtualAllocEx", "Uint", hProc, "Uint", 0, "Uint", 32, "Uint", 0x1000, "Uint", 0x4)
-	hctrl := Taskbar_getTaskBar()
+	hctrl := Taskbar_GetHandle()
 	SendMessage,TB_BUTTONCOUNT,,,, ahk_id %hctrl%
 	
 	i := bPos ? bPos-1 : 0
@@ -86,8 +106,21 @@ Taskbar_Define(Filter="", pQ="", ByRef o1="~`a ", ByRef o2="", ByRef o3="", ByRe
 }
 
 /*  
+ Function:	GetHandle
+ 			Get the Hwnd of the Taskbar.
+ 
+ Returns:
+			Hwnd 	
+ */
+Taskbar_GetHandle(){
+	ControlGet, hParent, HWND,,MSTaskSwWClass1, ahk_class Shell_TrayWnd
+	ControlGet, h, HWND,, ToolbarWindow321, ahk_id %hParent%
+	return h
+}
+
+/*  
  Function:	Hide
- 			Hide Toolbar button.
+ 			Hide Taskbar button.
  
  Parameters:
  			Position	- Position of the button.
@@ -99,14 +132,14 @@ Taskbar_Define(Filter="", pQ="", ByRef o1="~`a ", ByRef o2="", ByRef o3="", ByRe
 
 Taskbar_Hide(Handle, bHide=True){
 	static TB_HIDEBUTTON=0x404
-	h := Taskbar_getTaskBar()
+	h := Taskbar_GetHandle()
 	SendMessage, TB_HIDEBUTTON, Handle, bHide,,ahk_id %h%
 	return ErrorLevel
 }
 
 /*  
  Function:	Move
- 			Move Toolbar button.
+ 			Move Taskbar button.
  
  Parameters:
  			Pos		- 1-based postion of the button to be moved.
@@ -117,14 +150,15 @@ Taskbar_Hide(Handle, bHide=True){
  */
 Taskbar_Move(Pos, NewPos){
 	static TB_MOVEBUTTON=0x452
-	h := Taskbar_getTaskBar()
-	SendMessage, TB_MOVEBUTTON,Pos, NewPos,, ahk_id %h%
+	h := Taskbar_GetHandle()
+	SendMessage, TB_MOVEBUTTON,Pos-2, NewPos-2,, ahk_id %h%
+	SendMessage, TB_MOVEBUTTON,Pos-1, NewPos-1,, ahk_id %h%
 	return ErrorLevel
 }
 
 /*  
  Function:	Remove
- 			Remove Toolbar button.
+ 			Remove Taskbar button.
  
  Parameters:
  			Position	- Position of the button.
@@ -135,18 +169,34 @@ Taskbar_Move(Pos, NewPos){
 
 Taskbar_Remove(Position){
 	static TB_DELETEBUTTON=0x416
-	h := Taskbar_getTaskBar()
+	h := Taskbar_GetHandle()
 	SendMessage, TB_DELETEBUTTON,Position-1,,,ahk_id %h%
 	return ErrorLevel
 }
 
+/* Group: Example
+	
+	Sort buttons on the Taskbar:
 
+ (start code)
+	SortTaskbar(type="R") {
+		static WM_SETREDRAW=0xB 
+		h := Taskbar_GetHandle()
+		SendMessage, WM_SETREDRAW, 0, , , ahk_id %h%
+		loop, % Taskbar_Count() // 2 
+		{
+			s := btns := Taskbar_Define("", "ti") "`n"
+			Sort, s, %type%
+			s := RegExReplace( s, "([^\n]*+\n){" A_Index-1 "}", "", "", 1 )
+			s := SubStr(s, 1, InStr(S, "`n")-1)
+			StringSplit, w, s, |
 
-Taskbar_getTaskBar(){
-	ControlGet, hParent, HWND,,MSTaskSwWClass1, ahk_class Shell_TrayWnd
-	ControlGet, h, HWND,, ToolbarWindow321, ahk_id %hParent%
-	return h
-}
+			Taskbar_Move( w2, 2 )
+		}
+		SendMessage, WM_SETREDRAW, 1, , , ahk_id %h%
+	}
+  (end code)
+*/
 
 /* Group: About
 	o v1.0 by majkinetor.
