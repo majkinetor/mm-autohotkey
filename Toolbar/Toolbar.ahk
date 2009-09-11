@@ -528,8 +528,8 @@ Toolbar_Insert(hCtrl, Btns, Pos=""){
  			Moves a button from one position to another.
  
  Parameters:
- 			Pos		- 1-based postion of the button to be moved.
- 			NewPos	- 1-based postion where the button will be moved.
+ 			Pos		- 1-based position of the button to be moved.
+ 			NewPos	- 1-based position where the button will be moved.
  
  Returns:
  			Returns nonzero if successful, or zero otherwise.
