@@ -1,7 +1,7 @@
 /* Title:		Taskbar
 				*Taskbar monitor and controller*
  :
-				Using this module you can monitor and controll Windows taskbar. 
+				Using this module you can monitor and control Windows Taskbar buttons.
 				Your script can get information about windows currently displayed in Taskbar
 				as well as hide, delete or move its buttons.
  */
@@ -30,7 +30,7 @@ Taskbar_Count() {
 						  If you specify position as Filter, you can use output variables to store information since only 1 item
 						  will be returned in that case. If you omit this parameter, information about all buttons will be returned.
 				pQ		- Query parameter, by default "iwt".
-				o1..o4  - Reference to output variables.
+				o1..o7  - Reference to output variables.
 
   Query:
 				h	- Handle.
@@ -40,14 +40,11 @@ Taskbar_Count() {
 				n	- Process Name.
 				o	- IcOn handle.
 				t	- Title of the parent window.
- 
-  Remarks:
-				Keep in mind that taskbar contains hidden buttons.
 
   Returns:
 				String containing icon information per line. 
  */
-Taskbar_Define(Filter="", pQ="", ByRef o1="~`a ", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6=""){
+Taskbar_Define(Filter="", pQ="", ByRef o1="~`a ", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="", ByRef o7=""){
 	static TB_BUTTONCOUNT = 0x418, TB_GETBUTTON=0x417, sep="|"
 	ifEqual, pQ,, SetEnv, pQ, iwt
 
@@ -105,6 +102,73 @@ Taskbar_Define(Filter="", pQ="", ByRef o1="~`a ", ByRef o2="", ByRef o3="", ByRe
 	return SubStr(res, 1, -1)
 }
 
+/*	
+	Function:	Flash
+ 				Flash the Taskbar button.
+
+	Parameters:
+				Hwnd	- Hwnd of the window to flash.
+				Options	- White space separated list of flash options.
+
+	Flash options:
+				Caption - Flash caption.
+				Button  - Flash button. This is default option.
+				All     - Flash both.
+				Timer   - Flesh until next call of this function with empty Options argument.
+				TimerFG - Flash continuously until the window comes to the foreground.
+				N.R		- Decimal number. N specifies number of times to flash, by defult 3, R the flash rate (0 means cursor rate, default).
+				
+	Returns:
+				The return value specifies the window's state before the call to the Flash function. 
+				If the window caption was drawn as active before the call, the return value is nonzero. 
+				Otherwise, the return value is zero.
+
+	Example:
+		>		Taskbar_Flash( Taskbar_Define(2, "w"), "10.200 button")		;flash first button 10 times with 200ms rate, only button
+ */
+Taskbar_Flash( Hwnd=0, Options="" ) { 
+	static STOP=0, CAPTION=1, BUTTON=2, ALL=3, TIMER=4, TIMERFG=12
+	
+	cnt := 0, rate := 0, hFlags := 0
+	loop, parse, Options, %A_Space%%A_Tab%,%A_Space%%A_Tab%
+	{
+		ifEqual, A_LoopField,,continue
+		if A_LoopField is number
+			 cnt := floor(A_LoopField), rate := (j:=InStr(A_LoopField, ".")) ? SubStr(A_LoopField, j+1) : 0
+		else hFlags |= %A_LoopField%
+	}
+	ifEqual, hFlags, , return A_ThisFunc ">Some of the options are invalid: " Options
+	VarSetCapacity(FW, 20), NumPut(20,FW), NumPut(Hwnd,FW,4), NumPut(4,FW,8), NumPut(cnt,FW,12), NumPut(rate,FW,16) 
+	Return DllCall( "FlashWindowEx", "UInt", &FW ) 
+}
+
+/*	
+	Function:	Focus
+ 				Focus the Taskbar.
+	
+	Remarks:
+				After the Taskbar is focused, you can use {Space} or {Enter} to activate window or
+				windows popup button to display system menu.
+ */
+Taskbar_Focus() {
+	h := Taskbar_GetHandle()
+	ControlFocus,,ahk_id %h%    ;this is OK but pressing TAB doesn't move to tray, but returns back to quickl.
+}
+
+/*	
+	Function:	Disable
+ 				Disable the Taskbar.
+
+	Parameters:
+				bDisable	- Set to FALSE to enable Taskbar. By default TRUE.
+ */
+Taskbar_Disable(bDisable=true){
+	tid := Taskbar_GetHandle()
+	if bDisable
+		 WinHide, ahk_id %tid%
+	else WinShow, ahk_id %tid%
+}
+
 /*  
  Function:	GetHandle
  			Get the Hwnd of the Taskbar.
@@ -116,6 +180,45 @@ Taskbar_GetHandle(){
 	ControlGet, hParent, HWND,,MSTaskSwWClass1, ahk_class Shell_TrayWnd
 	ControlGet, h, HWND,, ToolbarWindow321, ahk_id %hParent%
 	return h
+}
+
+/* Function:	GetRect
+ 				Get Taskbar button placement.
+
+   Parameters:
+				Position	- Position of the button. Use negative position to retreive client coordinates.
+				X..H		- Refrence to output variables, optional.
+	
+   Returns:
+				String containing all outuput variables.
+
+   Remarks:
+				This function can be used to determine invisible buttons. Such buttons will have w & h equal to 0.
+  */
+Taskbar_GetRect( Position, ByRef X="", ByRef Y="", ByRef W="", ByRef H="" ) {
+	static TB_GETITEMRECT := 0x41D
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+
+	If (Position < 0)
+		Position := -Position, bClient := true
+
+	tid := Taskbar_GetHandle()
+	WinGetPos, xp, yp,,,ahk_id %tid%
+	VarSetCapacity(RECT, 16)
+
+	WinGet,	pidTaskbar, PID, ahk_id %tid%
+	hProc := DllCall("OpenProcess", "Uint", 0x38, "int", 0, "Uint", pidTaskbar)
+	pProc := DllCall("VirtualAllocEx", "Uint", hProc, "Uint", 0, "Uint", 16, "Uint", 0x1000, "Uint", 0x4)
+	
+	SendMessage, TB_GETITEMRECT, Position-1, pProc,,ahk_id %tid%
+	DllCall("ReadProcessMemory", "Uint", hProc, "Uint", pProc, "Uint", &RECT, "Uint", 16, "Uint", 0)	
+	X := NumGet(RECT, 0, "Int"), Y := NumGet(RECT, 4, "Int"),  W := NumGet(RECT, 8, "Int")-X,  H := NumGet(RECT, 12, "Int") - Y
+	if !bClient
+		X+=xp, Y+=yp
+
+	DetectHiddenWindows,  %oldDetect%
+	return X " " Y " " W " " H
 }
 
 /*  
@@ -142,17 +245,25 @@ Taskbar_Hide(Handle, bHide=True){
  			Move Taskbar button.
  
  Parameters:
- 			Pos		- 1-based postion of the button to be moved.
- 			NewPos	- 1-based postion where the button will be moved.
+ 			Pos		- 1-based position of the button to be moved.
+ 			NewPos	- 1-based postiion where the button will be moved.
  
  Returns:
-			TRUE indicates success. FALSE indicates failure. 
+			TRUE indicates success. FALSE indicates failure.
+
+ Remarks:
+			When moving a button this function will also move its hidden button.
  */
 Taskbar_Move(Pos, NewPos){
 	static TB_MOVEBUTTON=0x452
 	h := Taskbar_GetHandle()
-	SendMessage, TB_MOVEBUTTON,Pos-2, NewPos-2,, ahk_id %h%
-	SendMessage, TB_MOVEBUTTON,Pos-1, NewPos-1,, ahk_id %h%
+	if (NewPos < Pos) {
+		SendMessage, TB_MOVEBUTTON,Pos-2, NewPos-2,, ahk_id %h%
+		SendMessage, TB_MOVEBUTTON,Pos-1, NewPos-1,, ahk_id %h%
+	} else if (NewPos > Pos){
+		SendMessage, TB_MOVEBUTTON,Pos-1, NewPos-1,, ahk_id %h%
+		SendMessage, TB_MOVEBUTTON,Pos-2, NewPos-2,, ahk_id %h%	
+	} else return 1
 	return ErrorLevel
 }
 
@@ -179,6 +290,7 @@ Taskbar_Remove(Position){
 	Sort buttons on the Taskbar:
 
  (start code)
+    ;requires that there are no grouped buttons
 	SortTaskbar(type="R") {
 		static WM_SETREDRAW=0xB 
 		h := Taskbar_GetHandle()
@@ -200,6 +312,6 @@ Taskbar_Remove(Position){
 
 /* Group: About
 	o v1.0 by majkinetor.
-	o Original code by Sean. See <http://www.autohotkey.com/forum/topic18652.html>.
+	o Parts of code by Sean. See <http://www.autohotkey.com/forum/topic18652.html>.
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> .
  */
