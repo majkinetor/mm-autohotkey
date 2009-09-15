@@ -57,7 +57,7 @@ Win_Animate(Hwnd, Type="", Time=100){
  Parameters:
  			X, Y - Point. Use word "mouse" as X to use mouse coordinates.
  */
-Win_FromPoint(X="mouse", Y="", b) { 
+Win_FromPoint(X="mouse", Y="") { 
 	if X=mouse
 		VarSetCapacity(POINT, 8), DllCall("GetCursorPos", "uint", &POINT), X := NumGet(POINT), Y := NumGet(POINT, 4)
 
@@ -482,7 +482,7 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
 
  Parameters:
 			Hwnd	- Handle of the window. If this parameter is omited, Redraw updates the desktop window.
-			Option  - "-" to disable redrawing. "+" to enable it. By default empty.
+			Option  - "-" to disable redrawing for the window. "+" to enable it and redraw it. By default empty.
  
  Returns:
 			A nonzero value indicates success. Zero indicates failure.
@@ -493,10 +493,13 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
 Win_Redraw( Hwnd=0, Option="" ) {
 	static WM_SETREDRAW=0xB, RDW_ALLCHILDREN:=0x80, RDW_ERASE:=0x4, RDW_ERASENOW:=0x200, RDW_FRAME:=0x400, RDW_INTERNALPAINT:=0x2, RDW_INVALIDATE:=0x1, RDW_NOCHILDREN:=0x40, RDW_NOERASE:=0x20, RDW_NOFRAME:=0x800, RDW_NOINTERNALPAINT:=0x10, RDW_UPDATENOW:=0x100, RDW_VALIDATE:=0x8
 
-	if (Options != "") {
+	if (Option != "") {
+		old := A_DetectHiddenWindows
+		DetectHiddenWindows, on
 		bEnable := Option="+"
-		SendMessage, WM_SETREDRAW, bEnable,,,ahk_id %Hwnd%
-		return ErrorLevel
+		SendMessage, 0xB, bEnable,,,ahk_id %Hwnd%
+		DetectHiddenWindows, %old%
+		ifEqual, bEnable, 0, return		
 	}
 	return DllCall("RedrawWindow", "uint", Hwnd, "uint", 0, "uint", 0, "uint" ,RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ERASENOW | RDW_UPDATENOW | RDW_ALLCHILDREN)
 }
