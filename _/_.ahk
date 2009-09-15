@@ -4,23 +4,23 @@
 
 /*	
 	Function:	_
-				StdLib loader.
+				StdLib loader and script initializer.
 	
 	Parameters:
 				opt	- Space separated list of script options.
 	
 	Options:
-				s	- Speed, defaults to -1
+				sN	- Speed, defaults to -1
 				m	- Affects how <m> function works: mm makes it use MsgBox (default), mo OutputDebug, m alone disables it.
-					  Anything else will use FileAppend; for instance mout.txt! writes to out.txt file. ! at the end is optional
-					  and if present, it will mark the file for deletition on scripts startup. !can be also used with o mode to clear the DebugView log.
+					  Anything else will use FileAppend; for instance mout.txt! writes to out.txt file. ! at the end is optional.
+					  and if present, it will mark the file for deletition on scripts startup. ! can also be used with o mode to clear the DebugView log.
 					  DebugView will be started if it doesn't run, make sure its on the system PATH (there will be no error message if Run fails).
 				d	- Detect hidden windows.
 				e	- Escape exits the script. Use ea to exit the script only if its window is active.
 				wd	- SetWorkingDir %A_ScriptDir%
 				t	- Title match mode: t1 (ts), t2 (tc), t3 (te), tr. 
-				w	- SetWinDelay
-				c	- SetControlDelay
+				wN	- SetWinDelay.
+				cN	- SetControlDelay.
 
 
 	Example:	
@@ -61,16 +61,18 @@ _(opt="") {
 
 	if m != 
 	{
+		if (m="o") && !WinExist("ahk_class dbgviewClass"){
+			Run, DbgView.exe, , UseErrorLevel, PID
+			ifNotEqual, PID,, WinWaitActive, ahk_pid %PID%
+		} else WinRestore, ahk_class dbgviewClass
+
 		if SubStr(m,0) = "!" {
 			m := SubStr(m, 1, -1)
 			if m = o
 				 ControlSend, , ^x, ahk_class dbgviewClass
 			else FileDelete, %m%
 		}
-		if (m="o") && !WinExist("ahk_class dbgviewClass"){
-			Run, DbgView.exe, , UseErrorLevel, PID
-			ifNotEqual, PID,, WinWaitActive, ahk_pid %PID%
-		} else WinRestore, ahk_class dbgviewClass
+
 		m("~`a" (m = 1 ? "" : m))
 	}
 
