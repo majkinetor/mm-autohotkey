@@ -57,7 +57,7 @@ Win_Animate(Hwnd, Type="", Time=100){
  Parameters:
  			X, Y - Point. Use word "mouse" as X to use mouse coordinates.
  */
-Win_FromPoint(X="mouse", Y="", b) {
+Win_FromPoint(X="mouse", Y="", b) { 
 	if X=mouse
 		VarSetCapacity(POINT, 8), DllCall("GetCursorPos", "uint", &POINT), X := NumGet(POINT), Y := NumGet(POINT, 4)
 
