@@ -21,9 +21,18 @@
 				t	- Title match mode: t1 (ts), t2 (tc), t3 (te), tr. 
 
 	Example:	
-		>		_("s100 d e m")	;set speed to 100ms, detect hiden windows and disable m, exit on ESC.
-		>		_("mo w tc)		;set m to use OutputDebug, set working directory to A_ScriptDir, set title match mode to c (contain, 2).
+		>		_("s100 d e")	;set speed to 100ms, detect hiden windows, exit on ESC.
+		>		_("mo w tc)		;set m to use OutputDebug, set working directory to A_ScriptDir, set title match mode to c (c=2="contain").
 		>		_("mout.txt!")	;set m to use File out.txt and to clear it each time script is started.
+	
+		(start code)
+			_("m d")		;disable m for the script
+			....
+			...
+			if x = 1
+				_("mm")		;enable m after this point
+				....
+		(end code)
 
 	Remarks:
 				Includes #NoEnv and #SingleInstance force always.
