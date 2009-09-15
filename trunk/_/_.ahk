@@ -17,8 +17,11 @@
 					  DebugView will be started if it doesn't run, make sure its on the system PATH (there will be no error message if Run fails).
 				d	- Detect hidden windows.
 				e	- Escape exits the script. Use ea to exit the script only if its window is active.
-				w	- SetWorkingDir %A_ScriptDir%
+				wd	- SetWorkingDir %A_ScriptDir%
 				t	- Title match mode: t1 (ts), t2 (tc), t3 (te), tr. 
+				w	- SetWinDelay
+				c	- SetControlDelay
+
 
 	Example:	
 		>		_("s100 d e")	;set speed to 100ms, detect hiden windows, exit on ESC.
@@ -51,8 +54,10 @@ _(opt="") {
 		f := SubStr(A_LoopField,1,1), %f% := SubStr(A_LoopField, 2), %f% .= %f% = "" ? 1 : ""
 
 	ifEqual, d, 1, DetectHiddenWindows, on
-	ifEqual, w, 1, SetWorkingDir %A_ScriptDir%
+	ifEqual, wd, 1, SetWorkingDir %A_ScriptDir%
 	SetBatchLines, %s%
+	ifNotEqual, w,,SetWinDelay, %w%
+	ifNotEqual, c,,SetControlDelay, %c%
 
 	if m != 
 	{
