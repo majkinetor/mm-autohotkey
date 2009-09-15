@@ -19,8 +19,8 @@
 				e	- Escape exits the script. Use ea to exit the script only if its window is active.
 				wd	- SetWorkingDir %A_ScriptDir%
 				t	- Title match mode: t1 (ts), t2 (tc), t3 (te), tr. 
-				wN	- SetWinDelay.
-				cN	- SetControlDelay.
+				wN	- SetWinDelay. If N is omitted, it defaults to -1.
+				cN	- SetControlDelay. If N is omitted, it defaults to -1.
 
 
 	Example:	
