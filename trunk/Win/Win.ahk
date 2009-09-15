@@ -51,6 +51,21 @@ Win_Animate(Hwnd, Type="", Time=100){
 }
 
 /*
+ Function:	FromPoint
+ 			Retrieves a handle to the top level window that contains the specified point.
+ 
+ Parameters:
+ 			X, Y - Point. Use word "mouse" as X to use mouse coordinates.
+ */
+Win_FromPoint(X="mouse", Y="", b) {
+	if X=mouse
+		VarSetCapacity(POINT, 8), DllCall("GetCursorPos", "uint", &POINT), X := NumGet(POINT), Y := NumGet(POINT, 4)
+
+	VarSetCapacity(POINT, 8), NumPut(X, POINT, 0, "Int"), NumPut(Y, POINT, 4, "Int")
+	return DllCall("WindowFromPoint", &POINT)
+}
+
+/*
  Function:	Get
  			Get window information
  
@@ -466,7 +481,8 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
  			Redraws the window.
 
  Parameters:
-			Hwnd - Handle of the window. If this parameter is omited, Redraw updates the desktop window.
+			Hwnd	- Handle of the window. If this parameter is omited, Redraw updates the desktop window.
+			Option  - "-" to disable redrawing. "+" to enable it. By default empty.
  
  Returns:
 			A nonzero value indicates success. Zero indicates failure.
@@ -474,10 +490,15 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
  Remarks:
 			This function will update the window for sure, unlike WinSet or InvalidateRect.
  */
-Win_Redraw( Hwnd=0 ) {
-	static RDW_ALLCHILDREN:=0x80, RDW_ERASE:=0x4, RDW_ERASENOW:=0x200, RDW_FRAME:=0x400, RDW_INTERNALPAINT:=0x2, RDW_INVALIDATE:=0x1, RDW_NOCHILDREN:=0x40, RDW_NOERASE:=0x20, RDW_NOFRAME:=0x800, RDW_NOINTERNALPAINT:=0x10, RDW_UPDATENOW:=0x100, RDW_VALIDATE:=0x8
-	return DllCall("RedrawWindow", "uint", Hwnd, "uint", 0, "uint", 0, "uint"
-		      ,RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ERASENOW | RDW_UPDATENOW | RDW_ALLCHILDREN)
+Win_Redraw( Hwnd=0, Option="" ) {
+	static WM_SETREDRAW=0xB, RDW_ALLCHILDREN:=0x80, RDW_ERASE:=0x4, RDW_ERASENOW:=0x200, RDW_FRAME:=0x400, RDW_INTERNALPAINT:=0x2, RDW_INVALIDATE:=0x1, RDW_NOCHILDREN:=0x40, RDW_NOERASE:=0x20, RDW_NOFRAME:=0x800, RDW_NOINTERNALPAINT:=0x10, RDW_UPDATENOW:=0x100, RDW_VALIDATE:=0x8
+
+	if (Options != "") {
+		bEnable := Option="+"
+		SendMessage, WM_SETREDRAW, bEnable,,,ahk_id %Hwnd%
+		return ErrorLevel
+	}
+	return DllCall("RedrawWindow", "uint", Hwnd, "uint", 0, "uint", 0, "uint" ,RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ERASENOW | RDW_UPDATENOW | RDW_ALLCHILDREN)
 }
 
 /*
