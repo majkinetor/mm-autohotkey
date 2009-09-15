@@ -53,6 +53,9 @@ _(opt="") {
 	loop, parse, opt, %A_Space%
 		f := SubStr(A_LoopField,1,1), %f% := SubStr(A_LoopField, 2), %f% .= %f% = "" ? 1 : ""
 
+	ifEqual, w, 1, SetEnv, w, -1
+	ifEqual, c, 1, SetEnv, w, -1
+
 	ifEqual, d, 1, DetectHiddenWindows, on
 	ifEqual, wd, 1, SetWorkingDir %A_ScriptDir%
 	SetBatchLines, %s%
