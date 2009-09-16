@@ -26,7 +26,7 @@
 	Example:	
 		(start code)
 			_("s100 d e")	;set speed to 100ms, detect hiden windows, exit on ESC.
-			_("mo w tc)		;set m to use OutputDebug, set working directory to A_ScriptDir, set title match mode to c (c=2="contain").
+			_("mo wd tc)	;set m to use OutputDebug, set working directory to A_ScriptDir, set title match mode to c (c=2="contain").
 			_("mout.txt!")	;set m to use File out.txt and to clear it each time script is started.
 	
 		
