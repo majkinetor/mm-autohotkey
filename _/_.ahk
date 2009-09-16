@@ -12,29 +12,34 @@
 	Options:
 				sN	- Speed, defaults to -1
 				m	- Affects how <m> function works: mm makes it use MsgBox (default), mo OutputDebug, m alone disables it.
-					  Anything else will use FileAppend; for instance mout.txt! writes to out.txt file. ! at the end is optional.
-					  and if present, it will mark the file for deletition on scripts startup. ! can also be used with o mode to clear the DebugView log.
+					  Anything else will use FileAppend; for instance mout.txt! writes to out.txt file. ! at the end is optional and if present
+					  it will mark the file for deletition on scripts startup. ! can also be used with o mode to clear the DebugView log.
 					  DebugView will be started if it doesn't run, make sure its on the system PATH (there will be no error message if Run fails).
 				d	- Detect hidden windows.
 				e	- Escape exits the script. Use ea to exit the script only if its window is active.
 				wd	- SetWorkingDir %A_ScriptDir%
-				t	- Title match mode: t1 (ts), t2 (tc), t3 (te), tr. 
 				wN	- SetWinDelay. If N is omitted, it defaults to -1.
+				t	- Title match mode: t1 (ts), t2 (tc), t3 (te), tr. 
 				cN	- SetControlDelay. If N is omitted, it defaults to -1.
 
 
 	Example:	
-		>		_("s100 d e")	;set speed to 100ms, detect hiden windows, exit on ESC.
-		>		_("mo w tc)		;set m to use OutputDebug, set working directory to A_ScriptDir, set title match mode to c (c=2="contain").
-		>		_("mout.txt!")	;set m to use File out.txt and to clear it each time script is started.
-	
 		(start code)
-			_("m d")		;disable m for the script
+			_("s100 d e")	;set speed to 100ms, detect hiden windows, exit on ESC.
+			_("mo w tc)		;set m to use OutputDebug, set working directory to A_ScriptDir, set title match mode to c (c=2="contain").
+			_("mout.txt!")	;set m to use File out.txt and to clear it each time script is started.
+	
+		
+			_("m")			;disable m for the script
 			....
+			m( x, y )	    ;will not trigger
 			...
 			if x = 1
 				_("mm")		;enable m after this point
 				....
+				m(x, y)		;will trigger	
+				...
+				_("m")		;disable it again
 		(end code)
 
 	Remarks:
@@ -57,7 +62,7 @@ _(opt="") {
 	ifEqual, c, 1, SetEnv, w, -1
 
 	ifEqual, d, 1, DetectHiddenWindows, on
-	ifEqual, wd, 1, SetWorkingDir %A_ScriptDir%
+	ifEqual, w, d, SetWorkingDir %A_ScriptDir%
 	SetBatchLines, %s%
 	ifNotEqual, w,,SetWinDelay, %w%
 	ifNotEqual, c,,SetControlDelay, %c%
@@ -112,7 +117,7 @@ return
 	
 	Remarks:
 			  m can use MsgBox (m mode), OutputDebug (o mode) or FileAppend to write messages. See <_> function for details.
-			  In o mode, all arguments will be joined in single line.
+			  In o mode, all arguments will be joined in single line. If o mode is used, all parameters will be concatenated to fit the single line.
 
 	Returns: 
 			  o1.
@@ -387,6 +392,6 @@ Fatal(Message, E=1, ExitCode="") {
 
 
 /* Group: About
-	o 0.42 by majkinetor
+	o 0.43 by majkinetor
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
  */
