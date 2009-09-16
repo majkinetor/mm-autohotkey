@@ -68,17 +68,21 @@ _(opt="") {
 
 	if m != 
 	{
-		if (m="o") && !WinExist("ahk_class dbgviewClass"){
-			Run, DbgView.exe, , UseErrorLevel, PID
-			ifNotEqual, PID,, WinWaitActive, ahk_pid %PID%
-		} else WinRestore, ahk_class dbgviewClass
-
 		if SubStr(m,0) = "!" {
 			m := SubStr(m, 1, -1)
 			if m = o
-				 ControlSend, , ^x, ahk_class dbgviewClass
+				 bClear := true
 			else FileDelete, %m%
 		}
+
+		if (m="o") {
+			if !WinExist("ahk_class dbgviewClass")
+				 Run, DbgView.exe,, UseErrorLevel, PID
+			else WinRestore, ahk_class dbgviewClass
+			ifNotEqual, PID,, WinWaitActive, ahk_pid %PID%
+			if bClear
+				ControlSend, , ^x, ahk_class dbgviewClass
+		} 
 
 		m("~`a" (m = 1 ? "" : m))
 	}
