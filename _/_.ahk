@@ -10,7 +10,6 @@
 				opt	- Space separated list of script options.
 	
 	Options:
-				sN	- Speed, defaults to -1
 				m	- Affects how <m> function works: mm makes it use MsgBox (default), mo OutputDebug, m alone disables it.
 					  Anything else will use FileAppend; for instance mout.txt! writes to out.txt file. ! at the end is optional and if present
 					  it will mark the file for deletition on scripts startup. ! can also be used with o mode to clear the DebugView log.
@@ -19,9 +18,9 @@
 				e	- Escape exits the script. Use ea to exit the script only if its window is active.
 				wd	- SetWorkingDir %A_ScriptDir%
 				wN	- SetWinDelay. If N is omitted, it defaults to -1.
-				t	- Title match mode: t1 (ts), t2 (tc), t3 (te), tr. 
 				cN	- SetControlDelay. If N is omitted, it defaults to -1.
-
+				sN	- Speed, always active, defaults to -1
+				t?	- Title match mode: t1 (or ts), t2 (or tc), t3 (or te), tr (regular expression).
 
 	Example:	
 		(start code)
@@ -35,7 +34,7 @@
 			m( x, y )	    ;will not trigger
 			...
 			if x = 1
-				_("mm")		;enable m after this point
+				_("mm")		;enable m after this point and use msgbox.
 				....
 				m(x, y)		;will trigger	
 				...
