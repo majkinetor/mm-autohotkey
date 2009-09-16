@@ -602,6 +602,21 @@ Win_SetOwner(Hwnd, hOwner){
 }
 
 /*
+ Function:	SetToolWindow
+ 			Set the WS_EX_TOOLWINDOW style for the window.
+ 
+ Parameters:
+			Flag	- Set + to show the caption or - otherwise. If omited, caption will be toggled.
+ */
+Win_SetToolWindow(Hwnd, Flag="^") {
+	static WS_EX_TOOLWINDOW = 0x80	
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+	WinSet, ExStyle, %FLag%WS_EX_TOOLWINDOW, ahk_id %Hwnd%	
+	DetectHiddenWindows, %oldDetect%
+}
+
+/*
  Function:	Show
  			Show / Hide window.
  
