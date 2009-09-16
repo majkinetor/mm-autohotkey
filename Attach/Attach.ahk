@@ -30,10 +30,15 @@
 	Remarks:
 					You should reset the function when you programmatically change the position of the controls in the parent control.
 					Don't do this while parent is resizing as resetting procedure may be interrupted (this is also true for "+" & "-" options).
+					Depending on how you created your GUI, you might need to put "autosize" when showing it, otherwise reseting the Gui before its 
+					placement is changed will not work as intented. Autosize will make sure that WM_SIZE handler fires. Sometimes, however, WM_SIZE
+					message isn't sent to the window. One example is for instance when some control requires Gui size to be set in advance in which case
+					you would first have "Gui, Show, w100 h100 Hide" line prior to adding controls, and only Gui, Show after controls are added. This
+					case will not trigger WM_SIZE message unless AutoSize is added.
 					
 					Function monitors WM_SIZE message to detect parent changes. That means that it can be used with other eventual container controls
 					and not only top level windows.
-
+				
 	Examples:
 	(start code)
 					Attach(h, "w.5 h1/3 r2")	;Attach control's w, h and redraw it with delay.
@@ -86,7 +91,7 @@
 	(end code)
 
 	About:
-			o 1.0 by majkinetor
+			o 1.01 by majkinetor
 			o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
 Attach(hCtrl="", aDef="") {
@@ -142,9 +147,10 @@ Attach_(hCtrl, aDef, Msg, hParent){
  	if !reset && !enable {						;WM_SIZE handler starts here
 		%hParent%_pw := aDef & 0xFFFF, %hParent%_ph := aDef >> 16
 		ifEqual, %hParent%_ph, 0, return		;when u create gui without any control, it will send message with height=0 and scramble the controls ....
+
 	}
 	if (%hParent%_s = "") || reset
-		%hParent%_s := %hParent%_pw " " %hParent%_ph
+		m(%hParent%_s := %hParent%_pw " " %hParent%_ph)
 
 	StringSplit, s, %hParent%_s, %A_Space%
 	loop, parse, %hParent%, %A_Space%
