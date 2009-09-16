@@ -116,7 +116,7 @@ return
 	
 	Remarks:
 			  m can use MsgBox (m mode), OutputDebug (o mode) or FileAppend to write messages. See <_> function for details.
-			  In o mode, all arguments will be joined in single line. If o mode is used, all parameters will be concatenated to fit the single line.
+			  In o mode, all arguments will be joined in single line.
 
 	Returns: 
 			  o1.
