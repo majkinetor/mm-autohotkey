@@ -1,6 +1,5 @@
-;_("mo! e2")
-#SingleInstance, force
-DetectHiddenWindows, on
+_("mo! e")
+#SingleInstance, off
 	goto MakeGui
 return
 
@@ -18,7 +17,7 @@ MakeGui:
 	Gui, %no%:Add, Edit, HWNDhe5%no% w100 yp x+5 h100
 	
 	gosub SetAttach
-	Gui, %no%:Show, Autosize
+	Gui, %no%:Show
 
 	Randomize(no)
 return
@@ -33,7 +32,8 @@ return
 
 
 F1::
-	gosub MakeGui
+;	gosub MakeGui
+	Attach()
 return
 
 F2::
