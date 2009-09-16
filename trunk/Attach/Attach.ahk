@@ -149,8 +149,11 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		ifEqual, %hParent%_ph, 0, return		;when u create gui without any control, it will send message with height=0 and scramble the controls ....
 
 	}
-	if (%hParent%_s = "") || reset
-		m(%hParent%_s := %hParent%_pw " " %hParent%_ph)
+	if (%hParent%_s = "") || reset {
+		if !(%hParent%_pw)
+			DllCall(adrWindowInfo, "uint", hParent, "uint", adrB), %hParent%_pw := NumGet(B, 28) - NumGet(B, 20), %hParent%_ph := NumGet(B, 32) - NumGet(B, 24)
+		%hParent%_s := %hParent%_pw " " %hParent%_ph
+	}
 
 	StringSplit, s, %hParent%_s, %A_Space%
 	loop, parse, %hParent%, %A_Space%
