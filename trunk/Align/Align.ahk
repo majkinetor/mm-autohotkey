@@ -1,50 +1,38 @@
-_("w")
-	Gui, +LastFounds
-	hGui := WinExist()
-
-	Gui, Show, w400 h500 Hide
-
-	Gui, Add, Edit, HWNDhBtn1,
-	Gui, Add, Button, HWNDhBtn2, Nice
-	Gui, Add, Button, HWNDhBtn3 , Meh
-	Gui, Add, MonthCal, HWNDhCal
-
-	Align(hBtn1, "L", 100)
-	Align(hBtn2, "T", 35)
-	Align(hBtn3, "B")
-	Align(hCal,  "F")
-
-	Gui, Show
-return
-
-F1::
-	WinHide, ahk_id %hBtn3%
-	WinHide, ahk_id %hBtn1%	
-	Win_Redraw(hGui, "-")
-	Align(hGui)			;realign
-	Win_Redraw(hGui, "+")
-return
-
-
 /*
   Function:	Align
- 			Aligns control to its parent
+ 			Aligns controls inside the parent.
  
   Parameter:
- 			hCtrl	- Control's handle
- 			Type	- String specifying align type. Available align types are left, right, top, bottom and fill.
- 					  Top and bottom types are horizontal aligments while left and right are vertical. Fill is both
- 					  vertical and horizontaly aligned.
- 					  Control will be aligned to the edge of given type of its parent. If you use align, control's
- 					  x, y are ignored, w is ignored for vertical, h for horizontal aligment.
- 			Dim		- Optional dimension to use. This is width for vertical and height for horizontal aligment type.
- 					  If you omit dimension, controls current width or height will be used.
+ 			hCtrl	- Control's handle or Parent handle. If other parameters are omitted, hCtrl represents Parent that
+					  should be re-aligned. Use re-align when you hide/show/resize controls to reposition remaining controls.
+ 			Type	- String specifying align type. Available align types are Left, Right, Top, Bottom and Fill.
+ 					  Top and Bottom types are horizontal alignments while Left and Right are vertical. Fill type is both
+ 					  vertically and horizontally aligned.
+ 					  Control will be aligned to the edge of given type of its parent. For any given Type, control's
+ 					  x, y are ignored, w is ignored for vertical, h for horizontal alignment.
+ 			Dim		- Dimension, optional. This is width for vertical and height for horizontal alignment type.
+ 					  If you omit dimension, controls current dimension will be used.
  
-  Remarks:		
- 			You can also set align via <Add> function which is more convenient in most cases.
- 
+  Remarks:
+			Parent window size must be set prior to calling this function. Function is not limitted to top level windows, it can align
+			controls inside container controls.
+
+			The order in which you register controls to be aligned is important. 
+
+			In case you use resizable GUI and <Attach> function, Align will reset Attach for the parent that is re-aligned.
+
   Example:
- >			Align(hCtrl, "left", 100)	;align control to the left edge of its parent, set width to 100
+	(start code)
+ 			Align(h1, "L", 100)	  ;Align this control to the left edge of its parent, set width to 100,
+ 			Align(h2, "T")		  ; then align this control to the top minus space taken from previous control, use its own height,
+ 			Align(h3, "F")		  ; then set this control to fill remaining space.
+ 		
+ 			Align(hGui)			  ;Re-align hGui
+	(end code)
+
+  About:
+		o 1.0 by majkinetor
+		o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
 Align(HCtrl, Type="", Dim=""){
 	static 
@@ -56,10 +44,10 @@ Align(HCtrl, Type="", Dim=""){
 		loop, parse, %hParent%, |
 		{
 			StringSplit, s, A_LoopField, %A_Space%
-			HCtrl := s1, Type := s2, %Type% := true
+			HCtrl := s1, Type := s2, %Type% := true, Dim=""
 			gosub %A_ThisFunc%
 		}
-		return
+		return IsFunc(t:="Attach") ? %t%(hParent) : ""
 	}
 
  	hParent := DllCall("GetParent", "uint", HCtrl, "Uint")
@@ -76,7 +64,7 @@ Align(HCtrl, Type="", Dim=""){
 		Win_Get(hParent, "Lwh", c3, c4)
 	} else StringSplit, c, %hParent%rect, %A_Space%
 
-	if !InStr(list, HCtrl)
+	if !InStr(%hParent%, HCtrl)
 		%hParent% .= (%hParent% != "" ? "|" : "") HCtrl " " Type
 
 	ControlGet, style, Style, , , ahk_id %HCtrl%
