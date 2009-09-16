@@ -51,6 +51,21 @@ Win_Animate(Hwnd, Type="", Time=100){
 }
 
 /*
+ Function:	FromPoint
+ 			Retrieves a handle to the top level window that contains the specified point.
+ 
+ Parameters:
+ 			X, Y - Point. Use word "mouse" as X to use mouse coordinates.
+ */
+Win_FromPoint(X="mouse", Y="") { 
+	if X=mouse
+		VarSetCapacity(POINT, 8), DllCall("GetCursorPos", "uint", &POINT), X := NumGet(POINT), Y := NumGet(POINT, 4)
+
+	VarSetCapacity(POINT, 8), NumPut(X, POINT, 0, "Int"), NumPut(Y, POINT, 4, "Int")
+	return DllCall("WindowFromPoint", &POINT)
+}
+
+/*
  Function:	Get
  			Get window information
  
@@ -466,7 +481,8 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
  			Redraws the window.
 
  Parameters:
-			Hwnd - Handle of the window. If this parameter is omited, Redraw updates the desktop window.
+			Hwnd	- Handle of the window. If this parameter is omited, Redraw updates the desktop window.
+			Option  - "-" to disable redrawing for the window. "+" to enable it and redraw it. By default empty.
  
  Returns:
 			A nonzero value indicates success. Zero indicates failure.
@@ -474,10 +490,18 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
  Remarks:
 			This function will update the window for sure, unlike WinSet or InvalidateRect.
  */
-Win_Redraw( Hwnd=0 ) {
-	static RDW_ALLCHILDREN:=0x80, RDW_ERASE:=0x4, RDW_ERASENOW:=0x200, RDW_FRAME:=0x400, RDW_INTERNALPAINT:=0x2, RDW_INVALIDATE:=0x1, RDW_NOCHILDREN:=0x40, RDW_NOERASE:=0x20, RDW_NOFRAME:=0x800, RDW_NOINTERNALPAINT:=0x10, RDW_UPDATENOW:=0x100, RDW_VALIDATE:=0x8
-	return DllCall("RedrawWindow", "uint", Hwnd, "uint", 0, "uint", 0, "uint"
-		      ,RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ERASENOW | RDW_UPDATENOW | RDW_ALLCHILDREN)
+Win_Redraw( Hwnd=0, Option="" ) {
+	static WM_SETREDRAW=0xB, RDW_ALLCHILDREN:=0x80, RDW_ERASE:=0x4, RDW_ERASENOW:=0x200, RDW_FRAME:=0x400, RDW_INTERNALPAINT:=0x2, RDW_INVALIDATE:=0x1, RDW_NOCHILDREN:=0x40, RDW_NOERASE:=0x20, RDW_NOFRAME:=0x800, RDW_NOINTERNALPAINT:=0x10, RDW_UPDATENOW:=0x100, RDW_VALIDATE:=0x8
+
+	if (Option != "") {
+		old := A_DetectHiddenWindows
+		DetectHiddenWindows, on
+		bEnable := Option="+"
+		SendMessage, 0xB, bEnable,,,ahk_id %Hwnd%
+		DetectHiddenWindows, %old%
+		ifEqual, bEnable, 0, return		
+	}
+	return DllCall("RedrawWindow", "uint", Hwnd, "uint", 0, "uint", 0, "uint" ,RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ERASENOW | RDW_UPDATENOW | RDW_ALLCHILDREN)
 }
 
 /*
@@ -503,6 +527,7 @@ Win_SetCaption(Hwnd, Flag="^"){
 
  Returns:
 			Handle of the previous menu.
+
  */
 Win_SetMenu(Hwnd, hMenu=0){
 	hPrevMenu := DllCall("GetMenu", "uint", hwnd, "Uint")
@@ -574,6 +599,21 @@ Win_SetParent(Hwnd, hParent=0){
 Win_SetOwner(Hwnd, hOwner){
 	static GWL_HWNDPARENT = -8
 	return DllCall("SetWindowLong", "uint", Hwnd, "int", GWL_HWNDPARENT, "uint", hOwner)		
+}
+
+/*
+ Function:	SetToolWindow
+ 			Set the WS_EX_TOOLWINDOW style for the window.
+ 
+ Parameters:
+			Flag	- Set + to show the caption or - otherwise. If omited, caption will be toggled.
+ */
+Win_SetToolWindow(Hwnd, Flag="^") {
+	static WS_EX_TOOLWINDOW = 0x80	
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+	WinSet, ExStyle, %FLag%0x80, ahk_id %Hwnd%	
+	DetectHiddenWindows, %oldDetect%
 }
 
 /*
@@ -667,7 +707,7 @@ Win_Subclass(hCtrl, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.1  by majkinetor.
+	o v1.2  by majkinetor.
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*

@@ -1,16 +1,10 @@
 _("mo! e")
 	OnExit OnExit
-	;oldTaskbar := AppBar_SetTaskbar("+autohide")
+	oldTaskbar := AppBar_SetTaskbar("disable")
 
 	n := AppBar_New(hApp1)
 	Fatal("Can't create Appbar", n=0)
 	GroupAdd, AppBar, ahk_class DV2ControlHost		;add start menu so first appbar doesn't close when we launch it.
-
-; This works too, on some systems animation is jerky :)
-;	Run, Notepad
-;	WinWait, Untitled
-;	hApp3 := WinExist("Untitled")
-;	AppBar_New(hApp3,  "Edge=Right", "AutoHide=Blend", "Label=AppBar3")
 
 	Gui, %n%:Add, Text, HWNDhDummy
 	Gui, %n%:Add, Button, HWNDhStart gOnStart x4 w50 y2, Start

@@ -4,26 +4,42 @@
 
 /*	
 	Function:	_
-				StdLib loader.
+				StdLib loader and script initializer.
 	
 	Parameters:
 				opt	- Space separated list of script options.
 	
 	Options:
-				s	- Speed, defaults to -1
 				m	- Affects how <m> function works: mm makes it use MsgBox (default), mo OutputDebug, m alone disables it.
-					  Anything else will use FileAppend; for instance mout.txt! writes to out.txt file. ! at the end is optional
-					  and if present, it will mark the file for deletition on scripts startup. !can be also used with o mode to clear the DebugView log.
+					  Anything else will use FileAppend; for instance mout.txt! writes to out.txt file. ! at the end is optional and if present
+					  it will mark the file for deletition on scripts startup. ! can also be used with o mode to clear the DebugView log.
 					  DebugView will be started if it doesn't run, make sure its on the system PATH (there will be no error message if Run fails).
 				d	- Detect hidden windows.
 				e	- Escape exits the script. Use ea to exit the script only if its window is active.
-				w	- SetWorkingDir %A_ScriptDir%
-				t	- Title match mode: t1 (ts), t2 (tc), t3 (te), tr. 
+				wd	- SetWorkingDir %A_ScriptDir%
+				wN	- SetWinDelay. If N is omitted, it defaults to -1.
+				cN	- SetControlDelay. If N is omitted, it defaults to -1.
+				sN	- Speed, always active, defaults to -1
+				t?	- Title match mode: t1 (or ts), t2 (or tc), t3 (or te), tr (regular expression).
 
 	Example:	
-		>		_("s100 d e m")	;set speed to 100ms, detect hiden windows and disable m, exit on ESC.
-		>		_("mo w tc)		;set m to use OutputDebug, set working directory to A_ScriptDir, set title match mode to c (contain, 2).
-		>		_("mout.txt!")	;set m to use File out.txt and to clear it each time script is started.
+		(start code)
+			_("s100 d e")	;set speed to 100ms, detect hiden windows, exit on ESC.
+			_("mo wd tc)	;set m to use OutputDebug, set working directory to A_ScriptDir, set title match mode to c (c=2="contain").
+			_("mout.txt!")	;set m to use File out.txt and to clear it each time script is started.
+	
+		
+			_("m")			;disable m for the script
+			....
+			m( x, y )	    ;will not trigger
+			...
+			if x = 1
+				_("mm")		;enable m after this point and use msgbox.
+				....
+				m(x, y)		;will trigger	
+				...
+				_("m")		;disable it again
+		(end code)
 
 	Remarks:
 				Includes #NoEnv and #SingleInstance force always.
@@ -41,22 +57,33 @@ _(opt="") {
 	loop, parse, opt, %A_Space%
 		f := SubStr(A_LoopField,1,1), %f% := SubStr(A_LoopField, 2), %f% .= %f% = "" ? 1 : ""
 
+	ifEqual, w, 1, SetEnv, w, -1
+	ifEqual, c, 1, SetEnv, w, -1
+
 	ifEqual, d, 1, DetectHiddenWindows, on
-	ifEqual, w, 1, SetWorkingDir %A_ScriptDir%
+	ifEqual, w, d, SetWorkingDir %A_ScriptDir%
 	SetBatchLines, %s%
+	ifNotEqual, w,,SetWinDelay, %w%
+	ifNotEqual, c,,SetControlDelay, %c%
 
 	if m != 
 	{
 		if SubStr(m,0) = "!" {
 			m := SubStr(m, 1, -1)
 			if m = o
-				 ControlSend, , ^x, ahk_class dbgviewClass
+				 bClear := true
 			else FileDelete, %m%
 		}
-		if (m="o") && !WinExist("ahk_class dbgviewClass"){
-			Run, DbgView.exe, , UseErrorLevel, PID
+
+		if (m="o") {
+			if !WinExist("ahk_class dbgviewClass")
+				 Run, DbgView.exe,, UseErrorLevel, PID
+			else WinRestore, ahk_class dbgviewClass
 			ifNotEqual, PID,, WinWaitActive, ahk_pid %PID%
-		} else WinRestore, ahk_class dbgviewClass
+			if bClear
+				ControlSend, , ^x, ahk_class dbgviewClass
+		} 
+
 		m("~`a" (m = 1 ? "" : m))
 	}
 
@@ -368,6 +395,6 @@ Fatal(Message, E=1, ExitCode="") {
 
 
 /* Group: About
-	o 0.41 by majkinetor
+	o 0.43 by majkinetor
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
  */
