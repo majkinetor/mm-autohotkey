@@ -2,38 +2,43 @@
 	Function:		Attach
 					Determines how a control is resized with its parent.
 
-	Parameters:		
-					hCtrl	-  - hWnd of the control if aDef is not empty.
-					 		-  - hWnd of the parent to be reset if aDef is empty. If you are using the function with only one parent, you don't have to
-								 specify its handle, its enough to call Attach without any parameters.
-								 With multiple parents you need to specify which one you want to reset.
-					 		-  - Handler name, if parameter is string and aDef is empty. Handler will be called after the function has finished 
-								 moving controls for the parent. Handler receives hWnd of the parent as its only argument.
+	hCtrl:			
+					- hWnd of the control if aDef is not empty.					
+					- hWnd of the parent to be reset if aDef is empty. If you are using the function with only one parent, you don't have to
+					specify its handle, its enough to call Attach without any parameters.
+					With multiple parents you need to specify which one you want to reset.					
+					- Handler name, if parameter is string and aDef is empty. Handler will be called after the function has finished 
+					moving controls for the parent. Handler receives hWnd of the parent as its only argument.
 
-
-					aDef	- Attach definition string. Space separated list of attach options.
-					 		- You can use x,y,w,h,r,p letters along with coefficients, decimal numbers which can also
-							  be specified in m/n form (see example below). "r" or "r1" option specifies that control should be redrawn immediately.
-							  Specify "r2" to delay redrawing 100ms for the control. This can be used to prevent redrawing spam which in some situations
-							  may be annoying. 
-							  "p" is special coeficient that can only be used without x-h options. It means "proportional". It will make control always stay 
-							  in the same proportion to its parent (so, pin the control to the parent). Although you can mix pinned and non-pinned controls 
-							  that is rarely what you want. You will generally want to pin every control in the parent.
-
-					 		- You can use single letters "+" or "-" to enable or disable function for the control. If control is hidden, you may want to 
-							  disable the function for performance reasons. Its perfectly OK to leave invisible controls attached, but if you have lots of 
-							  them you can use this feature to get faster and more responsive updates.
-							  When you want to show disabled invisible control, make sure you first attach it back so it can take its correct position
-							  and size while in hidden state, then show it.
-					 		- If aDef parameter is omitted, function working depends on 1st parameter.
+	aDef:			
+					Attach definition string. Space separated list of attach options. If omitted, function working depends on hCtrl parameter.
+					
+					- 	You can use x,y,w,h,r,p letters along with coefficients, decimal numbers which can also
+						be specified in m/n form (see example below). "r" or "r1" option specifies that control should be redrawn immediately.
+						Specify "r2" to delay redrawing 100ms for the control. This can be used to prevent redrawing spam which in some situations
+						may be annoying. 
+					-	"p" is special coeficient that can only be used without x-h options and it must be first option. 
+						It means "proportional". It will make control always stay in the same proportion to its parent 
+						(so, pin the control to the parent). Although you can mix pinned and non-pinned controls 
+						that is rarely what you want. You will generally want to pin every control in the parent.				
+					-	You can use single letters "+" or "-" to enable or disable function for the control. If control is hidden, you may want to 
+						disable the function for performance reasons. Its perfectly OK to leave invisible controls attached, but if you have lots of 
+						them you can use this feature to get faster and more responsive updates.
+						When you want to show disabled invisible control, make sure you first attach it back so it can take its correct position
+						and size while in hidden state, then show it.													
 
 	Remarks:
 					You should reset the function when you programmatically change the position of the controls in the parent control.
-					Don't do this while parent is resizing as resetting procedure may be interrupted.
+					Don't do this while parent is resizing as resetting procedure may be interrupted (this is also true for "+" & "-" options).
+					Depending on how you created your GUI, you might need to put "autosize" when showing it, otherwise reseting the Gui before its 
+					placement is changed will not work as intented. Autosize will make sure that WM_SIZE handler fires. Sometimes, however, WM_SIZE
+					message isn't sent to the window. One example is for instance when some control requires Gui size to be set in advance in which case
+					you would first have "Gui, Show, w100 h100 Hide" line prior to adding controls, and only Gui, Show after controls are added. This
+					case will not trigger WM_SIZE message unless AutoSize is added.
 					
 					Function monitors WM_SIZE message to detect parent changes. That means that it can be used with other eventual container controls
 					and not only top level windows.
-
+				
 	Examples:
 	(start code)
 					Attach(h, "w.5 h1/3 r2")	;Attach control's w, h and redraw it with delay.
@@ -41,6 +46,7 @@
 					Attach()					;Reset first parent. Use when you have only 1 parent.
 					Attach(hGui2)				;Reset Gui2.
 					Attach("Win_Redraw")		;Use Win_Redraw function as a Handler. Attach will call it with parent's handle as argument.
+					Attach(h, "p r2")			;Pin control with delayed refreshing.
 
 					
 					; This is how to do delayed refresh of entire window.
@@ -59,9 +65,8 @@
 					Redraw:
 						Win_Redraw(hGuiToRedraw)
 					return
-
 	(end code)
-	Full Example:
+	Working sample:
 	(start code)
 		#SingleInstance, force
 			Gui, +Resize
@@ -86,10 +91,9 @@
 	(end code)
 
 	About:
-			o 1.0 by majkinetor
+			o 1.02 by majkinetor
 			o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
-
 Attach(hCtrl="", aDef="") {
 	 Attach_(hCtrl, aDef, "", "")
 }
@@ -100,6 +104,8 @@ Attach_(hCtrl, aDef, Msg, hParent){
 	if (aDef = "") {							;Reset if integer, Handler if string
 		if IsFunc(hCtrl)
 			return Handler := hCtrl
+
+		ifEqual, adrWindowInfo,, return			;Reseting prior to adding any control just returns.
 		hParent := hCtrl != "" ? hCtrl+0 : hGui
 		loop, parse, %hParent%, %A_Space%
 		{
@@ -137,21 +143,27 @@ Attach_(hCtrl, aDef, Msg, hParent){
 					k := SubStr(l, 2, j-2) / SubStr(l, j+1)
 				%hCtrl% .= f ":" k ":" c%f% " "
 			}
-			return %hCtrl% := SubStr(%hCtrl%, 1, -1), %hParent% .= InStr(%hParent%, hCtrl) ? "" : (%hParent% = "" ? "" : " ")  hCtrl 
+ 			return %hCtrl% := SubStr(%hCtrl%, 1, -1), %hParent% .= InStr(%hParent%, hCtrl) ? "" : (%hParent% = "" ? "" : " ")  hCtrl 
 		}
 	}
  	if !reset && !enable {						;WM_SIZE handler starts here
 		%hParent%_pw := aDef & 0xFFFF, %hParent%_ph := aDef >> 16
 		ifEqual, %hParent%_ph, 0, return		;when u create gui without any control, it will send message with height=0 and scramble the controls ....
+
 	}
-	if (%hParent%_s = "") || reset
-		%hParent%_s := %hParent%_pw " " %hParent%_ph,  reset := 0
+	if (%hParent%_s = "") || reset {
+		if !(%hParent%_pw)
+			DllCall(adrWindowInfo, "uint", hParent, "uint", adrB), %hParent%_pw := NumGet(B, 28) - NumGet(B, 20), %hParent%_ph := NumGet(B, 32) - NumGet(B, 24)
+		%hParent%_s := %hParent%_pw " " %hParent%_ph
+	}
 
 	StringSplit, s, %hParent%_s, %A_Space%
 	loop, parse, %hParent%, %A_Space%
 	{
 		hCtrl := A_LoopField, aDef := %hCtrl%, 	uw := uh := ux := uy := r := 0, hCtrl1 := SubStr(%hCtrl%,1,1)
-		ifEqual, hCtrl1, -, continue
+		if (hCtrl1 = "-")
+			ifEqual, reset, 1, continue
+			else aDef := SubStr(aDef, 2)			
 		gosub Attach_GetPos
 		loop, parse, aDef, %A_Space%
 		{
@@ -166,7 +178,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		r+0=2 ? Attach_redrawDelayed(hCtrl) : 
 	}
 
-	return Handler != "" ? %Handler%(hParent) : "", enable := 0
+	return Handler != "" ? %Handler%(hParent) : "", reset := enable := 0
 
  Attach_GetPos:									;hParent & hCtrl must be set up at this point
 		DllCall(adrWindowInfo, "uint", hParent, "uint", adrB), 	lx := NumGet(B, 20), ly := NumGet(B, 24), DllCall(adrWindowInfo, "uint", hCtrl, "uint", adrB)

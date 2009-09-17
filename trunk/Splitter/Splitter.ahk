@@ -25,6 +25,7 @@
  Remarks:
 			This function adds a new splitter on the given position. User is responsible for correct position of the splitter.
 			Splitter is inactive until you call <Set> function.
+			When setting dimension of the splitter (width or height) use even numbers.
 
  */
 Splitter_Add(Opt="", Text="") {
@@ -37,8 +38,17 @@ Splitter_Add(Opt="", Text="") {
 		else Opt .= A_LoopField " "
 
 	Gui, Add, Text, HWNDhSep -hscroll -vscroll %SS_CENTERIMAGE% %SS_NOTIFY% center %Opt% %hStyle%, %Text%	
-	return hSep
+	return hSep+0
 }
+
+/*
+ Function:	GetPos
+ 			Get position of the splitter.
+ */
+Splitter_GetPos( HSep ) {
+	return Win_GetRect(HSep, Splitter_IsVertical(HSep) ? "*x" : "*y")
+}
+
 
 /*
  Function:	Set
@@ -47,6 +57,7 @@ Splitter_Add(Opt="", Text="") {
  Parameters:
  			hSep - Splitter handle.
 			Def	 - Splitter definition or words "off" or "on". The syntax of splitter definition is:
+			Pos	 - Position of the splitter, optional.
 
  >		c11 c12 c13 ... Type c21 c22 c23 ...
 		
@@ -57,7 +68,7 @@ Splitter_Add(Opt="", Text="") {
  Returns:
 		Splitter handle
  */
-Splitter_Set( HSep, Def ) {
+Splitter_Set( HSep, Def, Pos="" ) {
 	static
 
 	if Def=off
@@ -70,13 +81,36 @@ Splitter_Set( HSep, Def ) {
 
 	Splitter_wndProc(0, bVert, Def, HSep)
 	old := Win_subclass(HSep, wnadProc = "" ? "Splitter_wndProc" : wndProc, "", wndProc)
+
+	if Pos != 
+		Splitter_SetPos(HSep, Pos)
 }
+
+/*
+ Function:	SetPos
+ 			Set position of the splitter.
+
+ Parameters:
+			Pos		- Position to set. If empty, function simply returns.
+ */
+Splitter_SetPos( HSep, Pos ) {
+	static WM_LBUTTONUP := 0x202
+	ifEqual, Pos, , return
+
+	bVert := Splitter_IsVertical(HSep)
+	sz := Win_GetRect(HSep, bVert ? "w" : "h") // 2
+	cpos := Splitter_GetPos(HSep), delta := Pos + sz - cpos
+	Splitter_wndProc(HSep, WM_LBUTTONUP, 0, bVert ? delta : delta << 16)
+}
+
+;=============================================== PRIVATE ===============================================
 
 Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {	
 	static
 	static WM_SETCURSOR := 0x20, WM_MOUSEMOVE := 0x200, WM_LBUTTONDOWN=0x201, WM_LBUTTONUP=0x202, WM_LBUTTONDBLCLK=0x203,  SIZENS := 32645, SIZEWE := 32644
 
 	critical 100
+	Hwnd += 0
 	if !Hwnd
 		return 	hwnd := Lparam+0, %hwnd%_bVert := Umsg, %hwnd%_def := WParam, %hwnd%_cursor := DllCall("LoadCursor", "Uint", 0, "Int", UMsg ? SIZEWE : SIZENS, "Uint")	
 
@@ -111,8 +145,8 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 		delta := bVert ? LParam & 0xFFFF : LParam >> 16
 		if delta > 10000
 			delta -= 0xFFFF
-		
-		DllCall("ClipCursor", "uint", 0),  DllCall("ReleaseCapture"), DllCall("SetCursor", "uint", cursor)
+
+		DllCall("ClipCursor", "uint", 0),  DllCall("ReleaseCapture")	;, DllCall("SetCursor", "uint", cursor)
 		moving := false, Splitter_UpdateVisual(), Splitter_move(Hwnd, delta, %Hwnd%_def)
 	}
 
@@ -123,13 +157,14 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 	return DllCall("CallWindowProc","uint",A_EventInfo,"uint",hwnd,"uint",uMsg,"uint",wParam,"uint",lParam)
 }
 
+;delta - offset by which to move splitter
 Splitter_move(HSep, Delta, Def){
-	WinGet, s, Style, ahk_id %HSep%
-	bVert := s & 0x80
+	bVert := Splitter_IsVertical(HSep)
 
 	Delta -= Win_GetRect(HSep,  bVert ? "*wx" : "*hy", _, d) // 2
 	if (d + Delta < 0)		;prevent splitter from going negative, if that happens controls become overlapped.
 		Delta := -d
+
 
 	j := InStr(Def, "|") or InStr(Def, "-")
 	StringSplit, s, Def, %A_Space%
@@ -171,24 +206,30 @@ Splitter_updateVisual( HSep="", bVert="" ) {
 		VarSetCapacity(RECT, 16), 	DllCall("GetClientRect", "uint", HSep, "uint", &RECT)
 		sz := Win_GetRect(HSep, bVert ? "w" : "h") // 2
 
-;		my -= ch
 		if (bVert)
 			 NumPut(mx-b-sz, RECT, 0),	NumPut(mx-b+sz, RECT, 8)
-		else NumPut(my-b-sz, RECT, 4),	NumPut(my-b+sz, RECT, 12)
+		else NumPut(my-b-sz-ch, RECT, 4),	NumPut(my-b+sz-ch, RECT, 12)
 
 		DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)	
 		return
 	}
 	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
-;	my -= ch
 	if (bVert)
 		 NumPut(mx-b-sz, RECT, 0),  NumPut(mx-b+sz, RECT, 8)
-	else NumPut(my-b-sz, RECT, 4),  NumPut(my-b+sz, RECT, 12)
+	else NumPut(my-ch-b-sz, RECT, 4),  NumPut(my-ch-b+sz, RECT, 12)
 
 	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 }
 
-#include Win.ahk
+Splitter_IsVertical(Hwnd) {
+	old := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+	WinGet, s, Style, ahk_id %Hwnd%
+	DetectHiddenWindows, %old%
+	return s & 0x80 
+}
+
+#include *i Win.ahk
 
 /* Group: Example
  (start code)
