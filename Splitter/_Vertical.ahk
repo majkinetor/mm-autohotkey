@@ -33,3 +33,4 @@ return
 
 #include Splitter.ahk
 #include inc\Attach.ahk
+#include inc\Win.ahk
