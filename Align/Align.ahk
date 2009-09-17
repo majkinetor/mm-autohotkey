@@ -31,7 +31,7 @@
 	(end code)
 
   About:
-		o 1.0 by majkinetor
+		o 1.01 by majkinetor
 		o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
 Align(HCtrl, Type="", Dim=""){
