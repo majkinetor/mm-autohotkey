@@ -32,7 +32,7 @@ return
 
 
 F1::
-;	gosub MakeGui
+	gosub MakeGui
 	Attach()
 return
 
