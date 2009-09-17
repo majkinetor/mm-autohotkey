@@ -24,9 +24,9 @@
 
  Remarks:
 			This function adds a new splitter on the given position. User is responsible for correct position of the splitter.
-			Splitter is inactive until you call <Set> function.
+			Splitter is inactive until you call <Set> function.			
+			
 			When setting dimension of the splitter (width or height) use even numbers.
-
  */
 Splitter_Add(Opt="", Text="") {
 	static SS_NOTIFY=0x100, SS_CENTERIMAGE=0x200, SS_SUNKEN=0x1000, SS_BLACKRECT=4, SS_GRAYRECT=5, SS_WHITERECT=6, SS_BLACKFRAME=7, SS_GRAYFRAM=8, SS_WHITEFRAME=9
@@ -66,7 +66,7 @@ Splitter_GetPos( HSep ) {
 		c2n	- Controls right or bottom of the splitter.
 							
  Returns:
-		Splitter handle
+		Splitter handle.
  */
 Splitter_Set( HSep, Def, Pos="" ) {
 	static
@@ -91,11 +91,15 @@ Splitter_Set( HSep, Def, Pos="" ) {
  			Set position of the splitter.
 
  Parameters:
-			Pos		- Position to set. If empty, function simply returns.
+			Pos	 - Position to set. If not integer, function simply returns. 
+
+ Remarks:
+ 			Splitter will reset <Attach>, if present, when it changes the size of the controls it affects.
  */
 Splitter_SetPos( HSep, Pos ) {
 	static WM_LBUTTONUP := 0x202
-	ifEqual, Pos, , return
+	if Pos is not integer
+		return
 
 	bVert := Splitter_IsVertical(HSep)
 	sz := Win_GetRect(HSep, bVert ? "w" : "h") // 2
@@ -221,7 +225,7 @@ Splitter_updateVisual( HSep="", bVert="" ) {
 	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 }
 
-Splitter_IsVertical(Hwnd) {
+Splitter_isVertical(Hwnd) {
 	old := A_DetectHiddenWindows
 	DetectHiddenWindows, on
 	WinGet, s, Style, ahk_id %Hwnd%
