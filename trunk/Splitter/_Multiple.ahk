@@ -55,4 +55,4 @@ GuiClose:
 return
 
 #include Splitter.ahk
-#include Attach.ahk
+#include inc\Attach.ahk
