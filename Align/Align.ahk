@@ -44,7 +44,7 @@ Align(HCtrl, Type="", Dim=""){
 		loop, parse, %hParent%, |
 		{
 			StringSplit, s, A_LoopField, %A_Space%
-			HCtrl := s1, Type := s2, %Type% := true, Dim=""
+			HCtrl := s1, Type := s2, %Type% := true, Dim := ""
 			gosub %A_ThisFunc%
 		}
 		return IsFunc(t:="Attach") ? %t%(hParent) : ""
