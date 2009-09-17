@@ -91,7 +91,7 @@
 	(end code)
 
 	About:
-			o 1.01 by majkinetor
+			o 1.02 by majkinetor
 			o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
 Attach(hCtrl="", aDef="") {
@@ -104,6 +104,8 @@ Attach_(hCtrl, aDef, Msg, hParent){
 	if (aDef = "") {							;Reset if integer, Handler if string
 		if IsFunc(hCtrl)
 			return Handler := hCtrl
+
+		ifEqual, adrWindowInfo,, return			;Reseting prior to adding any control just returns.
 		hParent := hCtrl != "" ? hCtrl+0 : hGui
 		loop, parse, %hParent%, %A_Space%
 		{
