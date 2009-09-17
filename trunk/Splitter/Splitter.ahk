@@ -7,7 +7,7 @@
 			(see splitter.gif)
 
  Dependency:
-			Win 1.2
+			Win 1.1
  */
 
 /*
