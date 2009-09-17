@@ -56,9 +56,10 @@ Splitter_GetPos( HSep ) {
  
  Parameters:
  			hSep - Splitter handle.
-			Def	 - Splitter definition or words "off" or "on". The syntax of splitter definition is:
+			Def	 - Splitter definition or words "off" or "on". The syntax is given bellow.
 			Pos	 - Position of the splitter, optional.
 
+ Def:
  >		c11 c12 c13 ... Type c21 c22 c23 ...
 		
 		c1n - Controls left or top of the splitter.
