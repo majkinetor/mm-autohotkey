@@ -1,5 +1,5 @@
 #SingleInstance, force
-	spos := 159
+	spos := 121
 	ssize := 30
 
 	pos := Win_Recall("<", 0, "config.ini")

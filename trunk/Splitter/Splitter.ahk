@@ -17,7 +17,7 @@
  Parameters:
  			Opt	  - Splitter Gui options. Splitter is subclassed Text control (Static), so it accepts any Text options.
 					plus one the following: blackframe, blackrect, grayframe, grayrect, whiteframe, whiterect, sunken.
-			Text  - Text or picture to set.
+			Text  - Text to set.
 
  Returns:
 			Splitter handle.
@@ -195,25 +195,23 @@ Splitter_updateVisual( HSep="", bVert="" ) {
 		w := 500, h := 600, sep := 5
 		w1 := w//3, w2 := w-w1 , h1 := h // 2, h2 := h // 3
 
-		gui, margin, 0, 0
-		gui, add, edit, HWNDc11 w%w1% h%h1%
-		gui, add, edit, HWNDc12 w%w1% h%h1%
+		Gui, Margin, 0, 0
+		Gui, Add, Edit, HWNDc11 w%w1% h%h1%
+		Gui, Add, Edit, HWNDc12 w%w1% h%h1%
 		hSepV := Splitter_Add( "x+0 y0 h" h " w" sep )
-		gui, add, monthcal, HWNDc21 w%w2% h%h2% x+0
-		gui, add, ListView, HWNDc22 w%w2% h%h2%, c1|c2|c3
-		gui, add, ListBox, HWNDc23 w%w2% h%h2% , 1|2|3
+		Gui, Add, Monthcal, HWNDc21 w%w2% h%h2% x+0
+		Gui, Add, ListView, HWNDc22 w%w2% h%h2%, c1|c2|c3
+		Gui, Add, ListBox,  HWNDc23 w%w2% h%h2% , 1|2|3
 
 		sdef = %c11% %c12% | %c21% %c22% %c23%			;vertical splitter.
 		Splitter_Set( hSepV, sdef )
 
-		gui, show, w%w% h%h%	
+		Gui, show, w%w% h%h%	
 	return
-
-	#include Splitter.ahk
  (end code)
  */
 
 /* Group: About
-	o Ver 1.0b by majkinetor. 
+	o Ver 1.0c by majkinetor. 
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
