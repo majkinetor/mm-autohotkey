@@ -7,7 +7,7 @@
 			(see splitter.gif)
 
  Dependency:
-			Win 1.1
+			Win 1.2
  */
 
 /*
@@ -24,9 +24,10 @@
 
  Remarks:
 			This function adds a new splitter on the given position. User is responsible for correct position of the splitter.
-			Splitter is inactive until you call <Set> function.			
-			
+			Splitter is inactive until you call <Set> function.
 			When setting dimension of the splitter (width or height) use even numbers.
+			Splitter will set CoordMode, mouse, relative.
+
  */
 Splitter_Add(Opt="", Text="") {
 	static SS_NOTIFY=0x100, SS_CENTERIMAGE=0x200, SS_SUNKEN=0x1000, SS_BLACKRECT=4, SS_GRAYRECT=5, SS_WHITERECT=6, SS_BLACKFRAME=7, SS_GRAYFRAM=8, SS_WHITEFRAME=9
@@ -56,10 +57,9 @@ Splitter_GetPos( HSep ) {
  
  Parameters:
  			hSep - Splitter handle.
-			Def	 - Splitter definition or words "off" or "on". The syntax is given bellow.
+			Def	 - Splitter definition or words "off" or "on". The syntax of splitter definition is:
 			Pos	 - Position of the splitter, optional.
 
- Def:
  >		c11 c12 c13 ... Type c21 c22 c23 ...
 		
 		c1n - Controls left or top of the splitter.
@@ -67,7 +67,7 @@ Splitter_GetPos( HSep ) {
 		c2n	- Controls right or bottom of the splitter.
 							
  Returns:
-		Splitter handle.
+		Splitter handle
  */
 Splitter_Set( HSep, Def, Pos="" ) {
 	static
@@ -92,15 +92,11 @@ Splitter_Set( HSep, Def, Pos="" ) {
  			Set position of the splitter.
 
  Parameters:
-			Pos	 - Position to set. If not integer, function simply returns. 
-
- Remarks:
- 			Splitter will reset <Attach>, if present, when it changes the size of the controls it affects.
+			Pos		- Position to set. If empty, function simply returns.
  */
 Splitter_SetPos( HSep, Pos ) {
 	static WM_LBUTTONUP := 0x202
-	if Pos is not integer
-		return
+	ifEqual, Pos, , return
 
 	bVert := Splitter_IsVertical(HSep)
 	sz := Win_GetRect(HSep, bVert ? "w" : "h") // 2
@@ -187,11 +183,11 @@ Splitter_move(HSep, Delta, Def){
 	}		
 					
 	Win_Redraw( Win_Get(HSep, "A") )
-	IsFunc(f := "Attach") ? %f%(DllCall("GetParent", "uint", HSep, "Uint")) : 
+	IsFunc(f := "Attach") ? %f%(DllCall("GetParent", "uint", HSep, "Uint")) : ""
 }
 
 Splitter_updateVisual( HSep="", bVert="" ) {
-	static sz, dc, RECT, parent, adrDrawFocusRect, ch, b
+	static sz, dc, RECT, parent, adrDrawFocusRect, ch, b, sx,sy,sw,sh
 
 	if !HSep
 		return dc := 0
@@ -204,29 +200,24 @@ Splitter_updateVisual( HSep="", bVert="" ) {
 		parent := DllCall("GetParent", "uint", HSep)
 		
 		Win_Get(parent, "NhB" (bVert ? "x" : "y"), ch, b)		;get caption and border size
-	
 		ifGreater, ch, 1000, SetEnv, ch, 0
+
 		dc := DllCall("GetDC", "uint", parent)
 
-		VarSetCapacity(RECT, 16), 	DllCall("GetClientRect", "uint", HSep, "uint", &RECT)
-		sz := Win_GetRect(HSep, bVert ? "w" : "h") // 2
-
-		if (bVert)
-			 NumPut(mx-b-sz, RECT, 0),	NumPut(mx-b+sz, RECT, 8)
-		else NumPut(my-b-sz-ch, RECT, 4),	NumPut(my-b+sz-ch, RECT, 12)
-
-		DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)	
-		return
+		Win_GetRect(HSep, "*xywh", sx, sy, sw, sh),	  sz := (bVert ? sw : sh) // 2
+		VarSetCapacity(RECT, 16),  NumPut(sx, RECT), NumPut(sy, RECT, 4), NumPut(sx+sw, RECT, 8), NumPut(sy+sh, RECT, 12)
+	
+		return DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	}
 	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	if (bVert)
-		 NumPut(mx-b-sz, RECT, 0),  NumPut(mx-b+sz, RECT, 8)
+		 NumPut(mx-b-sz, RECT),	NumPut(mx-b+sz, RECT, 8)
 	else NumPut(my-ch-b-sz, RECT, 4),  NumPut(my-ch-b+sz, RECT, 12)
 
 	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 }
 
-Splitter_isVertical(Hwnd) {
+Splitter_IsVertical(Hwnd) {
 	old := A_DetectHiddenWindows
 	DetectHiddenWindows, on
 	WinGet, s, Style, ahk_id %Hwnd%
