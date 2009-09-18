@@ -1,23 +1,26 @@
 ;_("m! w e d")
 #SingleInstance, force
 SetWinDelay, -1
+
+	;===============================
+
 	Gui, +LastFounds +Resize
 	hGui := WinExist()
 
-	Gui, Show, w500 h400 Hide
+	Gui, Show, w500 h600 Hide
 
-	Gui, Add, Edit,		HWNDhEdt1, F1 - hide`nF2 - show
+	Gui, Add, Edit,		HWNDhEdit, F1 - hide`nF2 - show
 	hSplit := Splitter_Add()
 	Gui, Add, ListView,	HWNDhList, Top control
 	Gui, Add, Text,		h100 0x200 HWNDhText,  Bottom
 	Gui, Add, MonthCal, HWNDhCal	
 
-	sdef = %hEdt1% | %hList% %hText% %hCal%			;vertical splitter.
+	sdef = %hEdit% | %hList% %hText% %hCal%			;vertical splitter.
 	IniRead, spos, config.ini, Config, Splitter, %A_Space%
 	ifEqual, spos, ,SetEnv, spos, 100
 	Splitter_Set( hSplit, sdef, spos )
 	
-	Align(hEdt1,  "L", spos),			Attach(hEdt1,	"h")
+	Align(hEdit,  "L", spos),			Attach(hEdit,	"h")
 	Align(hSplit, "L", 6)	,			Attach(hSplit,	"h")
 	Align(hList,  "T", 200) ,			Attach(hList,	"w")
 	Align(hText,  "B")		,			Attach(hText,	"y w")
@@ -41,10 +44,10 @@ HideControls(bHide) {
 	if (!bHide)
 	{
 		WinShow, ahk_id %hText%
-		WinShow, ahk_id %hEdt1%	
+		WinShow, ahk_id %hEdit%	
 	} else {
 		WinHide, ahk_id %hText%
-		WinHide, ahk_id %hEdt1%	
+		WinHide, ahk_id %hEdit%	
 	}
 	Align(hGui)		;re-align (it will reset attach automatically if present among includes)
 }
