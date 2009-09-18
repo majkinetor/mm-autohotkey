@@ -12,7 +12,7 @@ MakeGui:
 	hGui := WinExist(),  %hGui% := no
 
 	Gui, %no%:Add, Edit, HWNDhe1%no% w150 h100 -tabstop, F1 - new Gui `nF2 - hide ctrl`nF3 - show ctrl`nF4 - ctrl left `nF5 - ctrl right `nESC - exit script
-	Gui, %no%:Add, Picture, HWNDhe2%no% w100 x+0 h100, pic.bmp 
+	Gui, %no%:Add, Picture, HWNDhe2%no% w100 x+0 h100, inc\pic.bmp 
 
 	Gui, %no%:Add, Edit, HWNDhe3%no% w100 xm h100
 	Gui, %no%:Add, Edit, HWNDhe4%no% w100 x+0 h100
@@ -75,5 +75,7 @@ ESC::
 	ExitApp
 return
 
-#include Win.ahk
 #include Attach.ahk
+
+;sample include
+#include inc\Win.ahk
