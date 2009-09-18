@@ -182,7 +182,7 @@ Splitter_move(HSep, Delta, Def){
 	}		
 					
 	Win_Redraw( Win_Get(HSep, "A") )
-	IsFunc(f := "Attach") ? %f%(DllCall("GetParent", "uint", HSep, "Uint")) : 
+	IsFunc(f := "Attach") ? %f%(DllCall("GetParent", "uint", HSep, "Uint")) : ""
 }
 
 Splitter_updateVisual( HSep="", bVert="" ) {

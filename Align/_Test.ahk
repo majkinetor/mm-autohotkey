@@ -1,4 +1,4 @@
-;_("mo! w e d")
+_("mo! w e d")
 #SingleInstance, force
 SetWinDelay, -1
 	Gui, +LastFounds +Resize
@@ -44,7 +44,7 @@ return
 
 F1:: HideControls(true)
 F2:: HideControls(false)
-
+F3:: Attach()
 
 HideControls(bHide) {
 	global 
