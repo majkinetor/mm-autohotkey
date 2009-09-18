@@ -1,10 +1,10 @@
-;_("m! w e d")
+;_("mo! w e d")
 #SingleInstance, force
 SetWinDelay, -1
 
 	Choose()
 
-	Gui, +LastFounds +Resize
+	Gui, +LastFounds +Resize -caption
 	hGui := WinExist()
 
 	Gui, Show, w500 h600 Hide

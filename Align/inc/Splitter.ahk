@@ -26,6 +26,7 @@
 			This function adds a new splitter on the given position. User is responsible for correct position of the splitter.
 			Splitter is inactive until you call <Set> function.
 			When setting dimension of the splitter (width or height) use even numbers.
+			Splitter will set CoordMode, mouse, relative.
 
  */
 Splitter_Add(Opt="", Text="") {
@@ -186,7 +187,7 @@ Splitter_move(HSep, Delta, Def){
 }
 
 Splitter_updateVisual( HSep="", bVert="" ) {
-	static sz, dc, RECT, parent, adrDrawFocusRect, ch, b
+	static sz, dc, RECT, parent, adrDrawFocusRect, ch, b, sx,sy,sw,sh
 
 	if !HSep
 		return dc := 0
@@ -199,23 +200,18 @@ Splitter_updateVisual( HSep="", bVert="" ) {
 		parent := DllCall("GetParent", "uint", HSep)
 		
 		Win_Get(parent, "NhB" (bVert ? "x" : "y"), ch, b)		;get caption and border size
-	
 		ifGreater, ch, 1000, SetEnv, ch, 0
+
 		dc := DllCall("GetDC", "uint", parent)
 
-		VarSetCapacity(RECT, 16), 	DllCall("GetClientRect", "uint", HSep, "uint", &RECT)
-		sz := Win_GetRect(HSep, bVert ? "w" : "h") // 2
-
-		if (bVert)
-			 NumPut(mx-b-sz, RECT, 0),	NumPut(mx-b+sz, RECT, 8)
-		else NumPut(my-b-sz-ch, RECT, 4),	NumPut(my-b+sz-ch, RECT, 12)
-
-		DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)	
-		return
+		Win_GetRect(HSep, "*xywh", sx, sy, sw, sh),	  sz := (bVert ? sw : sh) // 2
+		VarSetCapacity(RECT, 16),  NumPut(sx, RECT), NumPut(sy, RECT, 4), NumPut(sx+sw, RECT, 8), NumPut(sy+sh, RECT, 12)
+	
+		return DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	}
 	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	if (bVert)
-		 NumPut(mx-b-sz, RECT, 0),  NumPut(mx-b+sz, RECT, 8)
+		 NumPut(mx-b-sz, RECT),	NumPut(mx-b+sz, RECT, 8)
 	else NumPut(my-ch-b-sz, RECT, 4),  NumPut(my-ch-b+sz, RECT, 12)
 
 	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
