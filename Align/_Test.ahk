@@ -1,15 +1,10 @@
-_("mo! w e d")
+;_("m! w e d")
 #SingleInstance, force
 SetWinDelay, -1
 	Gui, +LastFounds +Resize
 	hGui := WinExist()
-	pos := Win_Recall("<", 0, "config.ini")
-	if (pos != "") {	
-			StringSplit, p, pos, %A_Space%
-			pos = x%p1% y%p2% w%p6% h%p7%
-	}
-	else pos = w500 h500
-	Gui, Show, %pos% Hide
+
+	Gui, Show, w500 h400 Hide
 
 	Gui, Add, Edit,		HWNDhEdt1, F1 - hide`nF2 - show
 	hSplit := Splitter_Add()
@@ -22,24 +17,19 @@ SetWinDelay, -1
 	ifEqual, spos, ,SetEnv, spos, 100
 	Splitter_Set( hSplit, sdef, spos )
 	
-	Align(hEdt1,  "L", spos)
-	Align(hSplit, "L", 6)
-	Align(hList,  "T", 200)
-	Align(hText,  "B")
-	Align(hCal,   "F")
-
-	Attach(hEdt1,	"h")
-	Attach(hSplit,	"h")
-	Attach(hList,	"w")
-	Attach(hCal,	"w h")
-	Attach(hText,	"y w")
+	Align(hEdt1,  "L", spos),			Attach(hEdt1,	"h")
+	Align(hSplit, "L", 6)	,			Attach(hSplit,	"h")
+	Align(hList,  "T", 200) ,			Attach(hList,	"w")
+	Align(hText,  "B")		,			Attach(hText,	"y w")
+	Align(hCal,   "F")		,			Attach(hCal,	"w h")
 
 	IniRead, bVisible, config.ini, Config, Visible, %A_Space%
 	IfEqual, bVisible, , SetEnv, bVisible, 1
 	if !bVisible
 		HideControls(true)
-	
-	Gui, Show
+
+	if !Win_Recall("<", "", "config.ini")
+		Gui, Show
 return
 
 F1:: HideControls(true)
@@ -71,7 +61,6 @@ SaveGui() {
 	IniWrite, %p%, config.ini, Config, Splitter
 	IniWrite, %b%, config.ini, Config, Visible
 }
-
 
 Esc:: 
 GuiClose:
