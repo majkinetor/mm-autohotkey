@@ -100,6 +100,7 @@ Attach(hCtrl="", aDef="") {
 
 Attach_(hCtrl, aDef, Msg, hParent){
 	static
+
 	if (aDef = "") {							;Reset if integer, Handler if string
 		if IsFunc(hCtrl)
 			return Handler := hCtrl
