@@ -91,7 +91,7 @@
 	(end code)
 
 	About:
-			o 1.02 by majkinetor
+			o 1.03 by majkinetor
 			o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
 Attach(hCtrl="", aDef="") {
@@ -100,11 +100,10 @@ Attach(hCtrl="", aDef="") {
 
 Attach_(hCtrl, aDef, Msg, hParent){
 	static
-
 	if (aDef = "") {							;Reset if integer, Handler if string
 		if IsFunc(hCtrl)
 			return Handler := hCtrl
-
+	
 		ifEqual, adrWindowInfo,, return			;Reseting prior to adding any control just returns.
 		hParent := hCtrl != "" ? hCtrl+0 : hGui
 		loop, parse, %hParent%, %A_Space%
@@ -118,7 +117,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 			}
 			%hCtrl% := SubStr(%hCtrl%, 1, -1)				
 		}
-		reset := 1
+		reset := 1,  %hParent%_s := %hParent%_pw " " %hParent%_ph
 	}
 
 	if (hParent = "")  {						;Initialize controls 
@@ -128,6 +127,9 @@ Attach_(hCtrl, aDef, Msg, hParent){
 			,OnMessage(5, A_ThisFunc),	VarSetCapacity(B, 60), NumPut(60, B), adrB := &B
 
 		hGui := hParent := DllCall("GetParent", "uint", hCtrl, "Uint") 
+		if !%hParent%_s
+			DllCall(adrWindowInfo, "uint", hParent, "uint", adrB), %hParent%_pw := NumGet(B, 28) - NumGet(B, 20), %hParent%_ph := NumGet(B, 32) - NumGet(B, 24), %hParent%_s := !%hParent%_pw || !%hParent%_ph ? "" : %hParent%_pw " " %hParent%_ph
+		
 		if aDef contains p
 			aDef := "xp yp wp hp" SubStr(aDef, 2)
 		ifEqual, aDef, -, return SubStr(%hCtrl%,1,1) != "-" ? %hCtrl% := "-" %hCtrl% : 
@@ -146,16 +148,14 @@ Attach_(hCtrl, aDef, Msg, hParent){
  			return %hCtrl% := SubStr(%hCtrl%, 1, -1), %hParent% .= InStr(%hParent%, hCtrl) ? "" : (%hParent% = "" ? "" : " ")  hCtrl 
 		}
 	}
+
  	if !reset && !enable {						;WM_SIZE handler starts here
 		%hParent%_pw := aDef & 0xFFFF, %hParent%_ph := aDef >> 16
 		ifEqual, %hParent%_ph, 0, return		;when u create gui without any control, it will send message with height=0 and scramble the controls ....
-
 	}
-	if (%hParent%_s = "") || reset {
-		if !(%hParent%_pw)
-			DllCall(adrWindowInfo, "uint", hParent, "uint", adrB), %hParent%_pw := NumGet(B, 28) - NumGet(B, 20), %hParent%_ph := NumGet(B, 32) - NumGet(B, 24)
+	
+	if !%hParent%_s
 		%hParent%_s := %hParent%_pw " " %hParent%_ph
-	}
 
 	StringSplit, s, %hParent%_s, %A_Space%
 	loop, parse, %hParent%, %A_Space%
