@@ -5,11 +5,14 @@
   Parameter:
  			hCtrl	- Control's handle or Parent handle. If other parameters are omitted, hCtrl represents Parent that
 					  should be re-aligned. Use re-align when you hide/show/resize controls to reposition remaining controls.
- 			Type	- String specifying align type. Available align types are Left, Right, Top, Bottom and Fill.
+ 			Type	- String specifying align type. Available align types are Left, Right, Top, Bottom, Fill and N.
  					  Top and Bottom types are horizontal alignments while Left and Right are vertical. Fill type is both
  					  vertically and horizontally aligned.
  					  Control will be aligned to the edge of given type of its parent. For any given Type, control's
  					  x, y are ignored, w is ignored for vertical, h for horizontal alignment.
+					  If you specify number as align type, it will be seen as handle of the control which serves as a marker and
+					  hCtrl will be put on the same position as the given control.
+
  			Dim		- Dimension, optional. This is width for vertical and height for horizontal alignment type.
  					  If you omit dimension, controls current dimension will be used.
  
@@ -47,6 +50,11 @@ Align(HCtrl, Type="", Dim=""){
 			gosub %A_ThisFunc%
 		}
 		return IsFunc(t:="Attach") ? %t%(hParent) : ""
+	} else if Type is integer
+	{
+		ControlGetPos, x, y, w, h, , ahk_id %Type%
+		ControlMove, , x, y, w, h, ahk_id %HCtrl%
+		return
 	}
 
  	hParent := DllCall("GetParent", "uint", HCtrl, "Uint")
