@@ -1,13 +1,16 @@
 _("e")
 	hPanel := hForm1	:=	Form_New("w500 h400", "Resize ToolWindow")
 
-	hPanel	:=	Form_Add(hForm1,  "Panel",	 "",	  "w250",		"Align L", "Attach p")
-	hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnBtn h100","Align T", "Attach p", "Cursor hand", "Tooltip I have hand cursor")
+	hPanel	:=	Form_Add(hForm1,  "Panel",	 "",	  "w250",		"Align L, 250", "Attach p")
+	hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnBtn",		"Align T, 100", "Attach p", "Cursor hand", "Tooltip I have hand cursor")
 	hButton2 :=	Form_Add(hPanel,  "Button",  "Cancel","gOnBtn",		"Align F", "Attach p", "Tooltip jea baby")
 
 	hPanel2	:=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align F", "Attach p")
-	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "h200",		"Align T", "Attach p")
-	hCal1	:=  Form_Add(hPanel2, "MonthCal","",	  "",			"Align F", "Attach p")
+;	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "",			"Align T, 200", "Attach p")
+;	hCal1	:=  Form_Add(hPanel2, "MonthCal","",	  "",			"Align F", "Attach p")
+	hLV		:=  Form_Add(hPanel2, "ListView", "1|2|3", "gOnLV",		"Align T, 200", "Attach p")
+	hHE		:=  Form_Add(hPanel2, "HiEdit",	"HiEdit",  "dllPath=inc\hiedit.dll style='HILIGHT TABBED FILECHANGEALERT'",	"Align F", "Attach p")
+
 
 	Form_Show()
 return
@@ -18,6 +21,10 @@ return
 
 OnBtn:
 	msgbox % A_GuiCOntrol
+return
+
+OnLv:
+	msgbox % A_GuiEvent
 return
 
 
@@ -40,14 +47,12 @@ Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
 		ifEqual,o,,break
 
 		f_Extension := SubStr(o, 1, k:=InStr(o, " ")-1), k := SubStr(o, k+2)
-		if IsFunc(f_Extension)
-			 o := %f_Extension%(hCtrl, k)
-		else if IsFunc( f_Extension := "Ext_" f_Extension )
-			 o := %f_Extension%(hCtrl, k)
-		else return A_ThisFunc "> Unsupported extension: " f_Extension
-		ifEqual, o,0, return A_ThisFunc " >   Unsuported " Ctrl " extension: " f_Extension
+		Form_split(k, p1, p2, p3, p4, p5)
+		if !(IsFunc(f_Extension) || IsFunc( f_Extension := "Ext_" f_Extension ))
+			return A_ThisFunc "> Unsupported extension: " f_Extension
+		%f_Extension%(hCtrl, p1, p2, p3, p4, p5)
 	}
-		
+
 	return hCtrl
 }
 
@@ -123,7 +128,6 @@ Form_New(Size="", Options="") {
 			str?	- Boolean option, output is true if str exists in the option string or false otherwise (red?)
 
  Remarks:
-			Entire string is parsed even if only 1 option is in the query parameter.
 			Currently you can extract maximum 10 options at a time, but this restriction can be removed for up to 29 options.
 
  Returns:
@@ -215,6 +219,10 @@ Form_getFreeGuiNum(){
 	return 0
 }
 
+Form_split(s, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="") {
+	StringSplit, o, s, `, ,%A_Space%
+}
+
 ;storage
 Form(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
 	static
@@ -230,5 +238,9 @@ Form(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", B
 }
 
 #include Panel.ahk
+
 #include ext
 #include _Extensions.ahk
+
+#include ..\inc
+#include HiEdit.ahk
