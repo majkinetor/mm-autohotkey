@@ -3,7 +3,7 @@
 
 ;----------------------------------------------------------------------------------------------
 ; Function:		Color
-;				Display standard color dialog
+;				(See color.png)
 ;
 ; Parameters: 
 ;				pColor	- Initial color and output in RGB format, 
@@ -49,12 +49,14 @@ CmnDlg_Color(ByRef pColor, hGui=0){
 
 
 ;----------------------------------------------------------------------------------------------
+;
 ; Function:     Find / Replace
-;               Display standard Find and Replace dialog boxes.
+;				(see find.png)
+;				(see replace.png)
 ;
 ; Parameters: 
 ;               hGui    - Handle to parents HWND
-;               lbl     - Label used for communication with dialog. CmnDlg_Event, CmnDlg_FindWhat and CmnDlg_Flags hold the dialog data
+;               fun     - Notification function used for communication with dialog.
 ;               flags   - Creation flags, see below.
 ;               deff    - Default text to be displayed at the start of the dialog box in find edit box
 ;               defr    - Default text to be displayed at the start of the dialog box in replace edit box
@@ -66,26 +68,25 @@ CmnDlg_Color(ByRef pColor, hGui=0){
 ;                w - whole word selected
 ;                c - match case selected
 ;
-; Globals:      
-;				Dialog box is not modal, so it communicates with the script using 4 global variables:
+; Notifications:
+;				Dialog box is not modal, so it communicates with the script while it is active. Both Find & Replace use 
+;				the same prototype of notification function so even if you use Find only you will have to specify ReplaceWith parameter.
+;
+;>					OnFind(Event, Flags, FindWhat, ReplaceWith)
 ;
 ;                   Event    - "close", "find", "replace", "replace_all"
-;                   Flags    - String contaning flags about user selection; each letter means user has selected that particular GUI element.
-;                   FindWhat - User find text
-;                ReplaceWith - User replace text
+;                   Flags    - string contaning flags about user selection; each letter means user has selected that particular GUI element.
+;                   FindWhat - user find text
+;                ReplaceWith - user replace text
 ;   
 ; Returns:      
 ;               Handle of the dialog or 0 if dialog can't be created. Can also return "Invalid Label" if lbl is not valid.
 ; 
-CmnDlg_Find( hGui, lbl, flags="d", deff="") {
+CmnDlg_Find( hGui, fun, flags="d", deff="") {
 	static FINDMSGSTRING = "commdlg_FindReplace"
 	static FR_DOWN=1, FR_MATCHCASE=4, FR_WHOLEWORD=2, FR_HIDEMATCHCASE=0x8000, FR_HIDEWHOLEWORD=0x10000, FR_HIDEUPDOWN=0x4000
 	static buf, FR, len := 256
 
-	if !Islabel(lbl)
-		return "Invalid Label"
-
-	
 	f := 0
 	f |= InStr(flags, "d")  ? FR_DOWN : 0 
 	f |= InStr(flags, "c")  ? FR_MATCHCASE : 0
@@ -107,7 +108,7 @@ CmnDlg_Find( hGui, lbl, flags="d", deff="") {
 	NumPut( len,	FR, 24) ;wFindWhatLen
 
 
-	CmnDlg_callback(lbl,"","","")
+	CmnDlg_callback(fun,"","","")
 	OnMessage( DllCall("RegisterWindowMessage", "str", FINDMSGSTRING), "CmnDlg_callback" )
 
 	return DllCall("comdlg32\FindTextA", "str", FR)
@@ -115,7 +116,7 @@ CmnDlg_Find( hGui, lbl, flags="d", deff="") {
 
 ;----------------------------------------------------------------------------------------------
 ; Function:  Font
-;            Display standard font dialog
+;			 (see font.png)				
 ;
 ; Parameters:
 ;            pFace		- Initial font,  output
@@ -218,7 +219,7 @@ CmnDlg_Font(ByRef pFace, ByRef pStyle, ByRef pColor, pEffects=true, hGui=0) {
 
 ;-----------------------------------------------------------------------------------------------
 ; Function:	Icon 
-;			Display standard icon dialog.
+;			(See icon.png)
 ;
 ; Parameters:
 ;			sIcon   - Default icon resource, output
@@ -237,10 +238,10 @@ CmnDlg_Icon(ByRef sIcon, ByRef idx, hGui=0) {
         r := DllCall("MultiByteToWideChar", "UInt", 0, "UInt", 0, "Str", sIcon, "Int", StrLen(sIcon), "UInt", &wIcon, "Int", 1025) 
 		IfEqual, r, 0, return false
     } 
-    
-	r := DllCall(DllCall("GetProcAddress", "Uint", DllCall("LoadLibrary", "str", "shell32.dll"), "Uint", 62), "uint", hGui, "uint", &wIcon, "uint", 1025, "intp", (--idx)++)
-	IfEqual, r, 0, return false
 
+	r := DllCall(DllCall("GetProcAddress", "Uint", DllCall("LoadLibrary", "str", "shell32.dll"), "Uint", 62), "uint", hGui, "uint", &wIcon, "uint", 1025, "intp", --idx)
+	idx++
+	IfEqual, r, 0, return false
 
 	Len := DllCall("lstrlenW", "UInt", &wIcon) 
 	VarSetCapacity(sIcon, len, 0) 
@@ -252,8 +253,8 @@ CmnDlg_Icon(ByRef sIcon, ByRef idx, hGui=0) {
 
 ;---------------------------------------------------------------------------------------------- 
 ; Function:  Open / Save 
-;            Display standard Open / Save dialog
-; 
+;			 (see open.png)
+;
 ; Parameters: 
 ;            hGui            - Parent's handle, positive number by default 0 (influences dialog position) 
 ;            Title			 - Dialog title
@@ -265,25 +266,25 @@ CmnDlg_Icon(ByRef sIcon, ByRef idx, hGui=0) {
 ;            Flags           - White space separated list of flags, by default "FILEMUSTEXIST HIDEREADONLY"
 ;  
 ;  Flags:
-;			ALLOWMULTISELECT	- Specifies that the File Name list box allows multiple selections 
-;			CREATEPROMPT		- If the user specifies a file that does not exist, this flag causes the dialog box to prompt the user for permission to create the file
-;			DONTADDTORECENT		- Prevents the system from adding a link to the selected file in the file system directory that contains the user's most recently used documents. 
-;			EXTENSIONDIFFERENT	- Specifies that the user typed a file name extension that differs from the extension specified by defaulltExt
-;			FILEMUSTEXIST		- Specifies that the user can type only names of existing files in the File Name entry field
-;			FORCESHOWHIDDEN		- Forces the showing of system and hidden files, thus overriding the user setting to show or not show hidden files. However, a file that is marked both system and hidden is not shown.
-;			HIDEREADONLY		- Hides the Read Only check box.
-;			NOCHANGEDIR			- Restores the current directory to its original value if the user changed the directory while searching for files.
-;			NODEREFERENCELINKS	- Directs the dialog box to return the path and file name of the selected shortcut (.LNK) file. If this value is not specified, the dialog box returns the path and file name of the file referenced by the shortcut.
-;			NOVALIDATE			- Specifies that the common dialog boxes allow invalid characters in the returned file name
-;			OVERWRITEPROMPT		- Causes the Save As dialog box to generate a message box if the selected file already exists. The user must confirm whether to overwrite the file.
-;			PATHMUSTEXIST		- Specifies that the user can type only valid paths and file names.
-;			READONLY			- Causes the Read Only check box to be selected initially when the dialog box is created
-;			SHOWHELP			- Causes the dialog box to display the Help button. The hGui receives the HELPMSGSTRING registered messages that the dialog box sends when the user clicks the Help button. 
-;			NOREADONLYRETURN	- Specifies that the returned file does not have the Read Only check box selected and is not in a write-protected directory.
-;			NOTESTFILECREATE	- Specifies that the file is not created before the dialog box is closed. This flag should be specified if the application saves the file on a create-nonmodify network share.
+;			allowmultiselect	- Specifies that the File Name list box allows multiple selections 
+;			createprompt		- If the user specifies a file that does not exist, this flag causes the dialog box to prompt the user for permission to create the file
+;			dontaddtorecent		- Prevents the system from adding a link to the selected file in the file system directory that contains the user's most recently used documents. 
+;			extensiondifferent	- Specifies that the user typed a file name extension that differs from the extension specified by defaulltExt
+;			filemustexist		- Specifies that the user can type only names of existing files in the File Name entry field
+;			forceshowhidden		- Forces the showing of system and hidden files, thus overriding the user setting to show or not show hidden files. However, a file that is marked both system and hidden is not shown.
+;			hidereadonly		- Hides the Read Only check box.
+;			nochangedir			- Restores the current directory to its original value if the user changed the directory while searching for files.
+;			nodereferencelinks	- Directs the dialog box to return the path and file name of the selected shortcut (.LNK) file. If this value is not specified, the dialog box returns the path and file name of the file referenced by the shortcut.
+;			novalidate			- Specifies that the common dialog boxes allow invalid characters in the returned file name
+;			overwriteprompt		- Causes the Save As dialog box to generate a message box if the selected file already exists. The user must confirm whether to overwrite the file.
+;			pathmustexist		- Specifies that the user can type only valid paths and file names.
+;			readonly			- Causes the Read Only check box to be selected initially when the dialog box is created
+;			showhelp			- Causes the dialog box to display the Help button. The hGui receives the HELPMSGSTRING registered messages that the dialog box sends when the user clicks the Help button. 
+;			noreadonlyreturn	- Specifies that the returned file does not have the Read Only check box selected and is not in a write-protected directory.
+;			notestfilecreate	- Specifies that the file is not created before the dialog box is closed. This flag should be specified if the application saves the file on a create-nonmodify network share.
 ; 
 ;  Returns: 
-;            Selected FileName or nothing if cancelled. If more then one file is selected they are separated by new line character.
+;            Selected FileName or Emtpy when cancelled. If more then one file is selected they are separated by new line character.
 ; 	
 CmnDlg_Open( hGui=0, Title="", Filter="", defaultFilter="", Root="", defaultExt="", flags="FILEMUSTEXIST HIDEREADONLY" ) { 
 	static OFN_ALLOWMULTISELECT:=0x200, OFN_CREATEPROMPT:=0x2000, OFN_DONTADDTORECENT:=0x2000000, OFN_EXTENSIONDIFFERENT:=0x400, OFN_FILEMUSTEXIST:=0x1000, OFN_FORCESHOWHIDDEN:=0x10000000, OFN_HIDEREADONLY:=0x4, OFN_NOCHANGEDIR:=0x8, OFN_NODEREFERENCELINKS:=0x100000, OFN_NOVALIDATE:=0x100, OFN_OVERWRITEPROMPT:=0x2, OFN_PATHMUSTEXIST:=0x800, OFN_READONLY:=0x1, OFN_SHOWHELP:=0x10, OFN_NOREADONLYRETURN:=0x8000, OFN_NOTESTFILECREATE:=0x10000
@@ -351,13 +352,10 @@ CmnDlg_Open( hGui=0, Title="", Filter="", defaultFilter="", Root="", defaultExt=
 	return ms ? SubStr(res, 1, -1) : SubStr(d, 1, -1)
 }
 
-CmnDlg_Replace( hGui, lbl, flags="", deff="", defr="") {
+CmnDlg_Replace( hGui, fun, flags="", deff="", defr="") {
 	static FINDMSGSTRING = "commdlg_FindReplace"
 	static FR_MATCHCASE=4, FR_WHOLEWORD=2, FR_HIDEMATCHCASE=0x8000, FR_HIDEWHOLEWORD=0x10000, FR_HIDEUPDOWN=0x4000
 	static buf_s, buf_r, FR, len := 256
-
-	if !Islabel(lbl)
-		return "Invalid Label"
 
 	f := 0
 	f |= InStr(flags, "c")  ? FR_MATCHCASE : 0
@@ -382,55 +380,45 @@ CmnDlg_Replace( hGui, lbl, flags="", deff="", defr="") {
 	NumPut( len,	FR, 26) ;wReplaceWithLen
 
 
-	CmnDlg_callback(lbl,"","","")
+	CmnDlg_callback(fun,"","","")
 	OnMessage( DllCall("RegisterWindowMessage", "str", FINDMSGSTRING), "CmnDlg_callback" )
 
 	return DllCall("comdlg32\ReplaceTextA", "str", FR)
 }
 
 CmnDlg_Save( hGui=0, Title="", Filter="", defaultFilter="", Root="", defaultExt="", flags="" ) {
-	return CmnDlg_Open( "-" hGui, Title, Filter, defaultFilter, Root, defaultExt, flags )
+	return CmnDlg_Open( hGui, Title, Filter, defaultFilter, Root, defaultExt, flags )
 }
 
 
 ;=========================================== PRIVATE ===============================================
 
 CmnDlg_callback(wparam, lparam, msg, hwnd) {
-	global CmnDlg_Event, CmnDlg_Flags, CmnDlg_FindWhat, CmnDlg_ReplaceWith
 	static FR_DIALOGTERM = 0x40, FR_DOWN=1, FR_MATCHCASE=4, FR_WHOLEWORD=2, FR_HIDEMATCHCASE=0x8000, FR_HIDEWHOLEWORD=0x10000, FR_HIDEUPDOWN=0x4000, FR_REPLACE=0x10, FR_REPLACEALL=0x20, FR_FINDNEXT=8
 	static fun 
+	ifEqual, hwnd, ,return fun := wparam
 
-	if (hwnd = "")
-		return fun := wparam
+	flags := NumGet(lparam+0, 12)
+	if (flags & FR_DIALOGTERM)
+		return %fun%("close", "", "", "")
 
-	flags := NumGet(lparam+0, 12), CmnDlg_Flags := "" 
-	if (flags & FR_DIALOGTERM) {
-		CmnDlg_Event := "close"
-		gosub %fun%
-		return
-	}
-
-
-	CmnDlg_Flags .= (Flags & FR_MATCHCASE) && !(Flags & FR_HIDEMATCHCASE)? "c" :
-	CmnDlg_Flags .= (Flags & FR_WHOLEWORD) && !(Flags & FR_HIDEWHOLEWORD) ? " w" :
+ 	CmnDlg_Flags .= (Flags & FR_MATCHCASE) && !(Flags & FR_HIDEMATCHCASE)? "c" :
+	CmnDlg_Flags .= (Flags & FR_WHOLEWORD) && !(Flags & FR_HIDEWHOLEWORD) ? "w" :
 	CmnDlg_FindWhat := DllCall("MulDiv", "Int", NumGet(lparam+0, 16), "Int",1, "Int",1, "str") 
 
 	if (flags & FR_FINDNEXT) {
-		CmnDlg_Event := "find"
-		CmnDlg_Flags .= (Flags & FR_DOWN) && !(Flags & FR_HIDEUPDOWN) ? " d" :
-		gosub %fun%
-		return 
+		CmnDlg_Flags .= (Flags & FR_DOWN) && !(Flags & FR_HIDEUPDOWN) ? "d" :
+		return %fun%("find", CmnDlg_Flags, CmnDlg_FindWhat, "")
 	}
 
 	if (flags & FR_REPLACE) or (flags & FR_REPLACEALL) {
 		CmnDlg_Event := (flags & FR_REPLACEALL) ? "replace_all" : "replace"
 		CmnDlg_ReplaceWith := DllCall("MulDiv", "Int", NumGet(lparam+0, 20), "Int",1, "Int",1, "str") 
-		gosub %fun%
-		return 
+		return %fun%(CmnDlg_Event, CmnDlg_Flags, CmnDlg_FindWhat, CmnDlg_ReplaceWith)
 	}
 }
 
-;
+;-------------------------------------------------------------------------------------------------------------------
 ;Group: Examples
 ;
 ;Example1: 
@@ -461,5 +449,5 @@ CmnDlg_callback(wparam, lparam, msg, hwnd) {
 ;>return
 ;
 ;Group: About
-;		o Ver 4.03 by majkinetor. See http://www.autohotkey.com/forum/topic17230.html
+;		o Ver 4.1 by majkinetor. See http://www.autohotkey.com/forum/topic17230.html
 ;		o Licenced under Creative Commons Attribution-Noncommercial <http://creativecommons.org/licenses/by-nc/3.0/>.
