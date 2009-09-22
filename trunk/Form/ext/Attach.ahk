@@ -7,6 +7,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 	local s1,s2
 	global hHE
 
+	critical 500
 	if redraw := aDef = "redraw"
 		hParent := hCtrl
 
@@ -87,9 +88,9 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		}
 		flag := 4 | (r=1 ? 0x100 : 0) | (uw OR uh ? 0 : 1) | (ux OR uy ? 0 : 2)			; nozorder=4 nocopybits=0x100 SWP_NOSIZE=1 SWP_NOMOVE=2	
 		
-		r := DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag)
+		DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag)
 ;		if (hCtrl = hHE)
-			m(r, hParent,%hParent%a, hCtrl, floor(cx), floor(cy), floor(cw), floor(ch))
+;			m(r, hParent,%hParent%a, hCtrl, floor(cx), floor(cy), floor(cw), floor(ch))
 		r+0=2 ? Attach_redrawDelayed(hCtrl) : 
 	}
 

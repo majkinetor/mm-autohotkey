@@ -1,17 +1,19 @@
-_("e w")
-;#MaxThreads, 255
+_("mo e w")
+#MaxThreads, 255
 
-	hForm1	:=	Form_New("w500 h400", "Resize")
+	;Attach("OnAttach")
+	hForm1	:=	Form_New("w500 h900", "Resize")
 
 ;	hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "w250",		"Align L, 250", "Attach p")
-	loop, 5
+	loop, 3
 	{
-		hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align T, 100", "Attach p")
-		hPanel	 :=	Form_Add(hPanel,  "Panel",	 "",	  "",			"Align F", "Attach p")
-		hPanel	 :=	Form_Add(hPanel,  "Panel",	 "",	  "",			"Align F", "Attach p")
-		hPanel	 :=	Form_Add(hPanel,  "Panel",	 "",	  "",			"Align F", "Attach p")
-		hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnBtn",		"Align T, 50", "Attach p", "Cursor hand", "Tooltip I have hand cursor")
-		hButton2 :=	Form_Add(hPanel,  "Button",  "Cancel","gOnBtn",		"Align F", "Attach p", "Tooltip jea baby")
+		hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align T, 300", "Attach p")
+		loop, 3
+			hPanel	 :=	Form_Add(hPanel,  "Panel",	 "",	  "",			"Align F", "Attach p r2")
+		hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnBtn",		"Align T, 50", "Attach p r2", "Cursor hand", "Tooltip I have hand cursor")
+		hButton2 :=	Form_Add(hPanel,  "Button",  "Cancel","gOnBtn",		"Align T, 50", "Attach p r2", "Tooltip jea baby")
+		hCal1	:=  Form_Add(hPanel, "MonthCal","",	  "gOnBtn",			"Align F", "Attach p r2")
+		LV_Add("","123 safasdf asdfa sdf sadf asdf asdf asdf sadfsadfsadf asfdsadf")
 	}
 
 ;	hPanel2	:=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align F", "Attach p")
@@ -27,8 +29,20 @@ _("e w")
 	Form_Show()
 return
 
+OnAttach(Hwnd) {
+	static h
+	h := Hwnd
+	SetTimer, %A_ThisFunc%, -100
+	return
+
+ OnAttach:
+	Win_Redraw(h)	
+ return
+}
+
+
 F1::
-	WinMove, ahk_id %hForm1%, , , , 300, 300
+;	WinMove, ahk_id %hForm1%, , , , 300, 300
 return
 
 F2::
