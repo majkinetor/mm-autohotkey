@@ -5,6 +5,10 @@ Attach(hCtrl="", aDef="") {
 Attach_(hCtrl, aDef, Msg, hParent){
 	static
 	local s1,s2
+	global hHE
+
+	if redraw := aDef = "redraw"
+		hParent := hCtrl
 
 	if (aDef = "") {							;Reset if integer, Handler if string
 		if IsFunc(hCtrl)
@@ -26,7 +30,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		reset := 1,  %hParent%_s := %hParent%_pw " " %hParent%_ph
 	}
 
-	if (hParent = "")  {						;Initialize controls 
+	if (hParent = "") && !redraw {						;Initialize controls 
 		if !adrSetWindowPos
 			adrSetWindowPos		:= DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "SetWindowPos")
 			,adrWindowInfo		:= DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "GetWindowInfo")
@@ -54,15 +58,14 @@ Attach_(hCtrl, aDef, Msg, hParent){
  			return %hCtrl% := SubStr(%hCtrl%, 1, -1), %hParent%a .= InStr(%hParent%a, hCtrl) ? "" : (%hParent%a = "" ? "" : " ")  hCtrl 
 		}
 	}
+	ifEqual, %hParent%a,, return				;return if nothing to anchor.
 
-	if (%hParent%a = "")
-		return
-
-	if !reset && !enable {						;WM_SIZE handler starts here
+	
+	if !reset && !enable && !redraw {					
 		%hParent%_pw := aDef & 0xFFFF, %hParent%_ph := aDef >> 16
 		ifEqual, %hParent%_ph, 0, return		;when u create gui without any control, it will send message with height=0 and scramble the controls ....
-	}
-	
+	} 
+
 	if !%hParent%_s
 		%hParent%_s := %hParent%_pw " " %hParent%_ph
 
@@ -82,9 +85,11 @@ Attach_(hCtrl, aDef, Msg, hParent){
 				 c%z1% := z3 * (z1="x" || z1="w" ?  %hParent%_pw/s1 : %hParent%_ph/s2), u%z1% := true
 			else c%z1% := z3 + z2*(z1="x" || z1="w" ?  %hParent%_pw-s1 : %hParent%_ph-s2), 	u%z1% := true
 		}
-		flag := 4 | (r=1 ? 0x100 : 0) | (uw OR uh ? 0 : 1) | (ux OR uy ? 0 : 2)			; nozorder=4 nocopybits=0x100 SWP_NOSIZE=1 SWP_NOMOVE=2						
-		;m(hParent,%hParent%a, hCtrl, floor(cx), floor(cy), floor(cw), floor(ch))
-		DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag)
+		flag := 4 | (r=1 ? 0x100 : 0) | (uw OR uh ? 0 : 1) | (ux OR uy ? 0 : 2)			; nozorder=4 nocopybits=0x100 SWP_NOSIZE=1 SWP_NOMOVE=2	
+		
+		r := DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag)
+;		if (hCtrl = hHE)
+			m(r, hParent,%hParent%a, hCtrl, floor(cx), floor(cy), floor(cw), floor(ch))
 		r+0=2 ? Attach_redrawDelayed(hCtrl) : 
 	}
 

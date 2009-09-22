@@ -37,8 +37,10 @@ Panel_wndProc(Hwnd, UMsg, WParam, LParam) {
 		return DllCall("SendMessage", "uint", anc, "uint", umsg, "uint", wparam, "uint", LParam)
 	}
 	
-	if (UMsg = WM_SIZE)
-		return IsFunc(f) ? %f%(Wparam, LParam, UMsg, Hwnd) : ""
+	if (UMsg = WM_SIZE) {
+		;if DllCall("IsWindowVisible", "Uint", Hwnd)
+			return IsFunc(f) ? %f%(Wparam, LParam, UMsg, Hwnd) : ""
+	}
 
 	return DllCall("CallWindowProc","uint",A_EventInfo,"uint",Hwnd,"uint",UMsg,"uint",WParam,"uint",LParam)
 }
@@ -62,6 +64,9 @@ Panel_registerClass() {
 }
 
 Panel_Add2Form(hParent, Txt, Parameters){
-	Form_Parse(Parameters, "x# y# w# h# style", x, y, w, h, style)
-	return Panel_New(hParent, x, y, w, h, style, Txt)	
+	Form_Parse(Parameters, "x# y# w# h# style hidden?", x, y, w, h, style, bHidden)
+	hCtrl := Panel_New(hParent, x, y, w, h, style, Txt)	
+	if bHidden
+		WinHide, ahk_id %hCtrl%
+	return hCtrl
 }
