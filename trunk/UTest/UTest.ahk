@@ -2,14 +2,23 @@
 
 UTest_Start()	;execute tests
 
-Assert_True( bExp, Name="") {
-	if !bExp
-		UTest_SetFail( Name )
+Assert_True( b1="", b2="", b3="", b4="", b5="", b6="", b7="", b8="", b9="", b10="") {
+	
+	loop, 10
+		ifNotEqual, b%A_Index%,, ifNotEqual, b%A_Index%, 1
+		{
+			UTest_SetFail( Name )
+			break
+		}
 }
 
-Assert_False( bExp, Name="" ) {
-	if bExp
-		UTest_SetFail( Name )
+Assert_False( b1="", b2="", b3="", b4="", b5="", b6="", b7="", b8="", b9="", b10="") {
+	loop, 10
+		ifNotEqual, b%A_Index%,,ifNotEqual, b%A_Index%, 0
+		{
+			UTest_SetFail( Name )
+			break
+		}
 }
 
 Assert_Empty( Var, Name="" ){
