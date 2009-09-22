@@ -62,6 +62,6 @@ Panel_registerClass() {
 }
 
 Panel_Add2Form(hParent, Txt, Parameters){
-	Form_Parse(Parameters, "x y w h style", x, y, w, h, style)
+	Form_Parse(Parameters, "x# y# w# h# style", x, y, w, h, style)
 	return Panel_New(hParent, x, y, w, h, style, Txt)	
 }
