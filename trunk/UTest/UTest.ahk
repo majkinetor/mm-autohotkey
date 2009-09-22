@@ -1,9 +1,8 @@
 #SingleInstance, force
 
-UTest_Start()	;execute tests
+UTest("Result", UTest_Start( UTest("NoGui") ))	;execute tests
 
 Assert_True( b1="", b2="", b3="", b4="", b5="", b6="", b7="", b8="", b9="", b10="") {
-	
 	loop, 10
 		ifNotEqual, b%A_Index%,, ifNotEqual, b%A_Index%, 1
 		{
@@ -12,9 +11,9 @@ Assert_True( b1="", b2="", b3="", b4="", b5="", b6="", b7="", b8="", b9="", b10=
 		}
 }
 
-Assert_False( b1="", b2="", b3="", b4="", b5="", b6="", b7="", b8="", b9="", b10="") {
+Assert_False( b1="", b2="", b3="", b4="", b5="", b6="", b7="", b8="", b9="", b10="" ) {
 	loop, 10
-		ifNotEqual, b%A_Index%,,ifNotEqual, b%A_Index%, 0
+		ifNotEqual, b%A_Index%,, ifNotEqual, b%A_Index%, 0
 		{
 			UTest_SetFail( Name )
 			break
@@ -58,7 +57,8 @@ UTest_SetFail(Name) {
 
 UTest_RunTests(){
 	tests := UTest_GetTests(), bNoGui := UTest("NoGui")
-	
+	ifEqual, tests,, return
+
 	bTestsFail := 0
 	loop, parse, tests, `n
 	{
@@ -112,17 +112,14 @@ UTest_getFreeGuiNum(){
 }
 
 UTest_Start( bNoGui = false) {
-	UTest("NoGui", bNoGui)
 	if !bNoGui
 		hGui := UTest_CreateGui()
 	s := UTest_RunTests()
 	
-	if hGui
-	{
+	if (hGui){
 		Result := UTest("TestsFail") ? "FAIL" : "OK"
 		ControlSetText,Static1, %Result%, ahk_id %hGui%
 	}
-
 	return s
 }
 
