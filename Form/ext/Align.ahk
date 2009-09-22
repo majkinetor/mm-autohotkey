@@ -36,7 +36,6 @@
  */
 Align(HCtrl, Type="", Dim=""){
 	static 
-
 	HCtrl += 0
 	if (Type="") {	;realign
 		hParent := HCtrl
