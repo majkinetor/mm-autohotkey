@@ -1046,12 +1046,12 @@ WriteFile(file,data) {
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>.
  */
 
-HiEdit_Add2Panel(hPanel, Txt, Opt) {
-	f := "Panel_Parse"
-	%f%(Opt, "x y w h style dllPath", x, y, w, h, style, dllPath)
+HiEdit_Add2Form(hParent, Txt, Opt) {
+	f := "Form_Parse"
+	%f%(Opt, "x# y# w# h# style dllPath", x, y, w, h, style, dllPath)
 	if dllPath=
 		dllPath := "HiEdit.dll"
-	h := HE_Add(hPanel, x, y, w, h, style, dllPath)
+	h := HE_Add(hParent, x, y, w, h, style, dllPath)
 	if Txt != 
 		ControlSetText, , %Txt%, ahk_id %h%
 
