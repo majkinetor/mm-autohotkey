@@ -1,15 +1,15 @@
 _("e")
-	hForm1	:=	Form_New("w500 h400", "Resize ToolWindow")
+	hPanel := hForm1	:=	Form_New("w500 h400", "Resize ToolWindow")
 
-;	hPanel	:=	Form_Add(hForm1,  "Panel",	 "",	  "w250",		"Align L", "Attach p")
-;	hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnBtn h100","Align T", "Attach p", "Cursor hand", "Tooltip I am nasty button")
-;	hButton2 :=	Form_Add(hPanel,  "Button",  "Cancel","gOnBtn",		"Align F", "Attach p", "Tooltip jea baby")
-;
-;	hPanel2	:=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align F", "Attach p")
-;	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "h200",		"Align T", "Attach p")
-;	hCal1	:=  Form_Add(hPanel2, "MonthCal","",	  "",			"Align F", "Attach p")
-;
-;	Form_Show()
+	hPanel	:=	Form_Add(hForm1,  "Panel",	 "",	  "w250",		"Align L", "Attach p")
+	hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnBtn h100","Align T", "Attach p", "Cursor hand", "Tooltip I have hand cursor")
+	hButton2 :=	Form_Add(hPanel,  "Button",  "Cancel","gOnBtn",		"Align F", "Attach p", "Tooltip jea baby")
+
+	hPanel2	:=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align F", "Attach p")
+	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "h200",		"Align T", "Attach p")
+	hCal1	:=  Form_Add(hPanel2, "MonthCal","",	  "",			"Align F", "Attach p")
+
+	Form_Show()
 return
 
 F1::
@@ -42,7 +42,7 @@ Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
 		f_Extension := SubStr(o, 1, k:=InStr(o, " ")-1), k := SubStr(o, k+2)
 		if IsFunc(f_Extension)
 			 o := %f_Extension%(hCtrl, k)
-		else if IsFunc( f_Extension := "Extension_" f_Extension )
+		else if IsFunc( f_Extension := "Ext_" f_Extension )
 			 o := %f_Extension%(hCtrl, k)
 		else return A_ThisFunc "> Unsupported extension: " f_Extension
 		ifEqual, o,0, return A_ThisFunc " >   Unsuported " Ctrl " extension: " f_Extension
@@ -129,9 +129,9 @@ Form_New(Size="", Options="") {
  Returns:
 			Number of options in the string.
  */
-Form_Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",ByRef o6="",ByRef o7="",ByRef o8="", ByRef o9="")
-{
-	loop, parse, O, %A_Space%
+Form_Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",ByRef o6="",ByRef o7="",ByRef o8="", ByRef o9="", ByRef o10=""){
+	sep := A_Space, no := 0
+	loop, parse, O, %sep%
 	{	
 		if (LF := A_LoopField) = ""	{
 			if c
@@ -139,24 +139,41 @@ Form_Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",By
 			continue
 		}
 		lq := SubStr(LF, 1, 1) = "'", rq := SubStr(LF, 0, 1) = "'",   len=StrLen(LF),   q := lq && rq,  sq := lq AND !rq
-		, e := (!lq*!c) * InStr(LF, "="),  liq := e && (SubStr(LF, e+1, 1)="'"),  iq := liq && rq
+		,e := (!lq * !c) * InStr(LF, "="),  liq := e && (SubStr(LF, e+1, 1)="'"),  iq := liq && rq
+				
 		if !c
-			n := (e ? SubStr(LF, 1, e-1) : (i=""? i:=1:++i)), c := (c || sq || liq) AND !iq, p_# := i
+			n := (e ? SubStr(LF, 1, e-1) : (i="" ? i:=1 : ++i)),  c := (c || sq || liq) AND !iq, p_# := i
 		if q or iq
-			p_%n% := SubStr(LF, iq ? e+2:2, len-2-(iq ? e : 0))
+			p_%n% := SubStr(LF, iq ? e+2:2, len-2-(iq ? e : 0)), no++
 		else if c
 			if e
 				 p_%n% := SubStr(LF, e+2)
-			else p_%n% .= " " SubStr(LF, sq ? 2 : 1,  rq ? len-1 : len),   c := rq ? 0 : 1
-		else p_%n% := e ? SubStr(LF, e+1) : LF
+			else p_%n% .= (p_%n% = "" ? "" : " ") SubStr(LF, sq ? 2 : 1,  rq ? len-1 : len),   c := rq ? (0,no++) : 1
+		else p_%n% := e ? SubStr(LF, e+1) : LF, no++
 	}
-	loop, %p_#%
-		_ := SubStr(p_%A_Index%, 1, 1), p_%_% := SubStr(p_%A_Index%, 2)		;this creates locals x, y, w, h
-	
+
 	loop, parse, pQ, %A_Space%
-		if (A_Index > 9)
-			break
-		else _ := "p_" A_LoopField,  o%A_Index% := %_%
+	{
+		c := SubStr(LF := A_LoopField, 0), n := SubStr(LF, 1, -1), l := StrLen(n),  j := A_Index
+		if c in ?,#,*
+		{
+			loop, %p_#%
+			{
+				p := p_%A_Index%
+				if !(SubStr(p, 1, l) = n)
+					continue
+				v := SubStr(p, l+1)
+				if (c="*" || c="#")	{
+					if (c="#") && (v+0 = "")
+						continue
+					o%j% := v	
+				} else ifEqual, c, ?, SetEnv, o%j%, 1			
+			}
+		}
+		else o%j% := p_%LF%
+		ifGreater, A_Index, 10, break
+	}
+	return no
 }
 
 Form_Show( Name="", Title="" ){
@@ -212,19 +229,6 @@ Form(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", B
 	return _
 }
 
-
-;Form_getToken(s, r=0) {
-;	static next=1, sep=" "
-;
-;	ifEqual, r,1,SetEnv, next, 1
-;
-;	j := InStr(s, sep, 0, next)
-;	IfEqual, j, 0, return SubStr(s, next), next := 1
-;	r := SubStr(s, next, j-next), next:=j+1
-;	return, r
-;}
-
-
+#include Panel.ahk
 #include ext
 #include _Extensions.ahk
-
