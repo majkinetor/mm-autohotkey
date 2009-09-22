@@ -10,7 +10,7 @@ comment &
  				 ------------------------------------------------------------------------
 &
 
-;HiEdit Header V2.0.1.4
+;HiEdit Header V4.0.0.4
 ;----------------------
 
 ;************************************
@@ -48,7 +48,7 @@ ENM_CONTEXTMENU			EQU 00000020h
 
 ;Custom notifications: 
 EN_TABMCLICK			EQU 1000h			;When middle button clicked on HiTab control
-EN_FILECHANGE			EQU	1001h			;When file modified outside HiEdit
+EN_FILECHANGE			EQU	1001h			;When file state change
 
 HESELCHANGE STRUCT
 	nmhdr				NMHDR		<?>
@@ -68,13 +68,15 @@ SEL_FILETAB				EQU 0010h			;Custom constant: sent when current file tab changes.
 HEFILECHANGE STRUCT
 	nmhdr				NMHDR		<?>
 	dwFileIndex			DWORD		 ?		;File Index
-	dwChangeType		DWORD		 ?		;CHG_NOTAVAILABLE or CHG_MODIFIED
+	dwChangeType		DWORD		 ?		;CHG_NOTAVAILABLE or CHG_MODIFIED or CHG_FILELOADING or CHG_FILELOADED
 HEFILECHANGE ENDS
 
 ;dwChangeType constants:
 ;----------------------
-CHG_NOTAVAILABLE		EQU 1				;File renamed, moved or deleted
+CHG_NOTAVAILABLE		EQU 1				;File renamed, moved or deleted externally
 CHG_MODIFIED			EQU 2				;File modified externally
+CHG_FILELOADING			EQU 4				;File background loading in progress
+CHG_FILELOADED			EQU 8				;File background loading finished
 
 HECOLORS STRUCT
 	TextColor				DWORD ?			;Text Color
@@ -173,6 +175,13 @@ HEM_CONVERTCASE					EQU WM_USER+1022		;wParam=CC_UPPERCASE/CC_LOWERCASE/CC_TOGGL
 ;HEM_SETCOLUMNMODE				EQU WM_USER+1024		;wParam=fColumnMode:TRUE/FALSE,					lParam = -1
 ;HEM_GETCOLUMNMODE				EQU WM_USER+1025		;wParam=0,										lParam = -1 for current file
 
+;HEM_SETBOOKMARK					EQU WM_USER+1026		;wParam=Line,	lParam=BookmarkType
+;HEM_GETBOOKMARK					EQU WM_USER+1027		;wParam=Line,	lParam=0
+;HEM_CLRBOOKMARKS				EQU WM_USER+1028		;wParam=0,		lParam=BookmarkType
+;HEM_NXTBOOKMARK					EQU WM_USER+1029		;wParam=Line,	lParam=BookmarkType
+;HEM_PRVBOOKMARK					EQU WM_USER+1030		;wParam=Line,	lParam=BookmarkType
+;
+;HEM_GETCURRENTLINENR			EQU WM_USER+1031		;wParam=0,		lParam=0
 
 Comment $
 STANDARD Windows and Edit/RichEdit control messages supported

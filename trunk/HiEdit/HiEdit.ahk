@@ -1,19 +1,20 @@
-; Title:	HiEdit
-;			HiEdit is a multitabbed, ultra fast, large file edit control consuming very little memory. 
-;			It can display non-printable characters in a readable format and can be used for any general 
-;			purpose editing of text and birary files.
-;--------------------------------------------------------------------------------------------
-; Function: Add
-;			Add control to the GUI.
-;
-; Parameters:
-;			x,y,w,h	- Position of the control
-;			style	- Space separated list of control styles, by default both scroll bars are visible. You can use numbers or style strings.
-;			dllPath	- Path of the control dll, by default control is searched in the current folder.
-;
-; Styles:
-;			HSCROLL, VSCROLL, TABBED, HILIGHT, TABBEDBTOP, TABBEDHRZSB, TABBEDBOTTOM
-;
+/*	Title:	HiEdit
+			HiEdit is a multitabbed, ultra fast, large file edit control consuming very little memory. 
+			It can display non-printable characters in a readable format and can be used for any general 
+			purpose editing of text and birary files.
+ */
+
+/*	Function: Add
+			Add control to the GUI.
+
+	Parameters:
+			x,y,w,h	- Position of the control
+			style	- Space separated list of control styles, by default both scroll bars are visible. You can use numbers or style strings.
+			dllPath	- Path of the control dll, by default control is searched in the current folder.
+
+	Styles:
+			HSCROLL, VSCROLL, TABBED, HILIGHT, TABBEDBTOP, TABBEDHRZSB, TABBEDBOTTOM
+ */
 HE_Add(hwnd, x, y, w, h, style="HSCROLL VSCROLL", dllPath="HiEdit.dll"){
 	global HE_MODULEID
 	static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
@@ -80,7 +81,7 @@ HE_CloseFile(hEdit, idx=-1){
 ;			Convert case of selected text
 ;
 ; Parameters:
-;			case - can be "upper", "lower", "toggle" (default), "capitalize". 
+;			case - Can be "upper", "lower", "toggle" (default), "capitalize". 
 ;
 ; Returns:
 ;			Returns TRUE if successful, FALSE otherwise
@@ -92,6 +93,15 @@ HE_ConvertCase(hEdit, case="toggle") {
 	Return ErrorLevel
 }
 
+;-------------------------------------------------------------------------------
+; Function: EmptyUndoBuffer
+;           Resets the undo flag in the HiEdit control for the current file.
+;
+HE_EmptyUndoBuffer(hEdit){
+    Static EM_EMPTYUNDOBUFFER:=0xCD
+    SendMessage EM_EMPTYUNDOBUFFER,0,0,,ahk_id %hEdit%
+}
+
 ;----------------------------------------------------------------------------------------------------
 ; Function:	FindText
 ;			Find desired text in the control
@@ -99,48 +109,38 @@ HE_ConvertCase(hEdit, case="toggle") {
 ; Parameters:
 ;			sText	- Text to be searched for.
 ;			cpMin	- Start searching at this character position. By default 0.
-;			cpMax	- End searching at this character position. By default -1. 
-;					  When searching backward, cpMin must be equal to or greater than cpMax. 
-;					  When searching forward, a value of –1 in cpMax extends the search range to the end of the text.
-;			flags	- Space separated combination of search flags: "WHOLEWORD" (or "w") "MATCHCASE" (or "c")
+;			cpMax	- End searching at this character position. By default -1.
+;			flags	- Space separated combination of search flags: "WHOLEWORD" "MATCHCASE"
 ;
 ; Returns:	
 ;			The zero-based character position of the next match, or -1 if there are no more matches.
 ;	
 HE_FindText(hEdit, sText, cpMin=0, cpMax=-1, flags="") { 
-	static EM_FINDTEXT=1080,WHOLEWORD=2,MATCHCASE=4, c=4, w=2		 ;WM_USER + 56
+	static EM_FINDTEXT=1080,WHOLEWORD=2,MATCHCASE=4		 ;WM_USER + 56
 	hFlags := 0
 	loop, parse, flags, %A_Tab%%A_Space%,%A_Space%%A_Tab%
 		if (A_LoopField != "")
 			hFlags |= %A_LOOPFIELD%
-
 	VarSetCapacity(FT, 12)
 	NumPut(cpMin,  FT, 0)
 	NumPut(cpMax,  FT, 4)
 	NumPut(&sText, FT, 8)
 	SendMessage, EM_FINDTEXT, hFlags, &FT,, ahk_id %hEdit% 
-	
-	Return (ErrorLevel = 4294967295) ? -1 : ErrorLevel 
+	Return ErrorLevel 
 }
 
 ;--------------------------------------------------------------------------------------------
 ; Function: GetColors
 ;			Get the control colors
 ;
-; Parameters:
-;			colors	- Set to the color name to return its value. Omit to return all colors in INI format
-;
 ; Returns:
-;			Color(s) or FAIL if unsuccessful. See <SetColors> for details about available colors
-;
-HE_GetColors(hEdit, color=""){
+;			Colors in INI format. See <SetColors> for details.
+HE_GetColors(hEdit){
 	static HEM_GETCOLORS := 2038
 	static names := "Text,Back,SelText,ActSelBack,InSelBack,LineNumber,SelBarBack,NonPrintableBack,Number"
-	
 	VarSetCapacity(COLORS, 48, 0)
 	SendMessage,HEM_GETCOLORS,0,&COLORS,,ahk_id %hEdit%
 	ifEqual,ErrorLevel,FAIL, return FAIL
-
 	fmt := A_FormatInteger
 	SetFormat, integer, hex
 	Loop, Parse, names, `,
@@ -204,7 +204,7 @@ HE_GetFirstVisibleLine(hEdit){
 ;			idx	- Zero-based index of the line. -1 means current line.
 ;
 ; Returns:	
-;			The return value is the number of characters copied. 
+;			The return value is the text.
 ;			The return value is empty string if the line number specified by the line parameter is greater than the number of lines in the HiEdit control
 ;
 HE_GetLine(hEdit, idx=-1){
@@ -212,12 +212,17 @@ HE_GetLine(hEdit, idx=-1){
 	if (idx = -1) 
 		idx := HE_LineFromChar(hEdit, HE_LineIndex(hEdit))
 	len := HE_LineLength(hEdit, idx)
-	VarSetCapacity(txt, len), NumPut(len, txt)
+	ifEqual, len, 0, return	 
+
+	VarSetCapacity(txt, len, 0), NumPut(len = 1 ? 2 : len, txt)		; bug! if line contains only 1 character SendMessage returns FAIL.
 	SendMessage, EM_GETLINE, idx, &txt,, ahk_id %hEdit% 
-	if ErrorLevel = 0
+	if ErrorLevel = FAIL
+	{
+		Msgbox %A_ThisFunc% failed
 		return
+	}
 	VarSetCapacity(txt, -1)
-	Return SubStr(txt, 1, ErrorLevel)
+	return len = 1 ? SubStr(txt, 1, -1) : txt
 }
 
 ;----------------------------------------------------------------------------------------------------
@@ -229,6 +234,25 @@ HE_GetLineCount(hEdit){
 	static EM_GETLINECOUNT=186
    	SendMessage, EM_GETLINECOUNT, 0, 0,, ahk_id %hEdit%
 	Return ErrorLevel
+}
+
+;-------------------------------------------------------------------------------
+; Function: GetModify
+;           Gets the state of the modification flag for the HiEdit control. The
+;           flag indicates whether the contents of the control have been
+;           modified.
+;
+; Parameters:
+;           idx - Index of the file. -1 for the current file (default)
+;
+; Returns:
+;           TRUE if the content of HiEdit control has been modified, FALSE
+;           otherwise.
+;
+HE_GetModify(hEdit, idx=-1){
+    Static EM_GETMODIFY:=0xB8
+    SendMessage EM_GETMODIFY,0,idx,,ahk_id %hEdit%
+    Return ErrorLevel
 }
 
 ;--------------------------------------------------------------------------------------------------
@@ -251,23 +275,24 @@ HE_GetRedoData(hEdit, level){
 ;			Get letfmost and/or rightmost character positions of the selection
 ; 
 ; Parameters:
-;			info - "L" (default) means that function will return leftmost position.
-;				   Set to "R" to get rightmost position. Set to "" to return both separated by dot,
-;				   for instance, "12.195". To obtain L and R you can use for instance
-;> 				     	s := floor(sel), e := SubStr(sel, strlen(s)+2)
+;			start_pos	- Optional starting position of the selection.
+;			end_pos		- Optional ending position of the selection.
 ;
 ; Returns:	
-;			Depends on info parameter
+;			Starting position.
 ;		
-HE_GetSel(hEdit, info="L"){
+HE_GetSel(hEdit, ByRef start_pos="@",ByRef end_pos="@"){
 	static EM_GETSEL=176
 	
 	VarSetCapacity(s, 4), VarSetCapacity(e, 4)
 	SendMessage, EM_GETSEL, &s, &e,, ahk_id %hEdit% 
-	l := NumGet(s), r := NumGet(e)
-	ifEqual, info, L, return l
-	ifEqual, info, R, return r
-	Return l "." r
+	s := NumGet(s), e := NumGet(e)
+	if (start_pos != "@")
+		start_pos := s
+	if (end_pos != "@")
+		end_pos := e
+		
+	Return s
 }
 
 ;----------------------------------------------------------------------------------------------------
@@ -276,17 +301,14 @@ HE_GetSel(hEdit, info="L"){
 ; 
 HE_GetSelText(hEdit){
 	static EM_GETSELTEXT = 1086		;Returns: the number of characters copied, not including the terminating null character.
-	e := HE_GetSel(hEdit, "")
-	s := floor(sel), e := SubStr(sel, strlen(s)+2)
-
-	VarSetCapacity(buf, e-s+2)
+	HE_GetSel(hEdit, s, e),	VarSetCapacity(buf, e-s+2)
 	SendMessage, EM_GETSELTEXT, 0, &buf,, ahk_id %hEdit% 
 	VarSetCapacity(buf, -1)
 	Return buf
 }
 
 ;----------------------------------------------------------------------------------------------------
-; Function:	GetTextLength  
+; Function:	GetTextLength 
 ;			Returns the length of text, in characters.
 ;
 HE_GetTextLength(hEdit) {
@@ -415,6 +437,35 @@ HE_LineNumbersBar( hEdit, state="show", linw=40, selw=10 ) {
 	return errorlevel
 }
 
+;-------------------------------------------------------------------------------
+; Function: LineScroll
+;           Scrolls the text in the HiEdit control for the current file.
+;
+; Parameters:
+;           xScroll -	The number of characters to scroll horizontally.  Use a
+;						negative number to scroll to the left and a positive number to
+;						scroll to the right.
+;           yScroll -	The number of lines to scroll vertically.  Use a negative
+;						number to scroll up and a positive number to scroll down.
+;
+; Remarks:
+;           This message does not move the caret.
+;
+;           The HiEdit control does not scroll vertically past the last line of
+;           text in the control. If the current line plus the number of lines
+;           specified by the yScroll parameter exceeds the total number of lines
+;           in the HiEdit control, the value is adjusted so that the last line
+;           of the HiEdit control is scrolled to the top of the HiEdit control
+;           window.
+;
+;           This function can be used to scroll horizontally past
+;           the last character of any line.
+;
+HE_LineScroll(hEdit,xScroll=0,yScroll=0){
+    Static EM_LINESCROLL:=0xB6
+    SendMessage EM_LINESCROLL,xScroll,yScroll,,ahk_id %hEdit%
+}
+
 ;----------------------------------------------------------------------------------------------------
 ; Function:	NewFile
 ;			Opens new tab.
@@ -494,8 +545,87 @@ HE_SaveFile(hEdit, pFileName, idx=-1){
 	static HEM_SAVEFILE	:= 2028		;wParam=lpszFileName,					lParam = -1 for current file or dwFileIndex	:Returns 
 	
 	SendMessage, HEM_SAVEFILE, &pFileName, idx,, ahk_id %hEdit%
-	return errorlevel
+	return Errorlevel
 }
+
+;-------------------------------------------------------------------------------
+; Function: Scroll
+;           Scrolls the text vertically in the HiEdit control for the current file.
+;
+; Parameters:
+;           Pages - The number of pages to scroll.  Use a negative number to
+;					scroll up and a positive number to scroll down.
+;
+;           Lines - The number of lines to scroll.  Use a negative number to
+;					scroll up and a positive number to scroll down.
+;
+; Returns:
+;           The number of lines that the command scrolls. The number returned
+;           may not be the same as the actual number of lines scrolled if the
+;           scrolling moves to the beginning or the end of the text.
+;
+; Remarks:
+;           This message does not move the caret.
+;           0x7FFFFFFF = 2147483647 = largest possible 32-bit signed integer value
+;
+;           Despite the documentation, the return value for the message always
+;           reflects the request, not necessarily the actual number of lines
+;           that were scrolled.  Example: If a request to scroll down 25 lines
+;           is made, 25 is returned even if the control is already scrolled down
+;           to the bottom of the document. [Bug?]
+;
+HE_Scroll(hEdit,Pages=0,Lines=0){
+    Static EM_SCROLL:=0xB5, SB_LINEDOWN:=0x1, SB_LINEUP:=0x0, SB_PAGEDOWN:=0x3,SB_PAGEUP:=0x2
+
+    ;-- Initialize
+    l_ScrollLineCount := 0
+
+    ;-- Pages
+    if Pages
+	{
+        l_nScroll:=SB_PAGEDOWN
+        if Pages < 0
+            l_nScroll:=SB_PAGEUP, Pages:=Abs(Pages)
+    
+        loop %Pages%
+        {
+            SendMessage EM_SCROLL,l_nScroll,0,,ahk_id %hEdit%
+            l_ErrorLevel := ErrorLevel
+
+            ;-- Negative number?
+            if l_ErrorLevel > 0x7FFFFFFF
+                l_ErrorLevel:=-(~l_ErrorLevel)-1  ;-- Convert to signed integer
+
+            ;-- Add to the total
+            l_ScrollLineCount := l_ScrollLineCount + l_ErrorLevel
+        }
+    }
+
+    ;-- Lines
+    if Lines
+    {
+        l_nScroll := SB_LINEDOWN
+        if Lines<0
+            l_nScroll := SB_LINEUP, Lines := Abs(Lines)
+    
+        loop %Lines%
+        {
+            SendMessage EM_SCROLL,l_nScroll,0,,ahk_id %hEdit%
+            l_ErrorLevel:=ErrorLevel
+
+            ;-- Negative number?
+            if l_ErrorLevel>0x7FFFFFFF
+                l_ErrorLevel:=-(~l_ErrorLevel)-1  ;-- Convert to signed integer
+
+            ;-- Add to the total
+            l_ScrollLineCount:=l_ScrollLineCount+l_ErrorLevel
+         }
+     }
+
+    ;-- Return number of lines scrolled
+    Return l_ScrollLineCount
+}
+
 
 ;----------------------------------------------------------------------------------------------------
 ; Function:	ScrollCaret
@@ -512,7 +642,7 @@ HE_ScrollCaret(hEdit){
 ;			Set the control colors
 ;
 ; Parameters:
-;			colors	- Any subset of available color options in INI format (array of NAME=COLOR lines). Skiped colors will not be changed.
+;			colors	- Any subset of available color options in INI format (array of NAME=COLOR lines). Skiped colors will be set to 0.
 ;			fRdraw	- Set to TRUE to redraw control
 ;
 ; Colors:
@@ -529,20 +659,11 @@ HE_ScrollCaret(hEdit){
 HE_SetColors(hEdit, colors, fRedraw=true){
 	static HEM_SETCOLORS := 2037
 	static names := "Text,Back,SelText,ActSelBack,InSelBack,LineNumber,SelBarBack,NonPrintableBack,Operator,Number,Comment,String"
-
- ;set colors to current value by default, so that does that are skipped remain
-	current := HE_GetColors(hEdit)
-	Loop, parse, current, `n
-		j := InStr(A_LoopField, "="), clr := SubStr(A_LoopField, 1, j-1), val := SubStr(A_LoopField, j+1),  n%clr% := val
-
- ;parse new colors
 	at := A_AutoTrim
 	AutoTrim,  on
-    Loop, parse, colors, `n, `n
+    Loop, Parse, colors, `n, `n
 	{
-		color = %A_LoopField%
-		ifEqual, color,,continue
-		name := SubStr(color, 1, i:=InStr(color, "=")-1),  val := SubStr(color, i+2)
+		name := SubStr(A_LoopField, 1, i:=InStr(A_LoopField, "=")-1),  val := SubStr(A_LoopField, i+2)
 		name = %name%
 		val = %val%
 		if name not in %names%
@@ -552,8 +673,6 @@ HE_SetColors(hEdit, colors, fRedraw=true){
 		n%name%	:= val
 	}
 	AutoTrim, %at%
-
-
 	VarSetCapacity(COLORS, 36, 0)
 	NumPut(nText			, COLORS, 0)	;NormalTextColor
 	NumPut(nBack			, COLORS, 4) 	;EditorBkColor
@@ -589,19 +708,17 @@ HE_SetCurrentFile(hEdit, idx){
 ;			e		- White space separated list of events to monitor (by default "selchange").
 ;
 ; Globals:
-;			HE_HWND		- Control handle
 ;			HE_EVENT	- Specifies event that occurred. Event must be registered to be able to monitor them. Events "tabmclick" and "filechange" are registered automatically.
-;			HE_INFO		- String specifying event info.	You can access individual info elements as INFO_Start
-;			HE_RESULT	- Placeholder for notification result, if its needed.
+;			HE_INFO		- String specifying event info.
 ;
 ; Events & Infos:
-;			SelChange	- S<start> E<end> L<line>	[t|*] (t if tab changed, * if text changed)
+;			SelChange	- S<start_char_idx> E<end_char_idx> L<line_num>	[t|*] (t if tab changed, * if text changed)
 ;			Key			- key pressed
-;			Mouse		- x<xcoord> y<ycoord> v<virtual_key>
-;			Scroll		- Set HE_Result to 1 to prevent standard menu from showing
-;			ContextMenu	- 			
+;			Mouse		- x<mouse_x> y<mouse_y> v<virtual_key_code>
+;			Scroll		- ""
+;			ContextMenu	- ""			
 ;			FileChange	- <file_index>	(file is changed outside of the application)
-;			Tabmclick	- (middle button click over tab)
+;			Tabmclick	- ""			(middle button click over tab)
 ;
 ; Returns:
 ;			"OK" if succesiful, error string otherwise
@@ -647,7 +764,7 @@ HE_onNotify(wparam, lparam, msg, hwnd) {
 	code   :=  NumGet(lparam+8)		;- 4294967296
 
     HE_HWND := hw
-	HE_EVENT := HE_INFO := HE_Result := ""
+	HE_EVENT := HE_INFO := ""
 	if (code = EN_TABMCLICK) {
 		HE_EVENT := "tabmclick"
 		GoSub % HE_%hw%_func
@@ -662,11 +779,7 @@ HE_onNotify(wparam, lparam, msg, hwnd) {
 
 	if (code = EN_SELCHANGE) {
 		HE_EVENT := "selchange",  m := NumGet(lparam+20, 0, "Short")=16,  l := NumGet(lparam+30) && !m
-		HE_INFO_Start := NumGet(lparam+12)
-		HE_INFO_End  := NumGet(lparam+16)
-		HE_INFO_Line := NumGet(lparam+22)
-		HE_INFO_Flag := (m ? "t" : "") (l ? "*" : "")
-		HE_INFO := "S" HE_INFO_Start " E" HE_INFO_End " L" HE_INFO_Line " " HE_INFO_Flag 
+		HE_INFO := "S" NumGet(lparam+12) " E" NumGet(lparam+16) " L" NumGet(lparam+22)  (m ? " t" : "") (l ? " *" : "")
 		GoSub % HE_%hw%_func
 		return
 	}
@@ -684,7 +797,7 @@ HE_onNotify(wparam, lparam, msg, hwnd) {
 
 		if HE_EVENT
 			GoSub % HE_%hw%_func
-		return HE_Result
+		return
 	}
 }
 
@@ -696,7 +809,7 @@ HE_onNotify(wparam, lparam, msg, hwnd) {
 ;			pFont	- AHK font definition: "Style, FontName"
 ;
 HE_SetFont(hEdit, pFont="") { 
-   local height, weight, italic, underline, strikeout , nCharSet, fontFace 
+   local height, weight, italic, underline, strikeout , nCharSet 
    local hFont, LogPixels
    static WM_SETFONT := 0x30
  ;parse font 
@@ -730,17 +843,21 @@ HE_SetFont(hEdit, pFont="") {
 ; Parameters:
 ;			pFile	- Path to .hes file
 ;
-; Keyword File:
-;			[ext1,ext2,...,extN] - Each keyword definiton block starts with list of extensions in angular brackets.
-;			0xSSRRGGBB=word1 word2 ... wordN - Color keywords on this line with BBGGRR color. SS is 00 by default.
-;			delimiters	 - High byte in the color (0x01xxxxxx) refers to delimiters. Delimiters are added from ALL sections for a file extension.
-;			string chars - A & at the end of keyword specifies a string char. For ex. "& means that everything enclosed in two " is a string
-;			comments keyword - A + at the end of keyword specifies a comment char/keyword. For ex. //+ means that everything that follows is a comment.
-;							   Multiline comments are not supported yet. A "-" at the end of keyword specifies that ALL text up to the end of line will be painted using the color specified UNLESS a comment indicator is found.
-;			;	- Line comment
-;
 HE_SetKeywordFile( pFile ){
 	return DllCall("HiEdit.dll\SetKeywordFile", "str", pFile)
+}
+
+;-------------------------------------------------------------------------------
+; Function: SetModify
+;           Sets or clears the modification flag for the current file. The
+;           modification flag indicates whether the text within the control has been modified.
+;
+; Parameters:
+;           Flag - Set to TRUE to set the modification flag. Set to FALSE to clear the modification flag.
+;
+HE_SetModify(hEdit, Flag){
+    Static EM_SETMODIFY:=0xB9
+    SendMessage EM_SETMODIFY, Flag, 0, ,ahk_id %hEdit%
 }
 
 ;----------------------------------------------------------------------------------------------------
@@ -748,14 +865,11 @@ HE_SetKeywordFile( pFile ){
 ;			Set the selection 
 ; 
 ; Parameters:
-;			nStart	- Starting character position of the selection. Set -1 to remove current selection.
+;			nStart	- Starting character position of the selection. Set -1 to remov current selection.
 ;			nEnd	- Ending character position of the selection. Set -1 to use position of the last character in the control.
-;					  Omit to return cursor position
 ;	
-HE_SetSel(hEdit, nStart=0, nEnd="") {
+HE_SetSel(hEdit, nStart=0, nEnd=-1) {
 	static EM_SETSEL=0x0B1
-
-	ifEqual, nEnd, -1, SetEnv, nEnd, %nStart%
 	SendMessage, EM_SETSEL, nStart, nEnd,, ahk_id %hEdit% 
 	Return ErrorLevel 	
 }
@@ -843,18 +957,103 @@ WriteFile(file,data) {
    return 
 }
 
-;--------------------------------------------------------------------------------------------
-;Group: Example
-;> Gui, +LastFound 
-;> hwnd := WinExist() 
-;> 
-;> hEdit := HE_Add(hwnd,0,0,600,500) 
-;> Gui, SHow, w600 h500 
-;> 
-;> #include HiEdit.ahk
-;--------------------------------------------------------------------------------------------
+/* Group: Syntax Coloring
 
-;Group: About
-;	o HiEdit control is copyright of Antonis Kyprianou (aka akyprian). See http://www.winasm.net
-;	o AHK wrapper ver 3.0.0.1-5 is copyright of Miodrag Milic (aka majkinetor). See http://www.autohotkey.com/forum/topic17230.html
-;	o Licenced under Creative Commons Attribution-Noncommercial <http://creativecommons.org/licenses/by-nc/3.0/>.
+	File structure:
+		The file .hes is structured in sections, each of which specify the keywords for a one (or more) file extension. 
+		Thus, a single .hes file can be used to specify the syntax highlight of several different file types.
+
+
+	Section structure:
+		Each section starts with a list of file extensions, separated by a comma, enclosed in square brackets, for instance
+	>	[asm,inc]
+		starts a section for the keywords that will be applied to .asm and .inc files. 
+
+		The lines following the section start will specify a color and the keywords to which it is applied in this form :
+	>  0x00bbggrr = keyword1 keyword2 keyword3 ...
+		- the number is a DWORD in hexadecimal format
+		- first byte specifies the type of keywords (00=normal, 01=separators).
+		- rr, gg, bb specify the red green blue parts of the color (note the reverse order).
+		- after the equal sign follow the list of keywords separated by a space.
+
+	Keyword specification:
+
+		- A ^ in front of keyword: the keyword is case sensitive.
+		- A ~ in front of keyword: forces the specified case (display only).
+		- A + at the end of keyword: all the rest of the line will be treated as a comment.
+		- A - at the end of keyword: all the rest of the line will be treated as a string.
+		- A & at the end of keyword: specify the enclosing characters for a string (ie. "& specifies " as the string quotes, meaning that "string" is a string).
+		- A ! at the end of any delimiter indicates that any word starting with this delimiter will be colored. For example, 0x00408080=$! indicates that any word starting with $ (such as php variables e.g. $somevar, $another etc) will be colored.
+
+	Comments:
+		A line starting with ; is a comment and ignored by the syntax highlight parser.
+
+	Notes:
+
+		- The same file extension can be specified in up to nine (9) sections and all the keywords will be taken into account. This simplifies the management of keywords that are shared among different file types.
+		- There is no limit on the number of languages, keywords and keyword groups.
+		- You can specify a default syntax highlight for new, unsaved files by adding an "empty" extension between the square brackets at the beginning of the section. i.e. [,asm,inc] means that new files will have by default applied the syntax highlight of asm files.
+		- See http://www.winasm.net/forum/index.php?showtopic=2161 for some syntax sections.
+
+	Example:
+		This is an simplified example of a .hes syntax highlight file.
+
+	(start code)
+		[asm,inc]
+		;Registers
+		0x00408080=~AH ~AL ~AX ~BH ~BL ~BH
+		;User instructions
+		0x008000ff=~AAA ~AAD ~AAM ~AAS ~ADC ~ADD 
+
+		[rc]
+		;General statements
+		0x10000080=#define #include ACCELERATORS ALT AUTOCHECKBOX 
+		;Object states
+		0x104080ff=^BS_3STATE ^BS_AUTO3STATE ^BS_AUTOCHECKBOX 
+	(end code)
+
+	Quick reference:
+				[[,]ext1,ext2,...,extN] - Each keyword definiton block starts with list of extensions in angular brackets. If started with comma, this section will be used for coloring of new files.
+				0xSSRRGGBB=word1 .. wordN - Color keywords on this line with RRGGBB color. SS is 00 by default.
+				delimiters			- High byte in the color (0x01xxxxxx) refers to delimiters. Delimiters are added from ALL sections for a file extension.
+				&					- A & at the end of keyword specifies a string char. For ex. "& means that everything enclosed in two " is a string
+				+					- A + at the end of keyword specifies a comment char/keyword. For ex. //+ means that everything that follows is a comment. Multiline comments are not supported yet. 
+				!					- A ! at the end of any delimiter indicates that any word starting with this delimiter will be colored. For example $! marks php variables.
+				-					- A - at the end of keyword specifies that ALL text up to the end of line will be painted using the color specified UNLESS a comment indicator is found.
+				~					- A ~ in front of keyword forces the specified case (display only).
+				^					- A ^ in front of keyword means that the keyword is case sensitive.
+				;					- Line comment in hes file.
+				
+
+
+	Group: Example
+		(start code)
+			Gui, +LastFound 
+			hwnd := WinExist() 
+
+			hEdit := HE_Add(hwnd,0,0,600,500) 
+			Gui, SHow, w600 h500
+
+			HE_SetKeywordFile( A_ScriptDir "\Keywords.hes")
+			HE_OpenFile( hEdit, A_ScriptFullPath )
+		(end code)
+ */
+
+/* Group: About
+	o HiEdit control is copyright of Antonis Kyprianou (aka akyprian). See http://www.winasm.net
+	o AHK wrapper version 4.0.0.4-1 is copyright of Miodrag Milic (aka majkinetor). See http://www.autohotkey.com/forum/topic19141.html
+    o Additonal functions by jballi.
+	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>.
+ */
+
+HiEdit_Add2Panel(hPanel, Txt, Opt) {
+	f := "Panel_Parse"
+	%f%(Opt, "x y w h style dllPath", x, y, w, h, style, dllPath)
+	if dllPath=
+		dllPath := "HiEdit.dll"
+	h := HE_Add(hPanel, x, y, w, h, style, dllPath)
+	if Txt != 
+		ControlSetText, , %Txt%, ahk_id %h%
+
+	return h
+}

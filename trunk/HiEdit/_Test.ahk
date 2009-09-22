@@ -1,7 +1,7 @@
+; `
 #SingleInstance force
 CoordMode, Mouse, screen
 #NoEnv
-
 	Gui, +LastFound +Resize
 	hwnd := WinExist()
 
@@ -9,11 +9,11 @@ CoordMode, Mouse, screen
 	hEdit := HE_Add(hwnd,0,0,800,600, "HSCROLL VSCROLL HILIGHT TABBED FILECHANGEALERT")
 
 
-	fStyle := "s10" ,	fFace  := "Courier New"
+	fStyle := "s9" ,	fFace  := "Courier New"
 	HE_SetFont( hEdit, fStyle "," fFace)
 
 	SetColors(hEdit)
-	;msgbox % HE_GetColors(hEdit)
+	; msgbox % HE_GetColors(hEdit)
 
 
 	HE_SetTabWidth(hEdit, 4)
@@ -27,17 +27,19 @@ CoordMode, Mouse, screen
 	HE_SetKeywordFile( A_ScriptDir "\Keywords.hes")
 	HE_OpenFile( hEdit, A_ScriptFullPath )
 
-	Gui, Show, w800 h600
+	Attach(hEdit, "w h")
+	Gui, Show, w800 h600, HiEdit Test
 return
 
 OnHiEdit:
 	OutputDebug % HE_EVENT " | " HE_INFO
 return
 
-
+#IfWinActive, HiEdit Test
 F3:: FindNext(hedit)
 ^F:: CmnDlg_Find( hwnd, "OnFind" )
 ^G:: GoToLine()
+F1:: MsgBox % """" HE_GetLine(hEdit) """"
 
 
 SetColors(hEdit) {
@@ -90,22 +92,23 @@ CreateMenu(){
 	Menu, Standard, Add, Find,			 Standard
 	Menu, Standard, Add, Find Next,		 Standard
 	Menu, Standard, Add
-	Menu, Standard, Add, GetTextRange,  Standard
-	Menu, Standard, Add, GetTextLength, Standard
+	Menu, Standard, Add, GetTextRange,	 Standard
+	Menu, Standard, Add, GetTextLength,	 Standard
 	Menu, Standard, Add
-	Menu, Standard, Add, GetSel, Standard
-	Menu, Standard, Add, SetSel, Standard
-	Menu, Standard, Add, GetSelText, Standard
-	Menu, Standard, Add, ReplaceSel, Standard
-	Menu, Standard, Add, ScrollCaret, Standard
+	Menu, Standard, Add, GetSel,		 Standard
+	Menu, Standard, Add, SetSel,		 Standard
+	Menu, Standard, Add, GetSelText,	 Standard
+	Menu, Standard, Add, ReplaceSel,	 Standard
+	Menu, Standard, Add, ScrollCaret,	 Standard
 	Menu, Standard, Add
-	Menu, Standard, Add, Go To Line, Standard
-	Menu, Standard, Add, GetLine,	Standard
-	Menu, Standard, Add, GetLineCount, Standard
-	Menu, Standard, Add, LineIndex, Standard
-	Menu, Standard, Add, LineLength, Standard	
+	Menu, Standard, Add, Go To Line,	 Standard
+	Menu, Standard, Add, GetLine,		 Standard
+	Menu, Standard, Add, GetLineCount,	 Standard
+	Menu, Standard, Add, LineIndex,		 Standard
+	Menu, Standard, Add, LineLength,	 Standard	
 	Menu, Standard, Add, GetFirstVisibleLine, Standard
-
+	Menu, Standard, Add
+	Menu, Standard, Add, Scroll, Standard
 
 	Menu, MyMenuBar, Add,File,		:FileMenu  
 	Menu, MyMenuBar, Add,&Features, :Features 
@@ -117,7 +120,7 @@ CreateMenu(){
 
 
 Standard:
-;	HE_GetSel(hEdit, s, e)
+	HE_GetSel(hEdit, s, e)
 
 	if A_ThisMenuItem = GetTextRange
 		msgbox % "100 chars from carret possition:`n`n" HE_GetTextRange(hEdit, s, s+100)
@@ -159,7 +162,7 @@ Standard:
 		HE_Redo(hEdit)
 
 	if A_ThisMenuItem = GetLine
-		MsgBox % HE_GetLine(hEdit)
+		MsgBox % """" HE_GetLine(hEdit) """"
 
 	if A_ThisMenuItem = GetLineCount
 		MsgBox % HE_GetLineCount(hEdit)
@@ -172,6 +175,10 @@ Standard:
 
 	if A_ThisMenuItem = GetFirstVisibleLine
 		msgbox % HE_GetFirstVisibleLine(hEdit)
+
+	if A_ThisMenuItem = Scroll Page
+		 HE_Scroll(hEdit, 1, 0)
+
 return
 
 Features:
@@ -309,9 +316,10 @@ MenuHandler:
 	if A_ThisMenuItem = About
 	{
 		msg := "HiEdit AHK demo`n`n"
-		msg .= "For more information visit: www.winasm.net`n`n`n`n"
-		msg .= "HiEdit by akyprian`n"
-		msg .= "AHK wrapper by majkinetor"
+			. "For more information visit: www.winasm.net`n`n`n"
+			. "HiEdit by akyprian`n"
+			. "AHK wrapper by majkinetor"
+
 		MsgBox 48, About, %msg%
 	}
 
@@ -323,37 +331,6 @@ GuiClose:
 return
 
 
-Anchor(c, a = "", r = false) { ; v3.6 - Titan
-	static d
-	GuiControlGet, p, Pos, %c%
-	If ex := ErrorLevel {
-		Gui, %A_Gui%:+LastFound
-		ControlGetPos, px, py, pw, ph, %c%
-	}
-	If !(A_Gui or px) and a
-		Return
-	i = x.w.y.h./.7.%A_GuiWidth%.%A_GuiHeight%.`n%A_Gui%:%c%=
-	StringSplit, i, i, .
-	d := a ? d . ((n := !InStr(d, i9)) ? i9 : "")
-		: RegExReplace(d, "\n\d+:" . c . "=[\-\.\d\/]+")
-	Loop, 4
-		x := A_Index, j := i%x%, i6 += x = 3
-		, k := !RegExMatch(a, j . "([\d.]+)", v) + (v1 ? v1 : 0)
-		, e := p%j% - i%i6% * k, d .= n ? e . i5 : ""
-		, RegExMatch(d, "\Q" . i9 . "\E(?:([\d.\-]+)/){" . x . "}", v)
-		, l .= p%j% := InStr(a, j) ? (ex ? "" : j) . v1 + i%i6% * k : ""
-	If r
-		rx = Draw
-	If ex
-		ControlMove, %c%, px, py, pw, ph
-	Else GuiControl, Move%rx%, %c%, %l%
-}
-
-
-GuiSize:
-  Anchor("HiEdit1", "wh")
-return
-
-
 #include HiEdit.ahk
 #include CmnDlg.ahk
+#include Attach.ahk
