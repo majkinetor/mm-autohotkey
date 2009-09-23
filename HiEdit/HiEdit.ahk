@@ -4,88 +4,83 @@
 			purpose editing of text and birary files.
  */
 
-/*	Function: Add
-			Add control to the GUI.
+/*	Function:	Add
+				Add control to the GUI.
 
 	Parameters:
-			x,y,w,h	- Position of the control
-			style	- Space separated list of control styles, by default both scroll bars are visible. You can use numbers or style strings.
-			dllPath	- Path of the control dll, by default control is searched in the current folder.
+			X..H	- Position of the control.
+			Style	- Space separated list of control styles, by default both scroll bars are visible. You can use numbers or style strings.
+			DllPath	- Path of the control dll, by default control is searched in the current folder.
 
 	Styles:
 			HSCROLL, VSCROLL, TABBED, HILIGHT, TABBEDBTOP, TABBEDHRZSB, TABBEDBOTTOM
  */
-HE_Add(hwnd, x, y, w, h, style="HSCROLL VSCROLL", dllPath="HiEdit.dll"){
-	global HE_MODULEID
-	static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
+HE_Add(hGui, X, Y, W, H, Style="", DllPath="HiEdit.dll"){
+	static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000, MODULEID
 	static HSCROLL=0x8 ,VSCROLL=0x10, TABBED=4, HILIGHT=0x20, TABBEDBTOP=0x1, TABBEDHRZSB=0x2 ,TABBEDBOTTOM=0x4, SINGLELINE=0x40, FILECHANGEALERT=0x80
 
 	hStyle := 0
 	loop, parse, style, %A_Tab%%A_Space%
-	{
 		IfEqual, A_LoopField, , continue
-		hStyle |= %A_LOOPFIELD%
-	}
+		else hStyle |= %A_LOOPFIELD%
 
-	if !init {
-		HE_MODULEID := 1020
-		DllCall("LoadLibrary", "str", dllPath)
-		init := true 
-	}
+	if !MODULEID
+		MODULEID := 230909, DllCall("LoadLibrary", "str", DllPath)
 
 	hCtrl := DllCall("CreateWindowEx"
       , "Uint", 0x200            ; WS_EX_CLIENTEDGE
       , "str",  "HiEdit"         ; ClassName
       , "str",  szAppName      ; WindowName
       , "Uint", WS_CLIPCHILDREN | WS_CHILD | WS_VISIBLE | hStyle
-      , "int",  x            ; Left
-      , "int",  y            ; Top
-      , "int",  w            ; Width
-      , "int",  h            ; Height
-      , "Uint", hwnd         ; hWndParent
-      , "Uint", HE_MODULEID  ; hMenu
+      , "int",  X            ; Left
+      , "int",  Y            ; Top
+      , "int",  W            ; Width
+      , "int",  H            ; Height
+      , "Uint", hGui         ; hWndParent
+      , "Uint", MODULEID	 ; hMenu
       , "Uint", 0            ; hInstance
       , "Uint", 0, "Uint")
+
 	HE_SetTabsImageList(hCtrl)
 	return hCtrl
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function: AutoIndent
-;			Sets the autoindent state
-;
-; Parameters:
-;			pState	- TRUE or FALSE
-;
+/*
+ Function: AutoIndent
+			Sets the autoindent state
+
+ Parameters:
+			pState	- TRUE or FALSE
+ */
 HE_AutoIndent(hEdit, pState ) {
 	static HEM_AUTOINDENT := 2042		;wParam=0,	lParam=fAutoIndent:TRUE/FALSE	
 	SendMessage, HEM_AUTOINDENT, 0, pState,, ahk_id %hEdit%
 	return errorlevel
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	CloseFile
-;			Close file or all files
-;
-; Parameters: 
-;			idx	- Index of the file to close. -2 to close ALL opened files, -1 to close current file (default)
-;
+/*
+ Function:	CloseFile
+			Close file or all files
+
+ Parameters: 
+			idx	- Index of the file to close. -2 to close ALL opened files, -1 to close current file (default)
+ */
 HE_CloseFile(hEdit, idx=-1){
 	static HEM_CLOSEFILE	:= 2026		;wParam=0,			
 	SendMessage, HEM_CLOSEFILE, 0, idx,, ahk_id %hEdit%
 	return errorlevel
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	ConvertCase  
-;			Convert case of selected text
-;
-; Parameters:
-;			case - Can be "upper", "lower", "toggle" (default), "capitalize". 
-;
-; Returns:
-;			Returns TRUE if successful, FALSE otherwise
-;
+/*
+ Function:	ConvertCase  
+			Convert case of selected text
+
+ Parameters:
+			case - Can be "upper", "lower", "toggle" (default), "capitalize". 
+
+ Returns:
+			Returns TRUE if successful, FALSE otherwise
+ */
 HE_ConvertCase(hEdit, case="toggle") {
 	static HEM_CONVERTCASE=2046		;EQU WM_USER+1022	;wParam=CC_UPPERCASE/CC_LOWERCASE/CC_TOGGLECASE,lParam = -1	 :Returns TRUE if successful/FALSE otherwise
 	static cc_upper=0, cc_lower=1, cc_toggle=2, cc_capitalize=3
@@ -93,28 +88,28 @@ HE_ConvertCase(hEdit, case="toggle") {
 	Return ErrorLevel
 }
 
-;-------------------------------------------------------------------------------
-; Function: EmptyUndoBuffer
-;           Resets the undo flag in the HiEdit control for the current file.
-;
+/*
+ Function: EmptyUndoBuffer
+           Resets the undo flag in the HiEdit control for the current file.
+ */
 HE_EmptyUndoBuffer(hEdit){
     Static EM_EMPTYUNDOBUFFER:=0xCD
     SendMessage EM_EMPTYUNDOBUFFER,0,0,,ahk_id %hEdit%
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	FindText
-;			Find desired text in the control
-; 
-; Parameters:
-;			sText	- Text to be searched for.
-;			cpMin	- Start searching at this character position. By default 0.
-;			cpMax	- End searching at this character position. By default -1.
-;			flags	- Space separated combination of search flags: "WHOLEWORD" "MATCHCASE"
-;
-; Returns:	
-;			The zero-based character position of the next match, or -1 if there are no more matches.
-;	
+/*
+ Function:	FindText
+			Find desired text in the control
+ 
+ Parameters:
+			sText	- Text to be searched for.
+			cpMin	- Start searching at this character position. By default 0.
+			cpMax	- End searching at this character position. By default -1.
+			flags	- Space separated combination of search flags: "WHOLEWORD" "MATCHCASE"
+
+ Returns:	
+			The zero-based character position of the next match, or -1 if there are no more matches.
+ */
 HE_FindText(hEdit, sText, cpMin=0, cpMax=-1, flags="") { 
 	static EM_FINDTEXT=1080,WHOLEWORD=2,MATCHCASE=4		 ;WM_USER + 56
 	hFlags := 0
@@ -129,12 +124,13 @@ HE_FindText(hEdit, sText, cpMin=0, cpMax=-1, flags="") {
 	Return ErrorLevel 
 }
 
-;--------------------------------------------------------------------------------------------
-; Function: GetColors
-;			Get the control colors
-;
-; Returns:
-;			Colors in INI format. See <SetColors> for details.
+/*
+ Function:	GetColors
+			Get the control colors.
+
+ Returns:
+			Colors in INI format. See <SetColors> for details.
+ */
 HE_GetColors(hEdit){
 	static HEM_GETCOLORS := 2038
 	static names := "Text,Back,SelText,ActSelBack,InSelBack,LineNumber,SelBarBack,NonPrintableBack,Number"
@@ -149,36 +145,36 @@ HE_GetColors(hEdit){
 	return SubStr(res, 1, -1)
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function: GetCurrentFile
-;			Get the index of the current file
-;
+/*
+ Function:  GetCurrentFile
+			Get the index of the current file.
+ */
 HE_GetCurrentFile(hEdit){
 	static HEM_GETCURRENTFILE	:= 2032	;wParam=0,			lParam = 0
 	SendMessage, HEM_GETCURRENTFILE, 0, 0,, ahk_id %hEdit%
 	return errorlevel
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function: GetFileCount
-;			Returns count of open files.
-;
+/*
+ Function: GetFileCount
+			Returns count of open files.
+ */
 HE_GetFileCount(hEdit){
 	static HEM_GETFILECOUNT	:= 2029			;wParam=0,	lParam=0
 	SendMessage, HEM_GETFILECOUNT, 0, 0,, ahk_id %hEdit%
 	return errorlevel
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function: GetFileName
-;			Get the file path.
-;
-; Parameters: 
-;			idx	- Index of the file. -1 to get file path of the current file (default)
-;
-; Returns:
-;			TRUE if successful, FALSE otherwise
-;
+/*
+ Function:	GetFileName
+			Get the file path.
+
+ Parameters: 
+			idx	- Index of the file. -1 to get file path of the current file (default)
+
+ Returns:
+			TRUE if successful, FALSE otherwise
+ */
 HE_GetFileName(hEdit, idx=-1){
 	static HEM_GETFILENAME		:= 2030		;wParam = lpszFileName, lParam = -1 for current file or dwFileIndex	:Returns TRUE if successful/FALSE otherwise
 	VarSetCapacity(fileName, 512)
@@ -186,27 +182,27 @@ HE_GetFileName(hEdit, idx=-1){
 	return fileName
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	GetFirstVisibleLine  
-;			Returns the zero-based index of the uppermost visible line.
-;
+/*
+ Function:	GetFirstVisibleLine  
+			Returns the zero-based index of the uppermost visible line.
+ */
 HE_GetFirstVisibleLine(hEdit){
 	static EM_GETFIRSTVISIBLELINE=206
 	SendMessage, EM_GETFIRSTVISIBLELINE, 0, 0,, ahk_id %hEdit% 
 	Return ErrorLevel 	
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	GetLine
-;			Get the text of the desired line from the control
-; 
-; Parameters:
-;			idx	- Zero-based index of the line. -1 means current line.
-;
-; Returns:	
-;			The return value is the text.
-;			The return value is empty string if the line number specified by the line parameter is greater than the number of lines in the HiEdit control
-;
+/*
+ Function:	GetLine
+			Get the text of the desired line from the control.
+ 
+ Parameters:
+			idx	- Zero-based index of the line. -1 means current line.
+
+ Returns:	
+			The return value is the text.
+			The return value is empty string if the line number specified by the line parameter is greater than the number of lines in the HiEdit control
+ */
 HE_GetLine(hEdit, idx=-1){
 	static EM_GETLINE=196	  ;The return value is the number of characters copied. The return value is zero if the line number specified by the line parameter is greater than the number of lines in the HiEdit control
 	if (idx = -1) 
@@ -225,40 +221,38 @@ HE_GetLine(hEdit, idx=-1){
 	return len = 1 ? SubStr(txt, 1, -1) : txt
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	GetLineCount
-;			Returns an integer specifying the number of lines in the HiEdit control. 
-;			If no text is in the HiEdit control, the return value is 1. 
-;
+/*
+ Function:	GetLineCount
+			Returns an integer specifying the number of lines in the HiEdit control. 
+			If no text is in the HiEdit control, the return value is 1. 
+ */
 HE_GetLineCount(hEdit){
 	static EM_GETLINECOUNT=186
    	SendMessage, EM_GETLINECOUNT, 0, 0,, ahk_id %hEdit%
 	Return ErrorLevel
 }
 
-;-------------------------------------------------------------------------------
-; Function: GetModify
-;           Gets the state of the modification flag for the HiEdit control. The
-;           flag indicates whether the contents of the control have been
-;           modified.
-;
-; Parameters:
-;           idx - Index of the file. -1 for the current file (default)
-;
-; Returns:
-;           TRUE if the content of HiEdit control has been modified, FALSE
-;           otherwise.
-;
+/*
+ Function: GetModify
+           Gets the state of the modification flag for the HiEdit control. 
+		   The flag indicates whether the contents of the control has been modified.
+
+ Parameters:
+           idx - Index of the file. -1 for the current file (default).
+
+ Returns:
+           TRUE if the content of HiEdit control has been modified, FALSE otherwise.
+ */
 HE_GetModify(hEdit, idx=-1){
     Static EM_GETMODIFY:=0xB8
     SendMessage EM_GETMODIFY,0,idx,,ahk_id %hEdit%
     Return ErrorLevel
 }
 
-;--------------------------------------------------------------------------------------------------
-; Function:	GetRedoData
-;			Returns redo type and/or data for desired redo level. The same rules as in <GetUndoData>
-;
+/*
+ Function:	GetRedoData
+			Returns redo type and/or data for desired redo level. The same rules as in <GetUndoData>.
+ */
 HE_GetRedoData(hEdit, level){
 	static HEM_GETREDODATA=2040		;wParam=Undo level (1 based),	lParam=lpUNDODATA	:Returns type of undo (UNDONAMEID)
 	static UID_0="UNKNOWN",UID_1="TYPING",UID_2="DELETE",UID_3="DRAGDROP",UID_4="CUT",UID_5="PASTE",UID_6="SETTEXT",UID_7="REPLACESEL",UID_8="CLEAR",UID_9="BACKSPACE",UID_10="INDENT",UID_11="OUTDENT",UID_12="CODEPAGE",UID_13="CASE"
@@ -266,21 +260,21 @@ HE_GetRedoData(hEdit, level){
 	VarSetCapacity( RD, 8, 0), VarSetCapacity( buf, size ), NumPut(&buf, RD), NumPut(size, RD, 4)
 	SendMessage, HEM_GETREDODATA, level, &RD,, ahk_id %hEdit%
 	VarSetCapacity(buf, -1)
-;	Return % buf
+	Return % buf
 	Return % UID_%ErrorLevel%
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	GetSel
-;			Get letfmost and/or rightmost character positions of the selection
-; 
-; Parameters:
-;			start_pos	- Optional starting position of the selection.
-;			end_pos		- Optional ending position of the selection.
-;
-; Returns:	
-;			Starting position.
-;		
+/*
+ Function:	GetSel
+			Get letfmost and/or rightmost character positions of the selection.
+ 
+ Parameters:
+			start_pos	- Optional starting position of the selection.
+			end_pos		- Optional ending position of the selection.
+
+ Returns:	
+			Starting position.
+ */	
 HE_GetSel(hEdit, ByRef start_pos="@",ByRef end_pos="@"){
 	static EM_GETSEL=176
 	
@@ -295,10 +289,10 @@ HE_GetSel(hEdit, ByRef start_pos="@",ByRef end_pos="@"){
 	Return s
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	GetSelText
-;			Returns selected text 
-; 
+/*
+ Function:	GetSelText
+			Returns selected text.
+ */
 HE_GetSelText(hEdit){
 	static EM_GETSELTEXT = 1086		;Returns: the number of characters copied, not including the terminating null character.
 	HE_GetSel(hEdit, s, e),	VarSetCapacity(buf, e-s+2)
@@ -307,24 +301,24 @@ HE_GetSelText(hEdit){
 	Return buf
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	GetTextLength 
-;			Returns the length of text, in characters.
-;
+/*
+ Function:	GetTextLength 
+			Returns the length of text, in characters.
+ */
 HE_GetTextLength(hEdit) {
 	static WM_GETTEXTLENGTH=14
 	SendMessage, WM_GETTEXTLENGTH, 0, 0,, ahk_id %hEdit% 
 	Return ErrorLevel 	
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	GetTextRange
-;			Get range of characters from the control
-;
-; Parameters:
-;			min	- Index of leftmost characther of the range. By default 0.
-;			max - Index of rightmost characther of the range. -1 means last character in the control.
-;
+/*
+ Function:	GetTextRange
+			Get range of characters from the control
+
+ Parameters:
+			min	- Index of leftmost characther of the range. By default 0.
+			max - Index of rightmost characther of the range. -1 means last character in the control.
+ */
 HE_GetTextRange(hEdit, min=0, max=-1){
 	static EM_GETTEXTRANGE=1099			;Returns: The number of characters copied, not including the terminating null character.
 	if (max=-1)
@@ -336,29 +330,29 @@ HE_GetTextRange(hEdit, min=0, max=-1){
 	Return buf
 }
 
-;---------------------------------------------------------------------------
-; Function:	GetUndoData
-;			Returns undo type and/or data for desired undo level.
-;
-; Parameters:
-;			level - Undo level
-;
-; Types:
-;			UNKNOWN		-		The type of undo action is unknown.
-;			TYPING		-		Typing operation.
-;			DELETE		-		Delete operation.
-;			DRAGDROP	-		Drag-and-drop operation.
-;			CUT			-		Cut operation.
-;			PASTE		-		Paste operation.
-;			SETTEXT		-		WM_SETTEXT message was used to set the control text
-;			REPLACESEL	-		EM_REPLACESEL message was used to insert text
-;			CLEAR		-		Delete selected text
-;			BACKSPACE	-		Back Space Operation
-;			INDENT		-		Increase Indent
-;			OUTDENT		-		Decrease Indent
-;			CODEPAGE	-		Convert codepage
-;			CASE		-		Convert case
-;
+/*
+ Function:	GetUndoData
+			Returns undo type and/or data for desired undo level.
+
+ Parameters:
+			level - Undo level.
+
+ Types:
+			UNKNOWN		-		The type of undo action is unknown.
+			TYPING		-		Typing operation.
+			DELETE		-		Delete operation.
+			DRAGDROP	-		Drag-and-drop operation.
+			CUT			-		Cut operation.
+			PASTE		-		Paste operation.
+			SETTEXT		-		WM_SETTEXT message was used to set the control text
+			REPLACESEL	-		EM_REPLACESEL message was used to insert text
+			CLEAR		-		Delete selected text
+			BACKSPACE	-		Back Space Operation
+			INDENT		-		Increase Indent
+			OUTDENT		-		Decrease Indent
+			CODEPAGE	-		Convert codepage
+			CASE		-		Convert case
+ */
 HE_GetUndoData(hEdit, level){
 	static HEM_GETUNDODATA=2039		;wParam=Undo level (1 based),	lParam=lpUNDODATA	:Returns type of undo (UNDONAMEID)
 	static UID_0="UNKNOWN",UID_1="TYPING",UID_2="DELETE",UID_3="DRAGDROP",UID_4="CUT",UID_5="PASTE",UID_6="SETTEXT",UID_7="REPLACESEL",UID_8="CLEAR",UID_9="BACKSPACE",UID_10="INDENT",UID_11="OUTDENT",UID_12="CODEPAGE",UID_13="CASE"
@@ -371,62 +365,63 @@ HE_GetUndoData(hEdit, level){
 
 
 
-;----------------------------------------------------------------------------------------------------
-; Function:	LineFromChar
-;			Returns line number of the line containing specific character index.
-;
-; Parameters:
-;			ich	- The character index of the character contained in the line whose number is to be retrieved. If the ich parameter is -1, either the line number of the current line (the line containing the caret) is retrieved or, if there is a selection, the line number of the line containing the beginning of the selection is retrieved. 
-;	
-; Returns:
-;			The zero-based line number of the line containing the character index specified by ich. 
-;
+/*
+ Function:	LineFromChar
+			Returns line number of the line containing specific character index.
+
+ Parameters:
+			ich	- The character index of the character contained in the line whose number is to be retrieved. If the ich parameter is -1, either the line number of the current line (the line containing the caret) is retrieved or, if there is a selection, the line number of the line containing the beginning of the selection is retrieved. 
+	
+ Returns:
+			The zero-based line number of the line containing the character index specified by ich. 
+ */
 HE_LineFromChar(hEdit, ich) {
 	static EM_LINEFROMCHAR=201
    	SendMessage, EM_LINEFROMCHAR, ich, 0,, ahk_id %hEdit%
 	Return ErrorLevel
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	LineIndex
-;			Returns the character index of the line.
-;
-; Parameters:
-;			idx	- Line number for which to retreive character index. -1 (default) means current line.
-;	
-; Returns:
-;			The character index of the line specified in the idx parameter, or -1 if the specified line number is greater than the number of lines.
+/*
+ Function:	LineIndex
+			Returns the character index of the line.
+
+ Parameters:
+			idx	- Line number for which to retreive character index. -1 (default) means current line.
+	
+ Returns:
+			The character index of the line specified in the idx parameter, or -1 if the specified line number is greater than the number of lines.
+ */
 HE_LineIndex(hedit, idx=-1) {
 	static EM_LINEINDEX=187
  	SendMessage, EM_LINEINDEX, idx, 0,, ahk_id %hEdit% 
 	Return ErrorLevel
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	LineLength
-;			Returns the lenght of the line.
-;
-; Parameters:
-;			idx	- Line number for which to retreive line length. -1 (default) means current line.
-;	
-; Returns:
-;			the length, in characters, of the line
-;
+/*
+ Function:	LineLength
+			Returns the lenght of the line.
+
+ Parameters:
+			idx	- Line number for which to retreive line length. -1 (default) means current line.
+	
+ Returns:
+			the length, in characters, of the line
+ */
 HE_LineLength(hEdit, idx=-1) {
 	static EM_LINELENGTH=193
 	SendMessage, EM_LINELENGTH, He_LineIndex(hEdit, idx) , 0,, ahk_id %hEdit% 
 	Return ErrorLevel
 }
 
-;--------------------------------------------------------------------------------------------
-; Function: LineNumbersBar
-;			Sets the line numbers bar state and looks.
-;
-; Parameters:
-;			state	- Can be "show", "hide", "automaxsize", "autosize"
-;			linw	- Line numbers width (by default 40)
-;			selw	- Selection bar width (by default 10)
-;
+/*
+ Function: LineNumbersBar
+			Sets the line numbers bar state and looks.
+
+ Parameters:
+			state	- Can be "show", "hide", "automaxsize", "autosize"
+			linw	- Line numbers width (by default 40)
+			selw	- Selection bar width (by default 10)
+ */
 HE_LineNumbersBar( hEdit, state="show", linw=40, selw=10 ) {
 	static HEM_LINENUMBERSBAR := 2036		;EQU WM_USER+1012		;wParam=LNB_HIDE/LNB_SHOW/LNB_AUTOSIZE,			lParam=HIWORD:Selection bar width , LOWWORD:Line numbers width
 	static LNB_HIDE=0, LNB_SHOW=1, LNB_AUTOMAXSIZE=2, LNB_AUTOSIZE=4
@@ -437,92 +432,94 @@ HE_LineNumbersBar( hEdit, state="show", linw=40, selw=10 ) {
 	return errorlevel
 }
 
-;-------------------------------------------------------------------------------
-; Function: LineScroll
-;           Scrolls the text in the HiEdit control for the current file.
-;
-; Parameters:
-;           xScroll -	The number of characters to scroll horizontally.  Use a
-;						negative number to scroll to the left and a positive number to
-;						scroll to the right.
-;           yScroll -	The number of lines to scroll vertically.  Use a negative
-;						number to scroll up and a positive number to scroll down.
-;
-; Remarks:
-;           This message does not move the caret.
-;
-;           The HiEdit control does not scroll vertically past the last line of
-;           text in the control. If the current line plus the number of lines
-;           specified by the yScroll parameter exceeds the total number of lines
-;           in the HiEdit control, the value is adjusted so that the last line
-;           of the HiEdit control is scrolled to the top of the HiEdit control
-;           window.
-;
-;           This function can be used to scroll horizontally past
-;           the last character of any line.
-;
+/*
+ Function: LineScroll
+           Scrolls the text in the HiEdit control for the current file.
+
+ Parameters:
+           xScroll -	The number of characters to scroll horizontally.  Use a
+						negative number to scroll to the left and a positive number to
+						scroll to the right.
+           yScroll -	The number of lines to scroll vertically.  Use a negative
+						number to scroll up and a positive number to scroll down.
+
+ Remarks:
+           This message does not move the caret.
+
+           The HiEdit control does not scroll vertically past the last line of
+           text in the control. If the current line plus the number of lines
+           specified by the yScroll parameter exceeds the total number of lines
+           in the HiEdit control, the value is adjusted so that the last line
+           of the HiEdit control is scrolled to the top of the HiEdit control
+           window.
+
+           This function can be used to scroll horizontally past
+           the last character of any line.
+ */
 HE_LineScroll(hEdit,xScroll=0,yScroll=0){
     Static EM_LINESCROLL:=0xB6
     SendMessage EM_LINESCROLL,xScroll,yScroll,,ahk_id %hEdit%
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	NewFile
-;			Opens new tab.
+/*
+ Function:	NewFile
+			Opens new tab.
+ */
 HE_NewFile(hEdit){
 	static HEM_NEWFILE	:= 2024		;wParam=0,	lParam=0
 	SendMessage, HEM_NEWFILE, 0, 0,, ahk_id %hEdit%
 	return errorlevel
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	OpenFile
-;			Open file in new tab
-;
-; Parameters: 
-;			pFileName	- Path of the file to be opened
-;			flag		- Set to TRUE to create new file if pFileName doesn't exist. 
-;						  If set to FALSE, function fails if the file doesn't exist (default).
-; Returns:
-;			TRUE if successful/FALSE otherwise
-;
+/*
+ Function:	OpenFile
+			Open file in new tab
+
+ Parameters: 
+			pFileName	- Path of the file to be opened
+			flag		- Set to TRUE to create new file if pFileName doesn't exist. 
+						  If set to FALSE, function fails if the file doesn't exist (default).
+ Returns:
+			TRUE if successful/FALSE otherwise
+ */
 HE_OpenFile(hEdit, pFileName, flag=0){
 	static HEM_OPENFILE	:= 2025		;wParam=0,				lParam=lpszFileName	 Returns TRUE if successful/FALSE otherwise
 	SendMessage, HEM_OPENFILE, flag, &pFileName,, ahk_id %hEdit%
 	return errorlevel
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	Redo
-;			Do redo operation
-;
-; Returns:
-;			TRUE if the Redo operation succeeds, FALSE otherwise
+/*
+ Function:	Redo
+			Do redo operation
+
+ Returns:
+			TRUE if the Redo operation succeeds, FALSE otherwise
+ */
 HE_Redo(hEdit) { 
 	static EM_REDO := 1108 
 	SendMessage, EM_REDO,,,, ahk_id %hEdit%    
 	return ErrorLevel
 } 
-;----------------------------------------------------------------------------------------------------
-; Function:	ReloadFile
-;			Reload file
-;
-; Parameters: 
-;			idx	- Index of the file to reload. -1 to reload current file (default)
-;
+/*
+ Function:	ReloadFile
+			Reload file
+
+ Parameters: 
+			idx	- Index of the file to reload. -1 to reload current file (default)
+ */
 HE_ReloadFile(hEdit, idx=-1) {
 	static HEM_RELOADFILE=2027	;EQU WM_USER+1003	;wParam=0,	lParam = -1 for current file
 	SendMessage, HEM_RELOADFILE, 0, idx,, ahk_id %hEdit% 
 	Return ErrorLevel 	
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	ReplaceSel
-;			Replace selection with desired text
-;
-; Parameters:
-;			text - Text to replace selection with.
-;
+/*
+ Function:	ReplaceSel
+			Replace selection with desired text
+
+ Parameters:
+			text - Text to replace selection with.
+ */
 HE_ReplaceSel(hEdit, text=""){
 	static  EM_REPLACESEL=194
 	
@@ -530,17 +527,17 @@ HE_ReplaceSel(hEdit, text=""){
 	Return ErrorLevel
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function: SaveFile
-;			Save file to disk
-;
-; Parameters: 
-;			pFileName	- File name.
-;			idx			- Index of the file to save. -1 to save current file (default)
-;
-; Returns:
-;			TRUE if successful, FALSE otherwise
-;			
+/*
+ Function: SaveFile
+			Save file to disk
+
+ Parameters: 
+			pFileName	- File name.
+			idx			- Index of the file to save. -1 to save current file (default)
+
+ Returns:
+			TRUE if successful, FALSE otherwise
+ */	
 HE_SaveFile(hEdit, pFileName, idx=-1){
 	static HEM_SAVEFILE	:= 2028		;wParam=lpszFileName,					lParam = -1 for current file or dwFileIndex	:Returns 
 	
@@ -548,32 +545,32 @@ HE_SaveFile(hEdit, pFileName, idx=-1){
 	return Errorlevel
 }
 
-;-------------------------------------------------------------------------------
-; Function: Scroll
-;           Scrolls the text vertically in the HiEdit control for the current file.
-;
-; Parameters:
-;           Pages - The number of pages to scroll.  Use a negative number to
-;					scroll up and a positive number to scroll down.
-;
-;           Lines - The number of lines to scroll.  Use a negative number to
-;					scroll up and a positive number to scroll down.
-;
-; Returns:
-;           The number of lines that the command scrolls. The number returned
-;           may not be the same as the actual number of lines scrolled if the
-;           scrolling moves to the beginning or the end of the text.
-;
-; Remarks:
-;           This message does not move the caret.
-;           0x7FFFFFFF = 2147483647 = largest possible 32-bit signed integer value
-;
-;           Despite the documentation, the return value for the message always
-;           reflects the request, not necessarily the actual number of lines
-;           that were scrolled.  Example: If a request to scroll down 25 lines
-;           is made, 25 is returned even if the control is already scrolled down
-;           to the bottom of the document. [Bug?]
-;
+/*
+ Function: Scroll
+           Scrolls the text vertically in the HiEdit control for the current file.
+
+ Parameters:
+           Pages - The number of pages to scroll.  Use a negative number to
+					scroll up and a positive number to scroll down.
+
+           Lines - The number of lines to scroll.  Use a negative number to
+					scroll up and a positive number to scroll down.
+
+ Returns:
+           The number of lines that the command scrolls. The number returned
+           may not be the same as the actual number of lines scrolled if the
+           scrolling moves to the beginning or the end of the text.
+
+ Remarks:
+           This message does not move the caret.
+           0x7FFFFFFF = 2147483647 = largest possible 32-bit signed integer value
+
+           Despite the documentation, the return value for the message always
+           reflects the request, not necessarily the actual number of lines
+           that were scrolled.  Example: If a request to scroll down 25 lines
+           is made, 25 is returned even if the control is already scrolled down
+           to the bottom of the document. [Bug?]
+ */
 HE_Scroll(hEdit,Pages=0,Lines=0){
     Static EM_SCROLL:=0xB5, SB_LINEDOWN:=0x1, SB_LINEUP:=0x0, SB_PAGEDOWN:=0x3,SB_PAGEUP:=0x2
 
@@ -627,35 +624,35 @@ HE_Scroll(hEdit,Pages=0,Lines=0){
 }
 
 
-;----------------------------------------------------------------------------------------------------
-; Function:	ScrollCaret
-;			Scroll content of control until caret is visible.
-;
+/*
+ Function:	ScrollCaret
+			Scroll content of control until caret is visible.
+ */
 HE_ScrollCaret(hEdit){
 	static EM_SCROLLCARET=183
 	SendMessage, EM_SCROLLCARET, 0, 0,, ahk_id %hEdit% 
 	Return ErrorLevel
 }
 
-;--------------------------------------------------------------------------------------------
-; Function: SetColors
-;			Set the control colors
-;
-; Parameters:
-;			colors	- Any subset of available color options in INI format (array of NAME=COLOR lines). Skiped colors will be set to 0.
-;			fRdraw	- Set to TRUE to redraw control
-;
-; Colors:
-;	Text			 - Normal Text Color
-;	Back			 - Editor Back Color
-;	SelText			 - Selected Text Color
-;	ActSelBack		 - Active Selection Back Color
-;	InSelBack		 - Inactive Selection Back Color
-;	LineNumber		 - Line Numbers Color
-;	SelBarBack		 - Selection Bar Back Color
-;	NonPrintableBack - 0 - 31 special non printable chars
-;	Number			 - Number Color	   
-;
+/*
+ Function: SetColors
+			Set the control colors
+
+ Parameters:
+			colors	- Any subset of available color options in INI format (array of NAME=COLOR lines). Skiped colors will be set to 0.
+			fRdraw	- Set to TRUE to redraw control
+
+ Colors:
+	Text			 - Normal Text Color
+	Back			 - Editor Back Color
+	SelText			 - Selected Text Color
+	ActSelBack		 - Active Selection Back Color
+	InSelBack		 - Inactive Selection Back Color
+	LineNumber		 - Line Numbers Color
+	SelBarBack		 - Selection Bar Back Color
+	NonPrintableBack - 0 - 31 special non printable chars
+	Number			 - Number Color	   
+ */
 HE_SetColors(hEdit, colors, fRedraw=true){
 	static HEM_SETCOLORS := 2037
 	static names := "Text,Back,SelText,ActSelBack,InSelBack,LineNumber,SelBarBack,NonPrintableBack,Operator,Number,Comment,String"
@@ -687,130 +684,81 @@ HE_SetColors(hEdit, colors, fRedraw=true){
 	return ErrorLevel
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function: SetCurrentFile
-;			Set the the current file
-;
-; Parameters:
-;			idx	- New file index to set as current.
+/*
+ Function:	SetCurrentFile
+			Set the current file.
+
+ Parameters:
+			idx	- New file index to set as current.
+ */
 HE_SetCurrentFile(hEdit, idx){
 	static HEM_SETCURRENTFILE	:= 2033		;wParam=0,	lParam = dwFileIndex
 	SendMessage, HEM_SETCURRENTFILE, 0, idx,, ahk_id %hEdit%
 	return errorlevel
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function: SetEvents
-;			Set notification events
-;
-; Parameters:
-;			func	- Subroutine that will be called on events.
-;			e		- White space separated list of events to monitor (by default "selchange").
-;
-; Globals:
-;			HE_EVENT	- Specifies event that occurred. Event must be registered to be able to monitor them. Events "tabmclick" and "filechange" are registered automatically.
-;			HE_INFO		- String specifying event info.
-;
-; Events & Infos:
-;			SelChange	- S<start_char_idx> E<end_char_idx> L<line_num>	[t|*] (t if tab changed, * if text changed)
-;			Key			- key pressed
-;			Mouse		- x<mouse_x> y<mouse_y> v<virtual_key_code>
-;			Scroll		- ""
-;			ContextMenu	- ""			
-;			FileChange	- <file_index>	(file is changed outside of the application)
-;			Tabmclick	- ""			(middle button click over tab)
-;
-; Returns:
-;			"OK" if succesiful, error string otherwise
-;
-HE_SetEvents(hEdit, func, e="selchange"){
-	local old, hmask
+/*
+ Function:	SetEvents
+			Set notification events.
+
+ Parameters:
+			Handler	- Function that handles events. If empty, any existing handler will be removed.
+			Events	- White space separated list of events to monitor (by default "selchange").
+
+ Handler:
+			Event		- Specifies event that occurred. Event must be registered to be able to monitor them. Events "tabmclick" and "filechange" are registered automatically.
+			EventInfo	- Specifies event info.
+
+ Events & Infos:
+			SelChange	- S<start_char_idx> E<end_char_idx> L<line_num>	[t|*] (t if tab changed, * if text changed)
+			Key			- key pressed
+			Mouse		- x<mouse_x> y<mouse_y> v<virtual_key_code>
+			Scroll		- ""
+			ContextMenu	- ""			
+			FileChange	- <file_index>	(file is changed outside of the application)
+			Tabmclick	- ""			(middle button click over tab)
+
+ Returns:
+			The previous event mask (number).
+ */
+HE_SetEvents(hEdit, Handler="", Events="selchange"){
 	static ENM_KEYEVENTS = 0x10000, ENM_MOUSEEVENTS = 0x20000, ENM_SCROLLEVENTS = 0x8, ENM_SELCHANGEEVENTS = 0x80000, ENM_CONTEXTMENUEVENTS=0x20
-	static EM_SETEVENTMASK = 1093, events="key,mouse,scroll,selchange,contextmenu"
+	static EM_SETEVENTMASK = 1093, sEvents="key,mouse,scroll,selchange,contextmenu", old
 
-	if !IsLabel(func)
-		return "Err: label doesn't exist`n`n" func
+	if (Handler = "") 
+		return OnMessage(0x4E, old != "HE_onNotify" ? old : ""), old := ""
 
-	hmask := 0
-	loop, parse, e, %A_Tab%%A_Space%
+	if !IsFunc(Handler)
+		return A_ThisFunc "> Invalid handler: " Handler
+
+	hMask := 0
+	loop, parse, Events, %A_Tab%%A_Space%
 	{
-		IfEqual, A_LoopField, , continue
-		if A_LoopField not in %events%
-			return "Err: unknown event - '" A_LoopField "'"
+		IfEqual, A_LoopField,,continue
+		if A_LoopField not in %sEvents%
+			return A_ThisFunc "> Invalid event: " A_LoopField
 		hmask |= ENM_%A_LOOPFIELD%EVENTS
 	}
-	SendMessage, EM_SETEVENTMASK, 0, hMask,, ahk_id %hEdit%
 
-	old := OnMessage(0x4E, "HE_onNotify")
-	if (old != "HE_onNotify")
-		HE_oldNotify := RegisterCallback(old)
+	if !old { 
+		old := OnMessage(0x4E, "HE_onNotify")
+		if old != HE_onNotify
+			HE("oldNotify", RegisterCallback(old))
+	}
 
-	hEdit += 0
-	HE_%hEdit%_func	 := func
-	return "OK"
+	HE(hEdit "Handler", Handler)
+	SendMessage, EM_SETEVENTMASK,,hMask,, ahk_id %hEdit%
+	return ErrorLevel
 }
 
+/*
+ Function: SetFont
+			Sets the control font
 
-HE_onNotify(wparam, lparam, msg, hwnd) {
-	local code, hw, idFrom, m, l, w
-	static EN_TABMCLICK=0x1000, EN_FILECHANGE=0x1001, EN_SELCHANGE = 0x702, EN_MSGFILTER = 0x700
-
-	idFrom :=  NumGet(lparam+4)   ; and its ID 
-	if (idFrom != HE_MODULEID)
-		return HE_oldNotify ? DllCall(HE_oldNotify, "uint", wparam, "uint", lparam, "uint", msg, "uint", hwnd) : ""
-
-  ;NMHDR 
-	hw	   :=  NumGet(lparam+0)   ;control sending the message - this HiEdit
-	code   :=  NumGet(lparam+8)		;- 4294967296
-
-    HE_HWND := hw
-	HE_EVENT := HE_INFO := ""
-	if (code = EN_TABMCLICK) {
-		HE_EVENT := "tabmclick"
-		GoSub % HE_%hw%_func
-		return
-	}
-										
-	if (code = EN_FILECHANGE) {
-		HE_EVENT := "filechange", HE_INFO := NumGet(lparam+12)
-		GoSub % HE_%hw%_func
-		return
-	}
-
-	if (code = EN_SELCHANGE) {
-		HE_EVENT := "selchange",  m := NumGet(lparam+20, 0, "Short")=16,  l := NumGet(lparam+30) && !m
-		HE_INFO := "S" NumGet(lparam+12) " E" NumGet(lparam+16) " L" NumGet(lparam+22)  (m ? " t" : "") (l ? " *" : "")
-		GoSub % HE_%hw%_func
-		return
-	}
-
-	if (code=EN_MSGFILTER) {
-		m := NumGet(lparam+12), w := NumGet(lparam+16), l := NumGet(lparam+20)
-		if m between 0x201 AND 0x209	;mouse messges, don't report WM_MOUSEMOVE=0x200
-			 HE_EVENT := "mouse", HE_INFO := "x" l & 0xFFFF " y" (l >> 16) " v" w
-		else if m = 0x102				;WM_CHAR
-			 HE_EVENT := "key", HE_INFO := chr(w)
-		else if m = 0x7B				; WM_CONTEXTMENU 
-			 HE_EVENT := "contextmenu"
-		else if m = 0x20A				 ;WM_MOUSEWHEEL
-			 HE_EVENT := "scroll"
-
-		if HE_EVENT
-			GoSub % HE_%hw%_func
-		return
-	}
-}
-
-;--------------------------------------------------------------------------------------------
-; Function: SetFont
-;			Sets the control font
-;
-; Parameters:
-;			pFont	- AHK font definition: "Style, FontName"
-;
+ Parameters:
+			pFont	- AHK font definition: "Style, FontName"
+ */
 HE_SetFont(hEdit, pFont="") { 
-   local height, weight, italic, underline, strikeout , nCharSet 
-   local hFont, LogPixels
    static WM_SETFONT := 0x30
  ;parse font 
    italic      := InStr(pFont, "italic")    ?  1    :  0 
@@ -836,74 +784,73 @@ HE_SetFont(hEdit, pFont="") {
    return ErrorLevel
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	SetKeywordFile
-;			Set syntax highlighting.
-;
-; Parameters:
-;			pFile	- Path to .hes file
-;
+/*
+ Function:	SetKeywordFile
+			Set syntax highlighting.
+
+ Parameters:
+			pFile	- Path to .hes file
+ */
 HE_SetKeywordFile( pFile ){
 	return DllCall("HiEdit.dll\SetKeywordFile", "str", pFile)
 }
 
-;-------------------------------------------------------------------------------
-; Function: SetModify
-;           Sets or clears the modification flag for the current file. The
-;           modification flag indicates whether the text within the control has been modified.
-;
-; Parameters:
-;           Flag - Set to TRUE to set the modification flag. Set to FALSE to clear the modification flag.
-;
+/*
+ Function: SetModify
+           Sets or clears the modification flag for the current file. The
+           modification flag indicates whether the text within the control has been modified.
+
+ Parameters:
+           Flag - Set to TRUE to set the modification flag. Set to FALSE to clear the modification flag.
+ */
 HE_SetModify(hEdit, Flag){
     Static EM_SETMODIFY:=0xB9
     SendMessage EM_SETMODIFY, Flag, 0, ,ahk_id %hEdit%
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	SetSel
-;			Set the selection 
-; 
-; Parameters:
-;			nStart	- Starting character position of the selection. Set -1 to remov current selection.
-;			nEnd	- Ending character position of the selection. Set -1 to use position of the last character in the control.
-;	
+/*
+ Function:	SetSel
+			Set the selection 
+ 
+ Parameters:
+			nStart	- Starting character position of the selection. Set -1 to remov current selection.
+			nEnd	- Ending character position of the selection. Set -1 to use position of the last character in the control.
+ */
 HE_SetSel(hEdit, nStart=0, nEnd=-1) {
 	static EM_SETSEL=0x0B1
 	SendMessage, EM_SETSEL, nStart, nEnd,, ahk_id %hEdit% 
 	Return ErrorLevel 	
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function: SetTabWidth
-;			Sets the tab width
-;
-; Parameters:
-;			pWidth	- Tab width in characters
-;			pRedraw	- Set to true to redraw control (default)
-;
+/*
+ Function: SetTabWidth
+			Sets the tab width
+
+ Parameters:
+			pWidth	- Tab width in characters
+			pRedraw	- Set to true to redraw control (default)
+ */
 HE_SetTabWidth(hEdit, pWidth, pRedraw=true){
 	static HEM_SETTABWIDTH := 2041		;wParam=nChars,		lParam=fRedraw:TRUE/FALSE
 	SendMessage, HEM_SETTABWIDTH, pWidth, pRedraw,, ahk_id %hEdit%
 	return errorlevel
 }
 
-;--------------------------------------------------------------------------------------------
-; Function: SetTabsImageList
-;			Sets the image list of the tab navigation toolbar
-;
-; Parameters:
-;			pImg	- .BMP file with image list. Omit this parameter to use default image list.
-;
+/*
+ Function:	SetTabsImageList
+			Sets the image list of the tab navigation toolbar.
+
+ Parameters:
+			pImg - BMP file with the image list. Omit this parameter to use default image list.
+ */
 HE_SetTabsImageList(hEdit, pImg="") {
 	static LR_LOADFROMFILE		:= 0x10
 		,  LR_CREATEDIBSECTION	:= 0x2000
 		,  HEM_SETTABSIMAGELIST := 2043
 		,  toolbarBMP			:= "424de60000000000000076000000280000001c00000007000000010004000000000070000000000000000000000010000000000000000000000000008000008000000080800080000000800080008080000080808000c0c0c0000000ff0000ff000000ffff00ff000000ff00ff00ffff0000ffffff00fddddfdddddfdddfdddddfddddfd0000fdddffddddffdddffddddffdddfd0000fddfffdddfffdddfffdddfffddfd0000fdffffddffffdddffffddffffdfd0000fddfffdddfffdddfffdddfffddfd0000fdddffddddffdddffddddffdddfd0000fddddfdddddfdddfdddddfddddfd0000"
 	if (pImg = "")	{
-		deleteFile := true
-		pImg := "___he_bar.bmp"
-		WriteFile(pImg, toolbarBMP)
+		pImg := "___he_bar.bmp", 	deleteFile := true
+		HE_writeFile(pImg, toolbarBMP)
 	}
 	hImlTabs := DllCall("comctl32.dll\ImageList_LoadImage", "uint", 0
 			, "str", pImg
@@ -911,29 +858,31 @@ HE_SetTabsImageList(hEdit, pImg="") {
 			, "uint", 0x0FF00FF
 			, "uint", IMAGE_BITMAP
 			, "uint", LR_CREATEDIBSECTION | LR_LOADFROMFILE )
+	
 	if (deleteFile) 
 		FileDelete, %pImg%
 	SendMessage,HEM_SETTABSIMAGELIST,0,hImlTabs,,ahk_id %hEdit%
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	ShowFileList
-;			Show popup menu containg list of open files.
-; 
-; Parameters:
-;			x, y	- Position of popup window
-;
-HE_ShowFileList(hEdit, x=0, y=0){
+/*
+ Function:	ShowFileList
+			Show popup menu containg list of open files.
+ 
+ Parameters:
+			X, Y	- Position of the popup window. Optional, by default 0.
+ */
+HE_ShowFileList(hEdit, X=0, Y=0){
 	static HEM_SHOWFILELIST	:= 2044	    ;EQU WM_USER+1020		;wParam=X pos,									lParam=Y pos
-	SendMessage, HEM_SHOWFILELIST, x, y,, ahk_id %hEdit%
+	SendMessage, HEM_SHOWFILELIST, X, Y,, ahk_id %hEdit%
 }
 
-;----------------------------------------------------------------------------------------------------
-; Function:	Undo
-;			Do undo operation
-;
-; Returns:
-;			TRUE if the Undo operation succeeds, FALSE otherwise
+/*
+ Function:	Undo
+			Do undo operation
+
+ Returns:
+			TRUE if the Undo operation succeeds, FALSE otherwise
+ */
 HE_Undo(hEdit) { 
 	static WM_UNDO := 772 
 	SendMessage, WM_UNDO,,,, ahk_id %hEdit% 
@@ -942,9 +891,50 @@ HE_Undo(hEdit) {
 
 ;========================================== PRIVATE ===============================================================
 
-WriteFile(file,data) { 
-   Handle :=  DllCall("CreateFile","str",file,"Uint",0x40000000 ,"Uint",0,"UInt",0,"UInt",4,"Uint",0,"UInt",0) 
-   Loop{ 
+HE_onNotify(wparam, lparam, msg, hwnd) {
+	static EN_TABMCLICK=0x1000, EN_FILECHANGE=0x1001, EN_SELCHANGE = 0x702, EN_MSGFILTER = 0x700
+	static MODULEID := 230909, oldNotify="*" 
+
+	if (_ := (NumGet(Lparam+4))) != MODULEID
+	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
+	 else {
+		ifEqual, oldNotify, *, SetEnv, oldNotify, % HE("oldNotify")		
+		if oldNotify !=
+			return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
+	 }
+
+	hw :=  NumGet(Lparam+0), code := NumGet(Lparam+8, 0, "UInt"),  handler := HE(hw "Handler") 
+	ifEqual, handler,,return 
+	if (code = EN_TABMCLICK) 
+		return %handler%(hw, "tabmclick", "")
+										
+	if (code = EN_FILECHANGE)
+		return %handler%(hw, "filechange", NumGet(lparam+12))
+
+	if (code = EN_SELCHANGE) {
+		m := NumGet(lparam+20, 0, "Short")=16,  l := NumGet(lparam+30) && !m
+		info := "S" NumGet(lparam+12) " E" NumGet(lparam+16) " L" NumGet(lparam+22)  (m ? " t" : "") (l ? " *" : "")
+		return %handler%(hw, "selchange", info)
+	}
+
+	if (code=EN_MSGFILTER) {
+		m := NumGet(lparam+12), w := NumGet(lparam+16), l := NumGet(lparam+20)
+		if m between 0x201 and 0x209											;Mouse messages, don't report WM_MOUSEMOVE=0x200
+			 event := "mouse", info := "x" l & 0xFFFF " y" (l >> 16) " v" w
+		else if m = 0x102														;WM_CHAR
+			 event := "key", info := chr(w)
+		else if m = 0x7B														;WM_CONTEXTMENU 
+			 event := "contextmenu"
+		else if m = 0x20A														;WM_MOUSEWHEEL
+			 event := "scroll"
+			
+		return event != "" ? %handler%(hw, event, info) : ""
+	}
+}
+
+HE_writeFile(file,data) { 
+   Handle := DllCall("CreateFile","str",file,"Uint",0x40000000 ,"Uint",0,"UInt",0,"UInt",4,"Uint",0,"UInt",0)
+   Loop { 
      if strlen(data) = 0 
         break 
      StringLeft, Hex, data, 2          
@@ -955,6 +945,33 @@ WriteFile(file,data) {
  
    DllCall("CloseHandle", "Uint", Handle) 
    return 
+}
+
+;Storage
+HE(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
+	static
+	if (var = "" ){
+		if ( _ := InStr(value, ")") )
+			__ := SubStr(value, 1, _-1), value := SubStr(value, _+1)
+		loop, parse, value, %A_Space%
+			_ := %__%%A_LoopField%,  o%A_Index% := _ != "" ? _ : %A_LoopField%
+		return
+	} else _ := %var%
+	ifNotEqual, value, ~`a, SetEnv, %var%, %value%
+	return _
+}
+
+;Required function by Forms framework.
+HiEdit_add2Form(hParent, Txt, Opt) {
+	static f := "Form_Parse"
+	
+	%f%(Opt, "x# y# w# h# style dllPath", x, y, w, h, style, dllPath)
+	ifEqual, dllPath, ,SetEnv, dllPath, HiEdit.dll
+
+	h := HE_Add(hParent, x, y, w, h, style, dllPath)
+	ifNotEqual, Txt,, ControlSetText,, %Txt%, ahk_id %h%
+
+	return h
 }
 
 /* Group: Syntax Coloring
@@ -1045,15 +1062,3 @@ WriteFile(file,data) {
     o Additonal functions by jballi.
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>.
  */
-
-HiEdit_Add2Form(hParent, Txt, Opt) {
-	f := "Form_Parse"
-	%f%(Opt, "x# y# w# h# style dllPath", x, y, w, h, style, dllPath)
-	if dllPath=
-		dllPath := "HiEdit.dll"
-	h := HE_Add(hParent, x, y, w, h, style, dllPath)
-	if Txt != 
-		ControlSetText, , %Txt%, ahk_id %h%
-
-	return h
-}
