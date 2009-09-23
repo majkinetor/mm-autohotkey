@@ -5,11 +5,11 @@ _("mo e w")
 	hForm1	:=	Form_New("w500 h900", "Resize")
 
 ;	hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "w250",		"Align L, 250", "Attach p")
-	loop, 3
+	loop, 10	;desn't make a difference
 	{
 		hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align T, 300", "Attach p")
-		loop, 10
-			hPanel	 :=	Form_Add(hPanel,  "Panel",	 "",	  "",			"Align F", "Attach p r2")
+		loop, 5		;vistax32=10, xp64=5		depth level, makes the difference
+			hPanel	 :=	Form_Add(hPanel,  "Panel",	 "",	  "",		"Align F", "Attach p r2")
 		hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnBtn",		"Align T, 50", "Attach p r2", "Cursor hand", "Tooltip I have hand cursor")
 		hButton2 :=	Form_Add(hPanel,  "Button",  "Cancel","gOnBtn",		"Align T, 50", "Attach p r2", "Tooltip jea baby")
 		hCal1	:=  Form_Add(hPanel, "MonthCal","",	  "gOnBtn",			"Align F", "Attach p r2")

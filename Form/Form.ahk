@@ -10,13 +10,14 @@ _("m! d e w")
 
 	hPanel2	:=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align F", "Attach p")
 	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "hidden",		"Align " hPanel2, "Attach p")	;, Attach(hPanel3, "-")
-	hTV		:=  Form_Add(hPanel3, "TreeView", "", "gOnLV", "Align F",	"Attach p")
-	TV_Add("123 safasdf asdfa sdf sadf asdf asdf asdf sadfsadfsadf asfdsadf")
+;	hTV		:=  Form_Add(hPanel3, "TreeView", "", "gOnLV", "Align F",	"Attach p")
+;	TV_Add("123 safasdf asdfa sdf sadf asdf asdf asdf sadfsadfsadf asfdsadf")
+	hCal1	:=  Form_Add(hPanel3, "MonthCal","",	  "gOnBtn",			"Align F", "Attach p")
 
 ;	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "",			"Align T, 200", "Attach p")
 	hLV		:=  Form_Add(hPanel2, "ListView", "1|2|3", "gOnLV",		"Align T, 200", "Attach p")
 ;	hCal1	:=  Form_Add(hPanel2, "MonthCal","",	  "",			"Align F", "Attach p")
-	hHE		:=  Form_Add(hPanel2, "HiEdit",	"HiEdit1",  "dllPath=inc\hiedit.dll style='HSCROLL HILIGHT TABBED FILECHANGEALERT'",	"Align F", "Attach p")
+	hHE		:=  Form_Add(hPanel2, "HiEdit",	"HiEdit1",  "DllPath=inc\hiedit.dll style='HSCROLL HILIGHT TABBED FILECHANGEALERT'", "Align F", "Attach p")
 
 	Form_Show()
 return
