@@ -1,29 +1,23 @@
-_("e w")
+_("mo! d e w")
 ;#MaxThreads, 255
 
 	hForm1	:=	Form_New("w500 h400", "Resize")
 
-;	hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "w250",		"Align L, 250", "Attach p")
-	loop, 5
-	{
-		hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align T, 100", "Attach p")
-		hPanel	 :=	Form_Add(hPanel,  "Panel",	 "",	  "",			"Align F", "Attach p")
-		hPanel	 :=	Form_Add(hPanel,  "Panel",	 "",	  "",			"Align F", "Attach p")
-		hPanel	 :=	Form_Add(hPanel,  "Panel",	 "",	  "",			"Align F", "Attach p")
-		hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnBtn",		"Align T, 50", "Attach p", "Cursor hand", "Tooltip I have hand cursor")
-		hButton2 :=	Form_Add(hPanel,  "Button",  "Cancel","gOnBtn",		"Align F", "Attach p", "Tooltip jea baby")
-	}
+	hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "w250",		"Align L, 250", "Attach p")
+	hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnBtn",		"Align T, 50", "Attach p", "Cursor hand", "Tooltip I have hand cursor")
+	hButton2 :=	Form_Add(hPanel,  "Button",  "Cancel","gOnBtn",		"Align F", "Attach p", "Tooltip jea baby")
 
-;	hPanel2	:=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align F", "Attach p")
-;	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "hidden",		"Align " hPanel2, "Attach p")
-;	hTV		:=  Form_Add(hPanel3, "TreeView", "", "gOnLV", "Align F",	"Attach p")
-;	TV_Add("123 safasdf asdfa sdf sadf asdf asdf asdf sadfsadfsadf asfdsadf")
-;
-;;	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "",			"Align T, 200", "Attach p")
-;	hLV		:=  Form_Add(hPanel2, "ListView", "1|2|3", "gOnLV",		"Align T, 200", "Attach p")
-;;	hCal1	:=  Form_Add(hPanel2, "MonthCal","",	  "",			"Align F", "Attach p")
-;	hHE		:=  Form_Add(hPanel2, "HiEdit",	"HiEdit",  "dllPath=inc\hiedit.dll style='HSCROLL HILIGHT TABBED FILECHANGEALERT'",	"Align F", "Attach p")
-;
+
+	hPanel2	:=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align F", "Attach p")
+	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "hidden",		"Align " hPanel2, "Attach p"), Attach(hPanel3, "-")
+	hTV		:=  Form_Add(hPanel3, "TreeView", "", "gOnLV", "Align F",	"Attach p")
+	TV_Add("123 safasdf asdfa sdf sadf asdf asdf asdf sadfsadfsadf asfdsadf")
+
+;	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "",			"Align T, 200", "Attach p")
+	hLV		:=  Form_Add(hPanel2, "ListView", "1|2|3", "gOnLV",		"Align T, 200", "Attach p")
+;	hCal1	:=  Form_Add(hPanel2, "MonthCal","",	  "",			"Align F", "Attach p")
+	hHE		:=  Form_Add(hPanel2, "HiEdit",	"HiEdit",  "dllPath=inc\hiedit.dll style='HSCROLL HILIGHT TABBED FILECHANGEALERT'",	"Align F", "Attach p")
+
 	Form_Show()
 return
 
@@ -34,15 +28,19 @@ return
 F2::
 	if toggled
 	{
+		Attach(hPanel3, "-")
+		Attach(hPanel2, "+")
 		WinHide, ahk_id %hPanel3%
 		WinShow, ahk_id %hPanel2%
-		Attach(hPanel2, "redraw")
+;		Attach(hForm1, "redraw")
 		toggled := 0
 	}
 	else {
+		Attach(hPanel2, "-")
+		Attach(hPanel3, "+")
 		WinHide, ahk_id %hPanel2%
 		WinShow, ahk_id %hPanel3%
-		Attach(hForm1, "redraw")
+;		Attach(hForm1, "redraw")
 		toggled := 1
 	}
 return

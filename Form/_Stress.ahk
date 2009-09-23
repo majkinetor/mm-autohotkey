@@ -8,7 +8,7 @@ _("mo e w")
 	loop, 3
 	{
 		hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align T, 300", "Attach p")
-		loop, 3
+		loop, 10
 			hPanel	 :=	Form_Add(hPanel,  "Panel",	 "",	  "",			"Align F", "Attach p r2")
 		hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnBtn",		"Align T, 50", "Attach p r2", "Cursor hand", "Tooltip I have hand cursor")
 		hButton2 :=	Form_Add(hPanel,  "Button",  "Cancel","gOnBtn",		"Align T, 50", "Attach p r2", "Tooltip jea baby")
