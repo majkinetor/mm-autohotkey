@@ -15,7 +15,7 @@
 	Styles:
 			HSCROLL, VSCROLL, TABBED, HILIGHT, TABBEDBTOP, TABBEDHRZSB, TABBEDBOTTOM
  */
-HE_Add(hwnd, x, y, w, h, style="HSCROLL VSCROLL", dllPath="HiEdit.dll"){
+HE_Add(hwnd, x, y, w, h, style="HSCROLL VSCROLL", Handler="", dllPath="HiEdit.dll"){
 	global HE_MODULEID
 	static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
 	static HSCROLL=0x8 ,VSCROLL=0x10, TABBED=4, HILIGHT=0x20, TABBEDBTOP=0x1, TABBEDHRZSB=0x2 ,TABBEDBOTTOM=0x4, SINGLELINE=0x40, FILECHANGEALERT=0x80
@@ -707,12 +707,12 @@ HE_SetCurrentFile(hEdit, idx){
 			Set notification events.
 
  Parameters:
-			func	- Subroutine that will be called on events.
-			e		- White space separated list of events to monitor (by default "selchange").
+			Handler	- Subroutine that will be called on events. If empty, any existing handler will be removed.
+			Events	- White space separated list of events to monitor (by default "selchange").
 
- Globals:
-			HE_EVENT	- Specifies event that occurred. Event must be registered to be able to monitor them. Events "tabmclick" and "filechange" are registered automatically.
-			HE_INFO		- String specifying event info.
+ Handler:
+			Event		- Specifies event that occurred. Event must be registered to be able to monitor them. Events "tabmclick" and "filechange" are registered automatically.
+			EventInfo	- Specifies event info.
 
  Events & Infos:
 			SelChange	- S<start_char_idx> E<end_char_idx> L<line_num>	[t|*] (t if tab changed, * if text changed)
@@ -724,32 +724,38 @@ HE_SetCurrentFile(hEdit, idx){
 			Tabmclick	- ""			(middle button click over tab)
 
  Returns:
-			"OK" if succesiful, error string otherwise
+			"OK" if succesiful, error string otherwise.
  */
-HE_SetEvents(hEdit, func, e="selchange"){
-	local old, hmask
+HE_SetEvents(hEdit, Handler="", Events="selchange"){
+	static oldNotify
 	static ENM_KEYEVENTS = 0x10000, ENM_MOUSEEVENTS = 0x20000, ENM_SCROLLEVENTS = 0x8, ENM_SELCHANGEEVENTS = 0x80000, ENM_CONTEXTMENUEVENTS=0x20
-	static EM_SETEVENTMASK = 1093, events="key,mouse,scroll,selchange,contextmenu"
+	static EM_SETEVENTMASK = 1093, sEvents="key,mouse,scroll,selchange,contextmenu"
 
-	if !IsLabel(func)
-		return "Err: label doesn't exist`n`n" func
+	if !MODULEID { 
+		old := OnMessage(0x4E, "HE_onNotify"),	MODULEID := 230909
+		if old != Toolbar_onNotify
+			Toolbar("oldNotify", RegisterCallback(old))
+	}
 
-	hmask := 0
-	loop, parse, e, %A_Tab%%A_Space%
+	if !IsFunc(Handler)
+		return A_ThisFunc "> Invalid handler: " Handler
+
+	hMask := 0
+	loop, parse, Events, %A_Tab%%A_Space%
 	{
-		IfEqual, A_LoopField, , continue
-		if A_LoopField not in %events%
-			return "Err: unknown event - '" A_LoopField "'"
+		IfEqual, A_LoopField,,continue
+		if A_LoopField not in %sEvents%
+			return A_ThisFunc "> Invalid event: " A_LoopField
 		hmask |= ENM_%A_LOOPFIELD%EVENTS
 	}
-	SendMessage, EM_SETEVENTMASK, 0, hMask,, ahk_id %hEdit%
+	SendMessage, EM_SETEVENTMASK,,hMask,, ahk_id %hEdit%
 
-	old := OnMessage(0x4E, "HE_onNotify")
-	if (old != "HE_onNotify")
-		HE_oldNotify := RegisterCallback(old)
+	oldNotify := OnMessage(0x4E, "HE_onNotify")
+	if (oldNotify != "HE_onNotify")
+		oldNotify := RegisterCallback(oldNotify)
 
 	hEdit += 0
-	HE_%hEdit%_func	 := func
+;	HE_%hEdit%_func	 := func
 	return "OK"
 }
 
@@ -956,6 +962,20 @@ HE_writeFile(file,data) {
  
    DllCall("CloseHandle", "Uint", Handle) 
    return 
+}
+
+;Storage
+HE(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
+	static
+	if (var = "" ){
+		if ( _ := InStr(value, ")") )
+			__ := SubStr(value, 1, _-1), value := SubStr(value, _+1)
+		loop, parse, value, %A_Space%
+			_ := %__%%A_LoopField%,  o%A_Index% := _ != "" ? _ : %A_LoopField%
+		return
+	} else _ := %var%
+	ifNotEqual, value, ~`a, SetEnv, %var%, %value%
+	return _
 }
 
 ;Required function by Forms framework.
