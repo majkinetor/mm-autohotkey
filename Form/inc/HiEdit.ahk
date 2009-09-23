@@ -958,6 +958,19 @@ HE_writeFile(file,data) {
    return 
 }
 
+;Required function by Forms framework.
+HiEdit_add2Form(hParent, Txt, Opt) {
+	static f := "Form_Parse"
+	
+	%f%(Opt, "x# y# w# h# style dllPath", x, y, w, h, style, dllPath)
+	ifEqual, dllPath, ,SetEnv, dllPath, HiEdit.dll
+
+	h := HE_Add(hParent, x, y, w, h, style, dllPath)
+	ifNotEqual, Txt,, ControlSetText,, %Txt%, ahk_id %h%
+
+	return h
+}
+
 /* Group: Syntax Coloring
 
 	File structure:
@@ -1046,16 +1059,3 @@ HE_writeFile(file,data) {
     o Additonal functions by jballi.
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>.
  */
-
-HiEdit_Add2Form(hParent, Txt, Opt) {
-	f := "Form_Parse"
-	%f%(Opt, "x# y# w# h# style dllPath", x, y, w, h, style, dllPath)
-	if dllPath=
-		dllPath := "HiEdit.dll"
-	h := HE_Add(hParent, x, y, w, h, style, dllPath)
-
-	if Txt != 
-		ControlSetText, , %Txt%, ahk_id %h%
-
-	return h
-}

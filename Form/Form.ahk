@@ -1,4 +1,4 @@
-_("mo! d e w")
+_("m! d e w")
 ;#MaxThreads, 255
 
 	hForm1	:=	Form_New("w500 h400", "Resize")
@@ -16,7 +16,7 @@ _("mo! d e w")
 ;	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "",			"Align T, 200", "Attach p")
 	hLV		:=  Form_Add(hPanel2, "ListView", "1|2|3", "gOnLV",		"Align T, 200", "Attach p")
 ;	hCal1	:=  Form_Add(hPanel2, "MonthCal","",	  "",			"Align F", "Attach p")
-	hHE		:=  Form_Add(hPanel2, "HiEdit",	"HiEdit",  "dllPath=inc\hiedit.dll style='HSCROLL HILIGHT TABBED FILECHANGEALERT'",	"Align F", "Attach p")
+	hHE		:=  Form_Add(hPanel2, "HiEdit",	"HiEdit1",  "dllPath=inc\hiedit.dll style='HSCROLL HILIGHT TABBED FILECHANGEALERT'",	"Align F", "Attach p")
 
 	Form_Show()
 return
