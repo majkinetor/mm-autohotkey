@@ -1,23 +1,21 @@
 _("m! d e w")
 ;#MaxThreads, 255
 
-	hForm1	:=	Form_New("w500 h400", "Resize")
+	hMainForm:=	Form_New("w500 h400", "Resize")
+	hForm1  :=  Form_Add(hMainForm, "Panel", "", "", "Align F", "Attach p")
+	hForm2  :=  Form_Add(hMainForm, "Panel", "", "hidden", "Align " hForm1, "Attach p")
 
-	hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "w250",		"Align L, 250", "Attach p")
-	hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnBtn",		"Align T, 50", "Attach p", "Cursor hand", "Tooltip I have hand cursor")
-	hButton2 :=	Form_Add(hPanel,  "Button",  "Cancel","gOnBtn",		"Align F", "Attach p", "Tooltip jea baby")
+	loop, 2
+	{
+		hPanel	 :=	Form_Add(hForm%A_Index%,  "Panel",	 "",	  "w250",		"Align L, 250", "Attach p")
+		hButton1 :=	Form_Add(hPanel,  "Button",  "OK" A_Index,	  "gOnBtn 0x8000",		"Align T, 50", "Attach p", "Cursor hand", "Tooltip I have hand cursor")
+		hButton2 :=	Form_Add(hPanel,  "Button",  "Cancel" A_Index,"gOnBtn 0x8000",		"Align F", "Attach p", "Tooltip jea baby")
 
+		hPanel2	:=	Form_Add(hForm%A_Index%,  "Panel",	 "",	  "",			"Align F", "Attach p")
+		hEdit1	:=  Form_Add(hPanel2, "Edit",	 "F2 to switch to other form.",  "",			"Align T, 200", "Attach p")
+		hHE		:=  Form_Add(hPanel2, "HiEdit",	"HiEdit" A_Index,  "DllPath=inc\hiedit.dll style='HSCROLL HILIGHT TABBED FILECHANGEALERT'", "Align F", "Attach p")
+	}
 
-	hPanel2	:=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align F", "Attach p")
-	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "hidden",		"Align " hPanel2, "Attach p")	;, Attach(hPanel3, "-")
-;	hTV		:=  Form_Add(hPanel3, "TreeView", "", "gOnLV", "Align F",	"Attach p")
-;	TV_Add("123 safasdf asdfa sdf sadf asdf asdf asdf sadfsadfsadf asfdsadf")
-	hCal1	:=  Form_Add(hPanel3, "MonthCal","",	  "gOnBtn",			"Align F", "Attach p")
-
-;	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "",			"Align T, 200", "Attach p")
-	hLV		:=  Form_Add(hPanel2, "ListView", "1|2|3", "gOnLV",		"Align T, 200", "Attach p")
-;	hCal1	:=  Form_Add(hPanel2, "MonthCal","",	  "",			"Align F", "Attach p")
-	hHE		:=  Form_Add(hPanel2, "HiEdit",	"HiEdit1",  "DllPath=inc\hiedit.dll style='HSCROLL HILIGHT TABBED FILECHANGEALERT'", "Align F", "Attach p")
 
 	Form_Show()
 return
@@ -26,30 +24,30 @@ F1::
 	WinMove, ahk_id %hForm1%, , , , 300, 300
 return
 
+return
+
 F2::
-	if toggled
+	if toggled2
 	{
-		WinHide, ahk_id %hPanel3%
-		WinShow, ahk_id %hPanel2%
+		WinShow, ahk_id %hForm1%
+		WinHide, ahk_id %hForm2%
+		toggled2 := 0
 
 		;fix HiEdit bug
-		 Win_MoveDelta(hPanel2, "", "", 1, "")
-
-		toggled := 0
+		 Win_MoveDelta(hForm1, "", "", 1, "")
 	}
 	else {
-		WinHide, ahk_id %hPanel2%
-		WinShow, ahk_id %hPanel3%
-		toggled := 1
+		WinShow, ahk_id %hForm2%
+		WinHide, ahk_id %hForm1%
+		toggled2 := 1
+		
+		;fix HiEdit bug
+		 Win_MoveDelta(hForm2, "", "", 1, "")
 	}
 return
 
 OnBtn:
-	msgbox % A_GuiCOntrol
-return
-
-OnLv:
-	msgbox % A_GuiEvent
+	msgbox %  A_GuiCOntrol
 return
 
 
