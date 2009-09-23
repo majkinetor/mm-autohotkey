@@ -31,9 +31,9 @@ CoordMode, Mouse, screen
 	Gui, Show, w800 h600, HiEdit Test
 return
 
-OnHiEdit:
-	OutputDebug % HE_EVENT " | " HE_INFO
-return
+OnHiEdit(Hwnd, Event, Info) {
+	OutputDebug % Hwnd " | " Event  " | " Info
+}
 
 #IfWinActive, HiEdit Test
 F3:: FindNext(hedit)
@@ -243,7 +243,7 @@ Features:
 	if A_ThisMenuItem = Enable Events
 	{
 		HE_SetEvents(hEdit, "OnHiEdit", "SelChange Scroll Key Mouse ContextMenu")
-		MsgBox Open DebugView to monitor events
+		MsgBox Open DebugView to monitor events.
 	}
 
 return
