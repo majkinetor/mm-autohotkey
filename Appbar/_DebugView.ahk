@@ -17,6 +17,7 @@ OnExit:
 	ExitApp
 return
 
+#include %A_ScriptDir%
 #include AppBar.ahk
 #include Taskbar\Win.ahk
 #include Taskbar\_.ahk
