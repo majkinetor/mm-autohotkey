@@ -28,15 +28,16 @@ return
 F2::
 	if toggled
 	{
-;		Attach(hPanel3, "-")
-;		Attach(hPanel2, "+")
 		WinHide, ahk_id %hPanel3%
 		WinShow, ahk_id %hPanel2%
+
+		;fix HiEdit bug
+		 Win_MoveDelta(hPanel2, "", "", 1, "")
+		 Win_MoveDelta(hPanel2, "", "", -1, "")
+
 		toggled := 0
 	}
 	else {
-;		Attach(hPanel2, "-")
-;		Attach(hPanel3, "+")
 		WinHide, ahk_id %hPanel2%
 		WinShow, ahk_id %hPanel3%
 		toggled := 1
