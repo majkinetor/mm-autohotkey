@@ -1,4 +1,4 @@
-_("m! d e w")
+_("mo! d e w")
 ;#MaxThreads, 255
 
 	hMainForm:=	Form_New("w500 h400", "Resize")
@@ -21,7 +21,7 @@ _("m! d e w")
 return
 
 F1::
-	WinMove, ahk_id %hForm1%, , , , 300, 300
+	WinMove, ahk_id %hMainForm%, , , , 300, 300
 return
 
 return

@@ -1,4 +1,4 @@
-Panel_New(HParent, X, Y, W, H, Style="", Text="") { 
+Panel_New(HParent, X, Y, W, H, Style="", Text="") {
 	static init=0
 	static WS_VISIBLE=0x10000000, WS_CHILD=0x40000000, WS_CLIPCHILDREN=0x2000000, SS_NOTIFY=0x100
 	static SS_SIMPLE = 0xB, SS_BLACKFRAME = 7, SS_BLACKRECT = 4, SS_CENTER=0x201, SS_VCENTER=0x200, SS_HCENTER = 1, SS_GRAYFRAME = 0x8, SS_GRAYRECT = 0x5, SS_RIGHT = 2, SS_SUNKEN = 0x1000, SS_WHITEFRAME = 9, SS_WHITERECT = 6
@@ -29,7 +29,8 @@ Panel_New(HParent, X, Y, W, H, Style="", Text="") {
 } 
 
 Panel_wndProc(Hwnd, UMsg, WParam, LParam) { 
-	static WM_SIZE:=5, redirect = "32,78,273,277,279", anc, bDisabled		;WM_SETCURSOR=32,WM_COMMAND=78,WM_NOTIFY=273,WM_HSCROLL=277,WM_VSCROLL=299
+	static 
+	static WM_SIZE:=5, redirect = "32,78,273,277,279", anc		;WM_SETCURSOR=32,WM_COMMAND=78,WM_NOTIFY=273,WM_HSCROLL=277,WM_VSCROLL=299
 	
 	if UMsg in %redirect%
 	{	
@@ -40,14 +41,14 @@ Panel_wndProc(Hwnd, UMsg, WParam, LParam) {
 	if (UMsg = WM_SIZE) {
 		ifEqual, attach, %A_Space%, return
 		ifEqual, attach,, SetEnv, attach, % IsFunc("Attach_") ? "Attach_" : A_Space
-		
-		bVisible := DllCall("IsWindowVisible", "Uint", Hwnd)
-		if (bVisible && bDisabled)
-			 bDisabled := false, %attach%(Hwnd, "+")
-		else if (!bVisible && !bDisabled)
-			 bDisabled := true,  %attach%(Hwnd, "-")
 
-;		m(Hwnd, "Visble " bVisible, "Disabled " bDisabled)
+		bVisible := DllCall("IsWindowVisible", "Uint", Hwnd)
+		if (bVisible && %Hwnd%)
+			 %Hwnd% := false, %attach%(Hwnd, "+", "", ""), m("ena " hwnd)
+		else if (!bVisible && !%Hwnd%)
+			 %Hwnd%:= true,  %attach%(Hwnd, "-", "", "")
+
+		
 		return %attach%(Wparam, LParam, UMsg, Hwnd)
 	}
 	return DllCall("CallWindowProc","uint",A_EventInfo,"uint",Hwnd,"uint",UMsg,"uint",WParam,"uint",LParam)
@@ -71,7 +72,7 @@ Panel_registerClass() {
     return DllCall("RegisterClass","uint",&wcl)
 }
 
-Panel_Add2Form(hParent, Txt, Parameters){
+Panel_add2Form(hParent, Txt, Parameters){
 	Form_Parse(Parameters, "x# y# w# h# style hidden?", x, y, w, h, style, bHidden)
 	hCtrl := Panel_New(hParent, x, y, w, h, style, Txt)	
 	if bHidden
