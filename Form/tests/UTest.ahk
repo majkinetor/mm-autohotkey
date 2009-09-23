@@ -135,7 +135,7 @@ UTest_CreateGui() {
 	Gui, %n%: Add, ListView, w%w% h%h%, Result|Function|Line|Name
 	Gui, %n%: Font, s10 bold, Courier New
 	Gui, %n%: Add, Text, w%w% h40
-	Gui, %n%: Show,autosize, UTest
+	Gui, %n%: Show,autosize, UTest - %A_ScriptName%
 	UTest("GUINO", n)
 
 	Hotkey, ifWinActive, ahk_id %hGui%
