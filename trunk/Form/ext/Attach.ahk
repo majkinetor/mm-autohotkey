@@ -4,8 +4,8 @@ Attach(hCtrl="", aDef="") {
 
 Attach_(hCtrl, aDef, Msg, hParent){
 	static
-	local s1,s2
-	global hHE
+	local s1,s2, enable, reset, hCtrl1
+	global hForm1
 
 	critical 500
 	if redraw := aDef = "redraw"
@@ -45,7 +45,9 @@ Attach_(hCtrl, aDef, Msg, hParent){
 			aDef := "xp yp wp hp" SubStr(aDef, 2)
 		ifEqual, aDef, -, return SubStr(%hCtrl%,1,1) != "-" ? %hCtrl% := "-" %hCtrl% : 
 		else if (aDef = "+")
-			SubStr(%hCtrl%,1,1) != "-" ? return : %hCtrl% := SubStr(%hCtrl%, 2), enable := 1 
+			if SubStr(%hCtrl%,1,1) != "-" 
+				 return
+			else %hCtrl% := SubStr(%hCtrl%, 2), enable := 1 
 		else {
 			gosub Attach_GetPos
 			%hCtrl% := ""
@@ -75,8 +77,9 @@ Attach_(hCtrl, aDef, Msg, hParent){
 	{
 		hCtrl := A_LoopField, aDef := %hCtrl%, 	uw := uh := ux := uy := r := 0, hCtrl1 := SubStr(%hCtrl%,1,1)
 		if (hCtrl1 = "-")
-			ifEqual, reset, 1, continue
-			else aDef := SubStr(aDef, 2)			
+			ifEqual, reset,, continue
+			else aDef := SubStr(aDef, 2)	
+		
 		gosub Attach_GetPos
 		loop, parse, aDef, %A_Space%
 		{
@@ -89,12 +92,11 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		flag := 4 | (r=1 ? 0x100 : 0) | (uw OR uh ? 0 : 1) | (ux OR uy ? 0 : 2)			; nozorder=4 nocopybits=0x100 SWP_NOSIZE=1 SWP_NOMOVE=2	
 		
 		DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag)
-;		if (hCtrl = hHE)
-;			m(r, hParent,%hParent%a, hCtrl, floor(cx), floor(cy), floor(cw), floor(ch))
+		m(hParent, %hParent%a, hCtrl, hCtrl1, floor(cx), floor(cy), floor(cw), floor(ch))
 		r+0=2 ? Attach_redrawDelayed(hCtrl) : 
 	}
 
-	return Handler != "" ? %Handler%(hParent) : "", reset := enable := 0
+	return Handler != "" ? %Handler%(hParent) : ""
 
  Attach_GetPos:									;hParent & hCtrl must be set up at this point
 		DllCall(adrWindowInfo, "uint", hParent, "uint", adrB), 	lx := NumGet(B, 20), ly := NumGet(B, 24), DllCall(adrWindowInfo, "uint", hCtrl, "uint", adrB)

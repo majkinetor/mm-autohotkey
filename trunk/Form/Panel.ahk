@@ -38,6 +38,7 @@ Panel_wndProc(Hwnd, UMsg, WParam, LParam) {
 	}
 	
 	if (UMsg = WM_SIZE) {
+	;	m(hwnd, "wm_size")
 		;if DllCall("IsWindowVisible", "Uint", Hwnd)
 			return IsFunc(f) ? %f%(Wparam, LParam, UMsg, Hwnd) : ""
 	}
