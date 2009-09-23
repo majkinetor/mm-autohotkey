@@ -1,13 +1,19 @@
+	DetectHiddenWindows, on
 	OnExit, OnExit
-	Run, DbgView, , ,PID
-	WinWait, ahk_class dbgviewClass
-	hDbg := WinExist("ahk_pid " pid)
-	AppBar_New(hDbg,  "Edge=Right", "AutoHide=Blend")
-	Win_SetCaption(hDbg), Win_SetMenu(hDbg)
+	hDbg := WinExist("ahk_class dbgviewClass")
+	if !hDbg
+	{
+		Run, DbgView, , ,PID
+		WinWait, ahk_class dbgviewClass
+		bClose := hDbg := WinExist("ahk_pid " pid)		
+	}
+	AppBar_New(hDbg,  "Edge=Right", "Pos=p-320", "AutoHide=Blend")
+	Win_SetCaption(hDbg, "-"), Win_SetMenu(hDbg)
 return
 
 OnExit:
-	WinClose, ahk_id %hDbg%
+	if bClose
+		WinClose, ahk_id %hDbg%
 	ExitApp
 return
 
