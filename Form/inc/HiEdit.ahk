@@ -4,48 +4,43 @@
 			purpose editing of text and birary files.
  */
 
-/*	Function: Add
-			Add control to the GUI.
+/*	Function:	Add
+				Add control to the GUI.
 
 	Parameters:
-			x,y,w,h	- Position of the control
-			style	- Space separated list of control styles, by default both scroll bars are visible. You can use numbers or style strings.
-			dllPath	- Path of the control dll, by default control is searched in the current folder.
+			X..H	- Position of the control.
+			Style	- Space separated list of control styles, by default both scroll bars are visible. You can use numbers or style strings.
+			DllPath	- Path of the control dll, by default control is searched in the current folder.
 
 	Styles:
 			HSCROLL, VSCROLL, TABBED, HILIGHT, TABBEDBTOP, TABBEDHRZSB, TABBEDBOTTOM
  */
-HE_Add(hwnd, x, y, w, h, style="HSCROLL VSCROLL", Handler="", dllPath="HiEdit.dll"){
-	global HE_MODULEID
-	static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
+HE_Add(hGui, X, Y, W, H, Style="", DllPath="HiEdit.dll"){
+	static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000, MODULEID
 	static HSCROLL=0x8 ,VSCROLL=0x10, TABBED=4, HILIGHT=0x20, TABBEDBTOP=0x1, TABBEDHRZSB=0x2 ,TABBEDBOTTOM=0x4, SINGLELINE=0x40, FILECHANGEALERT=0x80
 
 	hStyle := 0
 	loop, parse, style, %A_Tab%%A_Space%
-	{
 		IfEqual, A_LoopField, , continue
-		hStyle |= %A_LOOPFIELD%
-	}
+		else hStyle |= %A_LOOPFIELD%
 
-	if !init {
-		HE_MODULEID := 1020
-		DllCall("LoadLibrary", "str", dllPath)
-		init := true 
-	}
+	if !MODULEID
+		MODULEID := 230909, DllCall("LoadLibrary", "str", DllPath)
 
 	hCtrl := DllCall("CreateWindowEx"
       , "Uint", 0x200            ; WS_EX_CLIENTEDGE
       , "str",  "HiEdit"         ; ClassName
       , "str",  szAppName      ; WindowName
       , "Uint", WS_CLIPCHILDREN | WS_CHILD | WS_VISIBLE | hStyle
-      , "int",  x            ; Left
-      , "int",  y            ; Top
-      , "int",  w            ; Width
-      , "int",  h            ; Height
-      , "Uint", hwnd         ; hWndParent
-      , "Uint", HE_MODULEID  ; hMenu
+      , "int",  X            ; Left
+      , "int",  Y            ; Top
+      , "int",  W            ; Width
+      , "int",  H            ; Height
+      , "Uint", hGui         ; hWndParent
+      , "Uint", MODULEID	 ; hMenu
       , "Uint", 0            ; hInstance
       , "Uint", 0, "Uint")
+
 	HE_SetTabsImageList(hCtrl)
 	return hCtrl
 }
@@ -707,7 +702,7 @@ HE_SetCurrentFile(hEdit, idx){
 			Set notification events.
 
  Parameters:
-			Handler	- Subroutine that will be called on events. If empty, any existing handler will be removed.
+			Handler	- Function that handles events. If empty, any existing handler will be removed.
 			Events	- White space separated list of events to monitor (by default "selchange").
 
  Handler:
@@ -724,18 +719,14 @@ HE_SetCurrentFile(hEdit, idx){
 			Tabmclick	- ""			(middle button click over tab)
 
  Returns:
-			"OK" if succesiful, error string otherwise.
+			The previous event mask (number).
  */
 HE_SetEvents(hEdit, Handler="", Events="selchange"){
-	static oldNotify
 	static ENM_KEYEVENTS = 0x10000, ENM_MOUSEEVENTS = 0x20000, ENM_SCROLLEVENTS = 0x8, ENM_SELCHANGEEVENTS = 0x80000, ENM_CONTEXTMENUEVENTS=0x20
-	static EM_SETEVENTMASK = 1093, sEvents="key,mouse,scroll,selchange,contextmenu"
+	static EM_SETEVENTMASK = 1093, sEvents="key,mouse,scroll,selchange,contextmenu", old
 
-	if !MODULEID { 
-		old := OnMessage(0x4E, "HE_onNotify"),	MODULEID := 230909
-		if old != Toolbar_onNotify
-			Toolbar("oldNotify", RegisterCallback(old))
-	}
+	if (Handler = "") 
+		return OnMessage(0x4E, old != "HE_onNotify" ? old : ""), old := ""
 
 	if !IsFunc(Handler)
 		return A_ThisFunc "> Invalid handler: " Handler
@@ -748,15 +739,16 @@ HE_SetEvents(hEdit, Handler="", Events="selchange"){
 			return A_ThisFunc "> Invalid event: " A_LoopField
 		hmask |= ENM_%A_LOOPFIELD%EVENTS
 	}
+
+	if !old { 
+		old := OnMessage(0x4E, "HE_onNotify")
+		if old != HE_onNotify
+			HE("oldNotify", RegisterCallback(old))
+	}
+
+	HE(hEdit "Handler", Handler)
 	SendMessage, EM_SETEVENTMASK,,hMask,, ahk_id %hEdit%
-
-	oldNotify := OnMessage(0x4E, "HE_onNotify")
-	if (oldNotify != "HE_onNotify")
-		oldNotify := RegisterCallback(oldNotify)
-
-	hEdit += 0
-;	HE_%hEdit%_func	 := func
-	return "OK"
+	return ErrorLevel
 }
 
 /*
@@ -900,52 +892,44 @@ HE_Undo(hEdit) {
 ;========================================== PRIVATE ===============================================================
 
 HE_onNotify(wparam, lparam, msg, hwnd) {
-	local code, hw, idFrom, m, l, w
 	static EN_TABMCLICK=0x1000, EN_FILECHANGE=0x1001, EN_SELCHANGE = 0x702, EN_MSGFILTER = 0x700
+	static MODULEID := 230909, oldNotify="*" 
 
-	idFrom :=  NumGet(lparam+4)   ; and its ID 
-	if (idFrom != HE_MODULEID)
-		return HE_oldNotify ? DllCall(HE_oldNotify, "uint", wparam, "uint", lparam, "uint", msg, "uint", hwnd) : ""
+	if (_ := (NumGet(Lparam+4))) != MODULEID
+	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
+	 else {
+		ifEqual, oldNotify, *, SetEnv, oldNotify, % HE("oldNotify")		
+		if oldNotify !=
+			return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
+	 }
 
-  ;NMHDR 
-	hw	   :=  NumGet(lparam+0)   ;control sending the message - this HiEdit
-	code   :=  NumGet(lparam+8)		;- 4294967296
+	hw :=  NumGet(Lparam+0), code := NumGet(Lparam+8, 0, "UInt"),  handler := HE(hw "Handler") 
+	ifEqual, handler,,return 
 
-    HE_HWND := hw
-	HE_EVENT := HE_INFO := ""
-	if (code = EN_TABMCLICK) {
-		HE_EVENT := "tabmclick"
-		GoSub % HE_%hw%_func
-		return
-	}
+	if (code = EN_TABMCLICK) 
+		return %handler%(hw, "tabmclick")
 										
-	if (code = EN_FILECHANGE) {
-		HE_EVENT := "filechange", HE_INFO := NumGet(lparam+12)
-		GoSub % HE_%hw%_func
-		return
-	}
+	if (code = EN_FILECHANGE)
+		return %handler%(hw, "filechange", NumGet(lparam+12))
 
 	if (code = EN_SELCHANGE) {
-		HE_EVENT := "selchange",  m := NumGet(lparam+20, 0, "Short")=16,  l := NumGet(lparam+30) && !m
-		HE_INFO := "S" NumGet(lparam+12) " E" NumGet(lparam+16) " L" NumGet(lparam+22)  (m ? " t" : "") (l ? " *" : "")
-		GoSub % HE_%hw%_func
-		return
+		m := NumGet(lparam+20, 0, "Short")=16,  l := NumGet(lparam+30) && !m
+		info := "S" NumGet(lparam+12) " E" NumGet(lparam+16) " L" NumGet(lparam+22)  (m ? " t" : "") (l ? " *" : "")
+		return %handler%(hw, "selchange", info)
 	}
 
 	if (code=EN_MSGFILTER) {
 		m := NumGet(lparam+12), w := NumGet(lparam+16), l := NumGet(lparam+20)
-		if m between 0x201 AND 0x209	;mouse messges, don't report WM_MOUSEMOVE=0x200
-			 HE_EVENT := "mouse", HE_INFO := "x" l & 0xFFFF " y" (l >> 16) " v" w
-		else if m = 0x102				;WM_CHAR
-			 HE_EVENT := "key", HE_INFO := chr(w)
-		else if m = 0x7B				; WM_CONTEXTMENU 
-			 HE_EVENT := "contextmenu"
-		else if m = 0x20A				 ;WM_MOUSEWHEEL
-			 HE_EVENT := "scroll"
-
-		if HE_EVENT
-			GoSub % HE_%hw%_func
-		return
+		if m between 0x201 and 0x209											;Mouse messages, don't report WM_MOUSEMOVE=0x200
+			 event := "mouse", info := "x" l & 0xFFFF " y" (l >> 16) " v" w
+		else if m = 0x102														;WM_CHAR
+			 event := "key", info := chr(w)
+		else if m = 0x7B														;WM_CONTEXTMENU 
+			 event := "contextmenu"
+		else if m = 0x20A														;WM_MOUSEWHEEL
+			 event := "scroll"
+			
+		return event != "" ? %handler%(hw, event, info) : ""
 	}
 }
 
