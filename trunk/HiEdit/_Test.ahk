@@ -37,7 +37,7 @@ OnHiEdit(Hwnd, Event, Info) {
 
 #IfWinActive, HiEdit Test
 F3:: FindNext(hedit)
-^F:: CmnDlg_Find( hwnd, "OnFind" )
+^F:: Dlg_Find( hwnd, "OnFind" )
 ^G:: GoToLine()
 F1:: MsgBox % """" HE_GetLine(hEdit) """"
 
@@ -150,7 +150,7 @@ Standard:
 		HE_ReplaceSel(hEdit, "---")
 
 	if A_ThisMenuItem = Find
-		CmnDlg_Find( hwnd, "OnFind" )
+		Dlg_Find( hwnd, "OnFind" )
 
 	if A_ThisMenuItem = Find Next
 		FindNext( hEdit )
@@ -226,7 +226,7 @@ Features:
 
 	if A_ThisMenuItem = SetFont
 	{
-		if CmnDlg_Font(fFace, fStyle, pColor, true, hwnd)
+		if Dlg_Font(fFace, fStyle, pColor, true, hwnd)
 			HE_SetFont(hEdit, fStyle "," fFace)
 	}
 
@@ -248,17 +248,35 @@ Features:
 
 return
 
-OnFind:
+OnFind(Event, Flags, FindText) {
+	global hEdit
+	static _FindText, _Flags, res
+	ifEqual, Event, C, return
 
-	StringReplace, CmnDlg_Flags, CmnDlg_Flags, d,
-	StringReplace, CmnDlg_Flags, CmnDlg_Flags, c, MATCHCASE%A_SPACE%
-	StringReplace, CmnDlg_Flags, CmnDlg_Flags, w, WHOLEWORD%A_SPACE%
+	if (Flags != "next")
+		_FindText := FindText, _Flags := Flags
+	else ifEqual, _FindText,, return
 
+	StringReplace, Flags, Flags, d,
+	StringReplace, Flags, Flags, c, MATCHCASE%A_SPACE%
+	StringReplace, Flags, Flags, w, WHOLEWORD%A_SPACE%
 
-	res := HE_FindText(hEdit, CmnDlg_FindWhat, HE_GetSel(hEdit)+ (res!="")*1, -1, CmnDlg_Flags)
-	HE_SetSel(hEdit, res, res + StrLen(CmnDlg_FindWhat))
+	res := HE_FindText(hEdit, _FindText, HE_GetSel(hEdit)+ (res!="")*1, -1, _Flags)
+	if res = 4294967295 
+	{
+		msgbox 4, , %_FindText% not found. Press YES to start searching from beginning.
+		IfMsgBox No
+			return 
+		res := "", 	HE_SetSel(hEdit, 1), HE_ScrollCaret(hEdit)
+		return OnFind("F", _Flags, _FindText)
+	}
+	HE_SetSel(hEdit, res, res + StrLen(_FindText) )
 	HE_ScrollCaret(hEdit)
-return
+}
+
+FindNext( hEdit ){
+	OnFind(hEdit, "next", "")
+}
 
 GoToLine() {
 	global hEdit
@@ -273,14 +291,6 @@ GoToLine() {
 	line_idx := HE_LineIndex(hEdit, line-1)
 	HE_SetSel( hEdit, line_idx, line_idx)
 	HE_ScrollCaret(hEdit )
-}
-
-FindNext( hEdit ){
-	global CmnDlg_Text
-
-	if (CmnDlg_Text = "")
-		return
-	gosub OnFind
 }
 
 MenuHandler:
@@ -332,5 +342,7 @@ return
 
 
 #include HiEdit.ahk
-#include CmnDlg.ahk
-#include Attach.ahk
+
+;sample includes
+#include inc\Dlg.ahk
+#include inc\Attach.ahk
