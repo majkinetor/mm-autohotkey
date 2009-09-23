@@ -1,4 +1,4 @@
-_("mo! d e w")
+_("mm! d e w")
 ;#MaxThreads, 255
 
 	hMainForm:=	Form_New("w500 h400", "Resize")
@@ -34,7 +34,7 @@ F2::
 		toggled2 := 0
 
 		;fix HiEdit bug
-		 Win_MoveDelta(hForm1, "", "", 1, "")
+		;Win_MoveDelta(hForm1, "", "", 1, "")
 	}
 	else {
 		WinShow, ahk_id %hForm2%
@@ -42,7 +42,7 @@ F2::
 		toggled2 := 1
 		
 		;fix HiEdit bug
-		 Win_MoveDelta(hForm2, "", "", 1, "")
+		;Win_MoveDelta(hForm2, "", "", 1, "")
 	}
 return
 
