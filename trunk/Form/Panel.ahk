@@ -29,8 +29,7 @@ Panel_New(HParent, X, Y, W, H, Style="", Text="") {
 } 
 
 Panel_wndProc(Hwnd, UMsg, WParam, LParam) { 
-	static 
-	static WM_SIZE:=5, redirect = "32,78,273,277,279", anc		;WM_SETCURSOR=32,WM_COMMAND=78,WM_NOTIFY=273,WM_HSCROLL=277,WM_VSCROLL=299
+	static WM_SIZE:=5, WM_SHOWWINDOW = 0x18, redirect = "32,78,273,277,279", anc, attach		;WM_SETCURSOR=32,WM_COMMAND=78,WM_NOTIFY=273,WM_HSCROLL=277,WM_VSCROLL=299
 	
 	if UMsg in %redirect%
 	{	
@@ -42,14 +41,17 @@ Panel_wndProc(Hwnd, UMsg, WParam, LParam) {
 		ifEqual, attach, %A_Space%, return
 		ifEqual, attach,, SetEnv, attach, % IsFunc("Attach_") ? "Attach_" : A_Space
 
-		bVisible := DllCall("IsWindowVisible", "Uint", Hwnd)
-		if (bVisible && %Hwnd%)
-			 %Hwnd% := false, %attach%(Hwnd, "+", "", ""), m("ena " hwnd)
-		else if (!bVisible && !%Hwnd%)
-			 %Hwnd%:= true,  %attach%(Hwnd, "-", "", "")
+;		bVisible := DllCall("IsWindowVisible", "Uint", Hwnd)
+;		if (bVisible && %Hwnd%)
+;			 return %Hwnd% := false, %attach%(Hwnd, "+", "", "")
+;		else if (!bVisible && !%Hwnd%)
+;			 return %Hwnd%:= true,  %attach%(Hwnd, "-", "", "")
 
-		
 		return %attach%(Wparam, LParam, UMsg, Hwnd)
+	}
+	if (Umsg = WM_SHOWWINDOW)
+	{
+		%attach%(Hwnd, WParam ? "+" : "-", "", "")
 	}
 	return DllCall("CallWindowProc","uint",A_EventInfo,"uint",Hwnd,"uint",UMsg,"uint",WParam,"uint",LParam)
 }

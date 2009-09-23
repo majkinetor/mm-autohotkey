@@ -1,7 +1,7 @@
 #include UTest.ahk
 return
 
-Test_String() {
+Test_FailString() {
 	o = 48 53.66 tooltip='some =tooltip' show=1 input='2' 101
 	no := Parse(o, "tooltip show input 1 2 3", p1, p2,p3, p4, p5, p6)
 	Assert_True(p1="some =tooltip", p2=1, p3=2, p4=48, p5=53.66, p6=101, no=6)
