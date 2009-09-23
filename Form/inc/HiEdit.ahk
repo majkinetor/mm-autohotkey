@@ -121,7 +121,7 @@ HE_FindText(hEdit, sText, cpMin=0, cpMax=-1, flags="") {
 	NumPut(cpMax,  FT, 4)
 	NumPut(&sText, FT, 8)
 	SendMessage, EM_FINDTEXT, hFlags, &FT,, ahk_id %hEdit% 
-	Return ErrorLevel 
+	Return ErrorLevel
 }
 
 /*
@@ -905,9 +905,8 @@ HE_onNotify(wparam, lparam, msg, hwnd) {
 
 	hw :=  NumGet(Lparam+0), code := NumGet(Lparam+8, 0, "UInt"),  handler := HE(hw "Handler") 
 	ifEqual, handler,,return 
-
 	if (code = EN_TABMCLICK) 
-		return %handler%(hw, "tabmclick")
+		return %handler%(hw, "tabmclick", "")
 										
 	if (code = EN_FILECHANGE)
 		return %handler%(hw, "filechange", NumGet(lparam+12))
@@ -1059,7 +1058,7 @@ HiEdit_add2Form(hParent, Txt, Opt) {
 
 /* Group: About
 	o HiEdit control is copyright of Antonis Kyprianou (aka akyprian). See http://www.winasm.net
-	o AHK wrapper version 4.0.0.4-1 is copyright of Miodrag Milic (aka majkinetor). See http://www.autohotkey.com/forum/topic19141.html
+	o AHK wrapper version 4.0.0.4-2 is copyright of Miodrag Milic (aka majkinetor). See http://www.autohotkey.com/forum/topic19141.html
     o Additonal functions by jballi.
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>.
  */
