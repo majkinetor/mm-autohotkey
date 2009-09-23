@@ -47,7 +47,7 @@ Panel_wndProc(Hwnd, UMsg, WParam, LParam) {
 		else if (!bVisible && !bDisabled)
 			 bDisabled := true,  %attach%(Hwnd, "-")
 
-		m(Hwnd, "Visble " bVisible, "Disabled " bDisabled)		
+;		m(Hwnd, "Visble " bVisible, "Disabled " bDisabled)
 		return %attach%(Wparam, LParam, UMsg, Hwnd)
 	}
 	return DllCall("CallWindowProc","uint",A_EventInfo,"uint",Hwnd,"uint",UMsg,"uint",WParam,"uint",LParam)
