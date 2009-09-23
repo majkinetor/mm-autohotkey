@@ -29,7 +29,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		reset := 1,  %hParent%_s := %hParent%_pw " " %hParent%_ph
 	}
 
-	if (hParent = "") && !redraw {						;Initialize controls 
+	if (hParent = "") {						;Initialize controls 
 		if !adrSetWindowPos
 			adrSetWindowPos		:= DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "SetWindowPos")
 			,adrWindowInfo		:= DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "GetWindowInfo")

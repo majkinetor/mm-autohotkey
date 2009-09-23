@@ -50,13 +50,11 @@ F2::
 	{
 		WinHide, ahk_id %hPanel3%
 		WinShow, ahk_id %hPanel2%
-		Attach(hPanel2, "redraw")
 		toggled := 0
 	}
 	else {
 		WinHide, ahk_id %hPanel2%
 		WinShow, ahk_id %hPanel3%
-		Attach(hForm1, "redraw")
 		toggled := 1
 	}
 return
@@ -64,11 +62,6 @@ return
 OnBtn:
 	msgbox % A_GuiCOntrol
 return
-
-OnLv:
-	msgbox % A_GuiEvent
-return
-
 
 Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
 	static integrated = "Text,Edit,UpDown,Picture,Button,Checkbox,Radio,DropDownList,ComboBox,ListBox,ListView,TreeView,Hotkey,DateTime,MonthCal,Slider,Progress,GroupBox,Tab2,StatusBar"
