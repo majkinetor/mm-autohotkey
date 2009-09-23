@@ -1,4 +1,4 @@
-; `
+; ` 
 #SingleInstance force
 CoordMode, Mouse, screen
 #NoEnv
