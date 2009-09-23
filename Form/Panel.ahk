@@ -29,20 +29,27 @@ Panel_New(HParent, X, Y, W, H, Style="", Text="") {
 } 
 
 Panel_wndProc(Hwnd, UMsg, WParam, LParam) { 
-	static WM_SIZE:=5, redirect = "32,78,273,277,279", anc, f="Attach_"		;WM_SETCURSOR,WM_COMMAND,WM_NOTIFY,WM_HSCROLL,WM_VSCROLL
+	static WM_SIZE:=5, redirect = "32,78,273,277,279", anc, bDisabled		;WM_SETCURSOR=32,WM_COMMAND=78,WM_NOTIFY=273,WM_HSCROLL=277,WM_VSCROLL=299
 	
 	if UMsg in %redirect%
 	{	
 		anc := DllCall("GetAncestor", "uint", Hwnd, "uint",2)	;GWL_ROOT = 2
-		return DllCall("SendMessage", "uint", anc, "uint", umsg, "uint", wparam, "uint", LParam)
+		return DllCall("SendMessage", "uint", anc, "uint", UMsg, "uint", WParam, "uint", LParam)
 	}
 	
 	if (UMsg = WM_SIZE) {
-	;	m(hwnd, "wm_size")
-		;if DllCall("IsWindowVisible", "Uint", Hwnd)
-			return IsFunc(f) ? %f%(Wparam, LParam, UMsg, Hwnd) : ""
-	}
+		ifEqual, attach, %A_Space%, return
+		ifEqual, attach,, SetEnv, attach, % IsFunc("Attach_") ? "Attach_" : A_Space
+		
+		bVisible := DllCall("IsWindowVisible", "Uint", Hwnd)
+		if (bVisible && bDisabled)
+			 bDisabled := false, %attach%(Hwnd, "+")
+		else if (!bVisible && !bDisabled)
+			 bDisabled := true,  %attach%(Hwnd, "-")
 
+		m(Hwnd, "Visble " bVisible, "Disabled " bDisabled)		
+		return %attach%(Wparam, LParam, UMsg, Hwnd)
+	}
 	return DllCall("CallWindowProc","uint",A_EventInfo,"uint",Hwnd,"uint",UMsg,"uint",WParam,"uint",LParam)
 }
 

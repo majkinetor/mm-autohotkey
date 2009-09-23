@@ -4,12 +4,10 @@ Attach(hCtrl="", aDef="") {
 
 Attach_(hCtrl, aDef, Msg, hParent){
 	static
-	local s1,s2, enable, reset, hCtrl1
+	local s1,s2, enable, reset
 	global hForm1
 
-	critical 500
-	if redraw := aDef = "redraw"
-		hParent := hCtrl
+;	critical 500
 
 	if (aDef = "") {							;Reset if integer, Handler if string
 		if IsFunc(hCtrl)
@@ -64,7 +62,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 	ifEqual, %hParent%a,, return				;return if nothing to anchor.
 
 	
-	if !reset && !enable && !redraw {					
+	if !reset && !enable {					
 		%hParent%_pw := aDef & 0xFFFF, %hParent%_ph := aDef >> 16
 		ifEqual, %hParent%_ph, 0, return		;when u create gui without any control, it will send message with height=0 and scramble the controls ....
 	} 
@@ -92,7 +90,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		flag := 4 | (r=1 ? 0x100 : 0) | (uw OR uh ? 0 : 1) | (ux OR uy ? 0 : 2)			; nozorder=4 nocopybits=0x100 SWP_NOSIZE=1 SWP_NOMOVE=2	
 		
 		DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag)
-		m(hParent, %hParent%a, hCtrl, hCtrl1, floor(cx), floor(cy), floor(cw), floor(ch))
+;		m(hParent, %hParent%a, hCtrl, hCtrl1, floor(cx), floor(cy), floor(cw), floor(ch))
 		r+0=2 ? Attach_redrawDelayed(hCtrl) : 
 	}
 
