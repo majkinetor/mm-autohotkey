@@ -9,7 +9,7 @@ _("mo! d e w")
 
 
 	hPanel2	:=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align F", "Attach p")
-	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "hidden",		"Align " hPanel2, "Attach p"), Attach(hPanel3, "-")
+	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "hidden",		"Align " hPanel2, "Attach p")	;, Attach(hPanel3, "-")
 	hTV		:=  Form_Add(hPanel3, "TreeView", "", "gOnLV", "Align F",	"Attach p")
 	TV_Add("123 safasdf asdfa sdf sadf asdf asdf asdf sadfsadfsadf asfdsadf")
 
@@ -28,19 +28,17 @@ return
 F2::
 	if toggled
 	{
-		Attach(hPanel3, "-")
-		Attach(hPanel2, "+")
+;		Attach(hPanel3, "-")
+;		Attach(hPanel2, "+")
 		WinHide, ahk_id %hPanel3%
 		WinShow, ahk_id %hPanel2%
-;		Attach(hForm1, "redraw")
 		toggled := 0
 	}
 	else {
-		Attach(hPanel2, "-")
-		Attach(hPanel3, "+")
+;		Attach(hPanel2, "-")
+;		Attach(hPanel3, "+")
 		WinHide, ahk_id %hPanel2%
 		WinShow, ahk_id %hPanel3%
-;		Attach(hForm1, "redraw")
 		toggled := 1
 	}
 return
