@@ -2,8 +2,8 @@
 		  Adds tooltips to GUI controls.
  
  Parameters:
-			 HCtrl	- Handle of the control
-			 Text	- Tooltip text
+			 HCtrl	- Handle of the control.
+			 Text	- Tooltip text.
 
  Configuration:
 			 TimeIn		- Time to pass before tooltip is shown, by default 800ms.
