@@ -27,7 +27,7 @@
 			flat		- Creates a flat toolbar. In a flat toolbar, both the toolbar and the buttons are transparent and hot-tracking is enabled. Button text appears under button bitmaps. To prevent repainting problems, this style should be set before the toolbar control becomes visible.
 			list		- Creates a flat toolbar with button text to the right of the bitmap. Otherwise, this style is identical to FLAT style. To prevent repainting problems, this style should be set before the toolbar control becomes visible.
 			tooltips	- Creates a ToolTip control that an application can use to display descriptive text for the buttons in the toolbar.
-			nodivder	- Prevents a two-pixel highlight from being drawn at the top of the control.
+			nodivider	- Prevents a two-pixel highlight from being drawn at the top of the control.
 			tabstop		- Specifies that a control can receive the keyboard focus when the user presses the TAB key.
 			wrapable	- Creates a toolbar that can have multiple lines of buttons. Toolbar buttons can "wrap" to the next line when the toolbar becomes too narrow to include all buttons on the same line. When the toolbar is wrapped, the break will occur on either the rightmost separator or the rightmost button if there are no separators on the bar. This style must be set to display a vertical toolbar control when the toolbar is part of a vertical rebar control.
 			vertical	- Creates vertical toolbar.
@@ -74,9 +74,6 @@
 			However, any little mistake -- an unexpected menu, prompt, MsgBox, etc., and the script will lock up. 
 			Without the Critical command, the function is a lot more forgiving. 
 			The developer should still be careful but the script won't shut down if something unexpected happens.
-
-			One little quirk of toolbar: since its usualy the first control created, upon reactivation of the window, first button will automatically become hot as effect of focusing.
-			You can solve this quickly if you add dummy control to be the first one:    Gui, Add, Text, w0 h0 x0 y0
  */
 Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 	static MODULEID
@@ -206,6 +203,33 @@ Toolbar_Customize(hCtrl) {
 }
 
 /*
+Function:  GetButton
+			Get button information
+
+	Parameters:
+			WhichButtton - One of the ways to identify the button: 1-based button position or button ID.
+						  If WhichButton is negative, the information about available (*) button on position -WhichButton will be returned.	
+			bCheck		 - Set to 1 to check the button (default). 
+
+	Returns:
+			Returns TRUE if successful, or FALSE otherwise.
+
+	Remarks:
+			With groupcheck use this function to check button. Using <SetButton> function will not uncheck other buttons in the group.
+ */
+Toolbar_CheckButton(hCtrl, WhichButton, bCheck=1) {
+	static TB_CHECKBUTTON = 0x402
+
+    if (WhichButton >= 1){
+		VarSetCapacity(TBB, 20)
+		SendMessage, TB_GETBUTTON, --WhichButton, &TBB,,ahk_id %hCtrl%
+		WhichButton := NumGet(&TBB+0, 4)
+	} else WhichButton := SubStr(WhichButton, 2)
+
+	SendMessage, TB_CHECKBUTTON, WhichButton, bCheck, ,ahk_id %hCtrl%
+}
+
+/*
  Function:  Define
  			Get the toolbar definition list.
  
@@ -262,9 +286,6 @@ Toolbar_DeleteButton(hCtrl, Pos=1) {
 
     SendMessage, TB_DELETEBUTTON, Pos-1, , ,ahk_id %hCtrl%
 	return ErrorLevel
-}
-
-Toolbar_FindButton(hCtrl, Text, ByRef pos, ByRef id="") {
 }
 
 /*
@@ -457,9 +478,9 @@ Toolbar_CommandToIndex( hCtrl, ID ) {
  			ID			- Button ID, unique number you choose to identify button. On customizable toolbars position can't be used to set button information.
  						  If you need to setup button information using <SetButton> function or obtain information using <GetButton>, you need to use button ID 
  						  as user can change button position any time.
- 						  ID *must be* number between 1 and 10,000. Numbers > 10,000 are reserved for auto ID that module does on its own. In most
- 						  typical scenarios you don't need to use ID to identify the button.
-						  If you set up button id to 2, clicking the button will exit the application automatically, without the need for additional code.
+ 						  It can by any number. Numbers > 10,000 are choosen by module as auto ID feature, that module does on its own when you don't use this option. 
+						  In most typical scenarios you don't need to use ID or think about them to identify the button. To specify ID in functions that accept it
+						  put dot infront of it, for instance .427 represents ID=427. This must be done in order to differentiate IDs from button position.
  
  Button Styles:
  			AUTOSIZE	- Specifies that the toolbar control should not assign the standard width to the button. Instead, the button's width will be calculated based on the width of the text plus the image of the button. 
@@ -507,15 +528,15 @@ Toolbar_Insert(hCtrl, Btns, Pos=""){
  			Moves a button from one position to another.
  
  Parameters:
- 			OldPos		- 1-based postion of the button to be moved.
- 			NewPos		- 1-based postion where the button will be moved.
+ 			Pos		- 1-based position of the button to be moved.
+ 			NewPos	- 1-based position where the button will be moved.
  
  Returns:
  			Returns nonzero if successful, or zero otherwise.
  */
-Toolbar_MoveButton(hCtrl, OldPos, NewPos) {
+Toolbar_MoveButton(hCtrl, Pos, NewPos) {
 	static TB_MOVEBUTTON = 0x452
-    SendMessage, TB_MOVEBUTTON, OldPos-1,NewPos-1, ,ahk_id %hCtrl%
+    SendMessage, TB_MOVEBUTTON, Pos-1, NewPos-1, ,ahk_id %hCtrl%
 	return ErrorLevel
 }
 
@@ -622,11 +643,27 @@ Toolbar_SetButtonWidth(hCtrl, Min, Max=""){
 	return ret
 }
 
-;Toolbar_SetDrawTextFlags(hModbar, 3, 2) ;right align text
-Toolbar_SetDrawTextFlags(hCtrl, f1, f2) {
-	static TB_SETDRAWTEXTFLAGS = 1094
-	SendMessage, TB_SETDRAWTEXTFLAGS, f1,f2,,ahk_id %hCtrl%
+/*
+ Function:  SetDrawTextFlags
+ 			Sets the text drawing flags for the toolbar.
+ 
+ Parameters:
+			Mask  - One or more of the DT_ flags, specified in DrawText, that indicate which bits in dwDTFlags will be used when drawing the text.
+			Flags - One or more of the DT_ flags, specified in DrawText, that indicate how the button text will be drawn. 
+					This value will be passed to the DrawText API when the button text is drawn. 
+ Returns:
+ 			Returns the previous text drawing flags.
 
+ Remarks:
+			See <http://msdn.microsoft.com/en-us/library/bb787425(VS.85).aspx> for more info.
+
+ Example:
+			Toolbar_SetDrawTextFlags(hToolbar, 3, 2) ;right align text
+ */
+Toolbar_SetDrawTextFlags(hCtrl, Mask, Flags) {
+	static TB_SETDRAWTEXTFLAGS = 1094
+	SendMessage, TB_SETDRAWTEXTFLAGS, Mask,Flags,,ahk_id %hCtrl%
+	return ErrorLevel
 }
 
 /*
@@ -641,9 +678,9 @@ Toolbar_SetDrawTextFlags(hCtrl, f1, f2) {
  */
 Toolbar_SetButtonSize(hCtrl, W, H="") {
 	static TB_SETBUTTONSIZE = 0x41F
-	IfEqual, h, , SetEnv, h, %W%
-	SendMessage, TB_SETBUTTONSIZE, 0,(W<<16) | H,,ahk_id %hCtrl%
-	SendMessage, 0x421, , ,,ahk_id %hCtrl%	;autosize
+	IfEqual, H, ,SetEnv, H, %W%
+	SendMessage, TB_SETBUTTONSIZE, ,(H<<16)|W ,,ahk_id %hCtrl%
+	SendMessage, 0x421,,,,ahk_id %hCtrl%	;autosize
 }
 
 /*
@@ -856,7 +893,7 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
     } 
 
 	if (code=NM_RCLICK)
-		ifEqual, pos, 4294967296, return 0 
+		ifEqual, pos, 4294967296, return
         else  %handler%(hw,"rclick", txt, pos, iItem) 
 
 
@@ -865,8 +902,7 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
  
 	if (code = TBN_HOTITEMCHANGE) { 
       IfEqual, pos, 4294967296, return  
-      %handler%(hw, "hot", txt, pos,  iItem) 
-      return 0 
+      return %handler%(hw, "hot", txt, pos,  iItem) 
    } 
 
   ;=================== CUSTOMIZATION NOTIFICATIONS =========================== 
@@ -1058,7 +1094,7 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 
 /*
  Group: About
-	o Ver 2.2 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Ver 2.21 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
 	o Parts of code in Toolbar_onNotify by jballi.
 	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
