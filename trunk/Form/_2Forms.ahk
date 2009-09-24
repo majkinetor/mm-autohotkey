@@ -3,7 +3,7 @@ _("mo! d e w")
 
 	hMainForm:=	Form_New("w500 h400", "Resize")
 	hForm1  :=  Form_Add(hMainForm, "Panel", "", "", "Align F", "Attach p")
-	hForm2  :=  Form_Add(hMainForm, "Panel", "", "hidden", "Align " hForm1, "Attach p")
+	hForm2  :=  Form_Add(hMainForm, "Panel", "", "hidden", "Align " hForm1, "Attach p"), Attach(hForm2, "-")
 	loop, 2
 	{		
 		hPanel	 :=	Form_Add(hForm%A_Index%,  "Panel",	 "",	  "w250",		"Align L, 250", "Attach p")
@@ -31,7 +31,7 @@ F2::
 		WinShow, ahk_id %hForm1%
 		WinHide, ahk_id %hForm2%
 		toggled2 := 0
-
+		WinSetTitle, ahk_id %hMainForm%, , Form1
 		;fix HiEdit bug
 		;Win_MoveDelta(hForm1, "", "", 1, "")
 	}
@@ -39,7 +39,7 @@ F2::
 		WinShow, ahk_id %hForm2%
 		WinHide, ahk_id %hForm1%
 		toggled2 := 1
-		
+		WinSetTitle, ahk_id %hMainForm%, , Form2
 		;fix HiEdit bug
 		;Win_MoveDelta(hForm2, "", "", 1, "")
 	}
