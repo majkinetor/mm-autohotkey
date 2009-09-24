@@ -9,16 +9,19 @@
  Parameters:
 			HParent		- Handle of the parent.
 			X..H		- Placement.
-			Style		- White space separated list of panel styles.
+			Style		- White space separated list of panel styles. Additionally, any integer style can be specified among other styles.
 			Text		- Text to display.
 
+ Styles:
+			SIMPLE, VCENTER, HCENTER, CENTER, RIGHT, SUNKEN, BLACKFRAME, BLACKRECT, GRAYFRAME, GRAYRECT, WHITEFRAME, WHITERECT.
+			
  Returns:
 		    Handle of the control or 0 if control couldn't be created.
 
  Remarks:
-			If you <Attach> Panel control to its parrent, Panel will disable Attach for itself when it becomes hidden and enable itself when its becomes visible again.
-			When Panel doesn't attach, its parrent will skip it when performing re-positioning of the controls. If Panel itself is Attach-ing its own children, 
-			this means that it will also stop Attach-ing them as its own size wont change. However, its children won't be disabled so if you programmatically change the 
+			If you <Attach> Panel control to its parent, Panel will disable Attach for itself when it becomes hidden and enable itself when it becomes visible again.
+			When Panel doesn't attach, its parent will skip it when performing repositioning of the controls. If Panel itself is attaching its own children, 
+			this means that it will also stop attaching them as its own size wont change. However, its children won't be disabled so if you programmatically change the 
 			the placement of such Panel, it will still reposition its controls.
  */
 Panel_Add(HParent, X, Y, W, H, Style="", Text="") {
