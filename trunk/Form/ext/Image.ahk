@@ -12,7 +12,6 @@ Ext_Image(hButton, Image, Width="", Height=""){
     static BM_SETIMAGE=247, IMAGE_ICON=2, BS_BITMAP=0x80, IMAGE_BITMAP=0, LR_LOADFROMFILE=16, LR_LOADTRANSPARENT=0x20
 
 	if (Width = "" || Height = "") {
-		m(width, height)
 		ControlGetPos, , ,W,H, ,ahk_id %hButton%
 		ifEqual, Width,, SetEnv, Width, % W-8
 		ifEqual, Height,,SetEnv, Height, % H-8
@@ -20,7 +19,7 @@ Ext_Image(hButton, Image, Width="", Height=""){
 
 	if Image is not integer 
 	{
-		if (!hBitmap := DllCall("LoadImage", "UInt", 0, "Str", Image, "UInt", 0, "Int", Width, "Int", Height="" ? Width : Height, "UInt", LR_LOADFROMFILE, "UInt"))
+		if (!hBitmap := DllCall("LoadImage", "UInt", 0, "Str", Image, "UInt", 0, "Int", Width, "Int", Height, "UInt", LR_LOADFROMFILE, "UInt"))
 			return 0
 	} else hBitmap := Image 
     
