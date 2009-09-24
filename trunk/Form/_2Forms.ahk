@@ -1,4 +1,4 @@
-_("m! d e w")
+_("mo! d e w")
 #MaxThreads, 255
 
 	hMainForm:=	Form_New("w500 h400", "Resize")

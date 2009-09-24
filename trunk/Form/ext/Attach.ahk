@@ -73,7 +73,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 	loop, parse, %hParent%a, %A_Space%
 	{
 		hCtrl := A_LoopField, aDef := %hCtrl%, 	uw := uh := ux := uy := r := 0, hCtrl1 := SubStr(%hCtrl%,1,1)
-;		m(hParent, %hParent%a, hCtrl, %hCtrl%)
+		m(hParent, %hParent%a, hCtrl, %hCtrl%)
 		if (hCtrl1 = "-")
 			ifEqual, reset,, continue
 			else aDef := SubStr(aDef, 2)	

@@ -8,7 +8,7 @@ _("mo! d e w")
 	hButton2 :=	Form_Add(hPanel,  "Button",  "Cancel","gOnBtn",		"Align F", "Attach p", "Tooltip jea baby")
 
 	hPanel2	:=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align F", "Attach p")
-	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "hidden",		"Align " hPanel2, "Attach p")	;, Attach(hPanel3, "-")
+	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "hidden",		"Align " hPanel2, "Attach p"), Attach(hPanel3, "-")	
 	hCal1	:=  Form_Add(hPanel3, "MonthCal","",	  "gOnBtn",		"Align F", "Attach p")
 
 	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "",			"Align T, 200", "Attach p")
