@@ -1,6 +1,12 @@
 #include UTest.ahk
 return
 
+Test_Style() {	
+	o = style='FLAT TOOLTIPS'
+	no := Parse(o, "x# y# w# h# style IL* g*", x, y,w,h,style,il,handler)
+	Assert_True(style="FLAT TOOLTIPS", x="", y="", w="", h="", il="", handler="")
+}
+
 Test_FailString() {
 	o = 48 53.66 tooltip='some =tooltip' show=1 input='2' 101
 	no := Parse(o, "tooltip show input 1 2 3", p1, p2,p3, p4, p5, p6)

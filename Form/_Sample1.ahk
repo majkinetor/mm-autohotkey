@@ -1,4 +1,4 @@
-_("mm! d e w")
+_("m! d e w")
 ;#MaxThreads, 255
 
 	hForm1	:=	Form_New("w500 h400", "Resize")
@@ -12,19 +12,7 @@ _("mm! d e w")
 	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "hidden",		"Align " hPanel2, "Attach p")
 	Attach(hPanel3, "-")	;not necessary but should be done, otherwise Panel3 will be active until toggled once.
 	
-	hLink	:=  Form_Add(hPanel3, "HLink",	"Click 'here':www.Google.com to go to Google", "", "Align B", "Attach y")
-	hToolbar:=  Form_Add(hPanel3, "Toolbar", "", "style='FLAT TOOLTIPS' gOnToolbar IL1S")
-	btns =
-		(LTrim
-		   new,  7,            ,dropdown showtext
-		   open, 8
-		   save, 9, disabled
-		   -
-		   state, 11, checked  ,check
-		)
-	 
-	Toolbar_Insert(hToolbar, btns)
-	WinSet, Style, -0x8000, ahk_id %hToolbar%	;remove this style, makes the black background
+	hCal1	:=  Form_Add(hPanel3, "MonthCal","",	  "gOnBtn",		"Align F", "Attach p")
 
 	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "",			"Align T, 200", "Attach p")
 	hLV		:=  Form_Add(hPanel2, "ListView", "1|2|3", "gOnLV",		"Align T, 200", "Attach p")
@@ -34,15 +22,9 @@ _("mm! d e w")
 	Form_Show()
 return
 
-OnToolbar(hCtrl, Event, Txt, Pos, Id) {
-	ifEqual, Event, hot, return
-	msgbox %Event% %Txt%
-}
-
 F1::
 	WinMove, ahk_id %hForm1%, , , , 300, 300
 return
-
 
 F2::
 	if toggled
@@ -287,7 +269,4 @@ Form(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", B
 #include ext
 #include _Extensions.ahk
 
-#include ..\inc
-#include HiEdit.ahk
-#include HLink.ahk
-#include Toolbar.ahk
+#include ..\inc\HiEdit.ahk

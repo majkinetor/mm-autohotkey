@@ -1,5 +1,6 @@
 Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",ByRef o6="",ByRef o7="",ByRef o8="", ByRef o9="", ByRef o10=""){
 	sep := A_Space, no := 0
+
 	loop, parse, O, %sep%
 	{	
 		if (LF := A_LoopField) = ""	{
