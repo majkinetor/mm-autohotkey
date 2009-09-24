@@ -1,12 +1,11 @@
-_("mm! d e w")
-;#MaxThreads, 255
+_("m! d e w")
+#MaxThreads, 255
 
 	hMainForm:=	Form_New("w500 h400", "Resize")
 	hForm1  :=  Form_Add(hMainForm, "Panel", "", "", "Align F", "Attach p")
 	hForm2  :=  Form_Add(hMainForm, "Panel", "", "hidden", "Align " hForm1, "Attach p")
-
 	loop, 2
-	{
+	{		
 		hPanel	 :=	Form_Add(hForm%A_Index%,  "Panel",	 "",	  "w250",		"Align L, 250", "Attach p")
 		hButton1 :=	Form_Add(hPanel,  "Button",  "OK" A_Index,	  "gOnBtn 0x8000",		"Align T, 50", "Attach p", "Cursor hand", "Tooltip I have hand cursor")
 		hButton2 :=	Form_Add(hPanel,  "Button",  "Cancel" A_Index,"gOnBtn 0x8000",		"Align F", "Attach p", "Tooltip jea baby")
@@ -50,6 +49,23 @@ OnBtn:
 	msgbox %  A_GuiCOntrol
 return
 
+
+/*
+ Function:	Form
+ 			Storage function. Extensions can use this function to store variables.
+ */
+Form(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
+	static
+	if (var = "" ){
+		if ( _ := InStr(value, ")") )
+			__ := SubStr(value, 1, _-1), value := SubStr(value, _+1)
+		loop, parse, value, %A_Space%
+			_ := %__%%A_LoopField%,  o%A_Index% := _ != "" ? _ : %A_LoopField%
+		return
+	} else _ := %var%
+	ifNotEqual, value,~`a , SetEnv, %var%, %value%
+	return _
+}
 
 Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
 	static integrated = "Text,Edit,UpDown,Picture,Button,Checkbox,Radio,DropDownList,ComboBox,ListBox,ListView,TreeView,Hotkey,DateTime,MonthCal,Slider,Progress,GroupBox,Tab2,StatusBar"
@@ -110,7 +126,7 @@ Form_New(Size="", Options="") {
 
 /*
  Function:	Parse
- 			Form options parser.
+ 			Form options parser. Extensions can use this function to parse its options.
 
 			o	- String with Form options.
 			pQ	- Query parameter. It is space a separated list of option names you want to extract from the options string. See bellow for
@@ -244,20 +260,6 @@ Form_getFreeGuiNum(){
 
 Form_split(s, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="") {
 	StringSplit, o, s, `, ,%A_Space%
-}
-
-;storage
-Form(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
-	static
-	if (var = "" ){
-		if ( _ := InStr(value, ")") )
-			__ := SubStr(value, 1, _-1), value := SubStr(value, _+1)
-		loop, parse, value, %A_Space%
-			_ := %__%%A_LoopField%,  o%A_Index% := _ != "" ? _ : %A_LoopField%
-		return
-	} else _ := %var%
-	ifNotEqual, value,~`a , SetEnv, %var%, %value%
-	return _
 }
 
 #include Panel.ahk

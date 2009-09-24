@@ -1,27 +1,32 @@
-Extension_Image(HBtn, Parameters){ 
-    static BM_SETIMAGE=247, IMAGE_ICON=2, BS_ICON=0x40 
-	static param_1 := "Image", param_2 := "Size"
-	loop, parse, Parameters, `n
-		_ := param_%A_Index%, %_% := A_LoopField
+/*
+ Group: Image Extension
+		Adds image to the Button control.
 
-	WinGetClass, cls, ahk_id %HBtn%
-	ifNotEqual, cls, Button, return 0
-		
+ Parameters:
+		Image	- Path to the .BMP file or image handle. First pixel signifies transparency color.
+		Width	- Width of the image, if omitted, current control width will be used.
+		Height	- Height of the image, if omitted, current control height will be used.
+ 
+ */
+Ext_Image(hButton, Image, Width="", Height=""){ 
+    static BM_SETIMAGE=247, IMAGE_ICON=2, BS_BITMAP=0x80, IMAGE_BITMAP=0, LR_LOADFROMFILE=16, LR_LOADTRANSPARENT=0x20
+
+	if (Width = "" || Height = "") {
+		m(width, height)
+		ControlGetPos, , ,W,H, ,ahk_id %hButton%
+		ifEqual, Width,, SetEnv, Width, % W-8
+		ifEqual, Height,,SetEnv, Height, % H-8
+	}
 
 	if Image is not integer 
-    { 
-        j := InStr(Image, ":", 0, 0), idx := 1 
-        if j > 2  
-            idx := Substr( Image, j+1), pPath := SubStr( Image, 1, j-1) 
-        DllCall("PrivateExtractIcons","str",pPath,"int",idx-1,"int",Size,"int",Size,"uint*",hIco,"uint*",0,"uint",1,"uint",0,"int") 
-        ifEqual, hIco, 0, return A_ThisFunc ">   Can't load image: " Image 
-
-	} else hIco := Image 
+	{
+		if (!hBitmap := DllCall("LoadImage", "UInt", 0, "Str", Image, "UInt", 0, "Int", Width, "Int", Height="" ? Width : Height, "UInt", LR_LOADFROMFILE, "UInt"))
+			return 0
+	} else hBitmap := Image 
     
-    WinSet, Style, +%BS_ICON%, ahk_id %hBtn%
-    SendMessage, BM_SETIMAGE, IMAGE_ICON, hIco, , ahk_id %hBtn% 
-    if ErrorLevel 
-        DllCall("DeleteObject", "UInt", ErrorLevel) 
-		
-    return hIco 
+    WinSet, Style, +%BS_BITMAP%, ahk_id %hButton% 
+    SendMessage, BM_SETIMAGE, IMAGE_BITMAP, hBitmap, , ahk_id %hButton% 
+    ifNotEqual, ErrorLevel, 0, DllCall("DeleteObject", "UInt", ErrorLevel)	;remove old bitmap if exists
+      
+    return hBitmap 
 }

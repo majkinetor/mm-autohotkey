@@ -1,22 +1,19 @@
-_("m! d e w")
+_("mo! d e w")
 ;#MaxThreads, 255
 
 	hForm1	:=	Form_New("w500 h400", "Resize")
 
 	hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "w250",		"Align L, 250", "Attach p")
-	hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnBtn",		"Align T, 50", "Attach p", "Cursor hand", "Tooltip I have hand cursor")
+	hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnBtn",		"Align T, 50", "Attach p", "Image inc\test.bmp, 40", "Cursor hand", "Tooltip I have hand cursor")
 	hButton2 :=	Form_Add(hPanel,  "Button",  "Cancel","gOnBtn",		"Align F", "Attach p", "Tooltip jea baby")
-
 
 	hPanel2	:=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align F", "Attach p")
 	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "hidden",		"Align " hPanel2, "Attach p")	;, Attach(hPanel3, "-")
-;	hTV		:=  Form_Add(hPanel3, "TreeView", "", "gOnLV", "Align F",	"Attach p")
-;	TV_Add("123 safasdf asdfa sdf sadf asdf asdf asdf sadfsadfsadf asfdsadf")
 	hCal1	:=  Form_Add(hPanel3, "MonthCal","",	  "gOnBtn",			"Align F", "Attach p")
 
-;	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "",			"Align T, 200", "Attach p")
+	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "",			"Align T, 200", "Attach p")
 	hLV		:=  Form_Add(hPanel2, "ListView", "1|2|3", "gOnLV",		"Align T, 200", "Attach p")
-;	hCal1	:=  Form_Add(hPanel2, "MonthCal","",	  "",			"Align F", "Attach p")
+	hCal1	:=  Form_Add(hPanel2, "MonthCal","",	  "",			"Align F", "Attach p")
 	hHE		:=  Form_Add(hPanel2, "HiEdit",	"HiEdit1",  "DllPath=inc\hiedit.dll style='HSCROLL HILIGHT TABBED FILECHANGEALERT'", "Align F", "Attach p")
 
 	Form_Show()
@@ -245,6 +242,8 @@ Form_getFreeGuiNum(){
 }
 
 Form_split(s, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="") {
+	loop, 5
+		o%A_Index% := ""
 	StringSplit, o, s, `, ,%A_Space%
 }
 
