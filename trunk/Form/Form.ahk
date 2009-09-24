@@ -9,7 +9,7 @@ _("mo! d e w")
 
 	hPanel2	:=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align F", "Attach p")
 	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "hidden",		"Align " hPanel2, "Attach p")	;, Attach(hPanel3, "-")
-	hCal1	:=  Form_Add(hPanel3, "MonthCal","",	  "gOnBtn",			"Align F", "Attach p")
+	hCal1	:=  Form_Add(hPanel3, "MonthCal","",	  "gOnBtn",		"Align F", "Attach p")
 
 	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "",			"Align T, 200", "Attach p")
 	hLV		:=  Form_Add(hPanel2, "ListView", "1|2|3", "gOnLV",		"Align T, 200", "Attach p")
@@ -262,9 +262,8 @@ Form(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", B
 }
 
 #include Panel.ahk
-
+;#include ext\_Extensions _J_.ahk
 #include ext
 #include _Extensions.ahk
 
-#include ..\inc
-#include HiEdit.ahk
+#include ..\inc\HiEdit.ahk
