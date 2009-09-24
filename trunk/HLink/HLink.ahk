@@ -19,7 +19,9 @@
  				hWnd	- Handle of the HLink control that generated notification.
  				Text	- Text of the control.
  				Link	- Link of the control.
- 
+
+  Returns:
+				Handle of the new control or 0 on failure.
   Example:
  >				hLink := HLink_Add(hGui, "OnLink", 10, 10, 200, 20, "Click 'here':www.Google.com to go to Google")
  */
@@ -49,6 +51,7 @@ HLink_Add(hGui, X, Y, W, H, Handler="", Text="'HLink Control':"){
                   ,"Uint", MODULEID
                   ,"Uint", 0
                   ,"Uint", 0, "Uint")
+    ifEqual, hCtrl, 0, return 0
 
 	if IsFunc(Handler)
 		HLink(hCtrl "handler", Handler)
@@ -58,15 +61,17 @@ HLink_Add(hGui, X, Y, W, H, Handler="", Text="'HLink Control':"){
 
 ;----------------------------------------------------------------------------------------------
 
-HLink_OnNotify(Wparam, Lparam, Msg, Hwnd){
+HLink_onNotify(Wparam, Lparam, Msg, Hwnd){
 	static MODULEID := 170608, oldNotify="*"
 	static NM_CLICK = -2, NM_ENTER = -4
 
-	if ((NumGet(Lparam+4)) != MODULEID){
-		ifEqual, oldNotify, *, SetEnv, oldNotify, % HLink("OldNotify")		
-		ifNotEqual, oldNotify,,return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)		
-		return
-	}
+	if (_ := (NumGet(Lparam+4))) != MODULEID
+	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
+	 else {
+		ifEqual, oldNotify, *, SetEnv, oldNotify, % HLink("oldNotify")
+		if oldNotify !=
+			return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
+	 }
 
 	hw := NumGet(Lparam+0),  code := NumGet(Lparam+8, 0, "Int")
 
@@ -93,6 +98,14 @@ HLink(var="", value="~`a") {
 }
 
 
+;Required function by Forms framework.
+HLink_add2Form(hParent, Txt, Opt) {
+	static f := "Form_Parse"
+	
+	%f%(Opt, "x# y# w# h# g*", x, y, w, h, handler)
+	x .= x = "" ? 0 : "", 	y .= y = "" ? 0 : "", 	w .= w="" ? 100 : "", 	h .= h = "" ? 25 : ""
+	return HLink_Add(hParent, x, y, w, h, handler, Txt)
+}
 
 
 /* Group: Example
@@ -120,7 +133,7 @@ HLink(var="", value="~`a") {
  */
 
 /* Group: About
-		o Ver 2.0 by majkinetor. See http://www.autohotkey.com/forum/topic19508.html
+		o Ver 2.01 by majkinetor. See http://www.autohotkey.com/forum/topic19508.html
 		o HLink Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760704.aspx>
 		o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
  */
