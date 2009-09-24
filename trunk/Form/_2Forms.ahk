@@ -20,7 +20,7 @@ _("mo! d e w")
 return
 
 F1::
-	WinMove, ahk_id %hMainForm%, , , , 300, 300
+	WinMove, ahk_id %hMainForm%, , , ,300, 300
 return
 
 return
