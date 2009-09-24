@@ -7,7 +7,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 	local s1,s2, enable, reset
 	global hForm1
 
-;	critical 500
+	critical, 500
 
 	if (aDef = "") {							;Reset if integer, Handler if string
 		if IsFunc(hCtrl)
