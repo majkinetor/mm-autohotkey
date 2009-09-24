@@ -1053,6 +1053,8 @@ Toolbar_add2Form(hParent, Txt, Opt) {
 	%f%(Opt, "x# y# w# h# style IL* g*", x,y,w,h,style,il,handler)
 	pos := (x!="" ? " x" x : "") (y!="" ? " y" y : "") (w!="" ? " w" w : "") (h!="" ? " h" h : "")
 	h := Toolbar_Add(hParent, handler, style, il, pos)
+	if Txt != 
+		Toolbar_Insert(h, Txt)
 	return h
 }
 

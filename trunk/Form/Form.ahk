@@ -13,17 +13,7 @@ _("mm! d e w")
 	Attach(hPanel3, "-")	;not necessary but should be done, otherwise Panel3 will be active until toggled once.
 	
 	hLink	:=  Form_Add(hPanel3, "HLink",	"Click 'here':www.Google.com to go to Google", "", "Align B", "Attach y")
-	hToolbar:=  Form_Add(hPanel3, "Toolbar", "", "style='FLAT TOOLTIPS' gOnToolbar IL1S")
-	btns =
-		(LTrim
-		   new,  7,            ,dropdown showtext
-		   open, 8
-		   save, 9, disabled
-		   -
-		   state, 11, checked  ,check
-		)
-	 
-	Toolbar_Insert(hToolbar, btns)
+	hToolbar:=  Form_Add(hPanel3, "Toolbar", "new, 7,`nopen, 8`nsave, 9, disabled`n-`nstate, 11, checked,check", "style='FLAT TOOLTIPS' gOnToolbar")	
 	WinSet, Style, -0x8000, ahk_id %hToolbar%	;remove this style, makes the black background
 
 	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "",			"Align T, 200", "Attach p")
