@@ -100,13 +100,17 @@ Attach(hCtrl="", aDef="") {
 
 Attach_(hCtrl, aDef, Msg, hParent){
 	static
+	local s1,s2, enable, reset
+
+	critical, 100
+
 	if (aDef = "") {							;Reset if integer, Handler if string
 		if IsFunc(hCtrl)
 			return Handler := hCtrl
 	
 		ifEqual, adrWindowInfo,, return			;Reseting prior to adding any control just returns.
 		hParent := hCtrl != "" ? hCtrl+0 : hGui
-		loop, parse, %hParent%, %A_Space%
+		loop, parse, %hParent%a, %A_Space%
 		{
 			hCtrl := A_LoopField, SubStr(%hCtrl%,1,1), aDef := SubStr(%hCtrl%,1,1)="-" ? SubStr(%hCtrl%,2) : %hCtrl%,  %hCtrl% := ""
 			gosub Attach_GetPos
@@ -134,7 +138,9 @@ Attach_(hCtrl, aDef, Msg, hParent){
 			aDef := "xp yp wp hp" SubStr(aDef, 2)
 		ifEqual, aDef, -, return SubStr(%hCtrl%,1,1) != "-" ? %hCtrl% := "-" %hCtrl% : 
 		else if (aDef = "+")
-			SubStr(%hCtrl%,1,1) != "-" ? return : %hCtrl% := SubStr(%hCtrl%, 2), enable := 1 
+			if SubStr(%hCtrl%,1,1) != "-" 
+				 return
+			else %hCtrl% := SubStr(%hCtrl%, 2), enable := 1 
 		else {
 			gosub Attach_GetPos
 			%hCtrl% := ""
@@ -145,25 +151,27 @@ Attach_(hCtrl, aDef, Msg, hParent){
 					k := SubStr(l, 2, j-2) / SubStr(l, j+1)
 				%hCtrl% .= f ":" k ":" c%f% " "
 			}
- 			return %hCtrl% := SubStr(%hCtrl%, 1, -1), %hParent% .= InStr(%hParent%, hCtrl) ? "" : (%hParent% = "" ? "" : " ")  hCtrl 
+ 			return %hCtrl% := SubStr(%hCtrl%, 1, -1), %hParent%a .= InStr(%hParent%, hCtrl) ? "" : (%hParent%a = "" ? "" : " ")  hCtrl 
 		}
 	}
+	ifEqual, %hParent%a,, return				;return if nothing to anchor.
 
- 	if !reset && !enable {						;WM_SIZE handler starts here
+	if !reset && !enable {					
 		%hParent%_pw := aDef & 0xFFFF, %hParent%_ph := aDef >> 16
 		ifEqual, %hParent%_ph, 0, return		;when u create gui without any control, it will send message with height=0 and scramble the controls ....
-	}
-	
+	} 
+
 	if !%hParent%_s
 		%hParent%_s := %hParent%_pw " " %hParent%_ph
 
 	StringSplit, s, %hParent%_s, %A_Space%
-	loop, parse, %hParent%, %A_Space%
+	loop, parse, %hParent%a, %A_Space%
 	{
 		hCtrl := A_LoopField, aDef := %hCtrl%, 	uw := uh := ux := uy := r := 0, hCtrl1 := SubStr(%hCtrl%,1,1)
 		if (hCtrl1 = "-")
-			ifEqual, reset, 1, continue
-			else aDef := SubStr(aDef, 2)			
+			ifEqual, reset,, continue
+			else aDef := SubStr(aDef, 2)	
+		
 		gosub Attach_GetPos
 		loop, parse, aDef, %A_Space%
 		{
@@ -178,7 +186,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		r+0=2 ? Attach_redrawDelayed(hCtrl) : 
 	}
 
-	return Handler != "" ? %Handler%(hParent) : "", reset := enable := 0
+	return Handler != "" ? %Handler%(hParent) : ""
 
  Attach_GetPos:									;hParent & hCtrl must be set up at this point
 		DllCall(adrWindowInfo, "uint", hParent, "uint", adrB), 	lx := NumGet(B, 20), ly := NumGet(B, 24), DllCall(adrWindowInfo, "uint", hCtrl, "uint", adrB)
@@ -194,5 +202,6 @@ Attach_redrawDelayed(hCtrl){
  Attach_redrawDelayed:
 	loop, parse, s, %A_Space%
 		WinSet, Redraw, , ahk_id %A_LoopField%
- return, s := ""
+	s := ""
+ return
 }
