@@ -69,7 +69,7 @@ QHTM_Add(Hwnd, Text, X, Y, W, H, Style="", Handler="", DllPath="qhtm.dll"){
 		  , "int",  W								; Width
 		  , "int",  H								; Height
 		  , "Uint", Hwnd							; hWndParent
-		  , "Uint", QHTM_MODULEID					; hMenu
+		  , "Uint", MODULEID						; hMenu
 		  , "Uint", 0								; hInstance
 		  , "Uint", 0, "UInt")
 	IfEqual, hCtrl, 0, return A_ThisFunc ">   Error while creating control"
@@ -595,6 +595,7 @@ QHTM_onForm(hwndQHTM, pFormSubmit, lParam){
 QHTM_onNotify(Wparam, Lparam, Msg, Hwnd) {
 	static MODULEID=171108, oldNotify="*"
 
+
 	if (_ := (NumGet(Lparam+4))) != MODULEID
 	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
 	 else {
@@ -602,7 +603,6 @@ QHTM_onNotify(Wparam, Lparam, Msg, Hwnd) {
 		if oldNotify !=
 			return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
 	 }
-
   ;NMHDR 
 	hw := NumGet(Lparam+0)			;control sending the message
 	handler := QHTM(hw "Handler")
