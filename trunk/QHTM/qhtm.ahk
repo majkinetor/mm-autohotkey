@@ -595,11 +595,13 @@ QHTM_onForm(hwndQHTM, pFormSubmit, lParam){
 QHTM_onNotify(Wparam, Lparam, Msg, Hwnd) {
 	static MODULEID=171108, oldNotify="*"
 
-	if ((NumGet(Lparam+4)) != MODULEID){
-		ifEqual, oldNotify, *, SetEnv, oldNotify, % QHTM("OldNotify")		
-		ifNotEqual, oldNotify,,return DllCall(OldNotify, "uint", wparam, "uint", lparam, "uint", msg, "uint", hwnd)		
-		return
-	}
+	if (_ := (NumGet(Lparam+4))) != MODULEID
+	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
+	 else {
+		ifEqual, oldNotify, *, SetEnv, oldNotify, % QHTM("oldNotify")		
+		if oldNotify !=
+			return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
+	 }
 
   ;NMHDR 
 	hw := NumGet(Lparam+0)			;control sending the message
