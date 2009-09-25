@@ -12,6 +12,10 @@ Test_Custom() {
 	o = w800 h600 style='Resize ToolWindow' font='s12 bold, Courier New' HWND12 show dummy=red
 	no := Parse(o, "w# h# red? HWND# style font dummy show?", w, h, bRed, HWND, style, font, d, bShow)
 	Assert_True(w=800, h=600, bRed="", hwnd=12, style="Resize ToolWindow", font="s12 bold, Courier New", d="red", bShow, no=7)
+
+	o = hidden h23
+	no := Parse(o, "h# hidden?", h, bHidden)
+	Assert_True(no=2, h=23, bHidden)
 }
 
 Test_Extra() {

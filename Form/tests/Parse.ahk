@@ -18,10 +18,8 @@ Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",ByRef o
 			 ifNotEqual, st, q, SetEnv, st, q				 
 			else st := "n"		
 		else ifNotEqual, st, q, SetEnv, st, n
-
 		if st not in s,e
 			 token .= c		
-		
 	}
 	if (token != "")
 		p__0++, p__%p__0% := token
@@ -31,18 +29,17 @@ Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",ByRef o
 		c := SubStr(f := A_LoopField, 0),  n := InStr("?#*", c) ? SubStr(f, 1, -1) : f,  j := A_Index, o := ""
 		if n is integer
 			o := p__%n%,  p__%n% := ""
-		else 
-		{	
+		else  {	
 			l := StrLen(n)
-			loop, %p__0%			;	o = AlwaysOnTop Resize T50 TCFFFFFF 'asfdasf asfd asf' style=' ja `'mislim`' da je to ok  ' x567
-			{					;	Parse(o, "OnTop? 3 style x#")
+			loop, %p__0% {
 				p := p__%A_Index%
 				if (!cC && !(SubStr(p, 1, l) = n)) || (cC & !(SubStr(p, 1, l) == n))
 					continue				
-				o := v := SubStr(p,l+1,1) = cA  ? SubStr(p,l+2) : SubStr(p, l+1),  p__%A_Index% := ""
-				ifEqual, c, ?, SetEnv, o, 1
+				v := SubStr(p,l+1,1) = cA  ? SubStr(p,l+2) : SubStr(p, l+1)
+				ifEqual, c, ?, SetEnv, v, 1
 				if (c="#") && (v+0 = "")
 					continue
+				o := v,  p__%A_Index% := ""
 				break
 			}
 		}
