@@ -1,57 +1,116 @@
+/* Title: UTest 
+		  Unit testing framework.
+
+   Usage:	
+		 UTest will scan the script for functions which name starts with "Test_". Test functions have no parameter and use one of the 
+		 Assert functions. If Assert function fails, test will fail and you will see that in the result CSV (or in ListView representing that CSV).
+		 Result shows the the test state, the function name, line number and test name if you have it. 
+
+		 To test your script, use the following template :
+
+		(start code)
+			#include UTest.ahk
+			return
+
+			Test_MyTest1() {
+			}
+
+			Test_MyTest2() {
+			}
+			...
+			...
+			#include FunctionToTest.ahk
+		(end code)
+
+   Remarks:
+		By default, executing the test script will show the GUI with the results. To get the same results in textual form you can set NoGui option and 
+		query Result variable from UTest storage:
+
+		>  UTest("NoGUI", true)
+		>  #include UTest.ahk
+		>  msgbox  UTest("Result")		
+*/
 #SingleInstance, force
 
 UTest("Result", UTest_Start( UTest("NoGui") ))	;execute tests
 
+/*
+ Function: True 
+		   Check if conditions are true.
+ */
 Assert_True( b1="", b2="", b3="", b4="", b5="", b6="", b7="", b8="", b9="", b10="") {
 	loop, 10
 		ifNotEqual, b%A_Index%,, ifNotEqual, b%A_Index%, 1
 		{
-			UTest_SetFail( Name )
+			UTest_setFail( Name )
 			break
 		}
 }
-
+/*
+ Function: False
+ 		   Check if conditions are false.
+ */
 Assert_False( b1="", b2="", b3="", b4="", b5="", b6="", b7="", b8="", b9="", b10="" ) {
 	loop, 10
 		ifNotEqual, b%A_Index%,, ifNotEqual, b%A_Index%, 0
 		{
-			UTest_SetFail( Name )
+			UTest_setFail( Name )
 			break
 		}
 }
-
+/*
+ Function:	Empty 
+			Check if variable is empty.
+ */
 Assert_Empty( Var, Name="" ){
 	if (Var != "")
-		UTest_SetFail( Name )
+		UTest_setFail( Name )
 }
-
+/*
+ Function: NotEmpty 
+		   Check if variable is not empty.
+ */
 Assert_NotEmpty( Var, Name="" ){
 	if (Var = "")
-		UTest_SetFail( Name )
+		UTest_setFail( Name )
 }
-
+/*
+ Function: Contains 
+ 		   Check if variable contains string.
+ */
 Assert_Contains(Var, String, Name=""){
 	if !InStr(Var, String)
-		UTest_SetFail( Name )
+		UTest_setFail( Name )
 }
 
+/*
+ Function:  StartsWith
+ 			Check if variable starts with string.
+ */
 Assert_StartsWith(Var, String, Name=""){
 	if SubStr(Var, 1, Strlen(String)) != String
 		UTest_SetFail( Name )
 }
-
+/*
+ Function: EndsWith
+ 		   Check if variable ends with string.
+ */
 Assert_EndsWith(Var, String, Name=""){
 	ifEqual, String,,return
 	if SubStr(Var, -1*Strlen(String)+1) != String
-		UTest_SetFail( Name )
+		UTest_setFail( Name )
 }
 
+/*
+ Function: Match
+		   Check if variable content matches RegEx pattern.
+ */
 Assert_Match(Var, RegEx, Name=""){
 	if !RegExMatch(Var, RegEx) 
-		UTest_SetFail( Name )
+		UTest_setFail( Name )
 }
 
-UTest_SetFail(Name) {
+UTest_setFail(Name) {
 	UTest("Name", Name), UTest("F", 1 )
 }
 
@@ -614,3 +673,8 @@ __addVar(var, func)
     NumPut(var, mVar+low*4)
     NumPut(mVarCount+1, func+28)
 }
+/* Group:  About
+		o v0.1 by majkinetor.
+		o Includes LowLevel.ahk by Lexikos. See <http://www.autohotkey.com/forum/topic26300.html>
+		o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
+ */
