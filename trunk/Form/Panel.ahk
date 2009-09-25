@@ -23,6 +23,8 @@
 			When Panel doesn't attach, its parent will skip it when performing repositioning of the controls. If Panel itself is attaching its own children, 
 			this means that it will also stop attaching them as its own size wont change. However, its children won't be disabled so if you programmatically change the 
 			the placement of such Panel, it will still reposition its controls.
+
+			If you have deep hierarchy of Panels(usualy >10), script may block. You can try to fix it by setting #MaxThreads, 255.
  */
 Panel_Add(HParent, X, Y, W, H, Style="", Text="") {
 	static init=0

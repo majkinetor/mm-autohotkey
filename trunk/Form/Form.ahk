@@ -1,7 +1,7 @@
 _("mm! d e w")
 ;#MaxThreads, 255
 
-	hForm1	:=	Form_New("w500 h400 a80 Resize Font='s8, Courier New'")
+	hForm1	:=	Form_New("w500 h400 Resize Font='s8, Courier New'")
 
 	hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "w250",		"Align L, 250", "Attach p")
 	hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnBtn",		"Align T, 50", "Attach p", "Image inc\test.bmp, 40", "Cursor hand", "Tooltip I have hand cursor")
@@ -95,11 +95,30 @@ Form_Close( Name ) {
 	Gui, %g%:Hide
 }
 
+/*
+ Function:	New
+			Creates new form.
+ 
+ Parameters:
+			Options	- Form options. Any AHK Gui option can be set plus extensions listed bellow:
+
+ Extensions:
+			a#		- Alpha. Range from 0% - 100%
+			c*		- Gui color. Hexadecimal or integer value.
+			Font	- Gui font (style, face).
+			Name	- Name of the form, by default FormN where N is the number of the forms created.
+			  
+ Returns:
+			Form handle.
+
+ Remarks:
+			Margin for the form is set to 0,0 always.
+ */
 Form_New(Options="") {
 	static no=1
 
 	Form_Parse(Options, "x# y# w# h# a# c* Font Name", x, y, w, h, a, c, font, name, extra)
-;	m(x,y,w,h,alpha,color,font,name,extra)
+
 	ifEqual, name,,SetEnv, Name, % "Form" no++
 	pos := (x!="" ? " x" x : "") (y!="" ? " y" y : "") (w!="" ? " w" w : "") (h!="" ? " h" h : "")
 	ifEqual, pos,, SetEnv, pos, w400 h200
