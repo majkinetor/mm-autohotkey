@@ -1,47 +1,56 @@
 Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",ByRef o6="",ByRef o7="",ByRef o8="", ByRef o9="", ByRef o10=""){
-	sep := A_Space, no := 0
+	cS := " ", cA := "=", cQ := "'", cE := "``", cC := 0
+	if (j := InStr(pQ, ")")) && (opts := SubStr(pQ, 1, j-1), pQ := SubStr(pQ, j+1))
+		Loop, parse, opts
+			  mod(A_Index, 2) ? f:=A_LoopField : c%f%:=A_LoopField
 
-	loop, parse, O, %sep%
-	{	
-		if (LF := A_LoopField) = ""	{
-			if c
-				p_%n% .= A_Space
-			continue
+	p__0 := 0, st := "n"
+	loop, parse, O						;  states: normal(n), separator(s), quote(q), escape(e)
+	{
+		c := A_LoopField
+		if (c = cS) {
+			if !InStr("qs", st)	
+				p__0++,  p__%p__0% := token,  token := "",  st := "s"			
 		}
-		lq := SubStr(LF, 1, 1) = "'", rq := SubStr(LF, 0, 1) = "'",   len=StrLen(LF),   q := lq && rq,  sq := lq AND !rq
-		,e := (!lq * !c) * InStr(LF, "="),  liq := e && (SubStr(LF, e+1, 1)="'"),  iq := liq && rq
-				
-		if !c
-			n := (e ? SubStr(LF, 1, e-1) : (i="" ? i:=1 : ++i)),  c := (c || sq || liq) AND !iq, p_# := i
-		if q or iq
-			p_%n% := SubStr(LF, iq ? e+2:2, len-2-(iq ? e : 0)), no++
-		else if c
-			if e
-				 p_%n% := SubStr(LF, e+2)
-			else p_%n% .= (p_%n% = "" ? "" : " ") SubStr(LF, sq ? 2 : 1,  rq ? len-1 : len),   c := rq ? (0,no++) : 1
-		else p_%n% := e ? SubStr(LF, e+1) : LF, no++
-	}
+		else if (c = cE)
+			st := "e"
+		else if (c = cQ) && (st != "e") 
+			 ifNotEqual, st, q, SetEnv, st, q				 
+			else st := "n"		
+		else ifNotEqual, st, q, SetEnv, st, n
 
+		if st not in s,e
+			 token .= c		
+		
+	}
+	if (token != "")
+		p__0++, p__%p__0% := token
+	
 	loop, parse, pQ, %A_Space%
 	{
-		c := SubStr(LF := A_LoopField, 0), n := SubStr(LF, 1, -1), l := StrLen(n),  j := A_Index
-		if c in ?,#,*
-		{
-			loop, %p_#%
-			{
-				p := p_%A_Index%
-				if !(SubStr(p, 1, l) = n)
+		c := SubStr(f := A_LoopField, 0),  n := InStr("?#*", c) ? SubStr(f, 1, -1) : f,  j := A_Index, o := ""
+		if n is integer
+			o := p__%n%,  p__%n% := ""
+		else 
+		{	
+			l := StrLen(n)
+			loop, %p__0%			;	o = AlwaysOnTop Resize T50 TCFFFFFF 'asfdasf asfd asf' style=' ja `'mislim`' da je to ok  ' x567
+			{					;	Parse(o, "OnTop? 3 style x#")
+				p := p__%A_Index%
+				if (!cC && !(SubStr(p, 1, l) = n)) || (cC & !(SubStr(p, 1, l) == n))
+					continue				
+				o := v := SubStr(p,l+1,1) = cA  ? SubStr(p,l+2) : SubStr(p, l+1),  p__%A_Index% := ""
+				ifEqual, c, ?, SetEnv, o, 1
+				if (c="#") && (v+0 = "")
 					continue
-				v := SubStr(p, l+1)
-				if (c="*" || c="#")	{
-					if (c="#") && (v+0 = "")
-						continue
-					o%j% := v	
-				} else ifEqual, c, ?, SetEnv, o%j%, 1			
+				break
 			}
 		}
-		else o%j% := p_%LF%
-		ifGreater, A_Index, 10, break
+		o%j% := SubStr(o, 1, 1) = cQ ? SubStr(o, 2, -1) : o
 	}
-	return no
+	j++
+	loop, %p__0%
+		o%j% .= p__%A_Index% != "" ? p__%A_Index% cS : ""
+	o%j% := SubStr(o%j%, 1, -1)
+	return p__0
 }
