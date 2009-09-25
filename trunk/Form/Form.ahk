@@ -1,7 +1,7 @@
 _("mm! d e w")
 ;#MaxThreads, 255
 
-	hForm1	:=	Form_New("w500 h400", "Resize")
+	hForm1	:=	Form_New("w500 h400 a80 Resize Font='s8, Courier New'")
 
 	hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "w250",		"Align L, 250", "Attach p")
 	hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnBtn",		"Align T, 50", "Attach p", "Image inc\test.bmp, 40", "Cursor hand", "Tooltip I have hand cursor")
@@ -95,26 +95,33 @@ Form_Close( Name ) {
 	Gui, %g%:Hide
 }
 
-Form_New(Size="", Options="") {
+Form_New(Options="") {
 	static no=1
 
-	if Name=
-		Name := "Form" no++
-	
-	if Size=
-		Size := "w400 h200"
+	Form_Parse(Options, "x# y# w# h# a# c* Font Name", x, y, w, h, a, c, font, name, extra)
+;	m(x,y,w,h,alpha,color,font,name,extra)
+	ifEqual, name,,SetEnv, Name, % "Form" no++
+	pos := (x!="" ? " x" x : "") (y!="" ? " y" y : "") (w!="" ? " w" w : "") (h!="" ? " h" h : "")
+	ifEqual, pos,, SetEnv, pos, w400 h200
 
 	if !(n := Form_getFreeGuiNum())
 		return A_ThisFunc "> Maximum number of windows created."
 
-	Gui, %n%:+LastFound +Label%Name%_ %Options%
+	Gui, %n%:+LastFound +Label%Name%_ %extra%
 	hForm := WinExist()+0
 
-	Form(Name, n), Form(hForm, n) 
+	ifNotEqual, a,,WinSet, Transparent, % a*2.5
+	ifNotEqual, c,,Gui, %n%:Color, %c%
+
+	if (font != "") {
+		StringSplit, font, font, %A_Space%
+		Gui, %n%:Font, %font1%, %font2%
+	}
 	
-	Gui, %n%:Show, %Size% Hide, %Name%
+	Gui, %n%:Show, %pos% Hide, %Name%
 	Gui, %n%:Margin, 0, 0		;this makes Add function behave normaly i.e. if you add control on pos X,Y it will not be X+mx and Y+my. This is important for Panel.
 
+	Form(Name, n), Form(hForm, n)
 	return hForm
 }
 
@@ -122,95 +129,109 @@ Form_New(Size="", Options="") {
  Function:	Parse
  			Form options parser.
 
-			o	- String with Form options.
+			O	- String with Form options.
 			pQ	- Query parameter. It is space a separated list of option names you want to extract from the options string. See bellow for
 				  details of extraction.  
-			o1..o10 - Variables to receive requested options.
+			o1..o10 - Variables to receive requested options. Their number should match the number of variables you want to extract from the option string plus
+					  1 more if you want to get non-consumed options.
 
- Options string:	
-			Options string is space separated list of named or unnamed options. 
-			The syntax is:
+ Query:
+			Query is space separated list of variables you want to extract with optional settings prefix .
+			The query syntax is:
 
- >			Options :: [Name=]Value {Options}
+ >			Query :: [Settings)][Name=]Value {Query}
+ >			Settings :: sC|aC|qC|eC|c01{Settings}
  >			Value   :: SentenceWithoutSpace | 'SentenceWithSpace'
 
-			Option can have a name which you can use to refer to it. Name can be anything that can pass as ahk variable name.
-			' char must be used if you have white space in a sentence. 
-			"=" car can be used in Value only if you use named option otherwise, sentence before it will be taken as option name.
-			
 
  Examples:
-			First one is regular AHK GUI option string, the second one also contains named options.
-
  >			options =  x20 y40 w0 h0 red HWNDvar gLabel
  >			options =  w800 h600 style='Resize ToolWindow' font='s12 bold, Courier New' 'show' dummy=dummy=5
 
-			In first line there are only unnamed options. 
-			In second line, there are all possible types of options	and you can see different styles to write them.
-
  Extracting:
-			To extract set of options from the option string you first use query parameter to specify an option 
+			To extract variables from the option string you first use query parameter to specify how to do extraction
 			then you supply variables to hold the results:
 
  >		    Parse(O, "x# y# h# red? HWND* style font 1 3", x, y, h, bRed, HWND, style, font, p1, p3)
 
-			name	- Get the option by that name (style, font)
-			N		- Get unnamed option by its position in the options string,  (1 3)
-			str*	- Get unnamed option that starts with string name (HWND*)
-			str#	- Get unnamed option that holds the number and have str prefix (x# y# h#)
-			str?	- Boolean option, output is true if str exists in the option string or false otherwise (red?)
+			name	- Get the option by the name (style, font). In option string, option must be followed by assignment char (= by default).
+			N		- Get option by its position in the options string, (1 3).
+			str*	- Get option that has str prefix (HWND*). 
+			str#	- Get option that holds the number and have str prefix (x# y# h#).
+			str?	- Boolean option, output is true if str exists in the option string or false otherwise (red?).
+
+ Settings:
+			You can change separator(s), assignment(a), escape(e) and quote(q) character and case sensitivity (c) using syntax similar to RegExMatch.
+			Option value follows the option name without any separator character.
+
+ >			Parse("x25|y27|Style:FLAT TOOLTIP", "s|a:c1)x# y# style", x, y, style)
+			
+			In above example, | is used as separator, : is used as assignment char and case sensitivity is turned on (style wont be found as it starts with S in options string).
+
+			sC	- Set separator char to C (default is space)
+			aC  - Set assignment char to C (default is =)
+			qE	- Set quote char to C	(default is ')
+			eE	- Set escape char to C  (default is	`)
 
  Remarks:
 			Currently you can extract maximum 10 options at a time, but this restriction can be removed for up to 29 options.
+			You can specify one more reference variable in addition to those you want to extract to get all extra options in the option string.
 
  Returns:
 			Number of options in the string.
  */
 Form_Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",ByRef o6="",ByRef o7="",ByRef o8="", ByRef o9="", ByRef o10=""){
-	sep := A_Space, no := 0
-	loop, parse, O, %sep%
-	{	
-		if (LF := A_LoopField) = ""	{
-			if c
-				p_%n% .= A_Space
-			continue
-		}
-		lq := SubStr(LF, 1, 1) = "'", rq := SubStr(LF, 0, 1) = "'",   len=StrLen(LF),   q := lq && rq,  sq := lq AND !rq
-		,e := (!lq * !c) * InStr(LF, "="),  liq := e && (SubStr(LF, e+1, 1)="'"),  iq := liq && rq
-				
-		if !c
-			n := (e ? SubStr(LF, 1, e-1) : (i="" ? i:=1 : ++i)),  c := (c || sq || liq) AND !iq, p_# := i
-		if q or iq
-			p_%n% := SubStr(LF, iq ? e+2:2, len-2-(iq ? e : 0)), no++
-		else if c
-			if e
-				 p_%n% := SubStr(LF, e+2)
-			else p_%n% .= (p_%n% = "" ? "" : " ") SubStr(LF, sq ? 2 : 1,  rq ? len-1 : len),   c := rq ? (0,no++) : 1
-		else p_%n% := e ? SubStr(LF, e+1) : LF, no++
-	}
+	cS := " ", cA := "=", cQ := "'", cE := "``", cC := 0
+	if (j := InStr(pQ, ")")) && (opts := SubStr(pQ, 1, j-1), pQ := SubStr(pQ, j+1))
+		Loop, parse, opts
+			  mod(A_Index, 2) ? f:=A_LoopField : c%f%:=A_LoopField
 
+	p__0 := 0, st := "n"
+	loop, parse, O						;  states: normal(n), separator(s), quote(q), escape(e)
+	{
+		c := A_LoopField
+		if (c = cS) {
+			if !InStr("qs", st)	
+				p__0++,  p__%p__0% := token,  token := "",  st := "s"			
+		}
+		else if (c = cE)
+			st := "e"
+		else if (c = cQ) && (st != "e") 
+			 ifNotEqual, st, q, SetEnv, st, q				 
+			else st := "n"		
+		else ifNotEqual, st, q, SetEnv, st, n
+		if st not in s,e
+			 token .= c		
+	}
+	if (token != "")
+		p__0++, p__%p__0% := token
+	
 	loop, parse, pQ, %A_Space%
 	{
-		c := SubStr(LF := A_LoopField, 0), n := SubStr(LF, 1, -1), l := StrLen(n),  j := A_Index
-		if c in ?,#,*
-		{
-			loop, %p_#%
-			{
-				p := p_%A_Index%
-				if !(SubStr(p, 1, l) = n)
+		c := SubStr(f := A_LoopField, 0),  n := InStr("?#*", c) ? SubStr(f, 1, -1) : f,  j := A_Index, o := ""
+		if n is integer
+			o := p__%n%,  p__%n% := ""
+		else  {	
+			l := StrLen(n)
+			loop, %p__0% {
+				p := p__%A_Index%
+				if (!cC && !(SubStr(p, 1, l) = n)) || (cC & !(SubStr(p, 1, l) == n))
+					continue				
+				v := SubStr(p,l+1,1) = cA  ? SubStr(p,l+2) : SubStr(p, l+1)
+				ifEqual, c, ?, SetEnv, v, 1
+				if (c="#") && (v+0 = "")
 					continue
-				v := SubStr(p, l+1)
-				if (c="*" || c="#")	{
-					if (c="#") && (v+0 = "")
-						continue
-					o%j% := v	
-				} else ifEqual, c, ?, SetEnv, o%j%, 1			
+				o := v,  p__%A_Index% := ""
+				break
 			}
 		}
-		else o%j% := p_%LF%
-		ifGreater, A_Index, 10, break
+		o%j% := SubStr(o, 1, 1) = cQ ? SubStr(o, 2, -1) : o
 	}
-	return no
+	j++
+	loop, %p__0%
+		o%j% .= p__%A_Index% != "" ? p__%A_Index% cS : ""
+	o%j% := SubStr(o%j%, 1, -1)
+	return p__0
 }
 
 Form_Show( Name="", Title="" ){
