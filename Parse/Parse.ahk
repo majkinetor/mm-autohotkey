@@ -2,7 +2,7 @@
  Function:	Parse
  			Options parser.
 
-			O	- String with Form options.
+			O	- String with options.
 			pQ	- Query parameter. It is space a separated list of option names you want to extract from the options string. See bellow for
 				  details of extraction.  
 			o1..o10 - Variables to receive requested options. Their number should match the number of variables you want to extract from the option string plus
