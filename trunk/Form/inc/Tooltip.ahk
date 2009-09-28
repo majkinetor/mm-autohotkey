@@ -1,4 +1,4 @@
-/* Group: Tooltip Extension
+/* Group: Tooltip
 		  Adds tooltips to GUI controls.
  
  Parameters:
@@ -9,7 +9,13 @@
 			 TimeIn		- Time to pass before tooltip is shown, by default 800ms.
  			 TimeOut	- Time to pass to close the tooltip, by default 0 (don't close).
 			 Num		- Tooltip number to use, by default 17.
-  
+
+ Remarks:
+	Tooltip uses Form storage if present for configuration. If Form module is not present, it will use defaults.
+			 
+ About:
+	o 1.0 by majkinetor.
+	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */
 Ext_Tooltip(HCtrl, Text){
 	static SS_NOTIFY=0x100, adrWndProc="Ext_Tooltip_WndProc"
@@ -27,10 +33,10 @@ Ext_Tooltip(HCtrl, Text){
 
 Ext_Tooltip_wndProc(Hwnd, UMsg, WParam, LParam){	
 	static
-	static WM_MOUSEHOVER = 0x2A1, WM_MOUSELEAVE = 0x2A3, WM_MOUSEMOVE = 0x200, TM_HOVERLEAVE=3
+	static WM_MOUSEHOVER = 0x2A1, WM_MOUSELEAVE = 0x2A3, WM_MOUSEMOVE = 0x200, TM_HOVERLEAVE=3, Form = "Form"
 
 	if !hwnd {
-		%LParam% := WParam,  Form("", "Tooltip_)TimeIn TimeOut Num", timeIn, timeOut, num)
+		%LParam% := WParam,  %Form%("", "Tooltip_)TimeIn TimeOut Num", timeIn, timeOut, num)
 		timeIn .= timeIn = "" ? 800 : "", 	 num .= num = "" ? 17 : ""
 		return
 	}

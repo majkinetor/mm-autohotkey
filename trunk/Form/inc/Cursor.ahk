@@ -1,4 +1,4 @@
-/* Group: Cursor Extension
+/* Group: Cursor
           Set cursor shape for control or window.
  
  Parameters: 
@@ -32,6 +32,10 @@
       sizene_big   - Big double-pointed arrow pointing north and east.
       sizesw_big   - Big double-pointed arrow pointing south and west.
       sizese_big   - Big double-pointed arrow pointing south and east.
+
+ About:
+	o 1.2 by majkinetor
+	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
 Ext_Cursor(HCtrl, Shape) { 
 	static adrWndProc = "Ext_Cursor_wndProc"

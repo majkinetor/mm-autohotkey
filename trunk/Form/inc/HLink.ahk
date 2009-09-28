@@ -59,7 +59,7 @@ HLink_Add(hGui, X, Y, W, H, Handler="", Text="'HLink Control':"){
 	return hCtrl
 }
 
-;----------------------------------------------------------------------------------------------
+;========================= PRIVATE ==========================================
 
 HLink_onNotify(Wparam, Lparam, Msg, Hwnd){
 	static MODULEID := 170608, oldNotify="*"

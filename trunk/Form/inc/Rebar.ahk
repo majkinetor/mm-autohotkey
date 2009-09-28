@@ -8,7 +8,6 @@
  			(See rebar.png)
  */
 
-
 /*
   Function: Add
  			Add a rebar to the GUI.
