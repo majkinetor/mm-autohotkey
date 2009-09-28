@@ -1,7 +1,7 @@
-_("m! d e w")
+_("mm! d e w")
 ;#MaxThreads, 255
 
-	hForm1	:=	Form_New("w500 h400 Resize")
+	hForm1	:=	Form_New("w500 h400 Resize Font='s8, Courier New'")
 
 	hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "w250",		"Align L, 250", "Attach p")
 	hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnControl",	"Align T, 50", "Attach p", "Image inc\test.bmp, 40", "Cursor hand", "Tooltip I have hand cursor")
@@ -12,7 +12,9 @@ _("m! d e w")
 	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "hidden",		"Align " hPanel2, "Attach p")
 	Attach(hPanel3, "-")	;not necessary but should be done, otherwise Panel3 will be active until toggled once.
 	
-	hCal1	:=  Form_Add(hPanel3, "MonthCal","",	  "gOnControl",	"Align F", "Attach p")
+	hLink	:=  Form_Add(hPanel3, "HLink",	"Click 'here':www.Google.com to go to Google", "", "Align B", "Attach y")
+	hToolbar:=  Form_Add(hPanel3, "Toolbar", "new, 7,`nopen, 8`nsave, 9, disabled`n-`nstate, 11, checked,check", "style='FLAT TOOLTIPS' gOnToolbar")	
+	WinSet, Style, -0x8000, ahk_id %hToolbar%	;remove this style, makes the black background
 
 	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "",			"Align T, 200", "Attach p")
 	hLV		:=  Form_Add(hPanel2, "ListView", "1|2|3", "gOnControl","Align T, 200", "Attach p")
@@ -22,9 +24,15 @@ _("m! d e w")
 	Form_Show()
 return
 
+OnToolbar(hCtrl, Event, Txt, Pos, Id) {
+	ifEqual, Event, hot, return
+	msgbox %Event% %Txt%
+}
+
 F1::
 	WinMove, ahk_id %hForm1%, , , , 300, 300
 return
+
 
 F2::
 	if toggled
@@ -45,10 +53,8 @@ F2::
 return
 
 OnControl:
-	msgbox % A_GuiCOntrol
+	msgbox % A_GuiEvent " " A_GuiCOntrol
 return
-
-
 
 #include inc
 #include _Forms.ahk
