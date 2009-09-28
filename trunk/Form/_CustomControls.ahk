@@ -4,13 +4,16 @@ _("e d w")
 	;===============================================
 	
 	SetWorkingDir, inc		;required to load some dll's that are put there
-	hForm  := Form_New("w500 h400")
-	hInfo  := Form_Add(hForm, "Text", "Press F1 to cycle controls.`nControls: " ctrls, "", "Align T, 50")
-	hTab   := Form_Add(hForm, "Panel", "", "", "Align F")
+	hForm  := Form_New("w500 h400 Resize")
+
+	htmlCtrls := RegExReplace(ctrls, "\w+", "<a href='" A_ScriptDir "\inc\_doc\files\$0-ahk.html'>$0</a>&nbsp;&nbsp;")
+	hInfo  := Form_Add(hForm, "QHTM", "<b>Press F1 to cycle controls.<br>`nControls:</b>   " htmlCtrls, "", "Align T, 50", "Attach p r2")
+
+	hTab   := Form_Add(hForm, "Panel", "", "", "Align F", "Attach p r2")
 	loop, parse, ctrls, %A_Space%
 	{		
-		hPanel%A_Index%	 :=	Form_Add(hTab,  "Panel", "",  "hidden",	"Align " hTab )
-		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, "", "Align F")
+		hPanel%A_Index%	 :=	Form_Add(hTab,  "Panel", "",  "hidden",	"Align " hTab, "Attach p")
+		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, "", "Align F", "Attach p")
 		InitControl(A_LoopField, hCtrl), ctrlNo := A_Index
 	}
 	
@@ -20,7 +23,12 @@ return
 
 InitControl(Name, HCtrl) {
 	global
-
+	
+	if Name = HLink
+	{
+		ControlSetText, ,Click <a href="www.autohotkey.com">here</a> to go to AutoHotKey site, ahk_id %HCtrl%
+		Attach(HCTRL, "y")
+	}
 	if Name = Toolbar
 		Toolbar_Insert(HCtrl, "cut`ncopy`npaste")
 	else if Name = Rebar
@@ -30,9 +38,9 @@ InitControl(Name, HCtrl) {
 	}
 	else if Name = Splitter
 	{
-		hp1 := Form_Add(hPanel%A_Index%	, "Panel", "Panel 1", "style='center sunken'", "Align T, 200")
-		Align(hCtrl, "T", 30)
-		hp2 := Form_Add(hPanel%A_Index%	, "Panel", "Panel 2", "style='center sunken'", "Align F")
+		hp1 := Form_Add(hPanel%A_Index%	, "Panel", "Panel 1", "style='center sunken'", "Align T, 200", "Attach w r")
+		Align(hCtrl, "T", 30), Attach(hCtrl, "w r")
+		hp2 := Form_Add(hPanel%A_Index%	, "Panel", "Panel 2", "style='center sunken'", "Align F", "Attach w h r")
 		Splitter_Set(hCtrl, hp1 " - " hp2)
 	}
 	else if Name= QHTM
