@@ -4,7 +4,7 @@ _("mm! d e w")
 	hForm1	:=	Form_New("w500 h400 Resize Font='s8, Courier New'")
 
 	hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "w250",		"Align L, 250", "Attach p")
-	hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnControl",	"Align T, 50", "Attach p", "Image inc\test.bmp, 40", "Cursor hand", "Tooltip I have hand cursor")
+	hButton1 :=	Form_Add(hPanel,  "Button",  "OK",	  "gOnControl",	"Align T, 50", "Attach p", "Image res\test.bmp, 40", "Cursor hand", "Tooltip I have hand cursor")
 	hButton2 :=	Form_Add(hPanel,  "Button",  "Cancel","gOnControl",	"Align F", "Attach p", "Tooltip jea baby")
 
 	hPanel2	:=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align F", "Attach p")

@@ -1,5 +1,5 @@
 /*
- Group: Image Extension
+ Group: Image
 		Adds image to the Button control.
 
  Parameters:

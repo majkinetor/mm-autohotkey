@@ -1,3 +1,89 @@
+/*
+	Title:	Form
+
+	Form module presents alternative way of creating AHK GUI. It can be used alone or as a part of the Forms framework.
+	Some of the main differences between normal GUI creation and the way it is done using the module are:
+
+	o Degree of cohesion - one function call can set all features for any control thus making changes, maintenance and bug testing much easier (and keeping related data together).
+	  Form provides more concise way of creating controls and top level windows using function instead commands where, generally, one Form call is equivalent to series of AHK commands.
+	  Contrary to that, original AHK way of creating GUI can suffer from spaghetti-like code and is generally much harder to maintain and change.
+	o Support for custom controls without any syntax differences. The end effect is the same as if you were using integrated AHK control.
+	o Support for control extensions in simplest way, basically any behavior that you may want for control.
+	o Provides (but doesn't force) standardization of Gui/control creation process, option specification and module design.
+ */
+
+/*
+ Function:  Add
+ 			Add control to the parent.
+ 
+ Parameters: 
+ 			HParent	- Handle of the parent. This can be top level window or container control.
+ 			Ctrl	- Control name or handle. All AHK controls are supported by default. Custom controls must be included if needed. See below for details.
+ 			Txt		- Text of the new control (optional).
+			Opt		- Space separated list of control options (optional).
+			E1..E5  - Control extensions (optional). Extension function must exist in the script in order to use it. See below for details.
+ 
+ Adding Controls:
+ 			Form can make any internal AHK control and any custom control.
+			Making internal control is similar to using native command Gui, Add :
+ 
+ > 			Gui, Add,		   CtrlName,  Options, Text
+ > 			Form_Add(hParent, "CtrlName", "Text", "Options")
+ 
+ 			To make custom control, you must include appropriate module. If the module contains *Add2Form* function you can create it the same
+			way as internal control, by specifying its textual name in Ctrl parameter. Otherwise, after creating the control the way described in the
+			module documentation and obtaining its handle, you can specify the handle as Ctrl parameter. In that case Txt and Opt parameters are ignored
+			but extensions will still work.
+
+			Implementing Add2Form function is the best way to use custom control as it makes you forget about difference between custom and integrated controls.
+		    The following is implementation of Add2Form for Panel control.
+		
+			(start code) 
+			Panel_Add2Form(hParent, Txt, Opt){
+				static parse = "Form_Parse"
+				if IsFunc(parse) 
+					%parse%(Opt, "x# y# w# h# style hidden?", x, y, w, h, style, bHidden)
+				hCtrl := Panel_Add(hParent, x, y, w, h, style, Txt)	
+				ifNotEqual,bHidden,,WinHide, ahk_id %hCtrl%
+				return hCtrl
+			}
+
+			;with above in place you can use:
+			hPanel := Form_Add(hForm, "Panel", "Panel1", "w100 h200 hidden")
+			(end code)
+	
+			When executing Add function, Form will check if there is Panel_add2Form function and if that's true, it will call it with 
+			adequate parameters. If not, function will return the error message. 
+
+			Controls can use Form_Parse function to extract individual options from the Opt string. It should be called using dynamic function calls so
+			that control can work even when included in scripts that don't use Form module (without it, compiler would generate missing include error).
+
+ Using Extensions:
+			Extension is any AHK function that accepts handle of the control as its first parameter. It can have any number of of additional parameters.
+			You can quickly write new extension when you need it and it will instantly become available, or you can include 3thd party extensions.
+			Extensions are used similarly to AHK commands - you specify extension name followed by a space (but not comma)
+			and list of its parameters between commas.
+		
+		>	hButton :=	Form_Add(hForm1, "Button", "Cancel", "gOnButton", "Align F, 250", "Attach p r", "Tooltip I pwn")
+		    
+			In this example Add function has 3 extensions: Align with 2 parameters and Attach & Tooltip with 1 parameter.
+			The above code is equivalent to:
+
+		>	hButton :=	Form_Add(hForm1, "Button", "Cancel", "gOnButton")	;make button without extensions:
+		>	Align(hButton, "F", 250), Attach(hButton, "p r"), Ext_Tooltip(hButton, "I pwn")
+
+			Notice that Tooltip extension uses "Ext_" prefix. Add function will first check for the function name that matches extension name and if
+			doesn't exist, it will try with "Ext_" prefix.
+
+			The order of extensions may be important. In above case Attach extension will not produce intented results if control doesn't have dimensions already
+			set, so Align extension is placed before it (in this case, the same could be achieved without Align extension by specifying x..w options). 
+			Tooltip extension, however, doesn't depend on anything so it can be put anywhere in extension list. 
+
+
+ Returns:
+ 			Control's handle if successful, 0 if control can't be created. Error message on invalid usage.
+
+ */
 Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
 	static integrated = "Text,Edit,UpDown,Picture,Button,Checkbox,Radio,DropDownList,ComboBox,ListBox,ListView,TreeView,Hotkey,DateTime,MonthCal,Slider,Progress,GroupBox,Tab2,StatusBar"
 
@@ -9,7 +95,7 @@ Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
 		else if IsFunc(f_Add := Ctrl "_Add2Form")
 			 hCtrl := %f_Add%(HParent, Txt, Opt)
 		else return A_ThisFunc "> Custom control doesn't have Add2Form function: " Ctrl 
-	}
+	} else 	DllCall("SetParent", "uint", hCtrl := Ctrl, "uint", HParent)
 
   ;apply extensions
 	loop {
@@ -198,6 +284,38 @@ Form_Show( Name="", Title="" ){
 	Gui, %n%:Show, ,%Title%
 }
 
+/*
+ Function:	Subclass 
+			Subclass child window (control)
+ 
+ Parameters: 
+			hCtrl   - Handle to the child window to be subclassed.
+			Fun		- New window procedure. You can also pass function address here in order to subclass child window.
+					  with previously created window procedure.
+			Opt		- Optional callback options for Fun, by default "" .
+		   $WndProc - Optional reference to the ouptut variable that will receive address of the new window procedure.
+
+ Returns:
+			The addresss of to the previous window procedure or 0 on error.	
+
+ Remarks:
+			Should be used by extensions if needed.
+			Works only for controls created in the autohotkey process.
+
+ Example:
+	(start code)
+  	if !Form_SubClass(hwndList, "MyWindowProc") 
+  	     MsgBox, Subclassing failed. 
+  	... 
+  	MyWindowProc(hwnd, uMsg, wParam, lParam){ 
+  
+  	   if (uMsg = .....)  
+            ; my message handling here 
+  
+  	   return DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", hwnd, "UInt", uMsg, "UInt", wParam, "UInt", lParam) 
+  	}
+	(end code)
+ */
 Form_Subclass(hCtrl, Fun, Opt="", ByRef $WndProc="") { 
 	if Fun is not integer
 	{
@@ -211,9 +329,47 @@ Form_Subclass(hCtrl, Fun, Opt="", ByRef $WndProc="") {
     return DllCall("SetWindowLong", "UInt", hCtrl, "Int", -4, "Int", $WndProc, "UInt")
 }
 
+/*
+	Function:	Form
+				Storage.
+			  	
+	Parameters:
+			  var		- Variable name to retrieve. To get up several variables at once (up to 6), omit this parameter.
+			  value		- Optional variable value to set. If var is empty value contains list of vars to retrieve with optional prefix
+			  o1 .. o6	- If present, reference to variables to receive values.
+	
+	Returns:
+			  o	if _value_ is omitted, function returns the current value of _var_
+			  o	if _value_ is set, function sets the _var_ to _value_ and returns previous value of the _var_
+			  o if _var_ is empty, function accepts list of variables in _value_ and returns values of those variables in o1 .. o5
 
+    Remarks:
+			  Form extensions can use this function to keep its internal data. This avoid the need to polute global variable space.
+			  In order to support working with or without forms, you can use dynamic function calls to invoke this function.
+
+	Examples:
+	(start code)			
+ 			Form(x)								; returns value of x or value of x from v.ahk inside scripts dir.
+ 			Form(x, v)							; set value of x to v and return previous value.
+ 			Form("", "x y z", x, y, z)			; get values of x, y and z into x, y and z.
+ 			Form("", "prefix_)x y z", x, y, z)	; get values of prefix_x, prefix_y and prefix_z into x, y and z.
+	(end code)
+ */
+Form(Var="", Value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
+	static
+	if (var = "" ){
+		if ( _ := InStr(value, ")") )
+			__ := SubStr(value, 1, _-1), value := SubStr(value, _+1)
+		loop, parse, value, %A_Space%
+			_ := %__%%A_LoopField%,  o%A_Index% := _ != "" ? _ : %A_LoopField%
+		return
+	} else _ := %var%
+	ifNotEqual, value,~`a , SetEnv, %var%, %value%
+	return _
+}
 
 ;==================================== PRIVATE ================================================
+
 Form_addAhkControl(hParent, Ctrl, Txt, Opt ) {
 	Gui, Add, %Ctrl%, HWNDhCtrl %Opt%, %Txt%
 	DllCall("SetParent", "uint", hCtrl, "uint", hParent)	
@@ -233,18 +389,11 @@ Form_split(s, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="") {
 	loop, 5
 		o%A_Index% := ""
 	StringSplit, o, s, `, ,%A_Space%
+	return o0
 }
 
-;storage
-Form(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
-	static
-	if (var = "" ){
-		if ( _ := InStr(value, ")") )
-			__ := SubStr(value, 1, _-1), value := SubStr(value, _+1)
-		loop, parse, value, %A_Space%
-			_ := %__%%A_LoopField%,  o%A_Index% := _ != "" ? _ : %A_LoopField%
-		return
-	} else _ := %var%
-	ifNotEqual, value,~`a , SetEnv, %var%, %value%
-	return _
-}
+/*
+Group: About
+	o v0.6 by majkinetor.
+	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
+/*

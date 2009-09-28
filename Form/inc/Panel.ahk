@@ -96,8 +96,10 @@ Panel_registerClass() {
     return DllCall("RegisterClass","uint",&wcl)
 }
 
-Panel_add2Form(hParent, Txt, Parameters){
-	Form_Parse(Parameters, "x# y# w# h# style hidden?", x, y, w, h, style, bHidden)
+Panel_add2Form(hParent, Txt, Opt){
+	static parse = "Form_Parse"
+	if IsFunc(parse) 
+		%parse%(Opt, "x# y# w# h# style hidden?", x, y, w, h, style, bHidden)
 	hCtrl := Panel_Add(hParent, x, y, w, h, style, Txt)	
 	ifNotEqual,bHidden,,WinHide, ahk_id %hCtrl%
 	return hCtrl

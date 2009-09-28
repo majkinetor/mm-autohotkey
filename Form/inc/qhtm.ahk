@@ -1,5 +1,5 @@
 /*  
-	Title:  QHTM Control
+	Title:  QHTM
 			*Ultra small Win32 HTML control*
  :
 	Using QHTM you can place HTML content on any window, any device context, on a report, on a button or even in a tooltip.
@@ -648,4 +648,3 @@ QHTM(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", By
 	o QHTML copyright © GipsySoft. See http://www.gipsysoft.com/qhtm/
 	o Licenced under Creative Commons Attribution-Noncommercial <http://creativecommons.org/licenses/by-nc/3.0/>.
  */
-
