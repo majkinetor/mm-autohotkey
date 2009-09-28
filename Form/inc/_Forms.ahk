@@ -4,13 +4,12 @@
 
  Group: Overview
  :
-		Forms framework is group of modules used together to create AHK graphical user interfaces in very simple manner. 
-		Even the very complex GUIs can be created with just several lines of code.
+		Forms framework is group of modules used together to create AHK graphical user interfaces in simple manner. 
  :
 		Forms framework is the list of optional module includes with each of them designed to work with or without framework.
 		It includes <Form> module which capabilities are backbone of the framework and number of custom controls, extensions and useful libraries.
  :
-		The framework can be used to quickly create Windows utilities of any kind.
+		The framework can be used to quickly create Windows utilities.
 
  Group: Features
  :
@@ -23,8 +22,8 @@
 		  having similar purpose are named equaly cross-module.
 		o Clean. They don't create any globals and try not to influence the hosting script in any way unless specified differently.
 		o Documented. All scripts contain documentation in the source code. You can use mkdoc script to create HTML documentation out of it by simply
-		  running it in the folder with scripts. You can use comment remover to reduce the size of the modules. Finally, you can merge them into
-		  single include using ScriptMerge, which gives the you option to create unite documentation in one big HTML file and simpler way to include framework.
+		  running it in the folder with scripts. You can use comment remover to reduce the size of the modules. You can also merge them into
+		  single include using ScriptMerge, which gives you the option to create documentation in one HTML file and simpler way to include framework.
 		o Free. All modules are open source and free.
 
  Group: Modules
