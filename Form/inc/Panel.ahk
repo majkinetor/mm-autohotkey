@@ -104,3 +104,8 @@ Panel_add2Form(hParent, Txt, Opt){
 	ifNotEqual,bHidden,,WinHide, ahk_id %hCtrl%
 	return hCtrl
 }
+
+/* Group: About
+	o Ver 0.1 by majkinetor. 
+	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+*/

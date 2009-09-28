@@ -19,7 +19,7 @@
 			  X-H		- Control coordinates.
   			  Style		- List of control styles, optional.
 			  Handler	- Notification handler, optional.
-			  DllPath	- Path to the control's dll, optional.
+			  DllPath	- Path to the control's dll, optional. By default current folder.
 
 	Styles:
 			  Border	  - Add border arond the control.
@@ -32,19 +32,21 @@
 				 
 	>  Result := Handler(Hwnd, Link, Id)
 
-			Hwnd	- Handle of the control
-			Link	- Link text
-			ID		- HTML link ID						
+			Hwnd	- Handle of the control.
+			Link	- Link text.
+			ID		- HTML link ID.				
 			Result  - Return 1 to open the link in system default editor.
  */
-QHTM_Add(Hwnd, Text, X, Y, W, H, Style="", Handler="", DllPath="qhtm.dll"){
+QHTM_Add(Hwnd, Text, X, Y, W, H, Style="", Handler="", DllPath=""){
 	static MODULEID
 	static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
 	static WS_EX_BORDER = 0x200, WS_EX_TRANSPARENT=0x20
 
 	if !MODULEID{
+		ifEqual, DllPath, ,SetEnv, DllPath, qhtm.dll
+
 		if !QHTM_Init( DllPath )
-			return A_ThisFunc ">   Initialisation failed"
+			return A_ThisFunc "> Initialisation failed."
 
 		old := OnMessage(0x4E, "QHTM_onNotify"), MODULEID := 171108
 		if old != QHTM_onNotify
@@ -72,7 +74,7 @@ QHTM_Add(Hwnd, Text, X, Y, W, H, Style="", Handler="", DllPath="qhtm.dll"){
 		  , "Uint", MODULEID						; hMenu
 		  , "Uint", 0								; hInstance
 		  , "Uint", 0, "UInt")
-	IfEqual, hCtrl, 0, return A_ThisFunc ">   Error while creating control"
+	IfEqual, hCtrl, 0, return 0
 
 	if IsFunc(Handler)
 		QHTM(hCtrl "Handler", Handler)
@@ -576,6 +578,12 @@ QHTM_Zoom(hCtrl, Level=2){
 	return ErrorLevel
 }
 
+;=================================== PRIVATE ==============================
+QHTM_add2Form(hParent, Txt, Opt) {
+	static parse = "Form_Parse"
+	%parse%(Opt, "x# y# w# h# style g* DllPath", x, y, w, h, style, Handler, DllPath)	
+	return QHTM_Add(hParent, Txt, x, y, w, h, Handler, DllPath)	
+}
 
 QHTM_onForm(hwndQHTM, pFormSubmit, lParam){
 	static fun
@@ -616,7 +624,7 @@ QHTM_onNotify(Wparam, Lparam, Msg, Hwnd) {
 	NumPut(%handler%(hw, txt1, txt2), Lparam+16)
 }
 
-QHTM_StrAtAdr(adr) { 
+QHTM_strAtAdr(adr) { 
    Return DllCall("MulDiv", "Int",adr, "Int",1, "Int",1, "str") 
 }
 
@@ -644,7 +652,7 @@ QHTM(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", By
 
 /* 
  Group: About 
- 	o AHK module ver 1.02 by majkinetor.
+ 	o AHK module ver 1.03 by majkinetor.
 	o QHTML copyright © GipsySoft. See http://www.gipsysoft.com/qhtm/
 	o Licenced under Creative Commons Attribution-Noncommercial <http://creativecommons.org/licenses/by-nc/3.0/>.
  */

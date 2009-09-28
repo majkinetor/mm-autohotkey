@@ -126,7 +126,7 @@ Toolbar_Add(hGui, Handler, Style="", ImageList="", Pos="") {
              , "uint", MODULEID
              , "uint", 0 
              , "uint", 0, "Uint") 
-    ifEqual, hCtrl, 0, return A_ThisFunc "> Can't create toolbar." 
+    ifEqual, hCtrl, 0, return 0
 	
 	SendMessage, TB_BUTTONSTRUCTSIZE, 20, 0, , ahk_id %hCtrl%
 	SendMessage, TB_SETEXTENDEDSTYLE, 0, hExStyle, , ahk_id %hCtrl% 
@@ -1108,7 +1108,7 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 
 /*
  Group: About
-	o Ver 2.21 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Ver 2.3 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
 	o Parts of code in Toolbar_onNotify by jballi.
 	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
