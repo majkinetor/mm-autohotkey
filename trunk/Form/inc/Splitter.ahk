@@ -105,6 +105,11 @@ Splitter_SetPos( HSep, Pos ) {
 }
 
 ;=============================================== PRIVATE ===============================================
+Splitter_add2Form(hParent, Txt, Opt) {
+	DllCall("SetParent", "uint", hCtrl := Splitter_Add(Opt, Txt), "uint", HParent)
+	return hCtrl
+}
+
 
 Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {	
 	static
@@ -249,6 +254,6 @@ Splitter_IsVertical(Hwnd) {
  */
 
 /* Group: About
-	o Ver 1.0c by majkinetor. 
+	o Ver 1.01 by majkinetor. 
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */

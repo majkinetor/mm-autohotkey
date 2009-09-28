@@ -590,6 +590,15 @@ Rebar_compileBand(ByRef BAND, hCtrl, ByRef o1="", ByRef o2="", ByRef o3="", ByRe
 
 
 ;=========================================================== PRIVATE =======================================================
+;Required function by Forms framework.
+Rebar_add2Form(hParent, Txt, Opt) {
+	static f := "Form_Parse"
+	
+	%f%(Opt, "x# y# w# h# style IL* g*", x,y,w,h,style,il,handler)
+	pos := (x!="" ? " x" x : "") (y!="" ? " y" y : "") (w!="" ? " w" w : "") (h!="" ? " h" h : "")
+	return Rebar_Add(hParent, style, il, pos, handler)
+}
+
 /*
   Function has 3 purposes :
  	o List evaluation: hex value out of list of style names
@@ -737,7 +746,7 @@ Rebar(var="", value="~`a") {
  */
 
 /* Group: About
-	o Ver 2.0c by majkinetor. 
+	o Ver 2.02 by majkinetor. 
 	o MSDN Reference: <http://msdn.microsoft.com/en-us/library/bb774375(VS.85).aspx>.
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>.
 */
