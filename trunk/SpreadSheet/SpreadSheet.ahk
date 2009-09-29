@@ -1,8 +1,8 @@
 /*  
 	Title:  SpreadSheet 
-			*SpreadSheet control*
+			SpreadSheet control is extremelly fast and small Excell like control, developed in Assembler.
 
-			SpreadSheet control is extremelly fast and small Excell like control, developed in Assembler. 
+			(See SpreadSheet.png)
  */
 
 /*
@@ -10,19 +10,19 @@
 			  Add control to the Gui
 
 	Parameters:
-			  hGui	- Parent's hwnd
-			  X-H	- Control coordinates
-			  Style	- White separated list of control styles, by default VSCROLL HSCROLL
-			  Handler - Notification handler, optional
+			  HParent	- Parent's handle.
+			  X..H		- Control coordinates.
+			  Style		- White separated list of control styles.
+			  Handler	- Notification handler, optional.
 			  DllPath	- Path to the dll, by default look at the working folder.
 
 	Styles:
 			 VSCROLL  HSCROLL  STATUS  GRIDLINES  ROWSELECT  CELLEDIT  GRIDMODE  COLSIZE  ROWSIZE  WINSIZE  MULTISELECT 
 	
 	Handler:
->			result := Handler(hWnd, Event, EArg, Col, Row)
+>			result := Handler(HCtrl, Event, EArg, Col, Row)
 
-			hWnd	- Handle of the speradsheet control that sends notification
+			HCtrl	- Handle of the speradsheet control that sends the notification.
 			Event	- Event that ocured. Can be *S* (select), *EB* (before edit), *EA* (after edit), *UB* (before update), *UA* (after update), *C* (click) and *D* (draw)
 			EArg    - Event argument. Depends on event. See below.
 			Col		- Column of the associated cell.
@@ -44,13 +44,14 @@
 			Control's handle	
 
   */
-SS_Add(hGui,X=0,Y=0,W=200,H=100, Style="VSCROLL HSCROLL", Handler="", DllPath="SprSht.dll"){
+SS_Add(HParent,X,Y,W,H, Style="", Handler="", DllPath=""){
 	static MODULEID
 	static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
 	static VSCROLL=0x0001, HSCROLL=0x0002, STATUS=0x0004, GRIDLINES=0x0008, ROWSELECT=0x0010, CELLEDIT=0x0020, GRIDMODE=0x0040, COLSIZE=0x0080, ROWSIZE=0x0100, WINSIZE=0x0200, MULTISELECT=0x0400
 
   ;standard registering procedure
 	if !MODULEID { 
+		ifEqual, DllPath,,SetEnv, DllPath, SprSht.dll
 		if !DllCall("LoadLibrary", "str", DllPath)	
 			return A_ThisFunc "> Can't load library - " DllPath		
 		old := OnMessage(0x4E, "SS_onNotify"),	MODULEID := 260609
@@ -73,7 +74,7 @@ SS_Add(hGui,X=0,Y=0,W=200,H=100, Style="VSCROLL HSCROLL", Handler="", DllPath="S
       , "int",  y				; Top
       , "int",  w				; Width
       , "int",  h				; Height
-      , "Uint", hGui			; hWndParent
+      , "Uint", HParent			; hWndParent
       , "Uint", MODULEID		; hMenu
       , "Uint", 0				; hInstance
       , "Uint", 0, "Uint")
@@ -698,7 +699,7 @@ SS_ReCalc(hCtrl){
 }
 
 /*
-	Function: ReCalc
+	Function: Redraw
 			  Redraw the control.
   */
 SS_Redraw(hCtrl){
@@ -1276,19 +1277,31 @@ SS_SplittSync(hCtrl, Flag=1 ) {	;. wParam=0, lParam=TRUE/FALSE
 	return ERRORLEVEL
 }
 
+;=============================================== PRIVATE ===============================================
+;required by the Forms framework
+SpreadSheet_add2Form(hParent, Txt, Opt) {
+	static f := "Form_Parse"
+	
+	%f%(Opt, "x# y# w# h# style dllPath g*", x, y, w, h, style, dllPath, handler)
+	h := SS_Add(hParent, x, y, w, h, style, dllPath)
+	ifNotEqual, Txt,, ControlSetText,, %Txt%, ahk_id %h%
+
+	return h
+}
 
 SS_onNotify(wparam, lparam, msg, hwnd){
 	static MODULEID := 260609, oldNotify="*"
 	static SPRN_SELCHANGE=1, SPRN_BEFOREEDIT=2, SPRN_AFTEREDIT=3, SPRN_BEFOREUPDATE=4, SPRN_AFTERUPDATE=5, SPRN_HYPERLINKENTER=6, SPRN_HYPERLINKLEAVE=7, SPRN_HYPERLINKCLICK=8, SPRN_BUTTONCLICK=9
 
-	if ((NumGet(lparam+4)) != MODULEID){
-		ifEqual, oldNotify, *, SetEnv, oldNotify, % SS("OldNotify")		
-		ifNotEqual, oldNotify,,return DllCall(oldNotify, "uint", wparam, "uint", lparam, "uint", msg, "uint", hwnd)		
-		return
-	}
+	if (_ := (NumGet(Lparam+4))) != MODULEID
+	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
+	 else {
+		ifEqual, oldNotify, *, SetEnv, oldNotify, % SS("oldNotify")		
+		if oldNotify !=
+			return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
+	 }
 
 	hw := NumGet(lparam+0),  code := NumGet(lparam+8)
-
 	handler := SS(hw "Handler")
 	ifEqual, handler,, return
 	
@@ -1446,7 +1459,7 @@ SS_strAtAdr(adr) {
 }
 
 ;Storage function
-s(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
+ss(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
 	static
 	if (var = "" ){
 		if ( _ := InStr(value, ")") )
@@ -1677,7 +1690,6 @@ return
 */
 
 /* Group: Known Bugs
-
 	o Cell cursor disapears in expanded cells.
 	o Multiselect scrolling by mouse is too fast.
 	o Scroll-locked area does not work well with splitts.
@@ -1685,9 +1697,9 @@ return
 */
 
 /* Group: About
-	o AHK module ver 2.1.1 by majkinetor
-	o SpreadSheet control Version: 0.0.2.1 by KetilO <http://www.masm32.com/board/index.php?topic=6913.0>
-	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
+	o SpreadSheet control version: 0.0.2.1 by KetilO <http://www.masm32.com/board/index.php?topic=6913.0>
+	o AHK module ver 0.0.2.1-2 by majkinetor.
+	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
 
  */
 
