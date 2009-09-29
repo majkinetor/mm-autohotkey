@@ -21,7 +21,6 @@
 	Form_Show(), OnQHTM("", "", init )
 return
 
-
 OnQHTM(Hwnd, Link, Id) {
 	local n
 	if (id)
@@ -33,6 +32,7 @@ InitControl(Name, HCtrl) {
 	global
 	
 	if Name = HiEdit
+		WinSet, Style, +1, ahk_id %Hctrl%
 
 	if Name = HLink
 	{
