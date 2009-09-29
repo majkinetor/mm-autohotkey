@@ -32,6 +32,8 @@ OnQHTM(Hwnd, Link, Id) {
 InitControl(Name, HCtrl) {
 	global
 	
+	if Name = HiEdit
+
 	if Name = HLink
 	{
 		ControlSetText, ,Click <a href="www.autohotkey.com">here</a> to go to AutoHotKey site, ahk_id %HCtrl%

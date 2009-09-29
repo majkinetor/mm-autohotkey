@@ -30,10 +30,10 @@
 		o <Rebar>		- Rebar custom control.
 		o <HLink>		- HyperLink custom control.
 		o <Splitter>	- Splitter custom control.
-		o <Scrollbar>	- Scrollbar custom control.
+		o <ScrollBar>	- Scrollbar custom control.
 		o <HiEdit>		- HiEdit custom control.
 		o <QHTM>		- Qhtm custom control.
-		o <SpreadSheat> - SpreaddSheat control.
+		o <SpreadSheet> - SpreaddSheet control.
 		o <Win>			- Set of window functions.
 		o <Dlg>			- Common dialogs.
 
