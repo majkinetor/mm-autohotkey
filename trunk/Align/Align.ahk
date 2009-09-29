@@ -17,8 +17,9 @@
 					  If you use dot infront of the number, everything after the dot will be seen as a handle of the control which serves as a marker.
 					  In this mode, hCtrl control is aligned according to the marker control.
 			
-			hMarker	- If present presents marking control which changes behavior of the function. HCtrl will be position according to this control
-					  and align type and Type will represent on which side to glue HCtrl to the hMarker.
+			hGlueCtrl - If present, changes behavior of the function. HCtrl will be glued to this control and Type will represent on which side 
+						to glue HCtrl to the hMarker. If first char of hMarker is "*", the function will position control relative to its root window, 
+						otherwise, the repositioning is relative to its parent.
  
   Remarks:
 			Parent window size must be set prior to calling this function. Function is not limitted to top level windows, it can align
@@ -37,8 +38,8 @@
  			Align(hGui)			  ;Re-align hGui
 
 
- 			Align(h3, "F", "",  hMarker )  ; Align h3 to cover hMarker control
-			Align(h3, "T", 200, hMarker )  ; Align h3 to be put above hMarker control and have 200 height.
+ 			Align(h3, "F", "",  hGlueCtrl )  ; Align h3 to cover hGlueCtrl control
+			Align(h3, "T", 200, hGlueCtrl )  ; Align h3 to be put above hGlueCtrl control and have height=200.
 	(end code)
 
   About:
@@ -62,7 +63,13 @@ Align(HCtrl, Type="", Dim="", hMarker=""){
 	} 
 	
 	if (hMarker) {
-		Win_GetRect(hMarker, "*xywh", x,y,w,h)
+		if SubStr(hMarker, 1, 1) = "*"
+			hMarker := SubStr(hMarker, 2), bRoot := 1
+		
+		if bRoot
+			ControlGetPos, x, y, w, h, , ahk_id %hMarker%
+		else Win_GetRect(hMarker, "*xywh", x,y,w,h)
+
 		l:=r:=t:=b:=f:=0, %Type% := 1
 		if (Dim = "") {
 			ControlGetPos,,,DimH,DimV,,ahk_id %HCtrl%
@@ -70,7 +77,11 @@ Align(HCtrl, Type="", Dim="", hMarker=""){
 		}
 		x += l || r ? (l ? -1*Dim : w) : 0,  w := r || l ? Dim : w
 		y += t || b ? (t ? -1*Dim : h) : 0,  h := t || b ? Dim : h
-		return DllCall("SetWindowPos", "uint", Hctrl, "uint", 0, "uint", x, "uint", y, "uint", w, "uint", h, "uint", 4)
+
+		if bRoot
+			 ControlMove, , x, y, w, h, ahk_id %hCtrl%
+		else DllCall("SetWindowPos", "uint", Hctrl, "uint", 0, "uint", x, "uint", y, "uint", w, "uint", h, "uint", 4)
+		return
 	}
 	
 

@@ -4,22 +4,27 @@ SetWinDelay, -1
 
 	;===============================
 
-	Gui, +LastFounds +Resize
+	Gui, +LastFounds
 	hGui := WinExist()
+	hGui := Panel_Add(hGui, 0, 0, 500, 500)
 
 	Gui, Show, w500 h500 Hide
 
-	Gui, Add, ListView,	HWNDhList x100 y100 w300 h300, 
+	;Gui, Add, ListView,	HWNDhMarker x100 y100 w300 h300, 
+	hMarker := Panel_Add(hGui, 100, 100, 300, 300, "hidden", "panel")
 
-	Gui, Add, Button, HWNDhb1, B1
-	Gui, Add, Button, HWNDhb2, B2
-	Gui, Add, Button, HWNDhb3, B3
-	Gui, Add, Button, HWNDhb4, B4
 
-	Align(hb1, "T", 60, hList)
-	Align(hb2, "B", 20, hList)
-	Align(hb3, "L", 90, hList)	
-	Align(hb4, "R", 50, hList)	
+	loop, 5
+	{
+		Gui, Add, Button, HWNDhb%A_Index%, B%A_Index%
+		Win_SetParent(hb%A_Index%, hGui)
+	}
+
+	Align(hb1, "T", 60, hMarker)
+	Align(hb2, "B", 20, hMarker)
+	Align(hb3, "L", 90, hMarker)	
+	Align(hb4, "R", 50, hMarker)	
+	Align(hb5, "F", "", hMarker)	
 
 	Gui, SHow,
 return
@@ -28,3 +33,4 @@ return
 
 #include Align.ahk
 #include inc\Win.ahk
+#include inc\Panel.ahk
