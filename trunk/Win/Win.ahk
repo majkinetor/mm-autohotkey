@@ -188,12 +188,13 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
  
  Parameters:
  			hwnd		- Window handle
-			pQ			- Query parameter: ordered list of x, y, w and h characters. If you specify * as first char rectangle will be raltive to the client area of window's parent.
-						  Leave pQ empty or "*" to return all attributes separated by space.
+			pQ			- Query parameter: ordered list of x, y, w and h characters and optionally type specified as first charachter.
+						  Use *  to get placement ralative to the client area of the parent's window, or ! get placement relative to the root window.
+						  Omit x,y,w,h to return all attributes separated by space for given placement type.
 			o1 .. o4	- Reference to output variables. 
 
  Returns:
-			o1
+			o1 or string with all coordinates.
 
  Remarks:
 			This function is faster alternative to <Get> with R parameter. However, if you query additional window info using <Get>, it may be faster and definitely more 
@@ -217,12 +218,11 @@ Win_GetRect(hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="") {
 	if (pQ = "") or pQ = ("*")
 		retAll := true,  pQ .= "xywh"
 
-	xx := NumGet(RECT, 0, "Int"), yy := NumGet(RECT, 4, "Int")
-	if SubStr(pQ, 1, 1) = "*"
-	{
-		Win_Get(DllCall("GetParent", "uint", hwnd), "Lxy", lx, ly), xx -= lx, yy -= ly
-		StringTrimLeft, pQ, pQ, 1
-	}
+	xx := NumGet(RECT, 0, "Int"), yy := NumGet(RECT, 4, "Int"),  c := SubStr(pQ, 1, 1)
+	if (c = "*") 
+		Win_Get(DllCall("GetParent", "uint", hwnd), "Lxy", lx, ly), xx -= lx, yy -= ly, pQ := SubStr(pQ, 2)
+	else if (c = "!") 
+		Win_Get(DllCall("GetAncestor", "uint", Hwnd, "uint", 2), "Lxy", lx, ly), xx -= lx, yy -= ly,  pQ := SubStr(pQ, 2)
 	
 	loop, parse, pQ
 		if A_LoopField = x
@@ -707,7 +707,7 @@ Win_Subclass(hCtrl, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.2  by majkinetor.
+	o v1.21 by majkinetor.
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*
