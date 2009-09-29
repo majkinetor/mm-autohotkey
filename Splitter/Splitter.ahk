@@ -105,6 +105,11 @@ Splitter_SetPos( HSep, Pos ) {
 }
 
 ;=============================================== PRIVATE ===============================================
+;required by forms framework.
+Splitter_add2Form(hParent, Txt, Opt) {
+	DllCall("SetParent", "uint", hCtrl := Splitter_Add(Opt, Txt), "uint", HParent)
+	return hCtrl
+}
 
 Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {	
 	static
