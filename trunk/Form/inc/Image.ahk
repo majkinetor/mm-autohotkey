@@ -1,11 +1,15 @@
 /*
- Group: Image
-		Adds image to the Button control.
+ Function:  Image
+			Adds image to the Button control.
 
  Parameters:
+		hButton	- Handle to the button.
 		Image	- Path to the .BMP file or image handle. First pixel signifies transparency color.
 		Width	- Width of the image, if omitted, current control width will be used.
 		Height	- Height of the image, if omitted, current control height will be used.
+ 
+ Returns:
+		Bitmap handle.
  
  */
 Ext_Image(hButton, Image, Width="", Height=""){ 

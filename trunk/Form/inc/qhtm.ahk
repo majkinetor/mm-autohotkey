@@ -1,6 +1,6 @@
 /*  
 	Title:  QHTM
-			*Ultra small Win32 HTML control*
+			Ultra small Win32 HTML control.
  :
 	Using QHTM you can place HTML content on any window, any device context, on a report, on a button or even in a tooltip.
 	QHTM is written entirely in C++ and does not rely on MFC, nor does it need IE installed. Instead QHTM uses direct Win32 API calls which makes it very fast and very light.

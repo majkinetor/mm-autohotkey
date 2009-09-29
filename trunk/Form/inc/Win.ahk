@@ -1,8 +1,7 @@
 /*
 	Title:	Win
-			*Set of window functions*
+			Set of window functions.
  */
-
 
 /*
  Function:	Animate

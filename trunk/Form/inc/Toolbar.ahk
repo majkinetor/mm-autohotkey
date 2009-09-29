@@ -1,5 +1,5 @@
 /* Title:    Toolbar
-			*Encapsulation of the system Toolbar API.*
+			Toolbar control.
 			(see toolbar.png)
 			The module is designed with following goals in mind :
 			* To allow programmers to quickly create toolbars in intuitive way.
@@ -16,7 +16,7 @@
 			hGui		- HWND of the GUI. GUI must have defined size.
 			Handler		- User function that handles Toolbar events. See below.
 			Style		- Styles to apply to the toolbar control, see list of styles bellow.
-			ImageList	- Handle of the image list that contains button images. Otherwise it specifies number and icon size of the one of the 3 system catalogs (see catalogs.png).
+			ImageList	- Handle of the image list that contains button images. Otherwise it specifies number and icon size of the one of the 3 system catalogs (see Toolbar_catalogs.png).
 						  Each catalog contains number of common icons in large and small size -- S or L (default). Defaults to "1L" (first catalog, large icons)
 			Pos			- Position of the toolbar specified - any space separated combination of the x y w h keywords followed by the size.
 
@@ -197,7 +197,7 @@ Toolbar_Clear(hCtrl){
 /*
  Function:  Customize
  			Launches customization dialog
- 			(see customize.png)
+ 			(see Toolbar_customize.png)
  */
 Toolbar_Customize(hCtrl) {
 	static TB_CUSTOMIZE=0x41B

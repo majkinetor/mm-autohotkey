@@ -1,10 +1,9 @@
 /* Title:    Splitter
-			*Implementation of the Splitter control*
+			Splitter control.
  :
-			Both Windows and AHK don't have splitter control. 
-			With this module you can add splitters to your GUIs. 
+			Both Windows and AHK don't have splitter control. With this module you can add splitters to your GUIs. 
 			
-			(see splitter.gif)
+			(see splitter.png)
 
  Dependency:
 			Win 1.2

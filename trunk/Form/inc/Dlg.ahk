@@ -1,10 +1,10 @@
 /* Title:	Dlg
-			*Common Operating System Dialogs*
+			Common operating system dialogs.
  */
 
 /*
  Function:		Color
-				(See color.png)
+				(See Dlg_color.png)
 
  Parameters: 
 				Color	- Initial color and output in RGB format.
@@ -46,8 +46,8 @@ Dlg_Color(ByRef Color, hGui=0){
 /*
 
  Function:     Find / Replace
-				(see find.png)
-				(see replace.png)
+				(See Dlg_find.png)
+				(See Dlg_replace.png)
 
  Parameters: 
                hGui    - Handle to the parent.
@@ -146,7 +146,7 @@ Dlg_Replace( hGui, Handler, Flags="", FindText="", ReplaceText="") {
 
 /*
  Function:  Font
-			 (see font.png)				
+			 (See Dlg_font.png)				
 
  Parameters:
             Name	- Initial font,  output.
@@ -249,7 +249,7 @@ Dlg_Font(ByRef Name, ByRef Style, ByRef Color, Effects=true, hGui=0) {
 
 /*
  Function:	Icon 
-			(See icon.png)
+			(See Dlg_icon.png)
 
  Parameters:
 			Icon	- Default icon resource, output.
@@ -279,7 +279,7 @@ Dlg_Icon(ByRef Icon, ByRef Index, hGui=0) {
 
 /*
  Function:  Open / Save 
-			 (see open.png)
+			 (See Dlg_open.png)
 
  Parameters: 
             hGui            - Parent's handle, positive number by default 0 (influences dialog position).

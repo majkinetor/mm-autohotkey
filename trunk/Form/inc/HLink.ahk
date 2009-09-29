@@ -1,5 +1,5 @@
 /* Title:	HLink
-			*Custom HyperLink control.*
+			HyperLink control.
 */
 
 /*
