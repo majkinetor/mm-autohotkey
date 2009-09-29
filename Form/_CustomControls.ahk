@@ -1,4 +1,4 @@
-_("m! e d w")
+_("mo! e d w")
 
 	ctrls = HiEdit HLink Toolbar QHTM Rebar Splitter
 	;===============================================
@@ -11,7 +11,7 @@ _("m! e d w")
 	hTab   := Form_Add(hForm, "Panel", "", "", "Align F", "Attach p r2")
 	loop, parse, ctrls, %A_Space%
 	{		
-		hPanel%A_Index%	 :=	Form_Add(hTab,  "Panel", "",  "style=hidden", "Align " hTab, "Attach p -")	;create hidden attach-disabled panel.
+		hPanel%A_Index%	 :=	Form_Add(hTab,  "Panel", "", "w100 h100 style=hidden", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
 		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, "", "Align F", "Attach p")
 		InitControl(A_LoopField, hCtrl), ctrlNo := A_Index
 	}
