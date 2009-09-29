@@ -4,12 +4,9 @@
 
  Group: Overview
  :
-		Forms framework is group of modules used together to create AHK graphical user interfaces in simple manner. 
- :
-		Forms framework is the list of optional module includes with each of them designed to work with or without framework.
-		It includes <Form> module which capabilities are backbone of the framework and number of custom controls, extensions and useful libraries.
- :
-		The framework can be used to quickly create Windows utilities.
+		Forms framework is a group of modules used together to create AHK graphical user interfaces. 
+		It contains the list of optional module includes with each module designed to work with or without the framework in place.
+		It includes number of custom controls, extensions and useful libraries. <Form> module is a backbone of the framework.
 
  Group: Features
  :
