@@ -50,8 +50,8 @@ Align(HCtrl, Type="", Dim="", hMarker=""){
 
 	HCtrl += 0
 	if (Type="") {	;realign
-		hParent := HCtrl
-		%hParent%rect := ""
+		critical 100
+		hParent := HCtrl, %hParent%rect := ""
 		loop, parse, %hParent%, |
 		{
 			StringSplit, s, A_LoopField, %A_Space%
