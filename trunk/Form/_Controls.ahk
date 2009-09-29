@@ -1,16 +1,20 @@
-;_("m! e d w")
+_("mm! e d w")
 #SingleInstance, force
 #NoEnv
 
-	ctrls = HiEdit HLink Toolbar QHTM Rebar SpreadSheet Splitter
+	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet Splitter 
+	ahk		= Text Edit UpDown Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress GroupBox StatusBar Tab2
 	init  = HiEdit
 	;===============================================
-	
-	SetWorkingDir, inc		;required to load some dll's that are put there
-	hForm  := Form_New("w500 h400 Resize")
 
-	htmlCtrls := RegExReplace(ctrls, "\w+", "<a href=$0 id=$0>$0</a><a href='" A_ScriptDir "\_doc\files\inc\$0-ahk.html'>&nbsp;+</a>&nbsp;&nbsp;")
-	hInfo  := Form_Add(hForm, "QHTM", "<b>Press F1 to cycle controls. Click + to see docs.<br><br></b>   " htmlCtrls, "gOnQHTM", "Align T, 100", "Attach p r2")
+	ctrls := custom " " ahk
+
+	SetWorkingDir, inc		;required to load some dll's that are put there
+	hForm  := Form_New("w700 h400 Resize")
+
+	htmlCtrls := RegExReplace(custom, "\w+", "<a href=$0 id=$0>$0</a><a href='" A_ScriptDir "\_doc\files\inc\$0-ahk.html'>&nbsp;+</a>&nbsp;&nbsp;")
+			   . "<hr>" RegExReplace(ahk, "\w+", "<a href=$0 id=$0>$0</a>&nbsp;&nbsp;")
+	hInfo  := Form_Add(hForm, "QHTM", "<b>Press F1 to cycle controls. Click + to see docs.<br><br></b>   " htmlCtrls, "gOnQHTM", "Align T, 150", "Attach p r2")
 	hTab   := Form_Add(hForm, "Panel", "", "", "Align F", "Attach p r2")
 	loop, parse, ctrls, %A_Space%
 	{		
