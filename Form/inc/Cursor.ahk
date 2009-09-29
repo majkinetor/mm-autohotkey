@@ -1,5 +1,5 @@
-/* Group: Cursor
-          Set cursor shape for control or window.
+/* Function: Cursor
+			Set cursor shape for control or window.
  
  Parameters: 
 			HCtrl	- Contorls handle.

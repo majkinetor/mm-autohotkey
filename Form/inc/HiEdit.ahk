@@ -2,6 +2,8 @@
 			HiEdit is a multitabbed, ultra fast, large file edit control consuming very little memory. 
 			It can display non-printable characters in a readable format and can be used for any general 
 			purpose editing of text and birary files.
+
+			(See HiEdit.png)
  */
 
 /*	Function:	Add
@@ -15,7 +17,7 @@
 	Styles:
 			HSCROLL, VSCROLL, TABBED, HILIGHT, TABBEDBTOP, TABBEDHRZSB, TABBEDBOTTOM
  */
-HE_Add(hGui, X, Y, W, H, Style="", DllPath="HiEdit.dll"){
+HE_Add(hGui, X, Y, W, H, Style="", DllPath=""){
 	static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000, MODULEID
 	static HSCROLL=0x8 ,VSCROLL=0x10, TABBED=4, HILIGHT=0x20, TABBEDBTOP=0x1, TABBEDHRZSB=0x2 ,TABBEDBOTTOM=0x4, SINGLELINE=0x40, FILECHANGEALERT=0x80
 
@@ -24,8 +26,10 @@ HE_Add(hGui, X, Y, W, H, Style="", DllPath="HiEdit.dll"){
 		IfEqual, A_LoopField, , continue
 		else hStyle |= %A_LOOPFIELD%
 
-	if !MODULEID
+	if !MODULEID {
+		ifEqual, DllPath, ,SetEnv, DllPath, HiEdit.dll
 		MODULEID := 230909, DllCall("LoadLibrary", "str", DllPath)
+	}
 
 	hCtrl := DllCall("CreateWindowEx"
       , "Uint", 0x200            ; WS_EX_CLIENTEDGE
@@ -966,8 +970,6 @@ HiEdit_add2Form(hParent, Txt, Opt) {
 	static f := "Form_Parse"
 	
 	%f%(Opt, "x# y# w# h# style dllPath", x, y, w, h, style, dllPath)
-	ifEqual, dllPath, ,SetEnv, dllPath, HiEdit.dll
-
 	h := HE_Add(hParent, x, y, w, h, style, dllPath)
 	ifNotEqual, Txt,, ControlSetText,, %Txt%, ahk_id %h%
 

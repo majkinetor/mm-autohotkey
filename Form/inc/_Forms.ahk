@@ -1,6 +1,6 @@
 /*
 	Title:	_Forms
-			*Forms framework*
+			*Forms framework.*
 
  Group: Overview
  :
@@ -30,8 +30,10 @@
 		o <Rebar>		- Rebar custom control.
 		o <HLink>		- HyperLink custom control.
 		o <Splitter>	- Splitter custom control.
+		o <Scrollbar>	- Scrollbar custom control.
 		o <HiEdit>		- HiEdit custom control.
 		o <QHTM>		- Qhtm custom control.
+		o <SpreadSheat> - SpreaddSheat control.
 		o <Win>			- Set of window functions.
 		o <Dlg>			- Common dialogs.
 
@@ -57,8 +59,10 @@
 #include *i Rebar.ahk
 #include *i HLink.ahk
 #include *i Splitter.ahk
+#include *i Scrollbar.ahk
 
 #include *i HiEdit.ahk
+#include *i SpreadSheet.ahk
 #include *i Qhtm.ahk
 
 
@@ -68,6 +72,6 @@
 
 /* 
  Group: About
-	o v0.1 by majkinetor.
+	o v0.2 by majkinetor.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> .
  */

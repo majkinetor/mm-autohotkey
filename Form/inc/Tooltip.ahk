@@ -1,5 +1,5 @@
-/* Group: Tooltip
-		  Adds tooltips to GUI controls.
+/* Function: Tooltip
+			 Add tooltips to GUI controls.
  
  Parameters:
 			 HCtrl	- Handle of the control.
