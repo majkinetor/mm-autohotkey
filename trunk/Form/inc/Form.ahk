@@ -41,9 +41,8 @@
 			(start code) 
 			Panel_Add2Form(hParent, Txt, Opt){
 				static parse = "Form_Parse"
-				%parse%(Opt, "x# y# w# h# style hidden?", x, y, w, h, style, bHidden)
+				%parse%(Opt, "x# y# w# h# style", x, y, w, h, style)
 				hCtrl := Panel_Add(hParent, x, y, w, h, style, Txt)	
-				ifNotEqual,bHidden,,WinHide, ahk_id %hCtrl%
 				return hCtrl
 			}
 

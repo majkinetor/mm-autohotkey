@@ -13,28 +13,30 @@
 			Text		- Text to display.
 
  Styles:
-			SIMPLE, VCENTER, HCENTER, CENTER, RIGHT, SUNKEN, BLACKFRAME, BLACKRECT, GRAYFRAME, GRAYRECT, WHITEFRAME, WHITERECT.
+			HIDDEN, SIMPLE, VCENTER, HCENTER, CENTER, RIGHT, SUNKEN, BLACKFRAME, BLACKRECT, GRAYFRAME, GRAYRECT, WHITEFRAME, WHITERECT.
 			
  Returns:
 		    Handle of the control or 0 if control couldn't be created.
 
  Remarks:
-			If you <Attach> Panel control to its parent, Panel will disable Attach for itself when it becomes hidden and enable itself when it becomes visible again.
+			If you <Attach> Panel control to its parent, Panel will disable Attach for itself when it becomes explicitelly hidden and enable itself when you show it latter.
 			When Panel doesn't attach, its parent will skip it when performing repositioning of the controls. If Panel itself is attaching its own children, 
 			this means that it will also stop attaching them as its own size wont change. However, its children won't be disabled so if you programmatically change the 
-			the placement of such Panel, it will still reposition its controls.
+			the placement of such Panel, it will still reposition its controls. Hence, if you create Panel with HIDDEN state and used Attach, you should also prefix
+			attach defintion string with "-" to set up that Panel initialy disabled. If you don't do that Panel will do attaching in hidden state initially 
+			(as it was never hidden explicitelly).
 
-			If you have deep hierarchy of Panels(usualy >10), script may block. You can try to fix it by setting #MaxThreads, 255.
+			If you have deep hierarchy of Panels(>10), script may block. Using #MaxThreads, 255 can sometimes help.
  */
 Panel_Add(HParent, X, Y, W, H, Style="", Text="") {
-	static init=0
 	static WS_VISIBLE=0x10000000, WS_CHILD=0x40000000, WS_CLIPCHILDREN=0x2000000, SS_NOTIFY=0x100
-	static SS_SIMPLE = 0xB, SS_BLACKFRAME = 7, SS_BLACKRECT = 4, SS_CENTER=0x201, SS_VCENTER=0x200, SS_HCENTER = 1, SS_GRAYFRAME = 0x8, SS_GRAYRECT = 0x5, SS_RIGHT = 2, SS_SUNKEN = 0x1000, SS_WHITEFRAME = 9, SS_WHITERECT = 6
+		   ,SS_SIMPLE = 0xB, SS_BLACKFRAME = 7, SS_BLACKRECT = 4, SS_CENTER=0x201, SS_VCENTER=0x200, SS_HCENTER = 1, SS_GRAYFRAME = 0x8, SS_GRAYRECT = 0x5, SS_RIGHT = 2, SS_SUNKEN = 0x1000, SS_WHITEFRAME = 9, SS_WHITERECT = 6
+		   ,init=0, SS_HIDDEN=0
 
 	if !init
 		init := Panel_registerClass()
 
-	hStyle := 0
+	hStyle := InStr(" " Style " ", " hidden ") ? 0 : WS_VISIBLE
 	loop, parse, Style, %A_Tab%%A_Space%, %A_Tab%%A_Space%
 	{
 		IfEqual, A_LoopField, , continue
@@ -47,7 +49,7 @@ Panel_Add(HParent, X, Y, W, H, Style="", Text="") {
 	  , "Uint",	  0
 	  , "str",    "Panel"	
 	  , "str",    text		
-	  , "Uint",   WS_VISIBLE | WS_CHILD	| WS_CLIPCHILDREN | SS_NOTIFY | hStyle
+	  , "Uint",   WS_CHILD	| WS_CLIPCHILDREN | SS_NOTIFY | hStyle
 	  , "int",    X, "int", Y, "int", W, "int",H
 	  , "Uint",   HParent
 	  , "Uint",   0, "Uint",0, "Uint",0, "Uint") 
@@ -99,9 +101,8 @@ Panel_registerClass() {
 Panel_add2Form(hParent, Txt, Opt){
 	static parse = "Form_Parse"
 	if IsFunc(parse) 
-		%parse%(Opt, "x# y# w# h# style hidden?", x, y, w, h, style, bHidden)
+		%parse%(Opt, "x# y# w# h# style hidden?", x, y, w, h, style)
 	hCtrl := Panel_Add(hParent, x, y, w, h, style, Txt)	
-	ifNotEqual,bHidden,,WinHide, ahk_id %hCtrl%
 	return hCtrl
 }
 
