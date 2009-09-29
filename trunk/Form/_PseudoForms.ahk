@@ -3,7 +3,7 @@ _("mo! d e w")
 
 	hMainForm:=	Form_New("w500 h400 Resize")
 	hForm1  :=  Form_Add(hMainForm, "Panel", "", "", "Align F", "Attach p")
-	hForm2  :=  Form_Add(hMainForm, "Panel", "", "hidden", "Align " hForm1, "Attach p"),  Attach(hForm2, "-")
+	hForm2  :=  Form_Add(hMainForm, "Panel", "", "hidden", "Align F,," hForm1, "Attach p -")
 	
 	loop, 2
 	{		

@@ -1,4 +1,4 @@
-_("m! d e w")
+_("mm! d e w")
 ;#MaxThreads, 255
 
 	hForm1	:=	Form_New("w540 h400 Resize")
@@ -9,8 +9,8 @@ _("m! d e w")
 
 	hPanel2	:=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align F", "Attach p")
 	
-	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "hidden",		"Align " hPanel2, "Attach p")
-	Attach(hPanel3, "-")	;not necessary but should be done, otherwise Panel3 will be active until toggled once.
+	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "style=hidden","Align F,," hPanel2, "Attach p -")
+
 	
 	hCal1	:=  Form_Add(hPanel3, "MonthCal","",	  "gOnControl",	"Align F", "Attach p")
 

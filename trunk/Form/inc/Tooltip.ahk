@@ -12,6 +12,7 @@
 
  Remarks:
 	Tooltip uses Form storage if present for configuration. If Form module is not present, it will use defaults.
+
 			 
  About:
 	o 1.0 by majkinetor.

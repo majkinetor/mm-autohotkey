@@ -100,8 +100,7 @@ Panel_registerClass() {
 
 Panel_add2Form(hParent, Txt, Opt){
 	static parse = "Form_Parse"
-	if IsFunc(parse) 
-		%parse%(Opt, "x# y# w# h# style hidden?", x, y, w, h, style)
+	%parse%(Opt, "x# y# w# h# style", x, y, w, h, style)
 	hCtrl := Panel_Add(hParent, x, y, w, h, style, Txt)	
 	return hCtrl
 }
