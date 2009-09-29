@@ -105,11 +105,11 @@ Splitter_SetPos( HSep, Pos ) {
 }
 
 ;=============================================== PRIVATE ===============================================
+;required by forms framework.
 Splitter_add2Form(hParent, Txt, Opt) {
 	DllCall("SetParent", "uint", hCtrl := Splitter_Add(Opt, Txt), "uint", HParent)
 	return hCtrl
 }
-
 
 Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {	
 	static
@@ -131,7 +131,7 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 	}
 
 	if (UMsg = WM_LBUTTONDOWN) {
-		DllCall("SetCapture", "uint", Hwnd), parent := DllCall("GetParent", "uint", Hwnd, "Uint")
+		DllCall("SetCapture", "uint", Hwnd),  parent := DllCall("GetParent", "uint", Hwnd, "Uint")
 		VarSetCapacity(RECT, 16), DllCall("GetWindowRect", "uint", parent, "uint", &RECT)
 
 		sz := Win_GetRect(Hwnd, bVert ? "w" : "h") // 2
@@ -140,9 +140,9 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 
 	  ;prevent user from going offscreen with separator
 	  ; let the separator always be visible a little if it is pulled up to the edge
-		NumPut( NumGet(Rect, 0) + sz	,RECT, 0)
+		NumPut( NumGet(Rect, 0) + sz -1	,RECT, 0)
 		NumPut( NumGet(RECT, 4) + sz+ch ,RECT, 4)
-		NumPut( NumGet(RECT, 8) - sz	,RECT, 8)
+		NumPut( NumGet(RECT, 8) - sz +1	,RECT, 8)
 		NumPut( NumGet(RECT, 12)- sz	,RECT, 12)
 
 		DllCall("ClipCursor", "uint", &RECT), DllCall("SetCursor", "uint", %Hwnd%_cursor),	moving := true
@@ -152,13 +152,13 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 		if delta > 10000
 			delta -= 0xFFFF
 
-		DllCall("ClipCursor", "uint", 0),  DllCall("ReleaseCapture")	;, DllCall("SetCursor", "uint", cursor)
+		DllCall("ClipCursor", "uint", 0),  DllCall("ReleaseCapture")
 		moving := false, Splitter_UpdateVisual(), Splitter_move(Hwnd, delta, %Hwnd%_def)
 	}
 
-	if (UMsg =  WM_LBUTTONDBLCLK){
-		return	; move splitter to 0 or to max
-	}
+;	if (UMsg =  WM_LBUTTONDBLCLK){
+;		return	; move splitter to 0 or to max
+;	}
 
 	return DllCall("CallWindowProc","uint",A_EventInfo,"uint",hwnd,"uint",uMsg,"uint",wParam,"uint",lParam)
 }
@@ -192,33 +192,31 @@ Splitter_move(HSep, Delta, Def){
 }
 
 Splitter_updateVisual( HSep="", bVert="" ) {
-	static sz, dc, RECT, parent, adrDrawFocusRect, ch, b, sx,sy,sw,sh
+	static
 
 	if !HSep
 		return dc := 0
 	
 	MouseGetPos, mx, my
-	if !dc
+	if !dc 
 	{
+		ifEqual, adrDrawFocusRect,, SetEnv, adrDrawFocusRect, % DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "DrawFocusRect")
 		CoordMode, mouse, relative
-		adrDrawFocusRect := DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "DrawFocusRect")
-		parent := DllCall("GetParent", "uint", HSep)
-		
-		Win_Get(parent, "NhB" (bVert ? "x" : "y"), ch, b)		;get caption and border size
+
+		root := Win_Get(hSep, "A")
+		Win_Get(root, "NhB" (bVert ? "x" : "y"), ch, b)		;get caption and border size
 		ifGreater, ch, 1000, SetEnv, ch, 0
 
-		dc := DllCall("GetDC", "uint", parent)
+		dc := DllCall("GetDC", "Uint", root, "Uint")
+		Win_GetRect(HSep, "!xywh", sx, sy, sw, sh),	  sz := (bVert ? sw : sh) // 2
 
-		Win_GetRect(HSep, "*xywh", sx, sy, sw, sh),	  sz := (bVert ? sw : sh) // 2
 		VarSetCapacity(RECT, 16),  NumPut(sx, RECT), NumPut(sy, RECT, 4), NumPut(sx+sw, RECT, 8), NumPut(sy+sh, RECT, 12)
-	
 		return DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	}
 	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	if (bVert)
 		 NumPut(mx-b-sz, RECT),	NumPut(mx-b+sz, RECT, 8)
 	else NumPut(my-ch-b-sz, RECT, 4),  NumPut(my-ch-b+sz, RECT, 12)
-
 	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 }
 

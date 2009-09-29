@@ -15,8 +15,8 @@
 
 	Parameters:
 			  Hwnd		- Handle of the parent.
-			  Text		- HTML to display.
 			  X-H		- Control coordinates.
+			  Text		- HTML to display.
   			  Style		- List of control styles, optional.
 			  Handler	- Notification handler, optional.
 			  DllPath	- Path to the control's dll, optional. By default current folder.
@@ -37,7 +37,7 @@
 			ID		- HTML link ID.				
 			Result  - Return 1 to open the link in system default editor.
  */
-QHTM_Add(Hwnd, Text, X, Y, W, H, Style="", Handler="", DllPath=""){
+QHTM_Add(Hwnd, X, Y, W, H, Text="", Style="", Handler="", DllPath=""){
 	static MODULEID
 	static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
 	static WS_EX_BORDER = 0x200, WS_EX_TRANSPARENT=0x20
@@ -579,10 +579,12 @@ QHTM_Zoom(hCtrl, Level=2){
 }
 
 ;=================================== PRIVATE ==============================
+
+;required by forms framework
 QHTM_add2Form(hParent, Txt, Opt) {
 	static parse = "Form_Parse"
-	%parse%(Opt, "x# y# w# h# style g* DllPath", x, y, w, h, style, Handler, DllPath)	
-	return QHTM_Add(hParent, Txt, x, y, w, h, Handler, DllPath)	
+	%parse%(Opt, "x# y# w# h# style g* DllPath", x, y, w, h, style, handler, dllPath)	
+	return QHTM_Add(hParent, x, y, w, h, Txt, style, handler, dllPath)	
 }
 
 QHTM_onForm(hwndQHTM, pFormSubmit, lParam){

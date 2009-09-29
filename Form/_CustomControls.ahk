@@ -1,24 +1,33 @@
 _("mo! e d w")
+#SingleInstance, force
+#NoEnv
 
 	ctrls = HiEdit HLink Toolbar QHTM Rebar Splitter
+	init = Splitter
 	;===============================================
 	
 	SetWorkingDir, inc		;required to load some dll's that are put there
 	hForm  := Form_New("w500 h400 Resize")
 
-	htmlCtrls := RegExReplace(ctrls, "\w+", "<a href='" A_ScriptDir "\_doc\files\inc\$0-ahk.html'>$0</a>&nbsp;&nbsp;")
-	hInfo  := Form_Add(hForm, "QHTM", "<b>Press F1 to cycle controls. Also try to keep F1 pressed while resizing.<br>`nControls:</b>   " htmlCtrls, "", "Align T, 50", "Attach p r2")
+	htmlCtrls := RegExReplace(ctrls, "\w+", "<a href=$0 id=$0>$0</a><a href='" A_ScriptDir "\_doc\files\inc\$0-ahk.html'>&nbsp;+</a>&nbsp;&nbsp;")
+	hInfo  := Form_Add(hForm, "QHTM", "<b>Press F1 to cycle controls. Click + to go to docs.<br>`nControls:</b>   " htmlCtrls, "gOnQHTM", "Align T, 50", "Attach p r2")
 	hTab   := Form_Add(hForm, "Panel", "", "", "Align F", "Attach p r2")
 	loop, parse, ctrls, %A_Space%
 	{		
 		hPanel%A_Index%	 :=	Form_Add(hTab,  "Panel", "", "w100 h100 style=hidden", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
 		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, "", "Align F", "Attach p")
-		InitControl(A_LoopField, hCtrl), ctrlNo := A_Index
-	}
-	
-	Form_Show()
-	n := 1, Win_Show(hPanel1)	;this will show Panel1 (and Panel1 will enable attach for itself)
+		InitControl(A_LoopField, hCtrl), ctrlNo := %A_LoopField% := A_Index
+	}	
+	Form_Show(), OnQHTM("", "", init )
 return
+
+
+OnQHTM(Hwnd, Link, Id) {
+	local n
+	if (id)
+		n := %Id%, Win_Show(hPanel%gCur%, false), Win_Show(hPanel%n%), gCur := n
+	else return 1
+}
 
 InitControl(Name, HCtrl) {
 	global
@@ -51,9 +60,10 @@ F2::
 return
 
 F1::
-	Win_Show(hPanel%n%, false), n++
-	ifGreater, n, %ctrlNo%, SetEnv, n, 1
-	Win_Show(hPanel%n%)
+	Win_Show(hPanel%gCur%, false), gCur++
+	if (gCur > ctrlNo)
+		gCur := 1
+	Win_Show(hPanel%gCur%)
 return
 
 #include inc
