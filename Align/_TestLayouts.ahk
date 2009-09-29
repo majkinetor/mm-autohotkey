@@ -145,7 +145,8 @@ SaveGui() {
 
 Esc:: 
 GuiClose:
-	SaveGui()
+	if iLayout !=
+		SaveGui()
 	ExitApp
 return
 
