@@ -1,3 +1,4 @@
+_("mo")
 #SingleInstance, force
 
 	;=========== SETUP ========
