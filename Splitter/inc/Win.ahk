@@ -163,7 +163,8 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
  
  Parameters:
  			hwnd		- Window handle
-			pQ			- Query parameter: ordered list of x, y, w and h characters. If you specify * as first char rectangle will be raltive to the client area of window's parent.
+			pQ			- Query parameter: ordered list of x, y, w and h characters. Specify * as first char rectangle will be raltive to the client area of window's parent.
+						  Using ! will return coordinates relative to root window client area.
 						  Leave pQ empty or "*" to return all attributes separated by space.
 			o1 .. o4	- Reference to output variables. 
 
@@ -173,7 +174,7 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
  Remarks:
 			This function is faster alternative to <Get> with R parameter. However, if you query additional window info using <Get>, it may be faster and definitely more 
 			convenient then obtaining the info using alternatives. 
-			Besides that, you can't use <Get> to obtain relative coordinates of child windows.
+			You can't use <Get> to obtain relative coordinates of child windows.
 
  Examples:
 	(start code)
@@ -196,6 +197,12 @@ Win_GetRect(hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="") {
 	if SubStr(pQ, 1, 1) = "*"
 	{
 		Win_Get(DllCall("GetParent", "uint", hwnd), "Lxy", lx, ly), xx -= lx, yy -= ly
+		StringTrimLeft, pQ, pQ, 1
+	}
+
+	if SubStr(pq, 1, 1) = "!"
+	{
+		Win_Get(DllCall("GetAncestor", "uint", Hwnd, "uint", 2), "Lxy", lx, ly), xx -= lx, yy -= ly
 		StringTrimLeft, pQ, pQ, 1
 	}
 	
