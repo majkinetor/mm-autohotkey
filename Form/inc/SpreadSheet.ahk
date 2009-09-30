@@ -1283,7 +1283,7 @@ SpreadSheet_add2Form(hParent, Txt, Opt) {
 	static f := "Form_Parse"
 	
 	%f%(Opt, "x# y# w# h# style dllPath g*", x, y, w, h, style, dllPath, handler)
-	h := SS_Add(hParent, x, y, w, h, style, dllPath)
+	h := SS_Add(hParent, x, y, w, h, style, handler, dllPath)
 	ifNotEqual, Txt,, ControlSetText,, %Txt%, ahk_id %h%
 
 	return h
