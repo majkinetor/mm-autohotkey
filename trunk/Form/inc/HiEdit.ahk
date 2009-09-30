@@ -969,7 +969,7 @@ HE(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRe
 HiEdit_add2Form(hParent, Txt, Opt) {
 	static f := "Form_Parse"
 	
-	%f%(Opt, "x# y# w# h# style dllPath", x, y, w, h, style, dllPath)
+	%f%(Opt, "x# y# w# h# style dllPath g*", x, y, w, h, style, dllPath)
 	h := HE_Add(hParent, x, y, w, h, style, dllPath)
 	ifNotEqual, Txt,, ControlSetText,, %Txt%, ahk_id %h%
 

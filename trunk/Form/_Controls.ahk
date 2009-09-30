@@ -1,12 +1,13 @@
-_("mm! e d w")
+_("mo! e d w")
 #SingleInstance, force
+
 #NoEnv
 
 	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet Splitter 
-	ahk		= Text Edit UpDown Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress GroupBox StatusBar Tab2
-	init  = HiEdit
+	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress GroupBox StatusBar Tab2 UpDown
+	init    = HiEdit
 	;===============================================
-
+	
 	ctrls := custom " " ahk
 
 	SetWorkingDir, inc		;required to load some dll's that are put there
@@ -19,11 +20,26 @@ _("mm! e d w")
 	loop, parse, ctrls, %A_Space%
 	{		
 		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "", "w100 h100 style=hidden", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
-		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, "", "Align F", "Attach p")
+		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, MakeOptions(A_LoopField), "Align F", "Attach p")
 		InitControl(A_LoopField, hCtrl), ctrlNo := %A_LoopField% := A_Index
 	}	
 	Form_Show(), OnQHTM("", "", init )
 return
+
+
+MakeOptions(Name) {
+	if Name not in Splitter,Progress,GroupBox
+		return "gHandler"
+}
+
+Handler:
+	Tooltip % A_GuiControl " " A_GuiEvent
+return
+
+Handler(p1, p2, p3) {
+	Tooltip, %p1% " " %p2% " " %p3%
+}
+
 
 OnQHTM(Hwnd, Link, Id) {
 	local n
@@ -34,9 +50,15 @@ OnQHTM(Hwnd, Link, Id) {
 
 InitControl(Name, HCtrl) {
 	global
-	
+
+	if Name = TreeView
+		TV_Add(":>", TV_Add(":)"))
+
 	if Name = HiEdit
+	{
 		WinSet, Style, +1, ahk_id %Hctrl%
+		HE_SetEvents(HCtrl, "Handler")
+	}
 
 	if Name = HLink
 	{
