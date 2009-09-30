@@ -1,6 +1,5 @@
 _("m! e d w")
 #SingleInstance, force
-
 #NoEnv
 
 	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet Splitter 
@@ -14,8 +13,15 @@ _("m! e d w")
 	hForm  := Form_New("w700 h400 Resize")
 
 	htmlCtrls := RegExReplace(custom, "\w+", "<a href=$0 id=$0>$0</a><a href='" A_ScriptDir "\_doc\files\inc\$0-ahk.html'>&nbsp;+</a>&nbsp;&nbsp;")
-			   . "<hr>" RegExReplace(ahk, "\w+", "<a href=$0 id=$0>$0</a>&nbsp;&nbsp;")
-	hInfo  := Form_Add(hForm, "QHTM", "<b>Press F1 to cycle controls. Click + to see docs.<br><br></b>   " htmlCtrls, "gOnQHTM", "Align T, 150", "Attach p r2")
+			   . "<br><br>" RegExReplace(ahk, "\w+", "<a href=$0 id=$0>$0</a>&nbsp;&nbsp;")
+
+	infoText=
+	(LTrim Join
+		<b>Press F1 to cycle controls. Click + to see docs.
+		Click control name to switch to its tab page. Press & hold F1 and resize window as experiment.</b><br><br>
+		%htmlCtrls%
+	)
+	hInfo  := Form_Add(hForm, "QHTM", infoText, "gOnQHTM", "Align T, 150", "Attach p r2")
 	hTab   := Form_Add(hForm, "Panel", "", "", "Align F", "Attach p r2")
 	loop, parse, ctrls, %A_Space%
 	{		
