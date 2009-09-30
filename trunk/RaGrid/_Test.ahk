@@ -1,3 +1,4 @@
+_("mo!")
 #SingleInstance, force
 	Gui, +LastFound +Resize
 	hwnd := WinExist()
@@ -7,7 +8,7 @@
 	Gui, Add, Button,x+0 yp	gOnBtn, Move Up
 	Gui, Add, Button,x+0 yp	gOnBtn, Move Down
 
-	Gui, Add, Button,x+20 yp gOnBtn, Colorize
+	Gui, Add, Button,x+20 yp gOnBtn, Colorize Row
 	Gui, Add, Button,x+0 yp	gOnBtn, Set Colors
 	Gui, Add, Button,x+20 yp gOnBtn, Read Cell
 
@@ -19,7 +20,7 @@
 		IL_Add(hIL, "shell32.dll", A_Index+20)
 
 
-	hGrd := RG_Add(hwnd, 0, 40, 1000, 300, "GRIDFRAME VGRIDLINES NOSEL" ), Attach(hGrd, "w h")
+	hGrd := RG_Add(hwnd, 0, 40, 1000, 300, "GRIDFRAME VGRIDLINES NOSEL", "OnRa" ), Attach(hGrd, "w h")
 	RG_SetFont(hGrd, "s10, Arial")
 	RG_SetHdrHeight(hGrd, 30), RG_SetRowHeight(hGrd, 25)	
 
@@ -43,10 +44,16 @@
 	RG_AddRow(hGrd, "", "RaGrid",  3, 3, 0, "btn4", "ebtn4", 3)
 return 
 
+OnRa(HCtrl, Event, Col, Row, Data="") {
+;	m(hctrl, event, col, row, NumGet(data+0), RG_strAtAdr(data), data)
+
+	if (Event = "beforeedit") && (Col=1)
+		return 1
+}
 
 OnBtn:
 	if A_GuiControl = Insert
-		RG_AddRow(hGrd, aColName, RG_GetCurrentRow(hGrd))
+		RG_AddRow(hGrd, RG_GetCurrentRow(hGrd))
 
 	if A_GuiControl = Delete
 		RG_DeleteRow(hGrd)
@@ -68,16 +75,21 @@ OnBtn:
 	if A_GuiControl = Reload
 		Reload
 
-	if A_GuiControl = Colorize
-		RG_SetRowColor(hGrd, 0xFF, 0xFF0000)
+	if A_GuiControl = Colorize Row
+	{
+		RG_SetRowColor(hGrd, "", 0xFF, 0xFF0000)
+		WinSet, Redraw, ,ahk_id %hGrd%
+	}
 	
 	if A_GuiControl = Read Cell
 		msgbox % RG_GetCell(hGrd)
 
 	if A_GuiControl = Set Colors
-		RG_SetColors(hGrd, "B1 GFFFFFF TFFFFFF")
+		RG_SetColors(hGrd, "B1 G0xFF F0xFFFFFF")
 return
 
+
+F1:: 	msgbox % RG_GetCell(hGrd)
 
 #Include RaGrid.ahk
 #include inc\Attach.ahk

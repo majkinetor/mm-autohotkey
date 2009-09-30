@@ -1,4 +1,5 @@
 /* Title: RaGrid
+		  Advanced grid custom control.
  */
 
 /*
@@ -8,16 +9,38 @@
  Parameters:
 			X..H	- Position of the control.
 			Style	- Space separated list of control styles, by default both scroll bars are visible. You can use numbers or style strings.
+			Handler	- Notification events handler. 
 			DllPath	- Path of the control dll, by default control is searched in the current folder.		
 
  Styles: 
 			NOSEL, NOFOCUS, HGRIDLINES, VGRIDLINES, GRIDLINES, GRIDFRAME, NOCOLSIZE.
 
+ Handler:
+ >     	Result := Handler(HCtrl, Event, EventInfo, Col, Row )
+
+		HCtrl	- Control sending the event.
+		Event   - Specifies event that occurred. Event must be registered to be able to monitor it. 
+		Col,Row - Cell coordinates.
+		Result  - Return 1 to prevent action.
+
+ Events:
+         Headerclick	 - Sent when user clicks header. 
+         Buttonclick	 - Sent when user clicks the button in a button cell. 
+         Checkclick		 - Sent when user double clicks the checkbox in a checkbox cell. 
+         Imageclick		 - Sent when user double clicks the image in an image cell. 
+         Beforeselchange - Sent when user request a selection change. 
+         Afterselchange  - Sent after a selection change. 
+         Beforeedit		 - Sent before the cell edit control shows. 
+         Afteredit		 - Sent when the cell edit control is about to close. 
+         Beforeupdate	 - Sent before a cell updates grid data. 
+         Afterupdate	 - Sent after grid data has been updated. 
+         Userconvert	 - Sent when user cell needs to be converted.  
+
  Returns:
 		Control's handle.
   
  */
-RG_Add(HParent,X,Y,W,H, Style="", DllPath=""){
+RG_Add(HParent,X,Y,W,H, Style="", Handler="", DllPath=""){
 	static	WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
 	static	NOSEL=0x1, NOFOCUS=0x2, HGRIDLINES=0x4, VGRIDLINES=0x8,GRIDLINES=12, GRIDFRAME=0x10, NOCOLSIZE=0x20, MODULEID
 
@@ -28,7 +51,11 @@ RG_Add(HParent,X,Y,W,H, Style="", DllPath=""){
 	
 	if !MODULEID {
 		ifEqual, DllPath, ,SetEnv, DllPath, RAGrid.dll
-		MODULEID := 301009, DllCall("LoadLibrary", "Str", DllPath)
+		DllCall("LoadLibrary", "Str", DllPath)
+
+		old := OnMessage(0x4E, "RG_onNotify"),	MODULEID := 300909
+		if old != RG_onNotify
+			RG("oldNotify", RegisterCallback(old))
 	}
 
 	hCtrl := DllCall("CreateWindowEx"
@@ -41,12 +68,16 @@ RG_Add(HParent,X,Y,W,H, Style="", DllPath=""){
       , "int",  W            ; Width
       , "int",  H            ; Height
       , "Uint", HParent      ; hWndParent
-      , "Uint", 0            ; hMenu
+      , "Uint", MODULEID     ; hMenu
       , "Uint", 0            ; hInstance
       , "Uint", 0, "Uint")
-	
+
+	if IsFunc(Handler)
+		RG(hCtrl "Handler", Handler)
+
 	return hCtrl
 }
+
 /*
  Function:	AddColumn
 			Add column.
@@ -68,7 +99,6 @@ RG_Add(HParent,X,Y,W,H, Style="", DllPath=""){
  Types:
 			EDITTEXT, EDITLONG, CHECKBOX, COMBOBOX, BUTTON, EDITBUTTON, HOTKEY, IMAGE, DATE, TIME, USER.
  */
-
 RG_AddColumn(hGrd, o1="", o2="", o3="", o4="", o5="", o6="", o7=""){
 	static GM_ADDCOL=0x401, ;ASC=0, DES=1, INVERT=2,  LEFT=0, CENTER=1, RIGHT=2
 
@@ -95,39 +125,8 @@ RG_AddColumn(hGrd, o1="", o2="", o3="", o4="", o5="", o6="", o7=""){
 															 	
 	SendMessage,GM_ADDCOL,,&COL,, ahk_id %hGrd%
 	return ErrorLevel										 
-}		
-/*
- Function:	GetColumn
-			Get column parameters.
- 
- Parameters:
-			Col		- 1 based column number.
-			pQ		- Query parameter. Space separated list of named parameters. See <AddColumn> for details. By default, type is returned.
-			o1..o7	- Reference to output variables.
-
- Returns:
-			o1
- */
-RG_GetColumn(hGrd, Col, pQ="type", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="", ByRef o7="") {
-	static GM_GETCOLDATA = 1068, init, COLUMN		;wParam=nCol, lParam=lpCOLUMN
-		   , w=0, txt=4, hdral=8, txtal=12, type=16, txtmax=20, format=24, il=28, sort=32, data=44
-
-	if !init
-		init := VarSetCapacity(COLUMN, 48)  
-
-	SendMessage,GM_GETCOLDATA, Col-1, &COLUMN,, ahk_id %hGrd%
-	loop, parse, pQ, %A_Space% 
-	{
-		o%A_Index% := NumGet(COLUMN, %A_LoopField%)
-		if A_LoopField in txt,format
-			o%A_Index% := RG_strAtAdr(o%A_Index%)
-		else if A_LoopField = type
-			o%A_Index% := RG_getType(o%A_Index%)
-	}
-
-	return o1
 }
-														 
+
 /*															 
  Function:	AddRow											 
 			Add row.
@@ -159,6 +158,50 @@ RG_AddRow(hGrd, Row="", c1="", c2="", c3="", c4="", c5="", c6="", c7="", c8="", 
 }
 
 /*
+ Function:	ComboAddString
+			Populate combo box.
+ 
+ Parameters:
+			Col		- Column number.
+			Items	- "|" separated list of items.
+
+ Returns:
+  
+ */
+RG_ComboAddString(hGrd, Col, Items) {
+	static GM_COMBOADDSTRING=0x406	;wParam=nCol, lParam=lpszString
+
+	Col -= 1
+	loop, parse, Items, |
+		SendMessage, GM_COMBOADDSTRING, Col, &(s:=A_LoopField),, ahk_id %hGrd%
+}
+/*
+ Function:	ComboClear
+			Clear combo box.
+ */
+RG_ComboClear(hGrd, Col) {
+	static GM_COMBOCLEAR=0x407	;wParam=nCol, lParam=0
+	SendMessage, GM_COMBOCLEAR, Co-1l,,, ahk_id %hGrd%
+	return ErrorLevel
+}
+
+/*
+ Function:	EnterEdit
+			Edit cell.
+
+ Parameters:
+			Col, Row	- Cell coordinates. If omitted, currently selected row/col is used.
+ */
+RG_EnterEdit(hGrd, Col="", Row="") {
+	static GM_ENTEREDIT=0x41A		;wParam=nCol, lParam=nRow
+
+	if (Col Row = "")
+		RG_GetCurrentCell(hGrd, Col, Row)
+	SendMessage, GM_ENTEREDIT,Col-1,Row-1,, ahk_id %hGrd% 
+	return ErrorLevel 
+}
+
+/*
  Function:	DeleteRow
 			Delete row.
  
@@ -174,28 +217,28 @@ RG_DeleteRow(hGrd, Row="") {
 }
 
 /*
- Function:	MoveRow
-			Move row.
- 
- Parameters:
-			From - Number of the row to move.
-			To	 - New position of the row. 
+ Function:	GetCell
+			Get cell value.
  */
-RG_MoveRow(hGrd, From, To ){
-	static GM_MOVEROW=0x405
-	SendMessage,GM_MOVEROW,From-1,To-1,, ahk_id %hGrd% 
-	return ErrorLevel 
-}
+RG_GetCell(hGrd, Col="", Row="") {
+	static GM_GETCELLDATA=0x410, BUF, init		;wParam=nRowCol, lParam=lpData
 
-/*
- Function: GetRowCount
-		   Returns number of rows.
 
- */
-RG_GetRowCount(hGrd) {
-	static GM_GETROWCOUNT=0x40F		;wParam=0, lParam=0
-	SendMessage,GM_GETROWCOUNT,,,,ahk_id %hGrd% 
-	return ErrorLevel 
+	if !init
+		init := VarSetCapacity(BUF, 256)
+	
+	if (Col="" && Row="")
+		RG_GetCurrentCell(hGrd, Col, Row)
+	
+	Col-=1, Row-=1
+
+	m(col, row)
+	type := RG_GetColumn(hGrd, Col+1, "type")
+	SendMessage, GM_GETCELLDATA, (Row << 16) + Col, &BUF,, ahk_id %hGrd%
+	
+	if type in COMBOBOX,CHECKBOX,EDITLONG,IMAGE,HOTKEY,DATE,TIME
+		 return NumGet(BUF, 0, "Int")		
+	else return BUF
 }
 
 /*
@@ -216,132 +259,6 @@ RG_GetColWidth(hGrd, Col) {		;wParam=nCol, lParam=0
 	static GM_GETCOLWIDTH=0x41C
 	SendMessage,GM_GETCOLWIDTH,Col-1,,,ahk_id %hGrd% 
 	return ErrorLevel 
-}
-
-/*
-	Function: SetColWidth
-			  Set column width.
-  */
-RG_SetColWidth(hGrd, Col, Width) {		;wParam=nCol, lParam=nWidth
-	static GM_GETCOLWIDTH=0x41D
-	SendMessage,GM_GETCOLWIDTH,Col-1,Width,, ahk_id %hGrd% 
-	return ErrorLevel 
-}
-
-/*
-	Function: GetHdrHeight
-			  Get height of the header row.
-  */
-RG_GetHdrHeight(hGrd) {		
-	static GM_GETHDRHEIGHT=0x41E
-	SendMessage,GM_GETHDRHEIGHT,,,, ahk_id %hGrd% 
-	return ErrorLevel 
-}
-
-/*
-	Function: SetHdrHeight
-			  Set height of the header row.
-  */
-RG_SetHdrHeight(hGrd, Height){
-	static GM_SETHDRHEIGHT=0x41F
-	SendMessage,GM_SETHDRHEIGHT,,Height,, ahk_id %hGrd%
-	return ErrorLevel
-}
-
-/*
-	Function: GetRowHeight.
-			  Get height of the row.
-  */
-RG_GetRowHeight(hGrd){		
-	static GM_GETROWHEIGHT=0x420
-	SendMessage,GM_GETROWHEIGHT,,,, ahk_id %hGrd%
-	return ErrorLevel
-}
-
-/*
-	Function: SetRowHeight.
-			  Set height of the row.
-  */
-RG_SetRowHeight(hGrd, Height){		
-	static GM_SETROWHEIGHT=0x421
-	SendMessage,GM_SETROWHEIGHT,,Height,, ahk_id %hGrd%
-	return ErrorLevel
-}
-
-/*
-	Function: ResetContent
-			  Reset content of the control.
-  */
-RG_ResetContent(hGrd) {
-	static GM_RESETCONTENT=0x422
-	SendMessage,GM_RESETCONTENT,,,, ahk_id %hGrd%
-	return ErrorLevel
-}
-
-/*
- Function:	GetCurrentRow
-			Get currently selected row. 
- */
-RG_GetCurrentRow(hGrd) {
-	static GM_GETCURROW=0x40C
-	SendMessage,GM_GETCURROW,,,,ahk_id %hGrd% 
-	return ErrorLevel + 1
-}
-
-/*
- Function:	SetCurrentRow
-			Set currently selected row. 
- */
-RG_SetCurrentRow(hGrd, Row) {		;wParam=nRow, lParam=0
-	static GM_SETCURROW=0x40D
-	SendMessage,GM_SETCURROW,Row-1,,, ahk_id %hGrd% 
-	return ErrorLevel 
-}
-
-/*
- Function:	EnterEdit
-			Edit cell.
-
- Parameters:
-			Col, Row	- Cell coordinates. If omitted, currently selected row/col is used.
- */
-RG_EnterEdit(hGrd, Col="", Row="") {
-	static GM_ENTEREDIT=0x41A		;wParam=nCol, lParam=nRow
-
-	if (Col Row = "")
-		RG_GetCurrentCell(hGrd, Col, Row)
-	SendMessage, GM_ENTEREDIT,Col-1,Row-1,, ahk_id %hGrd% 
-	return ErrorLevel 
-}
-
-/*
- Function:	Sort.
-			Sort column.
-
- Parameters:
-			SortType - Number, 1 (ASC), 2 (DES), 3 (INVERT)
- */
-RG_Sort(hGrd, Col, SortType){
-	static GM_COLUMNSORT=0x423
-	SendMessage,GM_COLUMNSORT,Col-1,SortType,,ahk_id %hGrd%
-}
-
-/*
- Function:	SetColors
-			Set colors.
- 
- Parameters:
-			Colors	- Space separated string of the color types and values. Possible types are B (background color), F (foreground color) and G (grid color).
- */
-RG_SetColors(hGrd, Colors){
-	static GM_SETBACKCOLOR=0x415, GM_SETGRIDCOLOR=0x417, GM_SETTEXTCOLOR=0x419
-
-	Loop, Parse, colors, %A_Space%
-		c := SubStr(A_LoopField, 1, 1), val := SubStr(A_LoopField, 2),  %c% := val
-
-	ifNotEqual, B,, SendMessage,GM_SETBACKCOLOR,B,,, ahk_id %hGrd%
-	ifNotEqual, G,, SendMessage,GM_SETGRIDCOLOR,G,,, ahk_id %hGrd%
-	ifNotEqual, F,, SendMessage,GM_SETTEXTCOLOR,T,,, ahk_id %hGrd%
 }
 
 /*
@@ -367,8 +284,230 @@ RG_GetColors(hGrd, pQ, ByRef o1="", ByRef o2="", ByRef o3=""){
 }
 
 /*
+ Function:	GetColumn
+			Get column parameters.
+ 
+ Parameters:
+			Col		- 1 based column number.
+			pQ		- Query parameter. Space separated list of named parameters. See <AddColumn> for details. By default, type is returned.
+			o1..o7	- Reference to output variables.
+
+ Returns:
+			o1
+ */
+RG_GetColumn(hGrd, Col, pQ="type", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="", ByRef o7="") {
+	static GM_GETCOLDATA = 1068, init, COLUMN		;wParam=nCol, lParam=lpCOLUMN
+		   , w=0, txt=4, hdral=8, txtal=12, type=16, txtmax=20, format=24, il=28, sort=32, data=44
+
+	if !init
+		init := VarSetCapacity(COLUMN, 48)  
+
+	SendMessage,GM_GETCOLDATA, Col-1, &COLUMN,, ahk_id %hGrd%
+	loop, parse, pQ, %A_Space% 
+	{
+		o%A_Index% := NumGet(COLUMN, %A_LoopField%)
+		if A_LoopField in txt,format
+			o%A_Index% := RG_strAtAdr(o%A_Index%)
+		else if A_LoopField = type
+			o%A_Index% := RG_getType(o%A_Index%)
+	}
+
+	return o1
+}
+
+/*
+	Function:	GetCurrentCell
+				Get current cell.
+
+	Parameters:
+				Col, Row - Reference to variables to receive output.
+  */
+RG_GetCurrentCell(hGrd, ByRef Col, ByRef Row) {
+	static GM_GETCURSEL=0x408	
+	SendMessage, GM_GETCURSEL,,,, ahk_id %hGrd%
+	Row := (ErrorLevel >> 16) + 1,  Col := (ErrorLevel & 0xFFFF) + 1
+}
+
+/*
+	Function:	GetCurrentCol
+				Get current column . 
+  */
+RG_GetCurrentCol(hGrd) {	
+	static GM_GETCURCOL=0x40A
+	SendMessage, GM_GETCURCOL,,,, ahk_id %hGrd%
+	return ERRORLEVEL + 1
+}
+/*
+ Function:	GetCurrentRow
+			Get currently selected row. 
+ */
+RG_GetCurrentRow(hGrd) {
+	static GM_GETCURROW=0x40C
+	SendMessage,GM_GETCURROW,,,,ahk_id %hGrd% 
+	return ErrorLevel + 1
+}
+														 
+/*
+	Function: GetHdrHeight
+			  Get height of the header row.
+  */
+RG_GetHdrHeight(hGrd) {		
+	static GM_GETHDRHEIGHT=0x41E
+	SendMessage,GM_GETHDRHEIGHT,,,, ahk_id %hGrd% 
+	return ErrorLevel 
+}
+
+/*
+ Function:	GetRowColor
+			Get row color.
+ 
+ Parameters:
+			Row	- Row number. If omitted current row will be used.
+			B,F	- Background, foreground color.
+ */
+RG_GetRowColor(hGrd, Row="", ByRef B="", ByRef F="") {	;wParam=nRow, lParam=lpROWCOLOR
+	static GM_GETROWCOLOR=0x42C
+
+	VarSetCapacity(RC, 8)
+	SendMessage, GM_GETROWCOLOR, Row-1, &RC,,ahk_id %hGrd%
+	B := NumGet(RC), F := NumPut(RC, 4)
+}
+
+/*
+	Function: GetRowHeight
+			  Get height of the row.
+  */
+RG_GetRowHeight(hGrd){		
+	static GM_GETROWHEIGHT=0x420
+	SendMessage,GM_GETROWHEIGHT,,,, ahk_id %hGrd%
+	return ErrorLevel
+}
+
+/*
+ Function: GetRowCount
+		   Returns number of rows.
+
+ */
+RG_GetRowCount(hGrd) {
+	static GM_GETROWCOUNT=0x40F		;wParam=0, lParam=0
+	SendMessage,GM_GETROWCOUNT,,,,ahk_id %hGrd% 
+	return ErrorLevel 
+}
+
+/*
+ Function:	MoveRow
+			Move row.
+ 
+ Parameters:
+			From - Number of the row to move.
+			To	 - New position of the row. 
+ */
+RG_MoveRow(hGrd, From, To ){
+	static GM_MOVEROW=0x405
+	SendMessage,GM_MOVEROW,From-1,To-1,, ahk_id %hGrd% 
+	return ErrorLevel 
+}
+
+/*
+	Function: ResetContent
+			  Reset content of the control.
+  */
+RG_ResetContent(hGrd) {
+	static GM_RESETCONTENT=0x422
+	SendMessage,GM_RESETCONTENT,,,, ahk_id %hGrd%
+	return ErrorLevel
+}
+
+/*
+	Function: ScrollCell
+			  Scrolls current cell into view.
+  */
+RG_ScrollCell(hGrd){
+	static GM_SCROLLCELL=0x413	;wParam=0, lParam=0
+	SendMessage,GM_SCROLLCELL,,,, ahk_id %hGrd% 
+	return ErrorLevel
+}
+
+/*
+ Function:	SetCell
+			Set cell value.
+ */
+RG_SetCell(hGrd, Col, Row, Value="") {
+	static GM_SETCELLDATA=0x411		;wParam=nRowCol, lParam=lpData (can be NULL)
+
+	type := RG_GetColumn(hGrd, Col)
+	if type in COMBOBOX,CHECKBOX,EDITLONG
+		NumPut(Value, Value)
+
+	Row-=1, Col-=1
+	SendMessage, GM_SETCELLDATA, (Row<<16)+Col, &Value,, ahk_id %hGrd%
+	return ErrorLevel
+}
+
+/*
+ Function:	SetColors
+			Set colors.
+ 
+ Parameters:
+			Colors	- Space separated string of the color types and values. Possible types are B (background color), F (foreground color) and G (grid color).
+ */
+RG_SetColors(hGrd, Colors){
+	static GM_SETBACKCOLOR=0x415, GM_SETGRIDCOLOR=0x417, GM_SETTEXTCOLOR=0x419
+
+	Loop, Parse, colors, %A_Space%
+		c := SubStr(A_LoopField, 1, 1), val := SubStr(A_LoopField, 2),  %c% := val
+
+	ifNotEqual, B,, SendMessage,GM_SETBACKCOLOR,B,,, ahk_id %hGrd%
+	ifNotEqual, G,, SendMessage,GM_SETGRIDCOLOR,G,,, ahk_id %hGrd%
+	ifNotEqual, F,, SendMessage,GM_SETTEXTCOLOR,F,,, ahk_id %hGrd%
+}
+
+/*
+	Function: SetColWidth
+			  Set column width.
+  */
+RG_SetColWidth(hGrd, Col, Width) {		;wParam=nCol, lParam=nWidth
+	static GM_GETCOLWIDTH=0x41D
+	SendMessage,GM_GETCOLWIDTH,Col-1,Width,, ahk_id %hGrd% 
+	return ErrorLevel 
+}
+
+/*
+ Function:	SetCurrentRow
+			Set currently selected row. 
+ */
+RG_SetCurrentRow(hGrd, Row) {		;wParam=nRow, lParam=0
+	static GM_SETCURROW=0x40D
+	SendMessage,GM_SETCURROW,Row-1,,, ahk_id %hGrd% 
+	return ErrorLevel 
+}
+
+/*
+	Function: SetCurrentCol
+			  Set current column.
+  */
+RG_SetCurrentCol(hGrd, Col) {		;wParam=nCol, lParam=0
+	static GM_SETCURCOL=0x40B
+	SendMessage, GM_SETCURCOL,Col-1,,,ahk_id %hGrd%
+	return ERRORLEVEL
+}
+
+/*
+	Function:	SetCurrentCell
+				Set current cell.
+
+	Parameters:
+				Col, Row	- Coordinates of the cell to select.
+  */
+RG_SetCurrentSel(hGrd, Col, Row) {	;wParam=nCol, lParam=nRow
+	static GM_SETCURSEL=0x409
+	SendMessage, GM_SETCURSEL, Col, Row,, ahk_id %hGrd%
+	return ERRORLEVEL
+}
+
+/*
  Function: SetFont
-			Sets the control font
+			Sets the control font.
 
  Parameters:
 			pFont	- AHK font definition: "Style, FontName"
@@ -400,222 +539,13 @@ RG_SetFont(hGrd, pFont="") {
 }
 
 /*
- Function:	ComboAddString
-			Populate combo box.
- 
- Parameters:
-			Col		- Column number.
-			Items	- "|" separated list of items.
-
- Returns:
-  
- */
-RG_ComboAddString(hGrd, Col, Items) {
-	static GM_COMBOADDSTRING=0x406	;wParam=nCol, lParam=lpszString
-
-	Col -= 1
-	loop, parse, Items, |
-		SendMessage, GM_COMBOADDSTRING, Col, &(s:=A_LoopField),, ahk_id %hGrd%
-}
-/*
- Function:	ComboClear
-			Clear combo box.
- */
-RG_ComboClear(hGrd, Col) {
-	static GM_COMBOCLEAR=0x407	;wParam=nCol, lParam=0
-	SendMessage, GM_COMBOCLEAR, Co-1l,,, ahk_id %hGrd%
+	Function: SetHdrHeight
+			  Set height of the header row.
+  */
+RG_SetHdrHeight(hGrd, Height){
+	static GM_SETHDRHEIGHT=0x41F
+	SendMessage,GM_SETHDRHEIGHT,,Height,, ahk_id %hGrd%
 	return ErrorLevel
-}
-
-RG_GetCell(hGrd, Col="", Row=""){
-	static GM_GETCELLDATA=0x410, init		;wParam=nRowCol, lParam=lpData
-
-	if !init
-		init := VarSetCapacity(BUF, 256)
-	
-	if (Col="" && Row="")
-		RG_GetCurrentCell(hGrd, Col, Row)
-	
-	type := RG_GetColumn(hGrd, Col, "type")
-	SendMessage, GM_GETCELLDATA, (Row << 16) + Col, &BUF,, ahk_id %hGrd%
-
-	if type in EDITTEXT,EDITBUTTON,BUTTON
-		 VarSetCapacity(BUF, -1), return BUF
-	else return NumGet(BUF, 0, "Int")		
-}
-
-RG_GetCellText(hGrd, nRow=0, nCol=0) {
-	static GM_GETCELLDATA=0x410		;wParam=nRowCol, lParam=lpData
-	
-	VarSetCapacity(buf, 256, 0)
-
-	nRowCol := (nRow << 16) + nCol
-	SendMessage, GM_GETCELLDATA, nRowCol, &buf,, ahk_id %hGrd%
-	return buf
-}
-
-RG_GetCellNum(hGrd, nRow=0, nCol=0) {
-	static GM_GETCELLDATA=0x410		;wParam=nRowCol, lParam=lpData
-	
-	VarSetCapacity(buf, 256, 0)
-
-	nRowCol := (nRow << 16) + nCol
-	SendMessage, GM_GETCELLDATA, nRowCol, &buf,, ahk_id %hGrd%
-	return NumGet(buf)
-}
-
-;---------------------------------------------------------------------------------------------------- 
-; Function: SetEvents 
-;         Set notification events 
-; 
-; Parameters: 
-;         func   - Subroutine that will be called on events. 
-;         e      - White space separated list of events to monitor (by default, null). 
-; 
-; Globals: 
-;         RG_EVENT   - Specifies event that occurred. Event must be registered to be able to monitor them. 
-;     RG_ROW    - String containing zero based row number. 
-;     RG_COLUMN - String containing zero based column number. 
-
-; Events & Infos: 
-;         HEADERCLICK   - Sent when user clicks header. 
-;         BUTTONCLICK - Sent when user clicks the button in a button cell. 
-;         CHECKCLICK - Sent when user double clicks the checkbox in a checkbox cell. 
-;         IMAGECLICK - Sent when user double clicks the image in an image cell. 
-;         BEFORESELCHANGE - (not implemented) Sent when user request a selection change. 
-;         AFTERSELCHANGE - Sent after a selection change. 
-;         BEFOREEDIT - Sent before the cell edit control shows. 
-;         AFTEREDIT - Sent when the cell edit control is about to close. 
-;         BEFOREUPDATE - (not implemented) Sent before a cell updates grid data. 
-;         AFTERUPDATE - (not implemented) Sent after grid data has been updated. 
-;         USERCONVERT - (not implemented) Sent when user cell needs to be converted. 
-; 
-; Returns: 
-;         "OK" if succesiful, error string otherwise 
-; 
-RG_SetEvents(hGrd, func, e=""){ 
-   local old, hmask 
-  static GN_HEADERCLICK=0x1,GN_BUTTONCLICK=0x2,GN_CHECKCLICK=0x3,GN_IMAGECLICK=0x4 
-        ,GN_BEFORESELCHANGE=0x5,GN_AFTERSELCHANGE=0x6,GN_BEFOREEDIT=0x7,GN_AFTEREDIT=0x8 
-        ,GN_BEFOREUPDATE=0x9,GN_AFTERUPDATE=0xa,GN_USERCONVERT=0xb, WM_NOTIFY:=0x4E 
-  static events="HEADERCLICK,BUTTONCLICK,CHECKCLICK,IMAGECLICK,BEFORESELCHANGE,AFTERSELCHANGE,BEFOREEDIT,AFTEREDIT,BEFOREUPDATE,AFTERUPDATE,USERCONVERT" 
-
-   if !IsLabel(func) 
-      return "Err: label doesn't exist`n`n" func 
-
-  RG_%hGrd%_mask := "" ; clear any previous set mask 
-   loop, parse, e, %A_Tab%%A_Space% 
-   { 
-      IfEqual, A_LoopField, , continue 
-      if A_LoopField not in %events% 
-         return "Err: unknown event - '" A_LoopField "'" 
-      RG_%hGrd%_mask .= RG_%hGrd%_mask ? "," . GN_%A_LOOPFIELD% : GN_%A_LOOPFIELD% 
-   } 
-   IfEqual, RG_%hGrd%_mask,, return   ; not monitoring any events 
-
-
-   old := OnMessage(WM_NOTIFY, "RG_onNotify") ; set RaGrid msg handler and remember old one 
-   if (old != "RG_onNotify") 
-      RG_oldNotify := RegisterCallback(old)    ; store callable old message handler 
-
-   hGrd += 0 
-   RG_%hGrd%_func := func 
-   return "OK" 
-} 
-
-;crashes AHK if there are no rows in the control.
-RG_SetCell(hGrd, Col, Row, Value="") {
-	static GM_SETCELLDATA=0x411		;wParam=nRowCol, lParam=lpData (can be NULL)
-
-	type := RG_GetColumn(hGrd, Col)
-	if type in COMBOBOX,CHECKBOX,EDITLONG
-		NumPut(Value, Value)
-
-	Row-=1, Col-=1
-	SendMessage, GM_SETCELLDATA, (Row<<16)+Col, &Value,, ahk_id %hGrd%
-	return ErrorLevel
-}
-
-RG_SetCellNum(hGrd, nRow=0, nCol=0, num=0) {
-	static GM_SETCELLDATA=0x411		;wParam=nRowCol, lParam=lpData (can be NULL)
-	
-	VarSetCapacity(data, 4)
-	NumPut(num, data, 0)
-
-	nRowCol := (nRow << 16) + nCol
-	SendMessage, GM_SETCELLDATA, nRowCol, &data,, ahk_id %hGrd%
-	return ERRORLEVEL
-}
-
-;numeric values are for combo and checkbox (index of element)
-RG_SetCellText(hGrd, nRow=0, nCol=0, data="") {
-	static GM_SETCELLDATA=0x411		;wParam=nRowCol, lParam=lpData (can be NULL)
-	
-	if (numeric) {
-		num := data
-		VarSetCapacity(data, 4)
-		NumPut(num, data, 0)
-	}
-
-	nRowCol := (nRow << 16) + nCol
-	SendMessage, GM_SETCELLDATA, nRowCol, &data,, ahk_id %hGrd%
-	return ERRORLEVEL
-}
-
-/*
-	Function:	GetCurrentCell
-				Get current cell.
-
-	Parameters:
-				Col, Row - Reference to variables to receive output.
-  */
-RG_GetCurrentCell(hGrd, ByRef Col, ByRef Row) {
-	static GM_GETCURSEL=0x408	
-	SendMessage, GM_GETCURSEL,,,, ahk_id %hGrd%
-	Row := (ErrorLevel >> 16) + 1,  Col := (ErrorLevel & 0xFFFF) + 1
-}
-
-/*
-	Function:	SetCurrentCell
-				Set current cell.
-
-	Parameters:
-				Col, Row	- Coordinates of the cell to select.
-  */
-RG_SetCurrentSel(hGrd, Col, Row) {	;wParam=nCol, lParam=nRow
-	static GM_SETCURSEL=0x409
-	SendMessage, GM_SETCURSEL, Col, Row,, ahk_id %hGrd%
-	return ERRORLEVEL
-}
-
-/*
-	Function:	GetCurrentCol
-				Get current column . 
-  */
-RG_GetCurrentCol(hGrd) {	
-	static GM_GETCURCOL=0x40A
-	SendMessage, GM_GETCURCOL,,,, ahk_id %hGrd%
-	return ERRORLEVEL + 1
-}
-
-/*
-	Function: ScrollCell
-			  Scrolls current cell into view.
-  */
-RG_ScrollCell(hGrd){
-	static GM_SCROLLCELL=0x413	;wParam=0, lParam=0
-	SendMessage,GM_SCROLLCELL,,,, ahk_id %hGrd% 
-	return ErrorLevel
-}
-
-/*
-	Function: SetCurrentCol
-			  Set current column.
-  */
-RG_SetCurrentCol(hGrd, Col) {		;wParam=nCol, lParam=0
-	static GM_SETCURCOL=0x40B
-	SendMessage, GM_SETCURCOL,Col-1,,,ahk_id %hGrd%
-	return ERRORLEVEL
 }
 
 /*
@@ -637,19 +567,25 @@ RG_SetRowColor(hGrd, Row="", B="", F="") { ;wParam=nRow, lParam=lpROWCOLOR
 }
 
 /*
- Function:	GetRowColor
-			Get row color.
- 
- Parameters:
-			Row	- Row number. If omitted current row will be used.
-			B,F	- Background, foreground color.
- */
-RG_GetRowColor(hGrd, Row="", ByRef B="", ByRef F="") {	;wParam=nRow, lParam=lpROWCOLOR
-	static GM_GETROWCOLOR=0x42C
+	Function: SetRowHeight
+			  Set height of the row.
+  */
+RG_SetRowHeight(hGrd, Height){		
+	static GM_SETROWHEIGHT=0x421
+	SendMessage,GM_SETROWHEIGHT,,Height,, ahk_id %hGrd%
+	return ErrorLevel
+}
 
-	VarSetCapacity(RC, 8)
-	SendMessage, GM_GETROWCOLOR, Row-1, &RC,,ahk_id %hGrd%
-	B := NumGet(RC), F := NumPut(RC, 4)
+/*
+ Function:	Sort
+			Sort column.
+
+ Parameters:
+			SortType - Number, 1 (ASC), 2 (DES), 3 (INVERT)
+ */
+RG_Sort(hGrd, Col, SortType){
+	static GM_COLUMNSORT=0x423
+	SendMessage,GM_COLUMNSORT,Col-1,SortType,,ahk_id %hGrd%
 }
 
 ;======================================= PRIVATE =================================
@@ -660,91 +596,65 @@ RG_getType( Type ) {
 	return (%Type%)
 }
 
+RG_onNotify(Wparam, Lparam, Msg, Hwnd) { 
+	static MODULEID = 300909, oldNotify="*" 
+		  ,GN_HEADERCLICK=0x1,GN_BUTTONCLICK=0x2,GN_CHECKCLICK=0x3,GN_IMAGECLICK=0x4, GN_BEFORESELCHANGE=0x5,GN_AFTERSELCHANGE=0x6,GN_BEFOREEDIT=0x7,GN_AFTEREDIT=0x8,GN_BEFOREUPDATE=0x9,GN_AFTERUPDATE=0xa,GN_USERCONVERT=0xb 
 
-RG_onNotify(wparam, lparam, msg, hwnd) { 
-   local code, hw, row,col,mask
-  static pInfo 
-  static GN_HEADERCLICK=0x1,GN_BUTTONCLICK=0x2,GN_CHECKCLICK=0x3,GN_IMAGECLICK=0x4 
-        ,GN_BEFORESELCHANGE=0x5,GN_AFTERSELCHANGE=0x6,GN_BEFOREEDIT=0x7 
-        ,GN_AFTEREDIT=0x8,GN_BEFOREUPDATE=0x9,GN_AFTERUPDATE=0xa,GN_USERCONVERT=0xb 
+	if (_ := (NumGet(Lparam+4))) != MODULEID
+	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
+	 else {
+		ifEqual, oldNotify, *, SetEnv, oldNotify, % RG("oldNotify")		
+		if oldNotify !=
+			return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
+		return
+	 }
+    
+   	hw :=  NumGet(Lparam+0), code := NumGet(Lparam+8),  handler := RG(hw "Handler") 
+	ifEqual, handler,, return
 
-  ; Call previous set WM_NOTIFY 
-  RG_oldNotify ? DllCall(RG_oldNotify, "uint", wparam, "uint", lparam, "uint", msg, "uint", hwnd) : "" 
+	
+	col := NumGet(Lparam+12)+1, row := NumGet(Lparam+16)+1, data := NumGet(Lparam+24)
 
-   hw    := NumGet(lparam+0)   ; control sending the message - this RaGrid 
-  mask := RG_%hw%_mask       ; current events monitoring for 
+	if (code = GN_HEADERCLICK) 
+		return %handler%(hw, "HeaderClick", col, "")
 
-  SetFormat, integer, hex 
-   code   :=  NumGet(lparam+8)   ;- 
-  SetFormat, integer, d 
+	if (code = GN_BUTTONCLICK)
+		return %handler%(hw, "ButtonClick", col, row, data)
 
-  if code not in %mask% 
-    return 
+	if (code = GN_CHECKCLICK)
+		return %handler%(hw, "CheckClick", col, row, data)
 
-  RG_ROW := NumGet(lparam+16),  RG_COLUMN := NumGet(lparam+12) 
+	if (code = GN_IMAGECLICK) 
+		return %handler%(hw, "ImageClick", col, row, data)
+      
+    if (code = GN_BEFORESELCHANGE) {
+		if RG( hw "LastSel" ) = col " " row
+			return NumPut(1, LParam+28)
 
-   if (code = GN_HEADERCLICK) { 
-      RG_EVENT := "HEADERCLICK", RG_ROW := "" 
-      GoSub % RG_%hw%_func 
-      return 
-   } 
+		else RG( hw "LastSel", col " " row )
+		r := %handler%(hw, "SelChange", col, row)				
+	}
 
-   if (code = GN_BUTTONCLICK) { 
-      RG_EVENT := "BUTTONCLICK" 
-      GoSub % RG_%hw%_func 
-      return 
-   } 
+	if (code = GN_AFTERSELCHANGE) { 
+		if RG( hw "AfterLastSel" ) = col " " row
+			return
+		else RG( hw "AfterLastSel", col " " row )
+   		r := %handler%(hw, "Afterselchange", col, row)
+	} 
 
-   if (code = GN_CHECKCLICK) { 
-      RG_EVENT := "CHECKCLICK" 
-      GoSub % RG_%hw%_func 
-      return 
-   } 
+	if (code = GN_BEFOREEDIT)
+		r := %handler%(hw, "Beforeedit", col, row, data)
 
-   if (code = GN_IMAGECLICK) { 
-      RG_EVENT := "IMAGECLICK" 
-      GoSub % RG_%hw%_func 
-      return 
-   } 
+	if (code = GN_AFTEREDIT)
+		return %handler%(hw, "Afteredit", col, row, data)
 
-;    if (code = GN_BEFORESELCHANGE) { 
-;       RG_EVENT := "BEFORESELCHANGE" 
-;       GoSub % RG_%hw%_func 
-;       return 
-;    } 
+    if (code = GN_BEFOREUPDATE) 
+		r := %handler%(hw, "Beforeupdate", col, row, data)
 
-   if (code = GN_AFTERSELCHANGE) { 
-    IfEqual, pInfo, %RG_ROW%|%RG_COLUMN%, return  ; filter out mutiple dup message calls 
-    pInfo = %RG_ROW%|%RG_COLUMN%                  ; store info for comparison in next iteration 
-      RG_EVENT := "AFTERSELCHANGE" 
-      GoSub % RG_%hw%_func 
-      return 
-   } 
+    if (code = GN_AFTERUPDATE)
+		return %handler%(hw, "Afterupdate", col, row, data)
 
-   if (code = GN_BEFOREEDIT) { 
-      RG_EVENT := "BEFOREEDIT" 
-      GoSub % RG_%hw%_func 
-      return 
-   } 
-
-   if (code = GN_AFTEREDIT) { 
-      RG_EVENT := "AFTEREDIT" 
-      GoSub % RG_%hw%_func 
-      return 
-   } 
-
-;    if (code = GN_BEFOREUPDATE) { 
-;       RG_EVENT := "BEFOREUPDATE" 
-;       GoSub % RG_%hw%_func 
-;       return 
-;    } 
-
-;    if (code = GN_AFTERUPDATE) { 
-;       RG_EVENT := "AFTERUPDATE" 
-;       GoSub % RG_%hw%_func 
-;       return 
-;    } 
-
+	NumPut(r, LParam+28)
 }
 
 ;Storage
