@@ -1,4 +1,4 @@
-_("mo! e d w")
+_("m! e d w")
 #SingleInstance, force
 
 #NoEnv
@@ -34,12 +34,17 @@ MakeOptions(Name) {
 
 Handler:
 	Tooltip % A_GuiControl " " A_GuiEvent
+	SetTimer, Tooltip, -4000
 return
 
 Handler(p1, p2, p3) {
-	Tooltip, %p1% " " %p2% " " %p3%
+	Tooltip, %p1%  %p2%  %p3%
+	SetTimer, Tooltip, -4000
 }
 
+Tooltip:
+	Tooltip
+return
 
 OnQHTM(Hwnd, Link, Id) {
 	local n
