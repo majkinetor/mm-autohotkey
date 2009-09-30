@@ -229,7 +229,7 @@ Splitter_IsVertical(Hwnd) {
 
 #include *i Win.ahk
 
-/* Group: Example
+/* Group: Examples
  (start code)
 		w := 500, h := 600, sep := 5
 		w1 := w//3, w2 := w-w1 , h1 := h // 2, h2 := h // 3
