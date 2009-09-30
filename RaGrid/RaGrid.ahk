@@ -11,7 +11,7 @@
 			DllPath	- Path of the control dll, by default control is searched in the current folder.		
 
  Styles: 
-			NOSEL, NOFOCUS, HGRIDLINES, VGRIDLINES,GRIDLINES, GRIDFRAME, NOCOLSIZE.
+			NOSEL, NOFOCUS, HGRIDLINES, VGRIDLINES, GRIDLINES, GRIDFRAME, NOCOLSIZE.
 
  Returns:
 		Control's handle.
@@ -66,7 +66,7 @@ RG_Add(HParent,X,Y,W,H, Style="", DllPath=""){
 			format	- Format string for the EDITLONG type.
 
  Types:
-			EDITTEXT, EDITLONG, CHECKBOX, COMBOBOX, HOTKEY, BUTTON, IMAGE, DATE, TIME, USER, EDITBUTTON.
+			EDITTEXT, EDITLONG, CHECKBOX, COMBOBOX, BUTTON, EDITBUTTON, HOTKEY, IMAGE, DATE, TIME, USER.
  */
 
 RG_AddColumn(hGrd, o1="", o2="", o3="", o4="", o5="", o6="", o7=""){
@@ -109,16 +109,16 @@ RG_AddColumn(hGrd, o1="", o2="", o3="", o4="", o5="", o6="", o7=""){
 			o1
  */
 RG_GetColumn(hGrd, Col, pQ="type", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="", ByRef o7="") {
-	static GM_GETCOLDATA = 1068, init		;wParam=nCol, lParam=lpCOLUMN
+	static GM_GETCOLDATA = 1068, init, COLUMN		;wParam=nCol, lParam=lpCOLUMN
 		   , w=0, txt=4, hdral=8, txtal=12, type=16, txtmax=20, format=24, il=28, sort=32, data=44
 
 	if !init
-		init := VarSetCapacity(COL, 48)  
+		init := VarSetCapacity(COLUMN, 48)  
 
-	SendMessage,GM_GETCOLDATA, Col, &COL,, ahk_id %hGrd%
+	SendMessage,GM_GETCOLDATA, Col-1, &COLUMN,, ahk_id %hGrd%
 	loop, parse, pQ, %A_Space% 
 	{
-		o%A_Index% := NumGet(COL, %A_LoopField%)
+		o%A_Index% := NumGet(COLUMN, %A_LoopField%)
 		if A_LoopField in txt,format
 			o%A_Index% := RG_strAtAdr(o%A_Index%)
 		else if A_LoopField = type
@@ -134,31 +134,26 @@ RG_GetColumn(hGrd, Col, pQ="type", ByRef o1="", ByRef o2="", ByRef o3="", ByRef 
  															 
  Parameters:		
 			Row		- Row number. If omitted, row is appended.
-			c1..c10	- Column values. If there is a number and space on the beginning of the cN, it will be taken as number of column to set.
-					  Otherwise, argument number is used as a column number.
+			c1..c10	- Column values.
 
  */
 RG_AddRow(hGrd, Row="", c1="", c2="", c3="", c4="", c5="", c6="", c7="", c8="", c9="", c10=""){ 
 	static GM_ADDROW=0x402, GM_INSROW=0x403		;wParam=nRow, lParam=lpROWDATA (can be NULL)
 
-	;colCount := RG_GetColCount(hGrd)
-	VarSetCapacity(ROWDATA, 4*colCount, 0) 
+	VarSetCapacity(ROWDATA, 40, 0)
 	Loop, 10
 	{
-		c := c%A_Index%
-		ifEqual,c,,break
-		
-		j := InStr(c, A_Space)
-		if (j > 0) && (n := SubStr(c, j-1)) && (n+0 != "")
-			 c := SubStr(c, j+1), idx := n-1
-		else idx := A_Index-1
+		ifEqual,c%A_Index%,,continue
+		idx := A_Index*4 - 4
 
-;		type := RG_GetColumn(hGrd, idx, "type")
-		NumPut(&c, ROWDATA, idx*4)
+		type := RG_GetColumn(hGrd, A_Index)
+		if type in COMBOBOX,CHECKBOX,EDITLONG,IMAGE
+			 NumPut(c%A_Index%,  ROWDATA, idx)
+		else NumPut(&c%A_Index%, ROWDATA, idx)
 	}
-	
+
 	if (Row = "")
-			SendMessage,GM_ADDROW,,&ROWDATA,, ahk_id %hGrd% 
+			SendMessage,GM_ADDROW,0,&ROWDATA,, ahk_id %hGrd% 
 	else	SendMessage,GM_INSROW,Row-1,&ROWDATA,, ahk_id %hGrd%  
 	return ErrorLevel 
 }
@@ -528,12 +523,16 @@ RG_SetEvents(hGrd, func, e=""){
    return "OK" 
 } 
 
+;crashes AHK if there are no rows in the control.
 RG_SetCell(hGrd, Col, Row, Value="") {
 	static GM_SETCELLDATA=0x411		;wParam=nRowCol, lParam=lpData (can be NULL)
 
-;	type := RG_GetColumn(hGrd, Col)
+	type := RG_GetColumn(hGrd, Col)
+	if type in COMBOBOX,CHECKBOX,EDITLONG
+		NumPut(Value, Value)
+
 	Row-=1, Col-=1
-	SendMessage, GM_SETCELLDATA, 0, 0,, ahk_id %hGrd%
+	SendMessage, GM_SETCELLDATA, (Row<<16)+Col, &Value,, ahk_id %hGrd%
 	return ErrorLevel
 }
 
@@ -774,7 +773,7 @@ RaGrid_add2Form(hParent, Txt, Opt) {
 }
 
 /* Group: About
-	o RaGrid control version 2.0.1.5 by KetilO. See <http://www.masm32.com/board/index.php?topic=55>
-	o AHK module ver 2.0.1.5-1 by majkinetor.
+	o RaGrid control version: 2.0.1.6 by KetilO. See <http://www.masm32.com/board/index.php?topic=55>
+	o AHK module ver 2.0.1.6-1 by majkinetor.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */

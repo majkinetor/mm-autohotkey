@@ -7,47 +7,40 @@
 	Gui, Add, Button,x+0 yp	gOnBtn, Move Up
 	Gui, Add, Button,x+0 yp	gOnBtn, Move Down
 
-	Gui, Add, Button,x+20 yp	gOnBtn, Colorize
+	Gui, Add, Button,x+20 yp gOnBtn, Colorize
 	Gui, Add, Button,x+0 yp	gOnBtn, Set Colors
-	Gui, Add, Button,x+20 yp	gOnBtn, Read Cell
+	Gui, Add, Button,x+20 yp gOnBtn, Read Cell
 
-	Gui, Add, Button,x+40 yp	gOnBtn, Reload
-	Gui, Show, h300 w600
+	Gui, Add, Button,x+40 yp gOnBtn, Reload
+	Gui, Show, h300 w1000
+	
+	hIL:= IL_Create(10)
+	Loop 10  
+		IL_Add(hIL, "shell32.dll", A_Index+20)
 
-	hGrd := RG_Add(hwnd, 0, 40, 600, 300, "GRIDFRAME VGRIDLINES NOSEL" ), Attach(hGrd, "w h")
+
+	hGrd := RG_Add(hwnd, 0, 40, 1000, 300, "GRIDFRAME VGRIDLINES NOSEL" ), Attach(hGrd, "w h")
 	RG_SetFont(hGrd, "s10, Arial")
-	RG_SetHdrHeight(hGrd, 30), RG_SetRowHeight(hGrd, 22)	
+	RG_SetHdrHeight(hGrd, 30), RG_SetRowHeight(hGrd, 25)	
 
-	RG_AddColumn(hGrd, "txt=EditText",  "w=150", "hdral=0"	"txtal=2", "type=EditText")
-	RG_AddColumn(hGrd, "txt=EditLong",  "w=100", "hdral=2", "txtal=2", "type=EditLong")
+	RG_AddColumn(hGrd, "txt=EditText",  "w=150", "hdral=1",	"txtal=1", "type=EditText")
+	RG_AddColumn(hGrd, "txt=EditLong",  "w=100", "hdral=1", "txtal=1", "type=EditLong", "format=# ### ###")
 	RG_AddColumn(hGrd, "txt=Combo",		"w=90",  "hdral=1", "txtal=1", "type=ComboBox")
-	RG_AddColumn(hGrd, "txt=Check",		"w=70",  "hdral=1", "txtal=1", "type=CheckBox")
+	RG_AddColumn(hGrd, "txt=Check",		"w=30",  "hdral=1", "txtal=1", "type=CheckBox")
 	RG_AddColumn(hGrd, "txt=Button",	"w=100", "hdral=1", "txtal=1", "type=Button")
+	RG_AddColumn(hGrd, "txt=EButton",	"w=100", "hdral=1", "txtal=1", "type=EditButton")
+	RG_AddColumn(hGrd, "txt=Image",		"w=100", "hdral=1", "txtal=1", "type=Image", "il=" hIL)
 	RG_AddColumn(hGrd, "txt=Hotkey",	"w=100", "hdral=1", "txtal=1", "type=Hotkey")
+	RG_AddColumn(hGrd, "txt=Date",		"w=100", "hdral=1", "txtal=1", "type=Date", "format=dd'.'MM'.'yyyy")
+	RG_AddColumn(hGrd, "txt=Time",		"w=100", "hdral=1", "txtal=1", "type=Time", "format=hh':'mm")
+	RG_AddColumn(hGrd, "txt=User",		"w=100", "hdral=1", "txtal=1", "type=User")
 
 	RG_ComboAddString(hGrd, 3, "combo 1|combo 2|combo 3|combo 4|combo 5|combo 6|combo 7|combo 8|combo 9|combo 10|combo 11|combo 12")
-	
-	RG_SetCell(hGrd, 1, 1, "Hello there")
 
-;	RG_AddRow(hGrd, "", "Another", "12")
-;	RG_AddRow(hGrd, "", "Extreme", "8")
-;	RG_AddRow(hGrd, "", "control")
-;	RG_AddRow(hGrd, "", "- RaGrid -")
-
-
-;	RG_SetCellNum(hGrd, 0, 2, 0)	;set combo indices
-;	RG_SetCellNum(hGrd, 2, 2, 2)
-;
-;	RG_SetCellNum(hGrd, 0, 3, 1)	;set radios here
-;	RG_SetCellNum(hGrd, 1, 3, 0)
-;	RG_SetCellNum(hGrd, 2, 3, 1)
-;	RG_SetCellNum(hGrd, 3, 3, 0)
-;
-;	RG_SetCellText(hGrd, 1, 1, "1234")		
-;	RG_SetCellText(hGrd, 1, 4, "btn txt")
-;
-	
-
+	RG_AddRow(hGrd, "", "Another", 0, 0, 1, "btn1", "ebtn1", 0)
+	RG_AddRow(hGrd, "", "Extreme", 1, 1, 0, "btn2", "ebtn2", 1)
+	RG_AddRow(hGrd, "", "Control", 2, 2, 1, "btn3", "ebtn3", 2)
+	RG_AddRow(hGrd, "", "RaGrid",  3, 3, 0, "btn4", "ebtn4", 3)
 return 
 
 
