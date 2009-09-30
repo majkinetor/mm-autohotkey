@@ -678,8 +678,8 @@ RG_strAtAdr(adr) {
 ;Required function by Forms framework.
 RaGrid_add2Form(hParent, Txt, Opt) {
 	static f := "Form_Parse"
-	%f%(Opt, "x# y# w# h# style dllPath", x, y, w, h, style, dllPath)
-	return RG_Add(hParent, x, y, w, h, style, dllPath)
+	%f%(Opt, "x# y# w# h# style dllPath g*", x, y, w, h, style, dllPath, handler)
+	return RG_Add(hParent, x, y, w, h, style, handler, dllPath)
 }
 
 /* Group: About
