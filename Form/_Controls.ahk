@@ -1,8 +1,8 @@
-_("m! e d w")
+_("mm! e d w")
 #SingleInstance, force
 #NoEnv
 
-	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet Splitter 
+	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet Splitter
 	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress GroupBox StatusBar Tab2 UpDown
 	init    = HiEdit
 	;===============================================
@@ -10,7 +10,7 @@ _("m! e d w")
 	ctrls := custom " " ahk
 
 	SetWorkingDir, inc		;required to load some dll's that are put there
-	hForm  := Form_New("w700 h400 Resize")
+	hForm  := Form_New("w700 h600 Resize")
 
 	htmlCtrls := RegExReplace(custom, "\w+", "<a href=$0 id=$0>$0</a><a href='" A_ScriptDir "\_doc\files\inc\$0-ahk.html'>&nbsp;+</a>&nbsp;&nbsp;")
 			   . "<br><br>" RegExReplace(ahk, "\w+", "<a href=$0 id=$0>$0</a>&nbsp;&nbsp;")
@@ -21,14 +21,15 @@ _("m! e d w")
 		Click control name to switch to its tab page. Press & hold F1 and resize window as experiment.</b><br><br>
 		%htmlCtrls%
 	)
-	hInfo  := Form_Add(hForm, "QHTM", infoText, "gOnQHTM", "Align T, 150", "Attach p r2")
+	hInfo  := Form_Add(hForm, "QHTM", infoText, "gOnQHTM", "Align T, 200", "Attach p r2")
 	hTab   := Form_Add(hForm, "Panel", "", "", "Align F", "Attach p r2")
 	loop, parse, ctrls, %A_Space%
 	{		
 		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "", "w100 h100 style=hidden", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
 		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, MakeOptions(A_LoopField), "Align F", "Attach p")
-		InitControl(A_LoopField, hCtrl), ctrlNo := %A_LoopField% := A_Index
+		InitControl(A_LoopField, hCtrl), %A_LoopField% := ctrlNo := A_Index
 	}	
+	QHTM_AddHtml(hInfo, "<br><h6>Total: " ctrlNo)
 	Form_Show(), OnQHTM("", "", init )
 return
 
@@ -78,6 +79,8 @@ InitControl(Name, HCtrl) {
 	}
 	if Name = Toolbar
 		Toolbar_Insert(HCtrl, "cut`ncopy`npaste")
+	if Name = SpreadSheet
+		SS_SetCell(HCtrl, 1,1, "Type=Text", "Txt=" Name)
 	else if Name = Rebar
 	{
 		Rebar_Insert(HCtrl, Form_Add(hForm, "Edit", Name, "w100 h100"))
