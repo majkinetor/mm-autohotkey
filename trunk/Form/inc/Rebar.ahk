@@ -722,7 +722,7 @@ Rebar(var="", value="~`a") {
 	return _
 }
 
-/* Group: Example
+/* Group: Examples
 	(start code)
 		Gui, +LastFound +Resize 
 		hGui := WinExist() 

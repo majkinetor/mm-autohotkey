@@ -2,9 +2,9 @@ _("mm! e d w")
 #SingleInstance, force
 #NoEnv
 
-	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet Splitter
+	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter 
 	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress GroupBox StatusBar Tab2 UpDown
-	init    = HiEdit
+	init    = RaGrid
 	;===============================================
 	
 	ctrls := custom " " ahk
@@ -35,6 +35,10 @@ return
 
 
 MakeOptions(Name) {
+
+	if Name=RaGrid
+		return "style='GRIDLINES NOSEL'"
+
 	if Name not in Splitter,Progress,GroupBox
 		return "gHandler"
 }
@@ -70,6 +74,15 @@ InitControl(Name, HCtrl) {
 	{
 		WinSet, Style, +1, ahk_id %Hctrl%
 		HE_SetEvents(HCtrl, "Handler")
+	}
+
+	if Name = RaGrid
+	{
+		RG_SetFont(HCtrl, "s8, courier"), RG_SetHdrHeight(HCtrl, 25), RG_SetRowHeight(HCtrl, 22)
+		RG_AddColumn(HCtrl, "txt=EditText", "w=150", "hdral=1",	"txtal=1", "type=EditText")
+		RG_AddColumn(HCtrl, "txt=Check",	"w=80",  "hdral=1", "txtal=1", "type=CheckBox")
+		RG_AddColumn(HCtrl, "txt=Button",	"w=80",  "hdral=1", "txtal=1", "type=Button")
+		RG_AddRow(HCtrl, "", Name, 1), 		RG_AddRow(HCtrl, "", Name, 0, ":)")
 	}
 
 	if Name = HLink

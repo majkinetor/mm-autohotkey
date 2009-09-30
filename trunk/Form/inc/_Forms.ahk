@@ -20,7 +20,7 @@
 		o Clean. They don't create any globals and try not to influence the hosting script in any way unless specified differently.
 		o Documented. All scripts contain documentation in the source code. You can use mkdoc script to create HTML documentation out of it by simply
 		  running it in the folder with scripts. You can use comment remover to reduce the size of the modules. You can also merge them into
-		  single include using ScriptMerge, which gives you the option to create documentation in one HTML file and simpler way to include framework.
+		  single include using ScriptMerge, which gives you the option to keep the framework and its documentation in single file.
 		o Free. All modules are open source and free.
 
  Group: Modules
@@ -33,7 +33,8 @@
 		o <ScrollBar>	- Scrollbar custom control.
 		o <HiEdit>		- HiEdit custom control.
 		o <QHTM>		- Qhtm custom control.
-		o <SpreadSheet> - SpreaddSheet control.
+		o <SpreadSheet> - SpreaddSheet custom control.
+		o <RaGrid>		- Ragrid custom control.
 		o <Win>			- Set of window functions.
 		o <Dlg>			- Common dialogs.
 
@@ -63,6 +64,7 @@
 
 #include *i HiEdit.ahk
 #include *i SpreadSheet.ahk
+#include *i RaGrid.ahk
 #include *i Qhtm.ahk
 
 
@@ -74,4 +76,6 @@
  Group: About
 	o v0.2 by majkinetor.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> .
+
+	(see _Forms.png)
  */

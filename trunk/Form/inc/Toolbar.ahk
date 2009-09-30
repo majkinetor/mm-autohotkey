@@ -1073,7 +1073,7 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 }
 
 /*
- Group: Example
+ Group: Examples
  (start code)
 	   Gui, +LastFound
 	   hGui := WinExist()

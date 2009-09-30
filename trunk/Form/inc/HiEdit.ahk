@@ -1045,7 +1045,7 @@ HiEdit_add2Form(hParent, Txt, Opt) {
 				
 
 
-	Group: Example
+	Group: Examples
 		(start code)
 			Gui, +LastFound 
 			hwnd := WinExist() 
