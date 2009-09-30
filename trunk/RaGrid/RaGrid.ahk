@@ -1,4 +1,4 @@
-/* Title : RaGrid
+/* Title: RaGrid
  */
 
 /*
@@ -102,13 +102,13 @@ RG_AddColumn(hGrd, o1="", o2="", o3="", o4="", o5="", o6="", o7=""){
  
  Parameters:
 			Col		- 1 based column number.
-			pQ		- Query parameter. Space separated list of named parameters. See <RG_AddColumn> for details.
+			pQ		- Query parameter. Space separated list of named parameters. See <AddColumn> for details. By default, type is returned.
 			o1..o7	- Reference to output variables.
 
  Returns:
 			o1
  */
-RG_GetColumn(hGrd, Col, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="", ByRef o7="") {
+RG_GetColumn(hGrd, Col, pQ="type", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="", ByRef o7="") {
 	static GM_GETCOLDATA = 1068, init		;wParam=nCol, lParam=lpCOLUMN
 		   , w=0, txt=4, hdral=8, txtal=12, type=16, txtmax=20, format=24, il=28, sort=32, data=44
 
@@ -133,7 +133,7 @@ RG_GetColumn(hGrd, Col, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="
 			Add row.
  															 
  Parameters:		
-			Row		- 1 based row number. If omitted, row is appended.
+			Row		- Row number. If omitted, row is appended.
 			c1..c10	- Column values. If there is a number and space on the beginning of the cN, it will be taken as number of column to set.
 					  Otherwise, argument number is used as a column number.
 
@@ -146,15 +146,14 @@ RG_AddRow(hGrd, Row="", c1="", c2="", c3="", c4="", c5="", c6="", c7="", c8="", 
 	Loop, 10
 	{
 		c := c%A_Index%
-		ifEqual, c,,break
+		ifEqual,c,,break
 		
 		j := InStr(c, A_Space)
 		if (j > 0) && (n := SubStr(c, j-1)) && (n+0 != "")
 			 c := SubStr(c, j+1), idx := n-1
 		else idx := A_Index-1
 
-		type := RG_GetColumn(hGrd, idx, "type")
-		m(c, type)
+;		type := RG_GetColumn(hGrd, idx, "type")
 		NumPut(&c, ROWDATA, idx*4)
 	}
 	
@@ -419,8 +418,9 @@ RG_SetFont(hGrd, pFont="") {
 RG_ComboAddString(hGrd, Col, Items) {
 	static GM_COMBOADDSTRING=0x406	;wParam=nCol, lParam=lpszString
 
-	loop, parse, string, |
-		SendMessage, GM_COMBOADDSTRING, Col-1, &A_LoopField,, ahk_id %hGrd%
+	Col -= 1
+	loop, parse, Items, |
+		SendMessage, GM_COMBOADDSTRING, Col, &(s:=A_LoopField),, ahk_id %hGrd%
 }
 /*
  Function:	ComboClear
@@ -432,8 +432,21 @@ RG_ComboClear(hGrd, Col) {
 	return ErrorLevel
 }
 
-RG_GetCell(hGrd, Row, Col){
-	static GM_GETCELLDATA=0x410	
+RG_GetCell(hGrd, Col="", Row=""){
+	static GM_GETCELLDATA=0x410, init		;wParam=nRowCol, lParam=lpData
+
+	if !init
+		init := VarSetCapacity(BUF, 256)
+	
+	if (Col="" && Row="")
+		RG_GetCurrentCell(hGrd, Col, Row)
+	
+	type := RG_GetColumn(hGrd, Col, "type")
+	SendMessage, GM_GETCELLDATA, (Row << 16) + Col, &BUF,, ahk_id %hGrd%
+
+	if type in EDITTEXT,EDITBUTTON,BUTTON
+		 VarSetCapacity(BUF, -1), return BUF
+	else return NumGet(BUF, 0, "Int")		
 }
 
 RG_GetCellText(hGrd, nRow=0, nCol=0) {
@@ -515,11 +528,13 @@ RG_SetEvents(hGrd, func, e=""){
    return "OK" 
 } 
 
-RG_SetCell(hGrd, Row, Col, Value="") {
+RG_SetCell(hGrd, Col, Row, Value="") {
 	static GM_SETCELLDATA=0x411		;wParam=nRowCol, lParam=lpData (can be NULL)
 
-	SendMessage, GM_SETCELLDATA, (Row << 16) + Col, &data,, ahk_id %hGrd%
-	return ERRORLEVEL
+;	type := RG_GetColumn(hGrd, Col)
+	Row-=1, Col-=1
+	SendMessage, GM_SETCELLDATA, 0, 0,, ahk_id %hGrd%
+	return ErrorLevel
 }
 
 RG_SetCellNum(hGrd, nRow=0, nCol=0, num=0) {
@@ -555,7 +570,7 @@ RG_SetCellText(hGrd, nRow=0, nCol=0, data="") {
 	Parameters:
 				Col, Row - Reference to variables to receive output.
   */
-RG_GetCurrentCell(hGrd, ByRef Row, ByRef Col) {
+RG_GetCurrentCell(hGrd, ByRef Col, ByRef Row) {
 	static GM_GETCURSEL=0x408	
 	SendMessage, GM_GETCURSEL,,,, ahk_id %hGrd%
 	Row := (ErrorLevel >> 16) + 1,  Col := (ErrorLevel & 0xFFFF) + 1
