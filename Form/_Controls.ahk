@@ -1,4 +1,4 @@
-_("mm! e d w")
+;_("mm! e d c w")
 #SingleInstance, force
 #NoEnv
 
@@ -10,7 +10,7 @@ _("mm! e d w")
 	ctrls := custom " " ahk
 
 	SetWorkingDir, inc		;required to load some dll's that are put there
-	hForm  := Form_New("w700 h600 Resize")
+	hForm  := Form_New("w700 h620 Resize")
 
 	htmlCtrls := RegExReplace(custom, "\w+", "<a href=$0 id=$0>$0</a><a href='" A_ScriptDir "\_doc\files\inc\$0-ahk.html'>&nbsp;+</a>&nbsp;&nbsp;")
 			   . "<br><br>" RegExReplace(ahk, "\w+", "<a href=$0 id=$0>$0</a>&nbsp;&nbsp;")
@@ -18,16 +18,20 @@ _("mm! e d w")
 	infoText=
 	(LTrim Join
 		<b>Press F1 to cycle controls. Click + to see docs.
-		Click control name to switch to its tab page. Press & hold F1 and resize window as experiment.</b><br><br>
+		Click control name to switch to its tab page. Press & hold F1 and resize window as experiment. Press F3 and F4 to switch layout.</b><br><br>
 		%htmlCtrls%
 	)
 	hInfo  := Form_Add(hForm, "QHTM", infoText, "gOnQHTM", "Align T, 200", "Attach p r2")
+	hLog   := Form_Add(hForm, "ListBox", "", "hscroll", "Align R, 300", "Attach p")
 	hTab   := Form_Add(hForm, "Panel", "", "", "Align F", "Attach p r2")
 	loop, parse, ctrls, %A_Space%
 	{		
 		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "", "w100 h100 style=hidden", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
 		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, MakeOptions(A_LoopField), "Align F", "Attach p")
 		InitControl(A_LoopField, hCtrl), %A_LoopField% := ctrlNo := A_Index
+		if !hFont ;create font only once, then use it for every control.
+			 hFont := Ext_Font(hCtrl, "S9", "Courier New")
+		else Ext_Font(hCtrl, hFont)
 	}	
 	QHTM_AddHtml(hInfo, "<br><h6>Total: " ctrlNo)
 	Form_Show(), OnQHTM("", "", init )
@@ -37,20 +41,28 @@ return
 MakeOptions(Name) {
 
 	if Name=RaGrid
-		return "style='GRIDLINES NOSEL'"
+		return "style='GRIDLINES NOSEL' gHandler"
+
+	if Name=SpreadSheet
+		return "style='WINSIZE VSCROLL HSCROLL CELLEDIT ROWSIZE COLSIZE MULTISELECT' gHandler"
 
 	if Name not in Splitter,Progress,GroupBox
 		return "gHandler"
 }
 
+Log(t1="", t2="", t3="", t4="", t5="") {
+	global hLog
+	txt = %t1% %t2% %t3% %t4% %t5%
+	Control,Add,%txt%,, ahk_id %hLog%
+	ControlSend, ,{End},ahk_id %hLog%
+}
+
 Handler:
-	Tooltip % A_GuiControl " " A_GuiEvent
-	SetTimer, Tooltip, -4000
+	Log(A_GuiControl,A_GuiEvent)
 return
 
-Handler(p1, p2, p3) {
-	Tooltip, %p1%  %p2%  %p3%
-	SetTimer, Tooltip, -4000
+Handler(p1, p2="", p3="",p4="") {
+	Log(p1,p2,p3,p4)
 }
 
 Tooltip:
@@ -78,7 +90,7 @@ InitControl(Name, HCtrl) {
 
 	if Name = RaGrid
 	{
-		RG_SetFont(HCtrl, "s8, courier"), RG_SetHdrHeight(HCtrl, 25), RG_SetRowHeight(HCtrl, 22)
+		RG_SetHdrHeight(HCtrl, 25), RG_SetRowHeight(HCtrl, 22)
 		RG_AddColumn(HCtrl, "txt=EditText", "w=150", "hdral=1",	"txtal=1", "type=EditText")
 		RG_AddColumn(HCtrl, "txt=Check",	"w=80",  "hdral=1", "txtal=1", "type=CheckBox")
 		RG_AddColumn(HCtrl, "txt=Button",	"w=80",  "hdral=1", "txtal=1", "type=Button")
@@ -93,7 +105,7 @@ InitControl(Name, HCtrl) {
 	if Name = Toolbar
 		Toolbar_Insert(HCtrl, "cut`ncopy`npaste")
 	if Name = SpreadSheet
-		SS_SetCell(HCtrl, 1,1, "Type=Text", "Txt=" Name)
+		SS_SetRowHeight(hCtrl, 0, 20), SS_SetColWidth(hCtrl, 1, 150), SS_SetCell(HCtrl, 1,1, "Type=Text", "Txt=" Name), SS_SetGlobalFields(HCtrl,  "gcellw gcellht cell_txtal rowhdr_txtal", 50, 30, "CENTER MIDDLE", "CENTER MIDDLE")
 	else if Name = Rebar
 	{
 		Rebar_Insert(HCtrl, Form_Add(hForm, "Edit", Name, "w100 h100"))
@@ -101,7 +113,7 @@ InitControl(Name, HCtrl) {
 	}
 	else if Name = Splitter
 	{		
-		hp1 := Form_Add(hPanel%A_Index%	, "Panel", "Panel 1", "style='center sunken'", "Align T, 200", "Attach w r")
+		hp1 := Form_Add(hPanel%A_Index%	, "Panel", "Panel 1", "style='center sunken'", "Align T, 130", "Attach w r")
 		Align(hCtrl, "T", 30), Attach(hCtrl, "w r")
 		hp2 := Form_Add(hPanel%A_Index%	, "Panel", "Panel 2", "style='center sunken'", "Align F", "Attach w h r")
 		Splitter_Set(hCtrl, hp1 " - " hp2)
@@ -109,6 +121,23 @@ InitControl(Name, HCtrl) {
 	else if Name= QHTM
 		QHTM_AddHtml(HCtrl, "<BR><b><font size=4>Remove flux capacitor?</font></b><p>Removing the flux capacitor during flight might lead to <b>overheating</b>,<br> <font color=""red"">toxi gas</font> exhaust, and some really unhappy passengers<p><b>Are you sure you wish to remove flux capacitor?</b><p>")
 }
+
+F4::
+	Win_Show(hInfo)
+	Align(hForm, "reset")
+	Align(hInfo, "T", 200)
+	Align(hLog, "R", 300)
+	Align(hTab, "F")
+	Attach(hForm)
+return
+
+F3::
+	Win_Show(hInfo, false)
+	Align(hForm, "reset")
+	Align(hLog, "T", 200)
+	Align(hTab, "F")
+	Attach(hForm)
+return
 
 F2::
 	WinMove, ahk_id %hForm%, , , , 300, 300

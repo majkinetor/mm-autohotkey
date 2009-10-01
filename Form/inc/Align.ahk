@@ -50,9 +50,10 @@ Align(HCtrl, Type="", Dim="", HGlueCtrl=""){
 	static 
 
 	HCtrl += 0
-	if (Type="") {	;realign
+	if (Type="") or (Type="reset") {	;realign
 		critical 100
 		hParent := HCtrl, %hParent%rect := ""
+		ifEqual, type, reset, return
 		loop, parse, %hParent%, |
 		{
 			StringSplit, s, A_LoopField, %A_Space%
