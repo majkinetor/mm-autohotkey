@@ -1,4 +1,4 @@
-_("mo! e")
+_("mo!")
 #SingleInstance, force
 
 	w := 1000, h := 500, header := 50
@@ -95,7 +95,8 @@ OnBtn:
 		RG_SetColors(hGrd, "B1 G0xFF F0xFFFFFF")
 return
 
-F1::  m( RG_ConvertDate(hGrd, "", RG_GetCell(hGrd)) )
+F1:: RG_EnterEdit(hGrd)
+F2:: RG_SetColFormat(hGrd, "", "###")
 
 #Include RaGrid.ahk
 #include inc\Attach.ahk

@@ -16,11 +16,12 @@
 			NOSEL, NOFOCUS, HGRIDLINES, VGRIDLINES, GRIDLINES, GRIDFRAME, NOCOLSIZE.
 
  Handler:
- >     	Result := Handler(HCtrl, Event, EventInfo, Col, Row )
+ >     	Result := Handler(HCtrl, Event, Col, Row, Data )
 
 		HCtrl	- Control sending the event.
 		Event   - Specifies event that occurred. Event must be registered to be able to monitor it. 
 		Col,Row - Cell coordinates.
+		Data	- Numeric data of the cell. Pointer to string for textual cells and DWORD value for numeric.
 		Result  - Return 1 to prevent action.
 
  Events:
@@ -183,15 +184,26 @@ RG_AddRow(hGrd, Row="", c1="", c2="", c3="", c4="", c5="", c6="", c7="", c8="", 
 }
 
 /*
+	Function: CellConvert
+			  Convert cell.
+  */
+RG_CellConvert(hGrd, Col="", Row="") {
+	static GM_CELLCONVERT=0x428		;wParam=nRowCol, lParam=lpBuffer
+	if (Col Row = "")
+		RG_GetCurrentCell(hGrd, Col, Row)
+	VarSetCapacity(Buf, 256)
+	SendMessage,GM_CELLCONVERT,(Row << 16 ) + Col, &Buf,, ahk_id %hGrd%
+	VarSetCapacity(Buf, -1)
+	return buf
+}
+
+/*
  Function:	ComboAddString
 			Populate combo box.
  
  Parameters:
 			Col		- Column number.
-			Items	- "|" separated list of items.
-
- Returns:
-  
+			Items	- "|" separated list of items. 
  */
 RG_ComboAddString(hGrd, Col, Items) {
 	static GM_COMBOADDSTRING=0x406	;wParam=nCol, lParam=lpszString
@@ -215,7 +227,7 @@ RG_ComboClear(hGrd, Col) {
 			Edit cell.
 
  Parameters:
-			Col, Row	- Cell coordinates. If omitted, currently selected row/col is used.
+			Col, Row	- Cell coordinates. If omitted, currently selected cell is used.
  */
 RG_EnterEdit(hGrd, Col="", Row="") {
 	static GM_ENTEREDIT=0x41A		;wParam=nCol, lParam=nRow
@@ -223,6 +235,23 @@ RG_EnterEdit(hGrd, Col="", Row="") {
 	if (Col Row = "")
 		RG_GetCurrentCell(hGrd, Col, Row)
 	SendMessage, GM_ENTEREDIT,Col-1,Row-1,, ahk_id %hGrd% 
+	return ErrorLevel 
+}
+
+/*
+ Function:	EndEdit
+			End cell editing.
+
+ Parameters:
+			Col, Row	- Cell coordinates. If omitted, currently selected cell is used.
+			bCancel		- Set to true to end editing.
+ */
+RG_EndEdit(hGrd, Col="", Row="", bCancel=1) {
+	static GM_ENDEDIT=0x41B		;wParam=nRowCol, lParam=fCancel
+
+	if (Col Row = "")
+		RG_GetCurrentCell(hGrd, Col, Row)	
+	SendMessage, GM_ENDEDIT, (Row<<16) + Col, bCancel,,ahk_id %hGrd%
 	return ErrorLevel 
 }
 
@@ -248,7 +277,6 @@ RG_DeleteRow(hGrd, Row="") {
 RG_GetCell(hGrd, Col="", Row="") {
 	static GM_GETCELLDATA=0x410, BUF, init		;wParam=nRowCol, lParam=lpData
 
-
 	if !init
 		init := VarSetCapacity(BUF, 256)
 	
@@ -256,13 +284,44 @@ RG_GetCell(hGrd, Col="", Row="") {
 		RG_GetCurrentCell(hGrd, Col, Row)
 	
 	Col-=1, Row-=1
-	m(col, row)
 	type := RG_GetColumn(hGrd, Col+1, "type")
 	SendMessage, GM_GETCELLDATA, (Row << 16) + Col, &BUF,, ahk_id %hGrd%
 	
 	if type in COMBOBOX,CHECKBOX,EDITLONG,IMAGE,HOTKEY,DATE,TIME
 		 return NumGet(BUF, 0, "Int")		
 	else return BUF
+}
+
+/*
+	Function: GetCellRect
+			  Get cell rect.
+  */
+SS_GetCellRect(hGrd, Col="", Row="", ByRef top="", ByRef left="", ByRef right="", ByRef bottom=""){
+	static SPRM_GETCELLRECT=0x412		; wParam=nRowCol, lParam=lpRECT
+	
+	if (Col="" && Row="")
+		RG_GetCurrentCell(hGrd, Col, Row)
+
+	VarSetCapacity(RECT, 16)
+	SendMessage,SPRM_GETCELLRECT,(Row<<16) + Col,&RECT,, ahk_id %hGrd%
+	left	:= NumGet(RECT, 0)
+	top		:= NumGet(RECT, 4)
+	right	:= NumGet(RECT, 8)
+	bottom	:= NumGet(RECT, 12)
+	return ErrorLevel
+}
+
+/*
+ Function:	GetColFormat
+			Get column format.
+ */
+RG_GetColFormat(hGrd, Col="") {
+	static GM_GETCOLFORMAT=0x426	;wParam=nCol, lParam=lpBuffer
+	ifEqual, Col,, SetEnv, Col, % RG_GetCurrentCol(hGrd)
+	VarSetCapacity(Buf, 32)
+	SendMessage,GM_GETCOLFORMAT,Col-1,&Buf,, ahk_id %hGrd% 
+	VarSetCapacity(Buf, -1)
+	return Buf
 }
 
 /*
@@ -340,6 +399,8 @@ RG_GetColumn(hGrd, Col="", pQ="type", ByRef o1="", ByRef o2="", ByRef o3="", ByR
 		o%A_Index% := NumGet(COLUMN, %A_LoopField%)
 		if A_LoopField=txt
 			o%A_Index% := RG_GetHdrText(hGrd, Col)
+		else if A_LoopField=format
+			o%A_Index% := RG_GetColFormat(hGrd, Col)
 		else if A_LoopField = type
 			o%A_Index% := RG_getType(o%A_Index%)
 	}
@@ -395,8 +456,8 @@ RG_GetHdrHeight(hGrd) {
   */
 RG_GetHdrText(hGrd, Col="") { ;wParam=nCol, lParam=lpBuffer
 	static GM_GETHDRTEXT=0x424
-	VarSetCapacity(Buf, 256)
 	ifEqual, Col,, SetEnv, Col, % RG_GetCurrentCol(hGrd)
+	VarSetCapacity(Buf, 256)
 	SendMessage,GM_GETHDRTEXT,Col-1,&Buf,, ahk_id %hGrd% 
 	VarSetCapacity(Buf, -1)
 	return Buf
@@ -528,6 +589,17 @@ RG_SetColWidth(hGrd, Col="", Width=0) {		;wParam=nCol, lParam=nWidth
 	ifEqual, Col,, SetEnv, Col, % RG_GetCurrentCol(hGrd)
 	SendMessage,GM_GETCOLWIDTH,Col-1,Width,, ahk_id %hGrd% 
 	return ErrorLevel 
+}
+
+/*
+ Function:	SetColFormat
+			Set column format.
+ */
+RG_SetColFormat(hGrd, Col="", Format="") {
+	static GM_SETCOLFORMAT=0x427	;wParam=nCol, lParam=lpszText
+	ifEqual, Col,, SetEnv, Col, % RG_GetCurrentCol(hGrd)
+	SendMessage, GM_SETCOLFORMAT, Col-1, &Format,, ahk_id %hGrd%
+	return ErrorLevel
 }
 
 /*
