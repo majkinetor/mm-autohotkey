@@ -1,5 +1,5 @@
 /*
- Function:  SetFont
+ Function:  Ext_Font
 			Sets the control font.
 
  Parameters:
