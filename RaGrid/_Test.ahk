@@ -21,13 +21,13 @@
 	Gui, Add, StatusBar, ,Loading data
 	Gui, Show, h%h% w%w%
 	
-	hIL:= IL_Create(255)
+	hIL := ImageList_Create(16, 16, 0x21, 255, 10)
 	Loop 255  
-		IL_Add(hIL, "shell32.dll", A_Index)
+		ImageList_AddIcon(hIL, LoadIcon("shell32.dll", A_Index, 16))
 	
 	hGrd := RG_Add(hwnd, 0, header, w, h-header-30, "GRIDFRAME VGRIDLINES NOSEL", "OnRa" ), Attach(hGrd, "w h")
 	RG_SetFont(hGrd, "s8, Courier New")
-	RG_SetHdrHeight(hGrd, 30), RG_SetRowHeight(hGrd, 25)	
+	RG_SetHdrHeight(hGrd, 30), RG_SetRowHeight(hGrd, 26)	
 
 	loop, 5
 	{
@@ -114,3 +114,4 @@ return
 
 #Include RaGrid.ahk
 #include inc\Attach.ahk
+#include inc\Il.ahk
