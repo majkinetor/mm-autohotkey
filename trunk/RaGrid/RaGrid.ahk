@@ -1,5 +1,7 @@
 /* Title: RaGrid
 		  Advanced grid custom control.
+
+		  (See RaGrid.png)
  */
 
 /*
@@ -143,7 +145,6 @@ RG_AddColumn(hGrd, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o9=""
 
 	if (items != "") && (type = "COMBOBOX")
 		RG_ComboAddString(hGrd, res, items)
-
 
 	return res
 }
