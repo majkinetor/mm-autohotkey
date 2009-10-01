@@ -1,4 +1,4 @@
-_("mo!")
+_("mm! e")
 #SingleInstance, force
 
 	w := 1000, h := 500, header := 50
@@ -26,7 +26,7 @@ _("mo!")
 	RG_SetFont(hGrd, "s8, Courier New")
 	RG_SetHdrHeight(hGrd, 30), RG_SetRowHeight(hGrd, 25)	
 
-	loop, 1
+	loop, 5
 	{
 		RG_AddColumn(hGrd, "txt=EditText",  "w=100", "hdral=1",	"txtal=1", "type=EditText")
 		RG_AddColumn(hGrd, "txt=EditLong",  "w=100", "hdral=1", "txtal=1", "type=EditLong", "format=# ### ####")
@@ -36,27 +36,29 @@ _("mo!")
 		RG_AddColumn(hGrd, "txt=EButton",	"w=100", "hdral=1", "txtal=1", "type=EditButton")
 		RG_AddColumn(hGrd, "txt=Image",		"w=100", "hdral=1", "txtal=1", "type=Image", "il=" hIL)
 		RG_AddColumn(hGrd, "txt=Hotkey",	"w=100", "hdral=1", "txtal=1", "type=Hotkey")
-		RG_AddColumn(hGrd, "txt=Date",		"w=100", "hdral=1", "txtal=1", "type=Date", "format=dd'.'MM'.'yyyy")
-		RG_AddColumn(hGrd, "txt=Time",		"w=100", "hdral=1", "txtal=1", "type=Time", "format=hh':'mm")
+		RG_AddColumn(hGrd, "txt=Date",		"w=100", "hdral=1", "txtal=1", "type=Date", "format=yy'-'MM'-'dd")
+		RG_AddColumn(hGrd, "txt=Time",		"w=100", "hdral=1", "txtal=1", "type=Time", "format=HH':'mm")
 		RG_AddColumn(hGrd, "txt=User",		"w=100", "hdral=1", "txtal=1", "type=User", "data=1234")
 	}
-	Rg_AddRow(HGrd)
-	RG_GetColumn(hGrd, 2, "txt") ;, hdral=8, txtal=12, type=16, txtmax=20, format=24, il=28, hdrflag=32, hctrl=40, data=44")
-	return
 
-	loop, 10
+	loop, 1000
 		RG_AddRow(hGrd, 0, "Text" A_Index ,A_Index, mod(A_Index, 12), mod(A_Index, 2), "btn" A_Index, "",mod(A_Index, 255))
 		, RG_AddRow(hGrd, 0 " " 10, "Text" A_Index ,A_Index, mod(A_Index, 12), mod(A_Index, 2), "btn" A_Index, "", mod(A_Index, 255))
 
-	m("Loading finished`n`nRows " RG_GetRowCount(hGrd) " Cols " RG_GetColCount(hGrd))
+;	m("Loading finished`n`nRows " RG_GetRowCount(hGrd) " Cols " RG_GetColCount(hGrd))
 return 
 
 OnRa(HCtrl, Event, Col, Row, Data="") {
 ;	m(hctrl, event, col, row, NumGet(data+0), RG_strAtAdr(data), data)
 
-	if (Event = "beforeedit") && (Col=1)
-		return 1
+	if (Event = "beforeedit")
+		SetTimer, ResizeTimer, -1
 }
+
+ResizeTImer:
+		h := RG_GetColumn(hGrd, "", "hctrl")
+		;Win_Move(h, "", "", 200, "")
+return
 
 OnBtn:
 	if A_GuiControl = Insert
@@ -95,8 +97,7 @@ OnBtn:
 		RG_SetColors(hGrd, "B1 G0xFF F0xFFFFFF")
 return
 
-F1:: RG_EnterEdit(hGrd)
-F2:: RG_SetColFormat(hGrd, "", "###")
+F1:: m(RG_CellCOnvert(hGrd))
 
 #Include RaGrid.ahk
 #include inc\Attach.ahk
