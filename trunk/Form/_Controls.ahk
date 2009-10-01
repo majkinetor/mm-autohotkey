@@ -1,10 +1,10 @@
-;_("mm! e d c w")
+_("mm! e d c w")
 #SingleInstance, force
 #NoEnv
 
 	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter 
 	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress GroupBox StatusBar Tab2 UpDown
-	init    = RaGrid
+	init    = HiEdit
 	;===============================================
 	
 	ctrls := custom " " ahk
@@ -35,6 +35,7 @@
 	}	
 	QHTM_AddHtml(hInfo, "<br><h6>Total: " ctrlNo)
 	Form_Show(), OnQHTM("", "", init )
+	SB_SetText("Forms test")
 return
 
 
