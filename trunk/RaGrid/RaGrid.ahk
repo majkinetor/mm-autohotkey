@@ -153,7 +153,7 @@ RG_AddColumn(hGrd, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o9=""
 			Add row.
  															 
  Parameters:		
-			Row		- Row number. If 0 row is appended. If omitted, blank row is added and cN are ignored  if present.
+			Row		- Row number. If 0 row is appended. If omitted, blank row is added and cN are ignored if present.
 					  if two numbers separated by space, - r o - r is taken as row number, o as row offset.
 			c1..c10	- Column values. 
 
@@ -297,7 +297,7 @@ RG_GetCell(hGrd, Col="", Row="") {
 	Function: GetCellRect
 			  Get cell rect.
   */
-SS_GetCellRect(hGrd, Col="", Row="", ByRef top="", ByRef left="", ByRef right="", ByRef bottom=""){
+RG_GetCellRect(hGrd, Col="", Row="", ByRef Top="", ByRef Left="", ByRef Right="", ByRef Bottom=""){
 	static SPRM_GETCELLRECT=0x412		; wParam=nRowCol, lParam=lpRECT
 	
 	if (Col="" && Row="")

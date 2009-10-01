@@ -1,4 +1,4 @@
-_("mm! e")
+;_("mm! e")
 #SingleInstance, force
 
 	w := 1000, h := 500, header := 50
@@ -112,7 +112,5 @@ OnBtn:
 		msgbox % RG_CellConvert(hGrd)
 return
 
-F1:: m(RG_CellCOnvert(hGrd))
-F2:: RG_Sort(hGrd)
 #Include RaGrid.ahk
 #include inc\Attach.ahk
