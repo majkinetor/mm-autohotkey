@@ -53,7 +53,7 @@ RG_Add(HParent,X,Y,W,H, Style="", Handler="", DllPath=""){
 		ifEqual, DllPath, ,SetEnv, DllPath, RAGrid.dll
 		DllCall("LoadLibrary", "Str", DllPath)
 
-		old := OnMessage(0x4E, "RG_onNotify"),	MODULEID := 300909
+;		old := OnMessage(0x4E, "RG_onNotify"),	MODULEID := 300909
 		if old != RG_onNotify
 			RG("oldNotify", RegisterCallback(old))
 	}
@@ -98,12 +98,19 @@ RG_Add(HParent,X,Y,W,H, Style="", Handler="", DllPath=""){
 
  Types:
 			EDITTEXT, EDITLONG, CHECKBOX, COMBOBOX, BUTTON, EDITBUTTON, HOTKEY, IMAGE, DATE, TIME, USER.
+
+ Returns:
+			Column count. 0 on failure.
+
+ Remarks:
+			Columns can not be added when the control has already rows in it. 
+			Total number of supported columns is around 3K.
  */
 RG_AddColumn(hGrd, o1="", o2="", o3="", o4="", o5="", o6="", o7=""){
-	static GM_ADDCOL=0x401, ;ASC=0, DES=1, INVERT=2,  LEFT=0, CENTER=1, RIGHT=2
+	static GM_ADDCOL=0x401, COLUMN
 
 	if !init
-		init := VarSetCapacity(COL, 48) 
+		init := VarSetCapacity(COLUMN, 48) 
 
 	type := "EDITTEXT"
 	loop, 7 {
@@ -111,20 +118,21 @@ RG_AddColumn(hGrd, o1="", o2="", o3="", o4="", o5="", o6="", o7=""){
 		else j := InStr( o%A_index%, "=" ), p := SubStr(o%A_index%, 1, j-1 ), %p% := SubStr( o%A_index%, j+1)
 	}		
 	hType := RG_getType(type)
-                                                 
-	 NumPut(w, COL, 0)
-	 , NumPut(&txt,		COL, 4)
-	 , NumPut(hdral,	COL, 8)
-	 , NumPut(txtal,	COL, 12)
-	 , NumPut(htype,	COL, 16)
-	 , NumPut(txtmax,	COL, 20)
-	 , NumPut(&format,	COL, 24)
-	 , NumPut(il,		COL, 28)
-	 , NumPut(sort,		COL, 32)
-	 , NumPut(data	,	COL, 44)
+     
+	 , NumPut(w,		COLUMN, 0)
+	 , NumPut(&txt,		COLUMN, 4)
+	 , NumPut(hdral,	COLUMN, 8)
+	 , NumPut(txtal,	COLUMN, 12)
+	 , NumPut(htype,	COLUMN, 16)
+	 , NumPut(txtmax,	COLUMN, 20)
+	 , NumPut(&format,	COLUMN, 24)
+	 , NumPut(il,		COLUMN, 28)
+	 , NumPut(sort,		COLUMN, 32)
+	 , NumPut(data	,	COLUMN, 44)
 															 	
-	SendMessage,GM_ADDCOL,,&COL,, ahk_id %hGrd%
-	return ErrorLevel										 
+	SendMessage,GM_ADDCOL,,&COLUMN,, ahk_id %hGrd%
+	ifEqual, ErrorLevel, 4294967295, return 0
+	return ErrorLevel+1
 }
 
 /*															 
@@ -132,28 +140,33 @@ RG_AddColumn(hGrd, o1="", o2="", o3="", o4="", o5="", o6="", o7=""){
 			Add row.
  															 
  Parameters:		
-			Row		- Row number. If omitted, row is appended.
-			c1..c10	- Column values.
+			Row		- Row number. If 0 row is appended. If omitted, blank row is added and cN are ignored  if present.
+			c1..c20	- Column values.
+
+ Remarks:
+			Maximum 65K rows are supported.
 
  */
-RG_AddRow(hGrd, Row="", c1="", c2="", c3="", c4="", c5="", c6="", c7="", c8="", c9="", c10=""){ 
-	static GM_ADDROW=0x402, GM_INSROW=0x403		;wParam=nRow, lParam=lpROWDATA (can be NULL)
+RG_AddRow(hGrd, Row="", c1="", c2="", c3="", c4="", c5="", c6="", c7="", c8="", c9="", c10="", c11="", c12="", c13="", c14="", c15="", c16="", c17="", c18="", c19="", c20=""){ 
+	static GM_ADDROW=0x402, GM_INSROW=0x403, colCnt		;wParam=nRow, lParam=lpROWDATA (can be NULL)
 
-	VarSetCapacity(ROWDATA, 40, 0)
-	Loop, 10
-	{
-		ifEqual,c%A_Index%,,continue
-		idx := A_Index*4 - 4
+	if (colCnt = "") 
+		colCnt := RG_GetColCount(hGrd)
 
-		type := RG_GetColumn(hGrd, A_Index)
-		if type in COMBOBOX,CHECKBOX,EDITLONG,IMAGE
-			 NumPut(c%A_Index%,  ROWDATA, idx)
-		else NumPut(&c%A_Index%, ROWDATA, idx)
+	if (Row != "") {
+		VarSetCapacity(ROWDATA, n*colCnt, 0), 	adrRowData := &ROWDATA
+		Loop, %colCnt%
+		{			
+			idx := (A_Index-1)*4, type := RG_GetColumn(hGrd, A_Index)
+			if type in COMBOBOX,CHECKBOX,EDITLONG,IMAGE
+				 NumPut(c%A_Index%,  ROWDATA, idx)
+			else NumPut(&c%A_Index%, ROWDATA, idx)
+		}
 	}
-
-	if (Row = "")
-			SendMessage,GM_ADDROW,0,&ROWDATA,, ahk_id %hGrd% 
-	else	SendMessage,GM_INSROW,Row-1,&ROWDATA,, ahk_id %hGrd%  
+	
+	if !Row
+			SendMessage,GM_ADDROW,,adrRowData,, ahk_id %hGrd% 
+	else	SendMessage,GM_INSROW,Row-1,adrRowData,, ahk_id %hGrd%  
 	return ErrorLevel 
 }
 
@@ -231,7 +244,6 @@ RG_GetCell(hGrd, Col="", Row="") {
 		RG_GetCurrentCell(hGrd, Col, Row)
 	
 	Col-=1, Row-=1
-
 	m(col, row)
 	type := RG_GetColumn(hGrd, Col+1, "type")
 	SendMessage, GM_GETCELLDATA, (Row << 16) + Col, &BUF,, ahk_id %hGrd%
@@ -436,7 +448,7 @@ RG_SetCell(hGrd, Col, Row, Value="") {
 	static GM_SETCELLDATA=0x411		;wParam=nRowCol, lParam=lpData (can be NULL)
 
 	type := RG_GetColumn(hGrd, Col)
-	if type in COMBOBOX,CHECKBOX,EDITLONG
+	if type in COMBOBOX,CHECKBOX,EDITLONG,IMAGE,HOTKEY,DATE,TIME
 		NumPut(Value, Value)
 
 	Row-=1, Col-=1
