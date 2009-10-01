@@ -239,39 +239,6 @@ RG_EnterEdit(hGrd, Col="", Row="") {
 	return ErrorLevel 
 }
 
-/*  
- Function:	FormatTime
- 			Converts number of seconds to time string using column format.
- */
-RG_FormatTime(hGrd, Col="", Row=""){
-	if (Col Row = "")
-		RG_GetCurrentCell(hGrd, Col, Row)
-
-	format := RG_GetColFormat(hGrd, Col)
-	seconds := RG_GetCell(hGrd, Col, Row)
-    time = 16010101  ; an arbitrary date.
-    time += %seconds%, seconds
-    FormatTime, var, %time%, %format%
-    return var 
-}
-
-/*  
- Function:	FormatDate
- 			Converts date number to date string using column format.
- */
-RG_FormatDate(hGrd, Col="", Row="") {
-	var := 16010101
-	if (Col Row = "")
-		RG_GetCurrentCell(hGrd, Col, Row)
-
-	format := RG_GetColFormat(hGrd, Col)
-	Date := RG_GetCell(hGrd, Col, Row)
-	
-	EnvAdd, var, %Date%, D
-	FormatTime, var, %var%, %format%
-	return var	
-}
-
 /*
  Function:	EndEdit
 			End cell editing.
