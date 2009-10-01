@@ -14,15 +14,18 @@ _("mm! e")
 	Gui, Add, Button,x+20 yp gOnBtn, Colorize Row
 	Gui, Add, Button,x+0 yp	gOnBtn, Set Colors
 	Gui, Add, Button,x+20 yp gOnBtn, Read Cell
+	Gui, Add, Button,x+5 yp gOnBtn, Convert Cell
+	Gui, Add, Button,x+5 yp gOnBtn, Sort Column
 
 	Gui, Add, Button,x+40 yp gOnBtn, Reload
+	Gui, Add, StatusBar, ,Loading data
 	Gui, Show, h%h% w%w%
 	
 	hIL:= IL_Create(255)
 	Loop 255  
 		IL_Add(hIL, "shell32.dll", A_Index)
 	
-	hGrd := RG_Add(hwnd, 0, header, w, h-header, "GRIDFRAME VGRIDLINES NOSEL", "OnRa" ), Attach(hGrd, "w h")
+	hGrd := RG_Add(hwnd, 0, header, w, h-header-30, "GRIDFRAME VGRIDLINES NOSEL", "OnRa" ), Attach(hGrd, "w h")
 	RG_SetFont(hGrd, "s8, Courier New")
 	RG_SetHdrHeight(hGrd, 30), RG_SetRowHeight(hGrd, 25)	
 
@@ -43,16 +46,22 @@ _("mm! e")
 
 	loop, 1000
 		RG_AddRow(hGrd, 0, "Text" A_Index ,A_Index, mod(A_Index, 12), mod(A_Index, 2), "btn" A_Index, "",mod(A_Index, 255))
-		, RG_AddRow(hGrd, 0 " " 10, "Text" A_Index ,A_Index, mod(A_Index, 12), mod(A_Index, 2), "btn" A_Index, "", mod(A_Index, 255))
+		;, RG_AddRow(hGrd, 0 " " 10, "Text" A_Index ,A_Index, mod(A_Index, 12), mod(A_Index, 2), "btn" A_Index, "", mod(A_Index, 255))
 
-;	m("Loading finished`n`nRows " RG_GetRowCount(hGrd) " Cols " RG_GetColCount(hGrd))
+	SB_SetText("Loading finished`n`nRows " RG_GetRowCount(hGrd) " Cols " RG_GetColCount(hGrd))
 return 
 
 OnRa(HCtrl, Event, Col, Row, Data="") {
-;	m(hctrl, event, col, row, NumGet(data+0), RG_strAtAdr(data), data)
-
-	if (Event = "beforeedit")
-		SetTimer, ResizeTimer, -1
+	static s
+	SB_SetText( s .= " | " col " " row " " event )
+	if StrLen(s)>120
+		s := ""
+		
+	if (Event = "BeforeEdit")
+		SetTimer, ResizeTimer, -1		;resize editing control
+	
+	if (Event = "HeaderClick")
+		RG_Sort(HCtrl, Col)
 }
 
 ResizeTImer:
@@ -95,9 +104,15 @@ OnBtn:
 
 	if A_GuiControl = Set Colors
 		RG_SetColors(hGrd, "B1 G0xFF F0xFFFFFF")
+
+	if A_GuiControl = Sort Column
+		RG_Sort(hGrd)
+
+	if A_GuiControl = Convert Cell
+		msgbox % RG_CellConvert(hGrd)
 return
 
 F1:: m(RG_CellCOnvert(hGrd))
-
+F2:: RG_Sort(hGrd)
 #Include RaGrid.ahk
 #include inc\Attach.ahk
