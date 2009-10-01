@@ -6,8 +6,8 @@
  :
 		Forms framework is a group of modules used together to create AHK graphical user interfaces. 
 		It contains the list of optional module includes with each module designed to work with or without the framework in place.
-		It includes number of custom controls, extensions and useful libraries. <Form> module is a backbone of the framework.
-
+		It includes number of custom controls, extensions and useful libraries. <Form> module is a backbone of the framework.		
+		
  Group: Features
  :
 		All modules are developed so they fulfill specific goals :
@@ -22,6 +22,7 @@
 		  running it in the folder with scripts. You can use comment remover to reduce the size of the modules. You can also merge them into
 		  single include using ScriptMerge, which gives you the option to keep the framework and its documentation in single file.
 		o Free. All modules are open source and free.
+
 
  Group: Modules
 		o <Form>		- Alternative way of creating AHK GUIs.

@@ -1,15 +1,13 @@
 /*
 	Title:	Form
 
-	Form module presents alternative way of creating AHK GUI. It can be used alone or as a part of the Forms framework.
+	Form module presents alternative way of creating AHK windows. It can be used alone or as a part of the Forms framework.
 	Some of the main differences between normal GUI creation and the way it is done using the module are:
 
-	o Degree of cohesion - one function call can set all features for any control thus making changes, maintenance and bug testing much easier (and keeping related data together).
-	  Form provides more concise way of creating controls and top level windows using function instead commands where, generally, one Form call is equivalent to series of AHK commands.
-	  Contrary to that, original AHK way of creating GUI can suffer from spaghetti-like code and is generally much harder to maintain and change.
-	o Support for custom controls without any syntax differences. The end effect is the same as if you were using integrated AHK control.
-	o Support for control extensions in simplest way, basically any behavior that you may want for control.
-	o Provides (but doesn't force) standardization of Gui/control creation process, option specification and module design.
+	o Bigger cohesion - one function call can set most of the creation features for any control thus making changes, maintenance and bug testing much easier.
+	o Custom controls without any syntax differences. The end effect is the same as if you were using integrated AHK control.
+	o Control extensions provide way to implement any behavior that you may want for control.
+	o Provides elements for standardization of Gui/control creation process, option specification and module design.
  */
 
 /*
