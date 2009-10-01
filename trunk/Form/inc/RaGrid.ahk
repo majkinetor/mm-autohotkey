@@ -1,5 +1,7 @@
 /* Title: RaGrid
 		  Advanced grid custom control.
+
+		  (See RaGrid.png)
  */
 
 /*
@@ -16,11 +18,12 @@
 			NOSEL, NOFOCUS, HGRIDLINES, VGRIDLINES, GRIDLINES, GRIDFRAME, NOCOLSIZE.
 
  Handler:
- >     	Result := Handler(HCtrl, Event, EventInfo, Col, Row )
+ >     	Result := Handler(HCtrl, Event, Col, Row, Data )
 
 		HCtrl	- Control sending the event.
 		Event   - Specifies event that occurred. Event must be registered to be able to monitor it. 
 		Col,Row - Cell coordinates.
+		Data	- Numeric data of the cell. Pointer to string for textual cells and DWORD value for numeric.
 		Result  - Return 1 to prevent action.
 
  Events:
@@ -91,40 +94,59 @@ RG_Add(HParent,X,Y,W,H, Style="", Handler="", DllPath=""){
 			txt		- Column caption.
 			txtmax	- Max text lenght for EDITTEXT and EDITLONG types.
 			hdral	- Header text alignment. Number, LEFT=0, CENTER=1, RIGHT=2
+			hdrflag	- Header flags. If initially sorted set to initial sort direction. ASC=0, DES=1, INVERT=2.
 			txtal	- Column text alignment.
-			sort	- Sort type. Number, ASC=0, DES=1, INVERT=2.
 			il		- Handle of the image list. For the image columns and combobox only.
-			format	- Format string for the EDITLONG type.
+			format	- Format string for the EDITLONG, DATE and TIME types.
+			data	- User data.
+			hctrl	- Handle of the column editing control. Used internally and with USER type.
+			items	- Items for the COMBOBOX column type. Syntax suggar for <ComboAddString> function.
 
  Types:
 			EDITTEXT, EDITLONG, CHECKBOX, COMBOBOX, BUTTON, EDITBUTTON, HOTKEY, IMAGE, DATE, TIME, USER.
+
+ Returns:
+			Column count. 0 on failure.
+
+ Remarks:
+			Columns can not be added when the control has rows. 
+			Total number of supported columns is around 3K.
  */
-RG_AddColumn(hGrd, o1="", o2="", o3="", o4="", o5="", o6="", o7=""){
-	static GM_ADDCOL=0x401, ;ASC=0, DES=1, INVERT=2,  LEFT=0, CENTER=1, RIGHT=2
+RG_AddColumn(hGrd, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o9="", o10=""){
+	static GM_ADDCOL=0x401, COLUMN
 
 	if !init
-		init := VarSetCapacity(COL, 48) 
+		init := VarSetCapacity(COLUMN, 48) 
 
 	type := "EDITTEXT"
-	loop, 7 {
+	loop, 10 {
 		ifEqual, o%A_Index%,,break
 		else j := InStr( o%A_index%, "=" ), p := SubStr(o%A_index%, 1, j-1 ), %p% := SubStr( o%A_index%, j+1)
 	}		
 	hType := RG_getType(type)
-                                                 
-	 NumPut(w, COL, 0)
-	 , NumPut(&txt,		COL, 4)
-	 , NumPut(hdral,	COL, 8)
-	 , NumPut(txtal,	COL, 12)
-	 , NumPut(htype,	COL, 16)
-	 , NumPut(txtmax,	COL, 20)
-	 , NumPut(&format,	COL, 24)
-	 , NumPut(il,		COL, 28)
-	 , NumPut(sort,		COL, 32)
-	 , NumPut(data	,	COL, 44)
+    if (type = "USER") && hCtrl
+		hCtrl := 0
+
+	  NumPut(w,			COLUMN, 0)
+	 , NumPut(&txt,		COLUMN, 4)
+	 , NumPut(hdral,	COLUMN, 8)
+	 , NumPut(txtal,	COLUMN, 12)
+	 , NumPut(htype,	COLUMN, 16)
+	 , NumPut(txtmax,	COLUMN, 20)
+	 , NumPut(&format,	COLUMN, 24)
+	 , NumPut(il,		COLUMN, 28)
+	 , NumPut(hdrflag,	COLUMN, 32)
+	 , NumPut(hctrl,    COLUMN, 40)
+	 , NumPut(data,		COLUMN, 44)
 															 	
-	SendMessage,GM_ADDCOL,,&COL,, ahk_id %hGrd%
-	return ErrorLevel										 
+	SendMessage,GM_ADDCOL,,&COLUMN,, ahk_id %hGrd%
+	ifEqual, ErrorLevel, 4294967295, return 0
+	res := ErrorLevel + 1
+
+	if (items != "") && (type = "COMBOBOX")
+		RG_ComboAddString(hGrd, res, items)
+
+	return res
 }
 
 /*															 
@@ -132,29 +154,49 @@ RG_AddColumn(hGrd, o1="", o2="", o3="", o4="", o5="", o6="", o7=""){
 			Add row.
  															 
  Parameters:		
-			Row		- Row number. If omitted, row is appended.
-			c1..c10	- Column values.
+			Row		- Row number. If 0 row is appended. If omitted, blank row is added and cN are ignored if present.
+					  if two numbers separated by space, - r o - r is taken as row number, o as row offset.
+			c1..c10	- Column values. 
 
+ Remarks:
+			Maximum 65K rows are supported.
  */
 RG_AddRow(hGrd, Row="", c1="", c2="", c3="", c4="", c5="", c6="", c7="", c8="", c9="", c10=""){ 
 	static GM_ADDROW=0x402, GM_INSROW=0x403		;wParam=nRow, lParam=lpROWDATA (can be NULL)
 
-	VarSetCapacity(ROWDATA, 40, 0)
-	Loop, 10
-	{
-		ifEqual,c%A_Index%,,continue
-		idx := A_Index*4 - 4
-
-		type := RG_GetColumn(hGrd, A_Index)
-		if type in COMBOBOX,CHECKBOX,EDITLONG,IMAGE
-			 NumPut(c%A_Index%,  ROWDATA, idx)
-		else NumPut(&c%A_Index%, ROWDATA, idx)
+	StringSplit, r, Row, %A_Space%
+	ifEqual, r2,, SetEnv, r2, 0
+	colCnt := RG_GetColCount(hGrd)
+	if (r1 != "") {
+		VarSetCapacity(ROWDATA, 4*colCnt, 0), 	adrRowData := &ROWDATA
+		Loop, % colCnt - r2
+		{
+			ifEqual, c%A_Index%,,continue
+			type := RG_GetColumn(hGrd, A_Index+r2), idx := (A_Index+r2-1)*4
+			if type in COMBOBOX,CHECKBOX,EDITLONG,IMAGE
+				 NumPut(c%A_Index%,  ROWDATA, idx)       
+			else NumPut(&c%A_Index%, ROWDATA, idx)  
+		}
 	}
-
-	if (Row = "")
-			SendMessage,GM_ADDROW,0,&ROWDATA,, ahk_id %hGrd% 
-	else	SendMessage,GM_INSROW,Row-1,&ROWDATA,, ahk_id %hGrd%  
+	if !r1
+	 	 SendMessage,GM_ADDROW,,adrRowData,, ahk_id %hGrd% 
+	else SendMessage,GM_INSROW,r1-1,adrRowData,, ahk_id %hGrd%  
 	return ErrorLevel 
+}
+
+/*
+	Function: CellConvert
+			  Convert cell.
+  */
+RG_CellConvert(hGrd, Col="", Row="") {
+	static GM_CELLCONVERT=0x428		;wParam=nRowCol, lParam=lpBuffer
+	if (Col Row = "")
+		RG_GetCurrentCell(hGrd, Col, Row)
+	VarSetCapacity(Buf, 256)
+	Col-=1, Row-=1
+	SendMessage,GM_CELLCONVERT,(Row << 16 ) + Col, &Buf,, ahk_id %hGrd%
+	VarSetCapacity(Buf, -1)
+	return buf
 }
 
 /*
@@ -163,10 +205,7 @@ RG_AddRow(hGrd, Row="", c1="", c2="", c3="", c4="", c5="", c6="", c7="", c8="", 
  
  Parameters:
 			Col		- Column number.
-			Items	- "|" separated list of items.
-
- Returns:
-  
+			Items	- "|" separated list of items. 
  */
 RG_ComboAddString(hGrd, Col, Items) {
 	static GM_COMBOADDSTRING=0x406	;wParam=nCol, lParam=lpszString
@@ -181,7 +220,7 @@ RG_ComboAddString(hGrd, Col, Items) {
  */
 RG_ComboClear(hGrd, Col) {
 	static GM_COMBOCLEAR=0x407	;wParam=nCol, lParam=0
-	SendMessage, GM_COMBOCLEAR, Co-1l,,, ahk_id %hGrd%
+	SendMessage, GM_COMBOCLEAR, Col-1,,, ahk_id %hGrd%
 	return ErrorLevel
 }
 
@@ -190,7 +229,7 @@ RG_ComboClear(hGrd, Col) {
 			Edit cell.
 
  Parameters:
-			Col, Row	- Cell coordinates. If omitted, currently selected row/col is used.
+			Col, Row	- Cell coordinates. If omitted, currently selected cell is used.
  */
 RG_EnterEdit(hGrd, Col="", Row="") {
 	static GM_ENTEREDIT=0x41A		;wParam=nCol, lParam=nRow
@@ -198,6 +237,23 @@ RG_EnterEdit(hGrd, Col="", Row="") {
 	if (Col Row = "")
 		RG_GetCurrentCell(hGrd, Col, Row)
 	SendMessage, GM_ENTEREDIT,Col-1,Row-1,, ahk_id %hGrd% 
+	return ErrorLevel 
+}
+
+/*
+ Function:	EndEdit
+			End cell editing.
+
+ Parameters:
+			Col, Row	- Cell coordinates. If omitted, currently selected cell is used.
+			bCancel		- Set to true to end editing.
+ */
+RG_EndEdit(hGrd, Col="", Row="", bCancel=1) {
+	static GM_ENDEDIT=0x41B		;wParam=nRowCol, lParam=fCancel
+
+	if (Col Row = "")
+		RG_GetCurrentCell(hGrd, Col, Row)	
+	SendMessage, GM_ENDEDIT, (Row<<16) + Col, bCancel,,ahk_id %hGrd%
 	return ErrorLevel 
 }
 
@@ -223,7 +279,6 @@ RG_DeleteRow(hGrd, Row="") {
 RG_GetCell(hGrd, Col="", Row="") {
 	static GM_GETCELLDATA=0x410, BUF, init		;wParam=nRowCol, lParam=lpData
 
-
 	if !init
 		init := VarSetCapacity(BUF, 256)
 	
@@ -231,14 +286,44 @@ RG_GetCell(hGrd, Col="", Row="") {
 		RG_GetCurrentCell(hGrd, Col, Row)
 	
 	Col-=1, Row-=1
-
-	m(col, row)
 	type := RG_GetColumn(hGrd, Col+1, "type")
 	SendMessage, GM_GETCELLDATA, (Row << 16) + Col, &BUF,, ahk_id %hGrd%
 	
 	if type in COMBOBOX,CHECKBOX,EDITLONG,IMAGE,HOTKEY,DATE,TIME
 		 return NumGet(BUF, 0, "Int")		
 	else return BUF
+}
+
+/*
+	Function: GetCellRect
+			  Get cell rect.
+  */
+RG_GetCellRect(hGrd, Col="", Row="", ByRef Top="", ByRef Left="", ByRef Right="", ByRef Bottom=""){
+	static SPRM_GETCELLRECT=0x412		; wParam=nRowCol, lParam=lpRECT
+	
+	if (Col="" && Row="")
+		RG_GetCurrentCell(hGrd, Col, Row)
+
+	VarSetCapacity(RECT, 16)
+	SendMessage,SPRM_GETCELLRECT,(Row<<16) + Col,&RECT,, ahk_id %hGrd%
+	left	:= NumGet(RECT, 0)
+	top		:= NumGet(RECT, 4)
+	right	:= NumGet(RECT, 8)
+	bottom	:= NumGet(RECT, 12)
+	return ErrorLevel
+}
+
+/*
+ Function:	GetColFormat
+			Get column format.
+ */
+RG_GetColFormat(hGrd, Col="") {
+	static GM_GETCOLFORMAT=0x426	;wParam=nCol, lParam=lpBuffer
+	ifEqual, Col,, SetEnv, Col, % RG_GetCurrentCol(hGrd)
+	VarSetCapacity(Buf, 32)
+	SendMessage,GM_GETCOLFORMAT,Col-1,&Buf,, ahk_id %hGrd% 
+	VarSetCapacity(Buf, -1)
+	return Buf
 }
 
 /*
@@ -254,9 +339,13 @@ RG_GetColCount(hGrd) {
 /*
  Function:	GetColWidth
 			Get column width. 
+
+ Parameters:
+			Col	- Column number. Omit to get width for currently selected column.
  */
-RG_GetColWidth(hGrd, Col) {		;wParam=nCol, lParam=0
+RG_GetColWidth(hGrd, Col="") {		;wParam=nCol, lParam=0
 	static GM_GETCOLWIDTH=0x41C
+	ifEqual, Col,, SetEnv, Col, % RG_GetCurrentCol(hGrd)
 	SendMessage,GM_GETCOLWIDTH,Col-1,,,ahk_id %hGrd% 
 	return ErrorLevel 
 }
@@ -277,7 +366,7 @@ RG_GetColors(hGrd, pQ, ByRef o1="", ByRef o2="", ByRef o3=""){
 	
 	loop, parse, pQ	
 	{	
-		SendMessage,GM_%A_Index%,,,,ahk_id %hGrd%
+		SendMessage,GM_%A_LoopField%,,,,ahk_id %hGrd%
 		o%A_Index% := ErrorLevel
 	}
 	return o1
@@ -288,26 +377,32 @@ RG_GetColors(hGrd, pQ, ByRef o1="", ByRef o2="", ByRef o3=""){
 			Get column parameters.
  
  Parameters:
-			Col		- 1 based column number.
-			pQ		- Query parameter. Space separated list of named parameters. See <AddColumn> for details. By default, type is returned.
-			o1..o7	- Reference to output variables.
+			Col		- Column number. Omit to get current column.
+			pQ		- Query parameter. Space separated list of named parameters:  w txt hdral txtal type txtmax format il hdrflag hctrl data.
+					  See <AddColumn> for details. By default "type". 
+					  Set "" to get all parameters.
+			o1..o10	- Reference to output variables.
 
  Returns:
 			o1
  */
-RG_GetColumn(hGrd, Col, pQ="type", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="", ByRef o7="") {
+RG_GetColumn(hGrd, Col="", pQ="type", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="", ByRef o7="", ByRef o8="",ByRef o9="", ByRef o10="") {
 	static GM_GETCOLDATA = 1068, init, COLUMN		;wParam=nCol, lParam=lpCOLUMN
-		   , w=0, txt=4, hdral=8, txtal=12, type=16, txtmax=20, format=24, il=28, sort=32, data=44
+		   , w=0, txt=4, hdral=8, txtal=12, type=16, txtmax=20, format=24, il=28, hdrflag=32, hctrl=40, data=44
 
 	if !init
-		init := VarSetCapacity(COLUMN, 48)  
+		init := VarSetCapacity(COLUMN, 48)
+
+	ifEqual, Col,, SetEnv, Col, % RG_GetCurrentCol(hGrd)
 
 	SendMessage,GM_GETCOLDATA, Col-1, &COLUMN,, ahk_id %hGrd%
 	loop, parse, pQ, %A_Space% 
 	{
 		o%A_Index% := NumGet(COLUMN, %A_LoopField%)
-		if A_LoopField in txt,format
-			o%A_Index% := RG_strAtAdr(o%A_Index%)
+		if A_LoopField=txt
+			o%A_Index% := RG_GetHdrText(hGrd, Col)
+		else if A_LoopField=format
+			o%A_Index% := RG_GetColFormat(hGrd, Col)
 		else if A_LoopField = type
 			o%A_Index% := RG_getType(o%A_Index%)
 	}
@@ -358,6 +453,19 @@ RG_GetHdrHeight(hGrd) {
 }
 
 /*
+	Function: GetHdrText
+			  Get header text.
+  */
+RG_GetHdrText(hGrd, Col="") { ;wParam=nCol, lParam=lpBuffer
+	static GM_GETHDRTEXT=0x424
+	ifEqual, Col,, SetEnv, Col, % RG_GetCurrentCol(hGrd)
+	VarSetCapacity(Buf, 256)
+	SendMessage,GM_GETHDRTEXT,Col-1,&Buf,, ahk_id %hGrd% 
+	VarSetCapacity(Buf, -1)
+	return Buf
+}
+
+/*
  Function:	GetRowColor
 			Get row color.
  
@@ -366,11 +474,12 @@ RG_GetHdrHeight(hGrd) {
 			B,F	- Background, foreground color.
  */
 RG_GetRowColor(hGrd, Row="", ByRef B="", ByRef F="") {	;wParam=nRow, lParam=lpROWCOLOR
-	static GM_GETROWCOLOR=0x42C
+	static GM_GETROWCOLOR=0x42A
+	ifEqual, Row,, SetEnv, Row, % RG_GetCurrentRow(hGrd)
 
 	VarSetCapacity(RC, 8)
 	SendMessage, GM_GETROWCOLOR, Row-1, &RC,,ahk_id %hGrd%
-	B := NumGet(RC), F := NumPut(RC, 4)
+	B := NumGet(RC), F := NumGet(RC, 4)
 }
 
 /*
@@ -431,12 +540,19 @@ RG_ScrollCell(hGrd){
 /*
  Function:	SetCell
 			Set cell value.
+
+ Parameters:
+			Col,Row	- Cell coordinates. Omit to use current cell.
+			Value	- Cell value. If omitted, empty string or 0 is used, depending on type.
  */
-RG_SetCell(hGrd, Col, Row, Value="") {
+RG_SetCell(hGrd, Col="", Row="", Value="") {
 	static GM_SETCELLDATA=0x411		;wParam=nRowCol, lParam=lpData (can be NULL)
 
+	if (Col="" && Row="")
+		RG_GetCurrentCell(hGrd, Col, Row)
+
 	type := RG_GetColumn(hGrd, Col)
-	if type in COMBOBOX,CHECKBOX,EDITLONG
+	if type in COMBOBOX,CHECKBOX,EDITLONG,IMAGE,HOTKEY,DATE,TIME
 		NumPut(Value, Value)
 
 	Row-=1, Col-=1
@@ -465,16 +581,32 @@ RG_SetColors(hGrd, Colors){
 /*
 	Function: SetColWidth
 			  Set column width.
+
+	Parameters:
+			 Col	- Column number. Omit to get width for currently selected column.	
+			 Width	- Column width, by default 0.
   */
-RG_SetColWidth(hGrd, Col, Width) {		;wParam=nCol, lParam=nWidth
+RG_SetColWidth(hGrd, Col="", Width=0) {		;wParam=nCol, lParam=nWidth
 	static GM_GETCOLWIDTH=0x41D
+	ifEqual, Col,, SetEnv, Col, % RG_GetCurrentCol(hGrd)
 	SendMessage,GM_GETCOLWIDTH,Col-1,Width,, ahk_id %hGrd% 
 	return ErrorLevel 
 }
 
 /*
+ Function:	SetColFormat
+			Set column format.
+ */
+RG_SetColFormat(hGrd, Col="", Format="") {
+	static GM_SETCOLFORMAT=0x427	;wParam=nCol, lParam=lpszText
+	ifEqual, Col,, SetEnv, Col, % RG_GetCurrentCol(hGrd)
+	SendMessage, GM_SETCOLFORMAT, Col-1, &Format,, ahk_id %hGrd%
+	return ErrorLevel
+}
+
+/*
  Function:	SetCurrentRow
-			Set currently selected row. 
+			Set current row. 
  */
 RG_SetCurrentRow(hGrd, Row) {		;wParam=nRow, lParam=0
 	static GM_SETCURROW=0x40D
@@ -501,12 +633,12 @@ RG_SetCurrentCol(hGrd, Col) {		;wParam=nCol, lParam=0
   */
 RG_SetCurrentSel(hGrd, Col, Row) {	;wParam=nCol, lParam=nRow
 	static GM_SETCURSEL=0x409
-	SendMessage, GM_SETCURSEL, Col, Row,, ahk_id %hGrd%
+	SendMessage, GM_SETCURSEL, Col-1, Row-1,, ahk_id %hGrd%
 	return ERRORLEVEL
 }
 
 /*
- Function: SetFont
+ Function:  SetFont
 			Sets the control font.
 
  Parameters:
@@ -541,11 +673,25 @@ RG_SetFont(hGrd, pFont="") {
 /*
 	Function: SetHdrHeight
 			  Set height of the header row.
+
+	Parameters:
+			  Height - Header height. By default 0.
   */
-RG_SetHdrHeight(hGrd, Height){
+RG_SetHdrHeight(hGrd, Height=0){
 	static GM_SETHDRHEIGHT=0x41F
 	SendMessage,GM_SETHDRHEIGHT,,Height,, ahk_id %hGrd%
 	return ErrorLevel
+}
+
+/*
+	Function: SetHdrText
+			  Set header text.
+  */
+RG_SetHdrText(hGrd, Col="", Text="") { ;wParam=nCol, lParam=lpBuffer
+	static GM_SETHDRTEXT=0x425
+	ifEqual, Col,, SetEnv, Col, % RG_GetCurrentCol(hGrd)
+	SendMessage,GM_SETHDRTEXT,Col-1,&Text,, ahk_id %hGrd% 
+	return ErrorLevel 
 }
 
 /*
@@ -581,10 +727,12 @@ RG_SetRowHeight(hGrd, Height){
 			Sort column.
 
  Parameters:
-			SortType - Number, 1 (ASC), 2 (DES), 3 (INVERT)
+ 			Col	- Column number. Omit to get width for currently selected column.
+			SortType - Number, 1 (ASC), 2 (DES), 3 (INVERT). By default, 3.
  */
-RG_Sort(hGrd, Col, SortType){
+RG_Sort(hGrd, Col="", SortType=3){
 	static GM_COLUMNSORT=0x423
+	ifEqual, Col,, SetEnv, Col, % RG_GetCurrentCol(hGrd)
 	SendMessage,GM_COLUMNSORT,Col-1,SortType,,ahk_id %hGrd%
 }
 
@@ -592,7 +740,6 @@ RG_Sort(hGrd, Col, SortType){
 RG_getType( Type ) {
 	static EDITTEXT=0, EDITLONG=1, CHECKBOX=2, COMBOBOX=3, HOTKEY=4, BUTTON=5, IMAGE=6, DATE=7, TIME=8, USER=9, EDITBUTTON=10
 		  ,0="EDITTEXT",1="EDITLONG",2="CHECKBOX",3="COMBOBOX",4="HOTKEY",5="BUTTON",6="IMAGE",7="DATE",8="TIME",9="USER",10="EDITBUTTON"
-
 	return (%Type%)
 }
 
@@ -650,7 +797,7 @@ RG_onNotify(Wparam, Lparam, Msg, Hwnd) {
 
     if (code = GN_BEFOREUPDATE) 
 		r := %handler%(hw, "Beforeupdate", col, row, data)
-
+	
     if (code = GN_AFTERUPDATE)
 		return %handler%(hw, "Afterupdate", col, row, data)
 
@@ -678,12 +825,16 @@ RG_strAtAdr(adr) {
 ;Required function by Forms framework.
 RaGrid_add2Form(hParent, Txt, Opt) {
 	static f := "Form_Parse"
-	%f%(Opt, "x# y# w# h# style dllPath", x, y, w, h, style, dllPath)
-	return RG_Add(hParent, x, y, w, h, style, dllPath)
+	%f%(Opt, "x# y# w# h# style dllPath g*", x, y, w, h, style, dllPath, handler)
+	return RG_Add(hParent, x, y, w, h, style, handler, dllPath)
 }
 
 /* Group: About
 	o RaGrid control version: 2.0.1.6 by KetilO. See <http://www.masm32.com/board/index.php?topic=55>
 	o AHK module ver 2.0.1.6-1 by majkinetor.
-	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+	o RaGrid is freely distributed for any kind of purpose.
+	o AHK module licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */
+
+;HexView structure:
+;[RGCOLUMN:|colwt D|lpszhdrtext D|halign D|calign D|ctype D|ctextmax D|lpszformat D|himl D|hdrflag D|colxp D|edthwnd D|lParam D
