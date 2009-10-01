@@ -44,7 +44,7 @@
 		o <Cursor>		- Set cursor shape for control or window.
 		o <Tooltip>		- Adds tooltips to GUI controls.
 		o <Image>		- Adds image to the Button control.
-		o <Font>		- Sets font for the control.
+		o <Ext_Font>	- Sets font for the control.
  */
 #include *i Form.ahk
 
