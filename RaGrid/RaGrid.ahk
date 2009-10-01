@@ -192,6 +192,7 @@ RG_CellConvert(hGrd, Col="", Row="") {
 	if (Col Row = "")
 		RG_GetCurrentCell(hGrd, Col, Row)
 	VarSetCapacity(Buf, 256)
+	Col-=1, Row-=1
 	SendMessage,GM_CELLCONVERT,(Row << 16 ) + Col, &Buf,, ahk_id %hGrd%
 	VarSetCapacity(Buf, -1)
 	return buf
@@ -236,6 +237,39 @@ RG_EnterEdit(hGrd, Col="", Row="") {
 		RG_GetCurrentCell(hGrd, Col, Row)
 	SendMessage, GM_ENTEREDIT,Col-1,Row-1,, ahk_id %hGrd% 
 	return ErrorLevel 
+}
+
+/*  
+ Function:	FormatTime
+ 			Converts number of seconds to time string using column format.
+ */
+RG_FormatTime(hGrd, Col="", Row=""){
+	if (Col Row = "")
+		RG_GetCurrentCell(hGrd, Col, Row)
+
+	format := RG_GetColFormat(hGrd, Col)
+	seconds := RG_GetCell(hGrd, Col, Row)
+    time = 16010101  ; an arbitrary date.
+    time += %seconds%, seconds
+    FormatTime, var, %time%, %format%
+    return var 
+}
+
+/*  
+ Function:	FormatDate
+ 			Converts date number to date string using column format.
+ */
+RG_FormatDate(hGrd, Col="", Row="") {
+	var := 16010101
+	if (Col Row = "")
+		RG_GetCurrentCell(hGrd, Col, Row)
+
+	format := RG_GetColFormat(hGrd, Col)
+	Date := RG_GetCell(hGrd, Col, Row)
+	
+	EnvAdd, var, %Date%, D
+	FormatTime, var, %var%, %format%
+	return var	
 }
 
 /*
@@ -801,32 +835,6 @@ RG_onNotify(Wparam, Lparam, Msg, Hwnd) {
 		return %handler%(hw, "Afterupdate", col, row, data)
 
 	NumPut(r, LParam+28)
-}
-
-RG_ConvertDate(hGrd, Col, Date) {
-	static var := 16010101
-
-	format := RG_GetColumn(hGrd, Col, "format")
-	msgbox %format%
-	if Date is integer
-	{
-		EnvAdd, var, %Date%, D
-		FormatTime, var, %var%, %format%
-		return var
-	}
-	else {
-			loop, parse, format
-			{
-				if A_LoopField not in d,M,y
-					continue
-				ifEqual, A_LoopField, y, SetEnv, y, % y SubStr(Date, A_Index, 1) 
-				ifEqual, A_LoopField, d, SetEnv, d, % d SubStr(Date, A_Index, 1) 
-				ifEqual, A_LoopField, m, SetEnv, m, % m SubStr(Date, A_Index, 1) 					
-			}		
-			time := y m d
-			EnvSub, time, %var%, D
-			return time
-	}
 }
 
 ;Storage
