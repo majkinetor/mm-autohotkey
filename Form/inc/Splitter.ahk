@@ -1,12 +1,10 @@
 /* Title:    Splitter
-			Splitter control.
- :
-			Both Windows and AHK don't have splitter control. With this module you can add splitters to your GUIs. 
-			
-			(see splitter.png)
+			 Splitter control.
+
+			 (see splitter.png)
 
  Dependency:
-			Win 1.2
+			 <Win> 1.2++
  */
 
 /*
@@ -61,9 +59,10 @@ Splitter_GetPos( HSep ) {
  
  Parameters:
  			hSep - Splitter handle.
-			Def	 - Splitter definition or words "off" or "on". The syntax of splitter definition is:
+			Def	 - Splitter definition or words "off" or "on". The syntax of splitter definition is given bellow.
 			Pos	 - Position of the splitter, optional.
 
+ Splitter Defintion:
  >		c11 c12 c13 ... Type c21 c22 c23 ...
 		
 		c1n - Controls left or top of the splitter.
@@ -285,5 +284,5 @@ Splitter(Var="", Value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="
 
 /* Group: About
 	o Ver 1.1 by majkinetor. 
-	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
+	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */
