@@ -1,5 +1,6 @@
 _("mm! e d c w")
 #SingleInstance, force
+#MaxThreads, 255		;Required for this sample with cursor/tooltip extensions.
 #NoEnv
 
 	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter 
@@ -18,12 +19,15 @@ _("mm! e d c w")
 	infoText=
 	(LTrim Join
 		<b>Press F1 to cycle controls. Click + to see docs.
-		Click control name to switch to its tab page. Press & hold F1 and resize window as experiment. Press F3 and F4 to switch layout.</b><br><br>
+		Click control name to switch to its tab page. Press & hold F1 and resize window as experiment.
 		%htmlCtrls%
 	)
-	hInfo  := Form_Add(hForm, "QHTM", infoText, "gOnQHTM", "Align T, 200", "Attach p r2")
-	hLog   := Form_Add(hForm, "ListBox", "", "hscroll", "Align R, 300", "Attach p r2")
-	hTab   := Form_Add(hForm, "Panel", "", "", "Align F", "Attach p r2")
+	hInfo  := Form_Add(hForm, "QHTM", infoText, "gOnQHTM", "Align T, 200", "Attach w")
+	hLog   := Form_Add(hForm, "ListBox", "", "hscroll", "Align R, 300", "Attach x h")
+	hSep   := Form_Add(hForm, "Splitter", "", "", "Align R, 6", "Attach x h" )
+	hTab   := Form_Add(hForm, "Panel", "", "", "Align F", "Attach w h")
+	Splitter_Set( hSep, hTab " | " hLog)
+
 	loop, parse, ctrls, %A_Space%
 	{		
 		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "", "w100 h100 style='hidden sunken'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
@@ -106,17 +110,21 @@ InitControl(Name, HCtrl) {
 		RG_AddColumn(HCtrl, "txt=EditText", "w=150", "hdral=1",	"txtal=1", "type=EditText")
 		RG_AddColumn(HCtrl, "txt=Check",	"w=80",  "hdral=1", "txtal=1", "type=CheckBox")
 		RG_AddColumn(HCtrl, "txt=Button",	"w=80",  "hdral=1", "txtal=1", "type=Button")
-		RG_AddRow(HCtrl, "", Name, 1), 		RG_AddRow(HCtrl, "", Name, 0, ":)")
+		RG_AddRow(HCtrl, 0, Name, 1), 		RG_AddRow(HCtrl, 0, Name, 0, ":)")
 	}
 
 	if Name = HLink
-	{
 		ControlSetText, ,Click <a href="www.autohotkey.com">here</a> to go to AutoHotKey site, ahk_id %HCtrl%
-	}
+
 	if Name = Toolbar
 		Toolbar_Insert(HCtrl, "cut`ncopy`npaste")
+
 	if Name = SpreadSheet
-		SS_SetRowHeight(hCtrl, 0, 20), SS_SetColWidth(hCtrl, 1, 150), SS_SetCell(HCtrl, 1,1, "Type=Text", "Txt=" Name), SS_SetGlobalFields(HCtrl,  "gcellw gcellht cell_txtal rowhdr_txtal", 50, 30, "CENTER MIDDLE", "CENTER MIDDLE")
+	{
+		SS_SetRowHeight(hCtrl, 0, 20), SS_SetColWidth(hCtrl, 1, 150), 
+		SS_SetCell(HCtrl, 1,1, "Type=Text", "Txt=" Name), 
+		SS_SetGlobalFields(HCtrl,  "gcellw gcellht cell_txtal rowhdr_txtal", 50, 30, "CENTER MIDDLE", "CENTER MIDDLE")
+	}
 	else if Name = Rebar
 	{
 		Rebar_Insert(HCtrl, Form_Add(hForm, "Edit", Name, "w100 h100"))
@@ -135,22 +143,6 @@ InitControl(Name, HCtrl) {
 		ControlSetText, ,%html%, ahk_id %HCtrl%
 	}
 }
-
-F4::
-	Align(hForm, "reset")
-	Align(hInfo,"T", 200)
-	Align(hLog, "R", 300)
-	Align(hTab, "F")
-	Attach(hForm)
-return
-
-F3::
-	Align(hForm, "reset")
-	Align(hInfo,"T", 200)
-	Align(hLog, "B", 200)
-	Align(hTab, "F")
-	Attach(hForm)
-return
 
 F2::
 	WinMove, ahk_id %hForm%, , , , 300, 300

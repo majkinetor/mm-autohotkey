@@ -117,7 +117,7 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 	critical 100
 	Hwnd += 0
 	if !Hwnd
-		return 	hwnd := Lparam+0, %hwnd%_bVert := Umsg, %hwnd%_def := WParam, %hwnd%_cursor := DllCall("LoadCursor", "Uint", 0, "Int", UMsg ? SIZEWE : SIZENS, "Uint")	
+		return 	hwnd := Lparam+0, %hwnd%_bVert := Umsg, %hwnd%_def := WParam, %hwnd%_cursor := DllCall("LoadCursor", "Uint", 0, "Int", UMsg ? SIZEWE : SIZENS, "Uint")
 
 	bVert := %Hwnd%_bVert
 	If (UMsg = WM_SETCURSOR)
