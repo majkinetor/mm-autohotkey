@@ -156,6 +156,7 @@ Form_New(Options="") {
 		WinSet, TransColor, 12345
 		w1 := w-5, h1 := h-5
 		WinSet, Region, 5-5 w%w1% h%h1%
+		Gui, -Resize
 	}
 		
 	if (font != "") {
