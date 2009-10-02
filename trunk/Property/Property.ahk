@@ -1,4 +1,3 @@
-
 /*
   Title:		Property
 				Properties viewer and editor.
@@ -37,11 +36,12 @@
 				Control's handle.
 
  */
-Property_Add(hGui, X=0, Y=0, W=200, H=100, Style="", Handler="") {
-	hCtrl := SS_Add(hGui, x, y, w, h, "GRIDMODE CELLEDIT ROWSELECT " style, "Property_handler")
+Property_Add(HParent, X=0, Y=0, W=200, H=100, Style="", Handler="") {
+	hCtrl := SS_Add(HParent, X, Y, W, H, "GRIDMODE CELLEDIT ROWSELECT " style, "Property_handler")
 	Property_initSheet(hCtrl)
 	if IsFunc(Handler)
 		Property(hCtrl "handler", Handler)
+	SS_SetLockCol(Hctrl, 1)
 	return hCtrl
 }
 
@@ -492,6 +492,13 @@ Property_SetRowHeight(hCtrl, Height) {
 	SS_SetRowHeight(hCtrl, 0, 0)
 }
 
+;==================================================== PRIVATE ============================================
+Property_add2Form(hParent, Txt, Opt){
+	static parse = "Form_Parse"
+	%parse%(Opt, "x# y# w# h# style g*", x, y, w, h, style, handler)
+	return Property_Add(hParent, x, y, w, h, style, handler)	
+}
+
 Property_handler(hCtrl, event, earg, col, row){
 	static last
 
@@ -578,11 +585,10 @@ Property(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 }
 
 /* Group: About
-	o Module ver 0.9 by majkinetor
-	o SpreadSheet control Version: 0.0.2.1 by KetilO <http://www.masm32.com/board/index.php?topic=6913.0>
-	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
+	o Module ver 1.01 by majkinetor
+	o SpreadSheet control Version: 0.0.2.1 by KetilO <http://www.masm32.com/board/index.php?topic=6913.0>.
+	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
 
  */
 
-#include SpreadSheet.ahk
-
+#include SpreadSheet.ahk	
