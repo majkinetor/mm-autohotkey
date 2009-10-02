@@ -2,10 +2,15 @@
 			HiEdit is a multitabbed, ultra fast, large file edit control consuming very little memory. 
 			It can display non-printable characters in a readable format and can be used for any general 
 			purpose editing of text and birary files.
+
+			Irrespective of the file size, the memory used at file loading never exceeeds 1024K. 
+			After the file is loaded, max memory used at any time is 128K.
+
+			(See HiEdit.png)
  */
 
 /*	Function:	Add
-				Add control to the GUI.
+				Add control to the parent.
 
 	Parameters:
 			X..H	- Position of the control.
@@ -15,7 +20,7 @@
 	Styles:
 			HSCROLL, VSCROLL, TABBED, HILIGHT, TABBEDBTOP, TABBEDHRZSB, TABBEDBOTTOM
  */
-HE_Add(hGui, X, Y, W, H, Style="", DllPath="HiEdit.dll"){
+HE_Add(HParent, X, Y, W, H, Style="", DllPath=""){
 	static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000, MODULEID
 	static HSCROLL=0x8 ,VSCROLL=0x10, TABBED=4, HILIGHT=0x20, TABBEDBTOP=0x1, TABBEDHRZSB=0x2 ,TABBEDBOTTOM=0x4, SINGLELINE=0x40, FILECHANGEALERT=0x80
 
@@ -24,19 +29,21 @@ HE_Add(hGui, X, Y, W, H, Style="", DllPath="HiEdit.dll"){
 		IfEqual, A_LoopField, , continue
 		else hStyle |= %A_LOOPFIELD%
 
-	if !MODULEID
+	if !MODULEID {
+		ifEqual, DllPath, ,SetEnv, DllPath, HiEdit.dll
 		MODULEID := 230909, DllCall("LoadLibrary", "str", DllPath)
+	}
 
 	hCtrl := DllCall("CreateWindowEx"
-      , "Uint", 0x200            ; WS_EX_CLIENTEDGE
-      , "str",  "HiEdit"         ; ClassName
-      , "str",  szAppName      ; WindowName
+      , "Uint", 0x200        ; WS_EX_CLIENTEDGE
+      , "str",  "HiEdit"     ; ClassName
+      , "str",  ""		     ; WindowName
       , "Uint", WS_CLIPCHILDREN | WS_CHILD | WS_VISIBLE | hStyle
       , "int",  X            ; Left
       , "int",  Y            ; Top
       , "int",  W            ; Width
       , "int",  H            ; Height
-      , "Uint", hGui         ; hWndParent
+      , "Uint", HParent      ; hWndParent
       , "Uint", MODULEID	 ; hMenu
       , "Uint", 0            ; hInstance
       , "Uint", 0, "Uint")
@@ -59,6 +66,57 @@ HE_AutoIndent(hEdit, pState ) {
 }
 
 /*
+ Function: CanPaste  
+           Determines whether a HiEdit control can paste a specified clipboard format. 
+  
+ Parameters: 
+           ClipboardFormat - The default is 0x1 (CF_TEXT).
+  
+ Returns: 
+           TRUE if the clipboard format can be pasted otherwise FALSE.
+  
+ Remarks: 
+           The HiEdit control supports the standard clipboard text formats -- 
+           CF_TEXT, CF_OEMTEXT, CF_UNICODETEXT (for Windows versions that support Unicode), 
+		   and CF_LOCALE (used by the OS to implicitly convert from CF_TEXT to CF_UNICODETEXT).
+		   If any application copies text of any type to the clipboard, it will usually copy the text to 
+           one (usually all, depending on the OS) of these clipboard formats. 
+            
+           For additional information on clipboard formats, see the following: 
+           <http://msdn.microsoft.com/en-us/library/ms649013(VS.85).aspx>
+
+ Bugs:
+           Despite the HiEdit documentation, sending zero as the clipboard 
+           format never returns a non-zero (can paste) value regardless of 
+           the contents of the clipboard. 
+ */
+HE_CanPaste(hEdit,ClipboardFormat=0x1) { 
+    Static EM_CANPASTE:=1074  ;-- 1074=WM_USER+50 
+    SendMessage EM_CANPASTE,ClipboardFormat,0,,ahk_id %hEdit% 
+    return ErrorLevel
+}
+
+/*
+ Function: CanRedo
+           Returns TRUE if the HiEdit control can do Redo operation.
+ */
+HE_CanRedo(hEdit) { 
+    Static EM_CANREDO=1109  ;-- 1109=WM_USER+85 
+    SendMessage EM_CANREDO,,,,ahk_id %hEdit% 
+    return ErrorLevel 
+}
+
+/*
+ Function: CanUndo 
+           Returns TRUE if the HiEdit control can correctly do Undo operation.
+ */ 
+HE_CanUndo(hEdit) { 
+    Static EM_CANUNDO=0xC6 
+    SendMessage EM_CANUNDO,,,,ahk_id %hEdit% 
+    return ErrorLevel 
+} 
+
+/*
  Function:	CloseFile
 			Close file or all files
 
@@ -70,6 +128,35 @@ HE_CloseFile(hEdit, idx=-1){
 	SendMessage, HEM_CLOSEFILE, 0, idx,, ahk_id %hEdit%
 	return errorlevel
 }
+
+/*
+ Function: Clear
+		   Clear.
+ */ 
+HE_Clear(hEdit) {
+    Static WM_CLEAR:=0x303 
+    SendMessage WM_CLEAR,,,,ahk_id %hEdit% 
+} 
+
+/* 
+ Function: CharFromPos 
+           Gets information about the character closest to a specified point 
+           in the client area of the HiEdit control. 
+ 
+ Parameters: 
+           x, y - The x/y-coordinates of a point in the HiEdit control's client 
+           area relative to the upper-left corner of the client area. 
+ 
+ Returns: 
+           The character index of the specified point or the character index to 
+           the last character if the given point is beyond the last character 
+           in the control.  
+ */
+HE_CharFromPos(hEdit,X,Y) { 
+    Static EM_CHARFROMPOS:=0xD7 
+    SendMessage EM_CHARFROMPOS,,(y<<16)|x,,ahk_id %hEdit% 
+    return ErrorLevel 
+} 
 
 /*
  Function:	ConvertCase  
@@ -87,6 +174,24 @@ HE_ConvertCase(hEdit, case="toggle") {
 	SendMessage, HEM_CONVERTCASE, cc_%case%, -1,, ahk_id %hEdit% 
 	Return ErrorLevel
 }
+
+/*
+ Function: Copy
+		   Copy.
+ */ 
+HE_Copy(hEdit) { 
+    Static WM_COPY:=0x301 
+    SendMessage WM_COPY,0,0,,ahk_id %hEdit% 
+} 
+
+/*
+ Function: Cut
+		   Cut.
+ */ 
+HE_Cut(hEdit) { 
+    Static WM_CUT:=0x300 
+    SendMessage WM_CUT,,,,ahk_id %hEdit% 
+} 
 
 /*
  Function: EmptyUndoBuffer
@@ -193,6 +298,20 @@ HE_GetFirstVisibleLine(hEdit){
 }
 
 /*
+ Function: GetLastVisibleLine 
+           Returns the zero-based line index of the last visible (including 
+           partially displayed) line on the HiEdit control. 
+ 
+ Remarks: 
+           To calculate the total number of visible lines, use the following: 
+ >         HE_GetLastVisibleLine(hEdit) - HE_GetFirstVisibleLine(hEdit) + 1 
+ */ 
+HE_GetLastVisibleLine(hEdit)  { 
+    HE_GetRect(hEdit,_,_,_,bottom) 
+    return HE_LineFromChar(hEdit,HE_CharFromPos(hEdit,0,bottom)) 
+}
+
+/*
  Function:	GetLine
 			Get the text of the desired line from the control.
  
@@ -263,6 +382,28 @@ HE_GetRedoData(hEdit, level){
 	Return % buf
 	Return % UID_%ErrorLevel%
 }
+
+/*
+ Function:  GetRect 
+            Gets the formatting rectangle of the HiEdit control.  
+
+ Parameters:
+			Left..Bottom	- Output variables, can be omitted.
+
+ Returns:
+		   Space separated rectangle.
+ */ 
+HE_GetRect(hEdit,ByRef Left="",ByRef Top="",ByRef Right="",ByRef Bottom="") { 
+    static EM_GETRECT:=0xB2
+
+	VarSetCapacity(RECT,16) 
+    SendMessage EM_GETRECT,0,&RECT,,ahk_id %hEdit% 
+    Left  :=NumGet(RECT,0,"Int") 
+    Top   :=NumGet(RECT,4,"Int") 
+    Right :=NumGet(RECT,8,"Int") 
+    Bottom:=NumGet(RECTe,12,"Int") 
+    return  Left " " Top " " Right " " Bottom
+} 
 
 /*
  Function:	GetSel
@@ -362,8 +503,6 @@ HE_GetUndoData(hEdit, level){
 	VarSetCapacity(buf, -1)
 	Return % UID_%ErrorLevel%
 }
-
-
 
 /*
  Function:	LineFromChar
@@ -486,6 +625,39 @@ HE_OpenFile(hEdit, pFileName, flag=0){
 	static HEM_OPENFILE	:= 2025		;wParam=0,				lParam=lpszFileName	 Returns TRUE if successful/FALSE otherwise
 	SendMessage, HEM_OPENFILE, flag, &pFileName,, ahk_id %hEdit%
 	return errorlevel
+}
+
+/*
+ Function: Paste
+		   Paste.
+ */ 
+HE_Paste(hEdit) { 
+    Static WM_PASTE:=0x302 
+    SendMessage WM_PASTE,0,0,,ahk_id %hEdit% 
+} 
+
+/*
+ Function: PosFromChar 
+           Gets the client area coordinates of a specified character.
+ 
+ Parameters: 
+           CharIndex - The zero-based index of the character. 
+ 
+           X, Y - These parameters, which must contain valid variable names, 
+           are used to return the x/y-coordinates of a point in the HiEdit 
+           control's client relative to the upper-left corner of the client 
+           area. 
+ 
+ Remarks: 
+           If CharIndex is greater than the index of the last character in 
+           the control, the returned coordinates are of the position just past 
+           the last character of the control. 
+ */ 
+HE_PosFromChar(hEdit,CharIndex,ByRef X,ByRef Y) { 
+    Static EM_POSFROMCHAR=0xD6 
+    VarSetCapacity(POINTL,8,0) 
+    SendMessage EM_POSFROMCHAR,&POINTL,CharIndex,,ahk_id %hEdit% 
+    X:=NumGet(POINTL,0,"Int"), Y:=NumGet(POINTL,4,"Int")     
 }
 
 /*
@@ -622,7 +794,6 @@ HE_Scroll(hEdit,Pages=0,Lines=0){
     ;-- Return number of lines scrolled
     Return l_ScrollLineCount
 }
-
 
 /*
  Function:	ScrollCaret
@@ -965,9 +1136,7 @@ HE(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRe
 HiEdit_add2Form(hParent, Txt, Opt) {
 	static f := "Form_Parse"
 	
-	%f%(Opt, "x# y# w# h# style dllPath", x, y, w, h, style, dllPath)
-	ifEqual, dllPath, ,SetEnv, dllPath, HiEdit.dll
-
+	%f%(Opt, "x# y# w# h# style dllPath g*", x, y, w, h, style, dllPath)
 	h := HE_Add(hParent, x, y, w, h, style, dllPath)
 	ifNotEqual, Txt,, ControlSetText,, %Txt%, ahk_id %h%
 
@@ -1043,7 +1212,7 @@ HiEdit_add2Form(hParent, Txt, Opt) {
 				
 
 
-	Group: Example
+	Group: Examples
 		(start code)
 			Gui, +LastFound 
 			hwnd := WinExist() 
@@ -1057,8 +1226,10 @@ HiEdit_add2Form(hParent, Txt, Opt) {
  */
 
 /* Group: About
-	o HiEdit control is copyright of Antonis Kyprianou (aka akyprian). See http://www.winasm.net
-	o AHK wrapper version 4.0.0.4-2 is copyright of Miodrag Milic (aka majkinetor). See http://www.autohotkey.com/forum/topic19141.html
+	o HiEdit control is copyright of Antonis Kyprianou (aka akyprian). See <http://www.winasm.net>.
+	o Available for *NON commercial purposes* provided you have previous line in your about box. 
+	  You need author's written permission to use HiEdit in commercial applications.
+	o AHK wrapper version 4.0.0.4-3 by majkinetor.
+	o AHK module licenced under BSD <http://creativecommons.org/licenses/BSD/>.
     o Additonal functions by jballi.
-	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>.
  */
