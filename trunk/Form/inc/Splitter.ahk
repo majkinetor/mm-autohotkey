@@ -1,10 +1,12 @@
 /* Title:    Splitter
 			Splitter control.
-		
+ :
+			Both Windows and AHK don't have splitter control. With this module you can add splitters to your GUIs. 
+			
 			(see splitter.png)
 
- Dependencies:
-			<Win>
+ Dependency:
+			Win 1.2
  */
 
 /*
@@ -27,11 +29,11 @@
 
  */
 Splitter_Add(Opt="", Text="") {
-	static SS_NOTIFY=0x100, SS_CENTERIMAGE=0x200, SS_SUNKEN=0x1000, SS_BLACKRECT=4, SS_GRAYRECT=5, SS_WHITERECT=6, SS_BLACKFRAME=7, SS_GRAYFRAM=8, SS_WHITEFRAME=9
+	static SS_NOTIFY=0x100, SS_CENTER=0x200, SS_SUNKEN=0x1000, SS_BLACKRECT=4, SS_GRAYRECT=5, SS_WHITERECT=6, SS_BLACKFRAME=7, SS_GRAYFRAM=8, SS_WHITEFRAME=9
 
 	hStyle := 0
 	loop, parse, Opt, %A_Space%
-		if A_LoopField in blackframe,blackrect,grayframe,grayrect,sunken,whiteframe,whiterect
+		if A_LoopField in blackframe,blackrect,grayframe,grayrect,sunken,whiteframe,whiterect,sunken,center
 			hStyle |= SS_%A_LoopField%
 		else Opt .= A_LoopField " "
 
@@ -77,6 +79,7 @@ Splitter_Set( HSep, Def, Pos="" ) {
 	if bVert := (InStr(Def, "|") != 0)
 		WinSet, Style, +0x80, ahk_id %HSep%		; SS_NOPREFIX=0x80  style used to mark vertical splitter
 
+
 	Splitter_wndProc(0, bVert, Def, HSep)
 	old := Win_subclass(HSep, wnadProc = "" ? "Splitter_wndProc" : wndProc, "", wndProc)
 
@@ -98,7 +101,7 @@ Splitter_SetPos( HSep, Pos ) {
 	bVert := Splitter_IsVertical(HSep)
 	sz := Win_GetRect(HSep, bVert ? "w" : "h") // 2
 	cpos := Splitter_GetPos(HSep), delta := Pos + sz - cpos
-	Splitter_wndProc(HSep, WM_LBUTTONUP, 0, bVert ? delta : delta << 16)
+	Splitter_wndProc(HSep, WM_LBUTTONUP, 12345, bVert ? delta : delta << 16)
 }
 
 ;=============================================== PRIVATE ===============================================
@@ -139,8 +142,8 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 	  ; let the separator always be visible a little if it is pulled up to the edge
 		NumPut( NumGet(Rect, 0) + sz-1	,RECT, 0)
 		NumPut( NumGet(RECT, 4) + sz+ch ,RECT, 4)
-		NumPut( NumGet(RECT, 8) - sz-1 	,RECT, 8)
-		NumPut( NumGet(RECT, 12)- sz-1	,RECT, 12)
+		NumPut( NumGet(RECT, 8) - sz+4 	,RECT, 8)
+		NumPut( NumGet(RECT, 12)- sz+4	,RECT, 12)
 
 		DllCall("ClipCursor", "uint", &RECT), DllCall("SetCursor", "uint", %Hwnd%_cursor),	moving := true
 	}
@@ -150,7 +153,7 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 			delta -= 0xFFFF
 
 		DllCall("ClipCursor", "uint", 0),  DllCall("ReleaseCapture")
-		moving := false, Splitter_UpdateVisual(), Splitter_move(Hwnd, delta, %Hwnd%_def)
+		moving := false, Splitter_UpdateVisual(), Splitter_move(Hwnd, delta, %Hwnd%_def, Wparam=12345)
 	}
 
 ;	if (UMsg =  WM_LBUTTONDBLCLK){
@@ -161,21 +164,23 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 }
 
 ;delta - offset by which to move splitter
-Splitter_move(HSep, Delta, Def){
+Splitter_move(HSep, Delta, Def, manual=""){
 	bVert := Splitter_IsVertical(HSep)
 
 	Delta -= Win_GetRect(HSep,  bVert ? "*wx" : "*hy", szf, d) // 2
 	parent := DllCall("GetParent", "uint", HSep, "Uint")	;prevent it from going too much positive. if that happens you can't pull it back.
 	Win_Get(parent, "RwhBxyNh", pw, ph, bx, by, ch)
-	ifGreater, ch, 1000, SetEnv, ch, 0			;Gui, -Caption returns large numbers here...
-	
-	min := bVert ? bx : by + ch
-	max := bVert ? pw - szf - bx*2 : ph - szf - by*2 - ch		;prevent goint too much postive.
+	ifGreater, ch, 1000, SetEnv, ch, 0		;Gui, -Caption returns large numbers here and panel too.
 
-	if (d + Delta < bx)					;prevent going too much negative, if that happens controls become overlapped.
+	min := bVert ? bx : by + ch
+	max := bVert ? pw - szf - bx*2 : ph - szf - by*2 - ch		
+
+	if (d + Delta < min)					;prevent going too much negative, if that happens controls become overlapped.
 		Delta := - d
-	else if (d + Delta > max )
-		Delta := max-d
+
+	if !manual								
+		if (d + Delta > max )				;prevent going too much positive, but only if user is actually dragging it, not do it when using SetPos.
+			Delta := max-d
 
 	j := InStr(Def, "|") or InStr(Def, "-")
 	StringSplit, s, Def, %A_Space%
@@ -214,7 +219,6 @@ Splitter_updateVisual( HSep="", bVert="" ) {
 
 		dc := DllCall("GetDC", "Uint", root, "Uint")
 		Win_GetRect(HSep, "!xywh", sx, sy, sw, sh),	  sz := (bVert ? sw : sh) // 2
-
 		VarSetCapacity(RECT, 16),  NumPut(sx, RECT), NumPut(sy, RECT, 4), NumPut(sx+sw, RECT, 8), NumPut(sy+sh, RECT, 12)
 		return DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	}
