@@ -80,7 +80,6 @@ return
 
 F2:: Property_ForEach(hCtrl)
 
-
 GuiClose:
 	ExitApp
 return
@@ -124,7 +123,7 @@ Handler(hCtrl, event, name, value, param){
 
 	if event = F
 	{
-		m(name, value, param)
+		msgbox %name% %value% %param%
 		return
 	}
 
