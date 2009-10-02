@@ -3,9 +3,9 @@ _("mo! e d c w")
 #MaxThreads, 255		;Required for this sample with cursor/tooltip extensions.
 #NoEnv
 
-	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter 
+	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter ScrollBar
 	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress GroupBox StatusBar Tab2 UpDown
-	init    = HiEdit
+	init    = ScrollBar
 	;===============================================
 	
 	ctrls := custom " " ahk
@@ -91,6 +91,9 @@ OnQHTM(Hwnd, Link, Id) {
 
 InitControl(Name, HCtrl) {
 	global
+
+	if Name = Scrollbar
+		Scrollbar_Set(HCtrl, 20, 0, 100, 10)
 
 	if Name = Button
 		Ext_Image(HCtrl, "..\res\test.bmp")
