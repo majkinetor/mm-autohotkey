@@ -12,7 +12,8 @@
 
  Remarks:
 	Tooltip uses Form storage if present for configuration. If Form module is not present, it will use defaults.
-
+	Some controls have its own child controls covering entire client space of the parent control (SpreadSheet, ReBar etc...).
+	In that case you need to set-up tooltip for the topmost child control.
 			 
  About:
 	o 1.0 by majkinetor.

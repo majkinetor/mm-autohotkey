@@ -3,9 +3,9 @@ _("mo! e d c w")
 #MaxThreads, 255		;Required for this sample with cursor/tooltip extensions.
 #NoEnv
 
-	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter ScrollBar
+	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter ScrollBar Property
 	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress GroupBox StatusBar Tab2 UpDown
-	init    = ScrollBar
+	init    = Property
 	;===============================================
 	
 	ctrls := custom " " ahk
@@ -31,7 +31,7 @@ _("mo! e d c w")
 	loop, parse, ctrls, %A_Space%
 	{		
 		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "", "w100 h100 style='hidden sunken'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
-		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, MakeOptions(A_LoopField), "Align F", "Attach p", "Cursor HAND", "Tooltip " A_LoopField), ctrl%hCtrl% := A_LoopField
+		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, MakeOptions(A_LoopField), "Align F", "Attach p", "Cursor HAND", "Tooltip Tooltip for " A_LoopField), ctrl%hCtrl% := A_LoopField
 		InitControl(A_LoopField, hCtrl), %A_LoopField% := ctrlNo := A_Index
 		if !hFont ;create font only once, then use it for every control.
 			 hFont := Ext_Font(hCtrl, "S9", "Courier New")
@@ -92,11 +92,59 @@ OnQHTM(Hwnd, Link, Id) {
 InitControl(Name, HCtrl) {
 	global
 
+	if Name = Property
+	{
+		p = 
+		 (LTrim
+			Name=My Checkbox
+			Type=CheckBox
+			Value=is that ok ?
+			Param=0
+
+			Name=My Separator
+			Type=Separator
+			Value=25
+			
+			Name=My Button
+			Type=Button
+			Value=click me
+			
+			Name=My Text
+			Type=Text
+			Value=default text
+			
+			Name=Some longer fat separator
+			Type=Separator
+			Value=55
+			
+			Name=My HyperLink
+			Type=HyperLink
+			Value=www.autohotkey.com
+			
+			Name=My WideButton
+			Type=WideButton
+			Value=click me
+			
+			Name=Digit
+			Type=Integer
+			Value=3
+				
+			Name=My Combo
+			Type=ComboBox
+			Value=1|2|3
+		)
+		Property_initSheet(hCtrl)	;must be done in panel ... will fix it...
+		Property_SetColors(hCtrl, "pbAAEEAA sbaaeeaa sffff")
+		Property_SetFont(hCtrl, "Separator", "bold s9, verdana")
+		Property_SetRowHeight(hCtrl, 25)
+		Property_Insert(HCtrl, p)
+	}
+
 	if Name = Scrollbar
 		Scrollbar_Set(HCtrl, 20, 0, 100, 10)
 
 	if Name = Button
-		Ext_Image(HCtrl, "..\res\test.bmp")
+		m(Ext_Image(HCtrl, "..\res\test.bmp"))
 
 	if Name = TreeView
 		TV_Add(":>", TV_Add(":)"))

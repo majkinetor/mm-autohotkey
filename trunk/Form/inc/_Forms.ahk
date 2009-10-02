@@ -34,7 +34,8 @@
 		o <ScrollBar>	- Scrollbar custom control.
 		o <HiEdit>		- HiEdit custom control.
 		o <QHTM>		- Qhtm custom control.
-		o <SpreadSheet> - SpreaddSheet custom control.
+		o <SpreadSheet> - SpreadSheet custom control.
+		o <Property>	- Property custom control.
 		o <RaGrid>		- Ragrid custom control.
 		o <Win>			- Set of window functions.
 		o <Dlg>			- Common dialogs.
@@ -64,6 +65,7 @@
 #include *i HLink.ahk
 #include *i Splitter.ahk
 #include *i Scrollbar.ahk
+#include *i Property.ahk
 
 #include *i HiEdit.ahk
 #include *i SpreadSheet.ahk
