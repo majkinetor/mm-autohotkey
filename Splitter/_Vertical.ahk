@@ -12,7 +12,7 @@ _("mo")
 	Gui, +Resize
 
 	gui, add, edit, HWNDhc1 w%w1% h%h%
-	hSep := Splitter_Add( "x+0 h" h " w" sep)
+	hSep := Splitter_Add( "blackframe x+0 h" h " w" sep)
 
 	gui, add, monthcal, HWNDhc2 w%w2% h%h% x+0
 

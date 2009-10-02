@@ -1,10 +1,9 @@
 /* Title:    Splitter
-			*Implementation of the Splitter control*
+			Splitter control.
  :
-			Both Windows and AHK don't have splitter control. 
-			With this module you can add splitters to your GUIs. 
+			Both Windows and AHK don't have splitter control. With this module you can add splitters to your GUIs. 
 			
-			(see splitter.gif)
+			(see splitter.png)
 
  Dependency:
 			Win 1.2
@@ -118,7 +117,7 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 	critical 100
 	Hwnd += 0
 	if !Hwnd
-		return 	hwnd := Lparam+0, %hwnd%_bVert := Umsg, %hwnd%_def := WParam, %hwnd%_cursor := DllCall("LoadCursor", "Uint", 0, "Int", UMsg ? SIZEWE : SIZENS, "Uint")	
+		return 	hwnd := Lparam+0, %hwnd%_bVert := Umsg, %hwnd%_def := WParam, %hwnd%_cursor := DllCall("LoadCursor", "Uint", 0, "Int", UMsg ? SIZEWE : SIZENS, "Uint")
 
 	bVert := %Hwnd%_bVert
 	If (UMsg = WM_SETCURSOR)
@@ -140,10 +139,10 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 
 	  ;prevent user from going offscreen with separator
 	  ; let the separator always be visible a little if it is pulled up to the edge
-		NumPut( NumGet(Rect, 0) + sz -1	,RECT, 0)
+		NumPut( NumGet(Rect, 0) + sz-1	,RECT, 0)
 		NumPut( NumGet(RECT, 4) + sz+ch ,RECT, 4)
-		NumPut( NumGet(RECT, 8) - sz +1	,RECT, 8)
-		NumPut( NumGet(RECT, 12)- sz	,RECT, 12)
+		NumPut( NumGet(RECT, 8) - sz-1 	,RECT, 8)
+		NumPut( NumGet(RECT, 12)- sz-1	,RECT, 12)
 
 		DllCall("ClipCursor", "uint", &RECT), DllCall("SetCursor", "uint", %Hwnd%_cursor),	moving := true
 	}
@@ -167,10 +166,18 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 Splitter_move(HSep, Delta, Def){
 	bVert := Splitter_IsVertical(HSep)
 
-	Delta -= Win_GetRect(HSep,  bVert ? "*wx" : "*hy", _, d) // 2
-	if (d + Delta < 0)		;prevent splitter from going negative, if that happens controls become overlapped.
-		Delta := -d
+	Delta -= Win_GetRect(HSep,  bVert ? "*wx" : "*hy", szf, d) // 2
+	parent := DllCall("GetParent", "uint", HSep, "Uint")	;prevent it from going too much positive. if that happens you can't pull it back.
+	Win_Get(parent, "RwhBxyNh", pw, ph, bx, by, ch)
+	ifGreater, ch, 1000, SetEnv, ch, 0			;Gui, -Caption returns large numbers here...
+	
+	min := bVert ? bx : by + ch
+	max := bVert ? pw - szf - bx*2 : ph - szf - by*2 - ch		;prevent goint too much postive.
 
+	if (d + Delta < bx)					;prevent going too much negative, if that happens controls become overlapped.
+		Delta := - d
+	else if (d + Delta > max )
+		Delta := max-d
 
 	j := InStr(Def, "|") or InStr(Def, "-")
 	StringSplit, s, Def, %A_Space%
@@ -230,7 +237,7 @@ Splitter_IsVertical(Hwnd) {
 
 #include *i Win.ahk
 
-/* Group: Example
+/* Group: Examples
  (start code)
 		w := 500, h := 600, sep := 5
 		w1 := w//3, w2 := w-w1 , h1 := h // 2, h2 := h // 3
