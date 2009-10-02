@@ -23,8 +23,18 @@
 			hpos		- Animates the window from left to right. This flag can be used with roll or slide animation. It is ignored when used with CENTER or BLEND.
 			vneg		- Animates the window from top to bottom. This flag can be used with roll or slide animation. It is ignored when used with CENTER or BLEND.
 			vpos		- Animates the window from bottom to top. This flag can be used with roll or slide animation. It is ignored when used with CENTER or BLEND.
+
+ Remarks:
+			When using slide or roll animation, you must specify the direction.
+			You can combine HPOS or HNEG with VPOS or VNEG to animate a window diagonally.
+			If a child window is displayed partially clipped, when it is animated it will have holes where it is clipped.
+			Avoid animating a window that has a drop shadow because it produces visually distracting, jerky animations.
+
  Returns:
  			If the function succeeds, the return value is nonzero.
+ 
+ Example:
+		>  Win_Animate(hWnd, "hide blend", 500)
  
  */
 Win_Animate(Hwnd, Type="", Time=100){
@@ -38,6 +48,21 @@ Win_Animate(Hwnd, Type="", Time=100){
 
 	ifEqual, hFlags, ,return "Err: Some of the types are invalid"
 	DllCall("AnimateWindow", "uint", Hwnd, "uint", Time, "uint", hFlags)
+}
+
+/*
+ Function:	FromPoint
+ 			Retrieves a handle to the top level window that contains the specified point.
+ 
+ Parameters:
+ 			X, Y - Point. Use word "mouse" as X to use mouse coordinates.
+ */
+Win_FromPoint(X="mouse", Y="") { 
+	if X=mouse
+		VarSetCapacity(POINT, 8), DllCall("GetCursorPos", "uint", &POINT), X := NumGet(POINT), Y := NumGet(POINT, 4)
+
+	VarSetCapacity(POINT, 8), NumPut(X, POINT, 0, "Int"), NumPut(Y, POINT, 4, "Int")
+	return DllCall("WindowFromPoint", &POINT)
 }
 
 /*
@@ -163,18 +188,18 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
  
  Parameters:
  			hwnd		- Window handle
-			pQ			- Query parameter: ordered list of x, y, w and h characters. Specify * as first char rectangle will be raltive to the client area of window's parent.
-						  Using ! will return coordinates relative to root window client area.
-						  Leave pQ empty or "*" to return all attributes separated by space.
+			pQ			- Query parameter: ordered list of x, y, w and h characters and optionally type specified as first charachter.
+						  Use *  to get placement ralative to the client area of the parent's window, or ! get placement relative to the root window.
+						  Omit x,y,w,h to return all attributes separated by space for given placement type.
 			o1 .. o4	- Reference to output variables. 
 
  Returns:
-			o1
+			o1 or string with all coordinates.
 
  Remarks:
 			This function is faster alternative to <Get> with R parameter. However, if you query additional window info using <Get>, it may be faster and definitely more 
 			convenient then obtaining the info using alternatives. 
-			You can't use <Get> to obtain relative coordinates of child windows.
+			Besides that, you can't use <Get> to obtain relative coordinates of child windows.
 
  Examples:
 	(start code)
@@ -193,18 +218,11 @@ Win_GetRect(hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="") {
 	if (pQ = "") or pQ = ("*")
 		retAll := true,  pQ .= "xywh"
 
-	xx := NumGet(RECT, 0, "Int"), yy := NumGet(RECT, 4, "Int")
-	if SubStr(pQ, 1, 1) = "*"
-	{
-		Win_Get(DllCall("GetParent", "uint", hwnd), "Lxy", lx, ly), xx -= lx, yy -= ly
-		StringTrimLeft, pQ, pQ, 1
-	}
-
-	if SubStr(pq, 1, 1) = "!"
-	{
-		Win_Get(DllCall("GetAncestor", "uint", Hwnd, "uint", 2), "Lxy", lx, ly), xx -= lx, yy -= ly
-		StringTrimLeft, pQ, pQ, 1
-	}
+	xx := NumGet(RECT, 0, "Int"), yy := NumGet(RECT, 4, "Int"),  c := SubStr(pQ, 1, 1)
+	if (c = "*") 
+		Win_Get(DllCall("GetParent", "uint", hwnd), "Lxy", lx, ly), xx -= lx, yy -= ly, pQ := SubStr(pQ, 2)
+	else if (c = "!") 
+		Win_Get(DllCall("GetAncestor", "uint", Hwnd, "uint", 2), "Lxy", lx, ly), xx -= lx, yy -= ly,  pQ := SubStr(pQ, 2)
 	
 	loop, parse, pQ
 		if A_LoopField = x
@@ -322,8 +340,7 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 		Options		- White space separated list of options. See bellow.		
 		Hwnd		- Hwnd of the window for which to store data or Gui number if AHK window. 
 					If omitted, function will use Hwnd of the default AHK Gui. You can also use Gui, N:Default 
-					prior to calling the function. For 3td party windows this option is mandatory. For 3td party windows, 
-					this parameter is mandatory. 
+					prior to calling the function. For 3td party windows, this parameter is mandatory. 
 					Set 0 as hwnd to return position string without applying it to any window. This can be used for AHK Guis to
 					calculate size of controls based on window size and position, when needed. 
 
@@ -336,7 +353,7 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 					It can be optionally followed by the string representing the name of the storage location for that window.
 					You need to use name if your script stores more then one window, otherwise it will be saved under unnamed location.
 					">" and "<" are special names that can be used to store or recall all AHK Guis.
-					"-"	operation is used alone as an argument to delete Registry entries belonging to the script.
+					"-"	operation is used alone as an argument to delete Registry or Ini sections belonging to the script.
 					"--" operation is used alone as an argument to delete all Registry entries for all scripts.
 
 		
@@ -350,19 +367,19 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 			cw & ch numbers are present only for AHK Guis and represent client width & height which can be used 
 			without modifications in Gui, Show command.
 
-			You can get only position if you specify 
-
   Examples:
 		Single Gui Example:
 		(start code)
-			Gui, +Resize +LastFound
-			WinSetTitle, MyGui
-			if !Win_Recall("<")						;Recall gui if its position is already saved
-				Gui, %n%:Show, h300 w300, MyGui		; otherwise use these defaults.
-			
-			GuiClose:
-				Win_Recall(">")						;Store the Gui.
-			return
+		 Gui, +Resize +LastFound
+		 WinSetTitle, MyGui
+		 if !Win_Recall("<")                     ;Recall gui if its position is already saved
+			Gui, Show, h300 w300, MyGui         ; otherwise use these defaults.
+		return
+
+		GuiClose:
+			Win_Recall(">")                     ;Store the Gui.
+			ExitApp
+		return
 		(end code)
 
 		Snippets:
@@ -384,8 +401,9 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
 	static key="Software\AutoHotkey\Win", section="Recall"
 
 	if (Options = "-"){
-		loop, HKEY_CURRENT_USER, %key%
-			InStr(A_LoopRegName, A_ScriptFullPath) ? 
+		ifNotEqual, IniFileName,, IniDelete, %IniFileName%, %section%
+		else loop, HKEY_CURRENT_USER, %key%
+			 InStr(A_LoopRegName, A_ScriptFullPath) ? 
 				RegDelete, HKEY_CURRENT_USER, %key%, %A_LoopRegName%		
 		return
 	} else if (Options = "--") {
@@ -400,10 +418,8 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
 
 		ifEqual, f, >, SetEnv, op, % ">", name := p
 		else ifEqual, f, <, SetEnv, op, % "<", name := p
-
 		else ifEqual, A_LoopField, -Min, SetEnv, noMin, 1
 		else ifEqual, A_LoopField, -Max, SetEnv, noMax, 1
-		else ifEqual, A_LoopField, Show, SetEnv, bShow, 1
 	}
 
 	if (Hwnd = "") || (Hwnd>0 && Hwnd <= 99) {
@@ -416,8 +432,7 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
 	{		
 		Loop, 99 {
 			Gui, %A_Index%:+LastFoundExist
-			if WinExist()
-			{
+			if WinExist() {
 				name := A_Index, Hwnd := WinExist()
 				gosub %A_ThisFunc%
 			}
@@ -446,7 +461,7 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
 		DllCall("GetWindowPlacement", "uint", Hwnd, "uint", &WP)
 		WinGetClass, cls, ahk_id %hwnd%
 		if (cls="AutoHotkeyGUI")
-			Win_Get(Hwnd, "Lwh",w,h),   szAHK := " " w " " h		;this is to store AHK Gui width & height so it can be used asap with Gui, Show.
+			Win_Get(Hwnd, "Lwh",w,h),   szAHK := " " w " " h		;Store AHK client width & height so it can be used with Gui, Show.
 
 		pos := ""
 		loop, 4
@@ -465,7 +480,9 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
  Function:	Redraw
  			Redraws the window.
 
-			Hwnd - Handle of the window. If this parameter is omited, Redraw updates the desktop window.
+ Parameters:
+			Hwnd	- Handle of the window. If this parameter is omited, Redraw updates the desktop window.
+			Option  - "-" to disable redrawing for the window. "+" to enable it and redraw it. By default empty.
  
  Returns:
 			A nonzero value indicates success. Zero indicates failure.
@@ -473,10 +490,32 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
  Remarks:
 			This function will update the window for sure, unlike WinSet or InvalidateRect.
  */
-Win_Redraw( Hwnd=0 ) {
-	static RDW_ALLCHILDREN:=0x80, RDW_ERASE:=0x4, RDW_ERASENOW:=0x200, RDW_FRAME:=0x400, RDW_INTERNALPAINT:=0x2, RDW_INVALIDATE:=0x1, RDW_NOCHILDREN:=0x40, RDW_NOERASE:=0x20, RDW_NOFRAME:=0x800, RDW_NOINTERNALPAINT:=0x10, RDW_UPDATENOW:=0x100, RDW_VALIDATE:=0x8
-	return DllCall("RedrawWindow", "uint", Hwnd, "uint", 0, "uint", 0, "uint"
-		      ,RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ERASENOW | RDW_UPDATENOW | RDW_ALLCHILDREN)
+Win_Redraw( Hwnd=0, Option="" ) {
+	static WM_SETREDRAW=0xB, RDW_ALLCHILDREN:=0x80, RDW_ERASE:=0x4, RDW_ERASENOW:=0x200, RDW_FRAME:=0x400, RDW_INTERNALPAINT:=0x2, RDW_INVALIDATE:=0x1, RDW_NOCHILDREN:=0x40, RDW_NOERASE:=0x20, RDW_NOFRAME:=0x800, RDW_NOINTERNALPAINT:=0x10, RDW_UPDATENOW:=0x100, RDW_VALIDATE:=0x8
+
+	if (Option != "") {
+		old := A_DetectHiddenWindows
+		DetectHiddenWindows, on
+		bEnable := Option="+"
+		SendMessage, 0xB, bEnable,,,ahk_id %Hwnd%
+		DetectHiddenWindows, %old%
+		ifEqual, bEnable, 0, return		
+	}
+	return DllCall("RedrawWindow", "uint", Hwnd, "uint", 0, "uint", 0, "uint" ,RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ERASENOW | RDW_UPDATENOW | RDW_ALLCHILDREN)
+}
+
+/*
+ Function:	SetCaption
+ 			Set visibility of the window caption.
+
+ Parameters:
+			Flag	- Set + to show the caption or - otherwise. If omited, caption will be toggled.
+ */
+Win_SetCaption(Hwnd, Flag="^"){
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+	WinSet, Style, %Flag%0xC00000
+	DetectHiddenWindows, %oldDetect%
 }
 
 /*
@@ -488,6 +527,7 @@ Win_Redraw( Hwnd=0 ) {
 
  Returns:
 			Handle of the previous menu.
+
  */
 Win_SetMenu(Hwnd, hMenu=0){
 	hPrevMenu := DllCall("GetMenu", "uint", hwnd, "Uint")
@@ -562,6 +602,21 @@ Win_SetOwner(Hwnd, hOwner){
 }
 
 /*
+ Function:	SetToolWindow
+ 			Set the WS_EX_TOOLWINDOW style for the window.
+ 
+ Parameters:
+			Flag	- Set + to show the caption or - otherwise. If omited, caption will be toggled.
+ */
+Win_SetToolWindow(Hwnd, Flag="^") {
+	static WS_EX_TOOLWINDOW = 0x80	
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+	WinSet, ExStyle, %FLag%WS_EX_TOOLWINDOW, ahk_id %Hwnd%	
+	DetectHiddenWindows, %oldDetect%
+}
+
+/*
  Function:	Show
  			Show / Hide window.
  
@@ -574,6 +629,36 @@ Win_SetOwner(Hwnd, hOwner){
  */
 Win_Show(Hwnd, bShow=true) {
 	return DllCall("ShowWindow", "uint", Hwnd, "uint", bShow ? 5:0)
+}
+
+/*
+ Function:	ShowSysMenu
+ 			Show system menu for a window (ALT + SPACE menu).
+ 
+ Parameters:
+			X, Y	- Coordinates on which to show menu. Pass word "mouse" as X (default) to use mouse coordinates.
+
+
+ Returns:
+			True if menu has been shown, False otherwise.
+ */
+Win_ShowSysMenu(Hwnd, X="mouse", Y="") {
+	static WM_SYSCOMMAND = 0x112, TPM_RETURNCMD=0x100
+
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+	Process, Exist
+	h := WinExist("ahk_pid " ErrorLevel)
+	DetectHiddenWindows, %oldDetect%
+
+	if X=mouse
+		VarSetCapacity(POINT, 8), DllCall("GetCursorPos", "uint", &POINT), X := NumGet(POINT), Y := NumGet(POINT, 4)
+
+	hSysMenu := DllCall("GetSystemMenu", "Uint", Hwnd, "int", False) 
+	r := DllCall("TrackPopupMenu", "uint", hSysMenu, "uint", TPM_RETURNCMD, "int", X, "int", Y, "int", 0, "uint", h, "uint", 0)
+	ifEqual, r, 0, return
+	PostMessage, WM_SYSCOMMAND, r,,,ahk_id %Hwnd%
+	return 1
 }
 
 /*
@@ -622,7 +707,7 @@ Win_Subclass(hCtrl, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.1 by majkinetor.
+	o v1.21 by majkinetor .
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*
