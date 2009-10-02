@@ -33,14 +33,17 @@
       sizesw_big   - Big double-pointed arrow pointing south and west.
       sizese_big   - Big double-pointed arrow pointing south and east.
 
+ Remarks:
+	 Setting the same cursor type on several controls uses the same cursor.
+
  About:
 	o 1.2 by majkinetor
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
 Ext_Cursor(HCtrl, Shape) { 
-	static adrWndProc = "Ext_Cursor_wndProc"
-
-	Form_SubClass(HCtrl, adrWndProc, "", adrWndProc)
+;	static adrWndProc = "Ext_Cursor_wndProc"
+;	Form_SubClass(HCtrl, adrWndProc, "", adrWndProc)	;subclassing with the same function all the time makes problem when instantiated bunch of times...
+	Form_SubClass(HCtrl, "Ext_Cursor_wndProc")
 	return Ext_Cursor_WndProc(0, 0, Shape, HCtrl)
 } 
 
@@ -55,7 +58,7 @@ Ext_Cursor_wndProc(Hwnd, UMsg, WParam, LParam) {
 			ext := SubStr(WParam, -2, 3)
 			if ext in cur,ani
 			 	 %LParam% := DllCall("LoadCursorFromFile", "Str", WParam) 
-			else %LParam% := DllCall("LoadCursor", "Uint", 0, "Int", %WParam%, "Uint") 		
+			else %LParam% := DllCall("LoadCursor", "Uint", 0, "Int", %WParam%, "Uint")
 		} else %LParam% := %WParam%
 		
 		curArrow .= curArrow ? "" : DllCall("LoadCursor", "Uint", 0, "Int", 32512, "Uint")
@@ -69,5 +72,6 @@ Ext_Cursor_wndProc(Hwnd, UMsg, WParam, LParam) {
       If (%Hwnd% != "")
 			DllCall("SetCursor", "uint", %Hwnd%)
 	  else  DllCall("SetCursor", "uint", curArrow)
+
    return DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", hwnd, "UInt", uMsg, "UInt", wParam, "UInt", lParam)
 } 

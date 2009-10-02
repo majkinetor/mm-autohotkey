@@ -22,12 +22,12 @@ _("mm! e d c w")
 		%htmlCtrls%
 	)
 	hInfo  := Form_Add(hForm, "QHTM", infoText, "gOnQHTM", "Align T, 200", "Attach p r2")
-	hLog   := Form_Add(hForm, "ListBox", "", "hscroll", "Align R, 300", "Attach p")
+	hLog   := Form_Add(hForm, "ListBox", "", "hscroll", "Align R, 300", "Attach p r2")
 	hTab   := Form_Add(hForm, "Panel", "", "", "Align F", "Attach p r2")
 	loop, parse, ctrls, %A_Space%
 	{		
-		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "", "w100 h100 style=hidden", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
-		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, MakeOptions(A_LoopField), "Align F", "Attach p")
+		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "", "w100 h100 style='hidden sunken'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
+		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, MakeOptions(A_LoopField), "Align F", "Attach p", "Cursor HAND", "Tooltip " A_LoopField), ctrl%hCtrl% := A_LoopField
 		InitControl(A_LoopField, hCtrl), %A_LoopField% := ctrlNo := A_Index
 		if !hFont ;create font only once, then use it for every control.
 			 hFont := Ext_Font(hCtrl, "S9", "Courier New")
@@ -38,6 +38,13 @@ _("mm! e d c w")
 	SB_SetText("Forms test")
 return
 
+/* Could be used to stretch button image on resizing
+OnAttach(Hwnd) {
+	global
+	if (Hwnd = hButtonPanel)
+		Ext_Image(hButton, "..\res\test.bmp")
+}
+*/
 
 MakeOptions(Name) {
 
@@ -62,8 +69,9 @@ Handler:
 	Log(A_GuiControl,A_GuiEvent)
 return
 
-Handler(p1, p2="", p3="",p4="") {
-	Log(p1,p2,p3,p4)
+Handler(HCtrl, p2="", p3="",p4="") {
+	global
+	Log(ctrl%hCtrl% ":   ",p2,p3,p4)
 }
 
 Tooltip:
@@ -79,6 +87,9 @@ OnQHTM(Hwnd, Link, Id) {
 
 InitControl(Name, HCtrl) {
 	global
+
+	if Name = Button
+		Ext_Image(HCtrl, "..\res\test.bmp")
 
 	if Name = TreeView
 		TV_Add(":>", TV_Add(":)"))
@@ -101,7 +112,6 @@ InitControl(Name, HCtrl) {
 	if Name = HLink
 	{
 		ControlSetText, ,Click <a href="www.autohotkey.com">here</a> to go to AutoHotKey site, ahk_id %HCtrl%
-		Attach(HCTRL, "y")
 	}
 	if Name = Toolbar
 		Toolbar_Insert(HCtrl, "cut`ncopy`npaste")
@@ -119,23 +129,25 @@ InitControl(Name, HCtrl) {
 		hp2 := Form_Add(hPanel%A_Index%	, "Panel", "Panel 2", "style='center sunken'", "Align F", "Attach w h r")
 		Splitter_Set(hCtrl, hp1 " - " hp2)
 	}
-	else if Name= QHTM
-		QHTM_AddHtml(HCtrl, "<BR><b><font size=4>Remove flux capacitor?</font></b><p>Removing the flux capacitor during flight might lead to <b>overheating</b>,<br> <font color=""red"">toxi gas</font> exhaust, and some really unhappy passengers<p><b>Are you sure you wish to remove flux capacitor?</b><p>")
+	else if Name=QHTM
+	{
+		html := "<BR><b><font size=4>Flux capacitor.</font></b><p>Removing the flux capacitor during flight might lead to <font size=6>overheating</font> <font color=""red"">toxi gas</font> exhaust, and some really unhappy passengers<p></b><img src='" A_ScriptDir "/res/test.bmp'></img><p>"
+		ControlSetText, ,%html%, ahk_id %HCtrl%
+	}
 }
 
 F4::
-	Win_Show(hInfo)
 	Align(hForm, "reset")
-	Align(hInfo, "T", 200)
+	Align(hInfo,"T", 200)
 	Align(hLog, "R", 300)
 	Align(hTab, "F")
 	Attach(hForm)
 return
 
 F3::
-	Win_Show(hInfo, false)
 	Align(hForm, "reset")
-	Align(hLog, "T", 200)
+	Align(hInfo,"T", 200)
+	Align(hLog, "B", 200)
 	Align(hTab, "F")
 	Attach(hForm)
 return

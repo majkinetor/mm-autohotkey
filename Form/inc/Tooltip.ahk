@@ -19,7 +19,7 @@
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */
 Ext_Tooltip(HCtrl, Text){
-	static SS_NOTIFY=0x100, adrWndProc="Ext_Tooltip_WndProc"
+	static SS_NOTIFY=0x100		;, adrWndProc="Ext_Tooltip_WndProc"
 
 	WinGetClass, cls, ahk_id %HCtrl%
 	if cls = Static
@@ -27,7 +27,9 @@ Ext_Tooltip(HCtrl, Text){
 	else if cls = ComboBox
 		ControlGet, HCtrl, HWND,,Edit1, ahk_id %HCtrl%	; while in combo, it happens in edit owned by the combo
 
-	Form_SubClass(HCtrl, adrWndProc, "", adrWndProc)
+;	Form_SubClass(HCtrl, adrWndProc, "", adrWndProc)	;subclassing with the same function all the time makes problem when instantiated bunch of times...
+	Form_SubClass(HCtrl, "Ext_Tooltip_WndProc")
+
 	Ext_Tooltip_wndProc(0, 0, Text, HCtrl)
 	return 1
 }
