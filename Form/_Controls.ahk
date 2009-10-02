@@ -24,13 +24,13 @@
 	)
 	hInfo  := Form_Add(hForm, "QHTM", infoText, "gOnQHTM", "Align T, 200", "Attach w")
 	hLog   := Form_Add(hForm, "ListBox", "", "hscroll", "Align R, 300", "Attach x h")
-	hSep   := Form_Add(hForm, "Splitter", "", "", "Align R, 6", "Attach x h" )
+	hSep   := Form_Add(hForm, "Splitter", "", "sunken", "Align R, 6", "Attach x h" )
 	hTab   := Form_Add(hForm, "Panel", "", "", "Align F", "Attach w h")
 	Splitter_Set( hSep, hTab " | " hLog)
 
 	loop, parse, ctrls, %A_Space%
 	{		
-		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "", "w100 h100 style='hidden sunken'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
+		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "Panel " A_LoopField, "w100 h100 style='hidden sunken'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
 		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, MakeOptions(A_LoopField), "Align F", "Attach p", "Cursor HAND", "Tooltip Tooltip for " A_LoopField), ctrl%hCtrl% := A_LoopField
 		InitControl(A_LoopField, hCtrl), %A_LoopField% := ctrlNo := A_Index
 		if !hFont ;create font only once, then use it for every control.
@@ -40,17 +40,23 @@
 	QHTM_AddHtml(hInfo, "<br><h6>Total: " ctrlNo)
 	Form_Show(), OnQHTM("", "", init )
 	SB_SetText("Forms test")
+
+;	Attach("OnAttach")
 return
 
-/* Could be used to stretch button image on resizing
+
 OnAttach(Hwnd) {
 	global
-	if (Hwnd = hButtonPanel)
-		Ext_Image(hButton, "..\res\test.bmp")
+	;if (Hwnd = hButtonPanel) /* Could be used to stretch button image on resizing */
+	;	hbitmap := Ext_Image(hButton, "..\res\test.bmp") ;remove old bitmap....
 }
-*/
+
 
 MakeOptions(Name) {
+	global ListBox, MonthCal,TreeView,Hotkey,Slider,UpDown
+
+	if Name in MonthCal,ListBox,TreeView,Hotkey,Slider,UpDown
+		return "v" Name " gHandler"
 
 	if Name=Splitter
 		return "center handler=Handler"
@@ -73,7 +79,7 @@ Log(t1="", t2="", t3="", t4="", t5="") {
 }
 
 Handler:
-	Log(A_GuiControl,A_GuiEvent)
+	Log(A_GuiControl, ctrl, A_GuiEvent)
 return
 
 Handler(HCtrl, p2="", p3="",p4="") {
@@ -189,7 +195,8 @@ InitControl(Name, HCtrl) {
 		hp1 := Form_Add(hPanel%A_Index%	, "Panel", "Panel 1", "style='center sunken'", "Align T, 130", "Attach w r")
 		Align(hCtrl, "T", 30), Attach(hCtrl, "w r")
 		hp2 := Form_Add(hPanel%A_Index%	, "Panel", "Panel 2", "style='center sunken'", "Align F", "Attach w h r")
-		Splitter_Set(hCtrl, hp1 " - " hp2)
+		Splitter_Set(HCtrl, hp1 " - " hp2)
+		hSplitter := HCtrl
 	}
 	else if Name=QHTM
 	{
