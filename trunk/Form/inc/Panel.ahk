@@ -58,7 +58,7 @@ Panel_Add(HParent, X, Y, W, H, Style="", Text="") {
 } 
 
 Panel_wndProc(Hwnd, UMsg, WParam, LParam) { 
-	static WM_SIZE:=5, WM_SHOWWINDOW=0x18, redirect = "32,78,273,277,279", anc, attach, init		;WM_SETCURSOR=32,WM_COMMAND=78,WM_NOTIFY=273,WM_HSCROLL=277,WM_VSCROLL=299
+	static WM_SIZE:=5, WM_SHOWWINDOW=0x18, redirect = "32,78,273,276,277", anc, attach, init		;WM_SETCURSOR=32,WM_COMMAND=78,WM_NOTIFY=273,WM_HSCROLL=276,WM_VSCROLL=277
 
 	if !init {
 		ifEqual, attach, %A_Space%, return
