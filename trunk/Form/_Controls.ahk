@@ -5,7 +5,7 @@ _("mo! e d c w")
 
 	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter ScrollBar Property
 	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress GroupBox StatusBar Tab2 UpDown
-	init    = Property
+	init    = HiEdit
 	;===============================================
 	
 	ctrls := custom " " ahk

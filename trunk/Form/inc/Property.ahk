@@ -1,6 +1,9 @@
 /*
   Title:		Property
 				Properties viewer and editor.
+
+  Dependencies:
+				<SpreadSheet>
  */
 
 /*
