@@ -15,8 +15,9 @@
  
  Parameters:
  			Opt	  - Splitter Gui options. Splitter is subclassed Text control (Static), so it accepts any Text options.
-					plus one the following: blackframe, blackrect, grayframe, grayrect, whiteframe, whiterect, sunken.
+					plus one the following: blackframe, blackrect, grayframe, grayrect, whiteframe, whiterect, sunken.	
 			Text  - Text to set.
+			Handler - Notification function. Triggered when user changes the position. Accepts two parameters - control handle and new position.
 
  Returns:
 			Splitter handle.
@@ -27,8 +28,9 @@
 			When setting dimension of the splitter (width or height) use even numbers.
 			Splitter will set CoordMode, mouse, relative.
 
+			Upon movement, splitter will reset <Attach> for the parent, if present.
  */
-Splitter_Add(Opt="", Text="") {
+Splitter_Add(Opt="", Text="", Handler="") {
 	static SS_NOTIFY=0x100, SS_CENTER=0x200, SS_SUNKEN=0x1000, SS_BLACKRECT=4, SS_GRAYRECT=5, SS_WHITERECT=6, SS_BLACKFRAME=7, SS_GRAYFRAM=8, SS_WHITEFRAME=9
 
 	hStyle := 0
@@ -38,7 +40,10 @@ Splitter_Add(Opt="", Text="") {
 		else Opt .= A_LoopField " "
 
 	Gui, Add, Text, HWNDhSep -hscroll -vscroll %SS_CENTERIMAGE% %SS_NOTIFY% center %Opt% %hStyle%, %Text%	
-	return hSep+0
+	hSep+=0
+	if IsFunc(Handler)
+		Splitter(hSep "Handler", Handler)
+	return hSep
 }
 
 /*
@@ -93,6 +98,9 @@ Splitter_Set( HSep, Def, Pos="" ) {
 
  Parameters:
 			Pos		- Position to set. If empty, function simply returns.
+
+ Remarks:
+			Resets <Attach> for the parent.
  */
 Splitter_SetPos( HSep, Pos ) {
 	static WM_LBUTTONUP := 0x202
@@ -106,8 +114,10 @@ Splitter_SetPos( HSep, Pos ) {
 
 ;=============================================== PRIVATE ===============================================
 ;required by forms framework.
-Splitter_add2Form(hParent, Txt, Opt) {
-	DllCall("SetParent", "uint", hCtrl := Splitter_Add(Opt, Txt), "uint", HParent)
+Splitter_add2Form(HParent, Txt, Opt){
+	static parse = "Form_Parse"
+	%parse%(Opt, "handler", handler)
+	DllCall("SetParent", "uint", hCtrl := Splitter_Add(Opt, Txt, handler), "uint", HParent)
 	return hCtrl
 }
 
@@ -186,6 +196,7 @@ Splitter_move(HSep, Delta, Def, manual=""){
 	StringSplit, s, Def, %A_Space%
 	
 	v := bVert ? Delta : 0,	  h := bVert ? 0 : Delta
+
 	loop, %s0%
 	{
 		s := s%A_Index%
@@ -197,8 +208,11 @@ Splitter_move(HSep, Delta, Def, manual=""){
 		} else 	Win_MoveDelta(s, v, h, -v, -h)
 	}		
 					
-	Win_Redraw( Win_Get(HSep, "A") )
+	Win_Redraw( Win_Get(HSep, "A") )	;redrawing imediate parent was not that good.
 	IsFunc(f := "Attach") ? %f%(DllCall("GetParent", "uint", HSep, "Uint")) : ""
+
+	if (handler := Splitter(HSep "Handler")) && !manual
+		%handler%(HSep, Splitter_GetPos(HSep))
 }
 
 Splitter_updateVisual( HSep="", bVert="" ) {
@@ -237,6 +251,15 @@ Splitter_IsVertical(Hwnd) {
 	return s & 0x80 
 }
 
+;storage
+Splitter(Var="", Value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") {
+	static
+	_ := %var%
+	ifNotEqual, value,~`a , SetEnv, %var%, %value%
+	return _
+}
+
+
 #include *i Win.ahk
 
 /* Group: Examples
@@ -261,6 +284,6 @@ Splitter_IsVertical(Hwnd) {
  */
 
 /* Group: About
-	o Ver 1.02 by majkinetor. 
+	o Ver 1.1 by majkinetor. 
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
