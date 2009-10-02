@@ -1,4 +1,4 @@
-_("mm! e d c w")
+_("mo! e d c w")
 #SingleInstance, force
 #MaxThreads, 255		;Required for this sample with cursor/tooltip extensions.
 #NoEnv
