@@ -201,10 +201,22 @@ ScrollBar_Show(HCtrl, Show=true) {
 }
 
 ;=================================== PRIVATE ===============================================================
+;required by the Forms framework.
+ScrollBar_add2Form(hParent, Txt, Opt){
+	static parse = "Form_Parse"
+	%parse%(Opt, "x# y# w# h# g* style pos min max page", x, y, w, h, handler, style, pos, min, max, page)
+	p1 .= style = "" ? "style="  style	: ""
+	, p2 .= pos   = "" ? "pos="	 pos	: ""
+	, p3 .= min   = "" ? "min="	 min	: ""
+	, p4 .= max   = "" ? "max="	 max	: ""
+	, p5 .= page  = "" ? "page=" page	: ""
+
+	return ScrollBar_Add(hParent, x, y, w, h, handler, p1, p2, p3, p4, p5)
+}
 
 ScrollBar_onScroll(Wparam, Lparam, Msg){
 	static SB_LINEDOWN=1, SB_PAGEDOWN=3, SB_PAGEUP=2, SB_THUMBTRACK=5, SB_TOP=6, SB_BOTTOM=7, SB_LINEUP=0, SB_ENDSCROLL=8
-	
+
 	Handler := ScrollBar(LParam "Handler")
 	nPos := ScrollBar_Get(LParam, "pos")
 	action := Wparam & 0xFFFF
