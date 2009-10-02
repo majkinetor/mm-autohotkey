@@ -8,9 +8,6 @@
 		Width	- Width of the image, if omitted, current control width will be used.
 		Height	- Height of the image, if omitted, current control height will be used.
  
- Returns:
-		Bitmap handle.
- 
  */
 Ext_Image(hButton, Image, Width="", Height=""){ 
     static BM_SETIMAGE=247, IMAGE_ICON=2, BS_BITMAP=0x80, IMAGE_BITMAP=0, LR_LOADFROMFILE=16, LR_LOADTRANSPARENT=0x20
@@ -30,6 +27,7 @@ Ext_Image(hButton, Image, Width="", Height=""){
     WinSet, Style, +%BS_BITMAP%, ahk_id %hButton% 
     SendMessage, BM_SETIMAGE, IMAGE_BITMAP, hBitmap, , ahk_id %hButton% 
     ifNotEqual, ErrorLevel, 0, DllCall("DeleteObject", "UInt", ErrorLevel)	;remove old bitmap if exists
-      
-    return hBitmap 
+
+	if Image is not integer
+		DllCall("DeleteObject", "Uint", hBitmap)
 }
