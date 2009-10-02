@@ -17,7 +17,7 @@
 	hGui := WinExist()
 
 	gui, add, edit, HWNDhc1 w%w% h%h1%, ESC - exit and save window.`nF1 - Set splitter position to 40
-	hSep := Splitter_Add("h" ssize " w" w " sunken", "drag me")
+	hSep := Splitter_Add("h" ssize " w" w " center sunken", "drag me", "OnSplitter")
 	w1 := w//2
 	gui, add, monthcal, HWNDhc2 w%w1% h%h2%
 	gui, add, monthcal, HWNDhc3 x+0 w%w1% h%h2%
@@ -33,6 +33,11 @@
 	Gui, Show, x%x% y%y% w%w% h%h%
 return
 
+OnSplitter(HCtrl, Pos){
+	txt = position: %pos%
+	ControlSetText, ,%txt%, ahk_id %HCtrl%
+}
+
 F1::
 	Splitter_SetPos(hSep, 40)
 return
@@ -41,7 +46,7 @@ Esc::
 GuiClose:
 	Win_Recall(">", "", "config.ini")
 	p := Splitter_GetPos(hSep)
-	IniWrite, %p%, config.ini, Config , Splitter
+	IniWrite, %p%, config.ini, Config, Splitter
 	ExitApp
 return
 
