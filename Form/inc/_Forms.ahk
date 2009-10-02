@@ -77,7 +77,7 @@
 
 /* 
  Group: About
-	o v0.2 by majkinetor.
+	o v0.3 by majkinetor.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> .
 
 	(see _Forms.png)
