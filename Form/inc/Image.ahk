@@ -3,13 +3,16 @@
 			Adds image to the Button control.
 
  Parameters:
-		hButton	- Handle to the button.
-		Image	- Path to the .BMP file or image handle. First pixel signifies transparency color.
-		Width	- Width of the image, if omitted, current control width will be used.
-		Height	- Height of the image, if omitted, current control height will be used.
+			HButton	- Handle to the button.
+			Image	- Path to the .BMP file or image handle. First pixel signifies transparency color.
+			Width	- Width of the image, if omitted, current control width will be used.
+			Height	- Height of the image, if omitted, current control height will be used.
+
+ Returns:
+		Bitmap handle.
  
  */
-Ext_Image(hButton, Image, Width="", Height=""){ 
+Ext_Image(HButton, Image, Width="", Height=""){ 
     static BM_SETIMAGE=247, IMAGE_ICON=2, BS_BITMAP=0x80, IMAGE_BITMAP=0, LR_LOADFROMFILE=16, LR_LOADTRANSPARENT=0x20
 
 	if (Width = "" || Height = "") {
@@ -25,9 +28,6 @@ Ext_Image(hButton, Image, Width="", Height=""){
 	} else hBitmap := Image 
     
     WinSet, Style, +%BS_BITMAP%, ahk_id %hButton% 
-    SendMessage, BM_SETIMAGE, IMAGE_BITMAP, hBitmap, , ahk_id %hButton% 
-    ifNotEqual, ErrorLevel, 0, DllCall("DeleteObject", "UInt", ErrorLevel)	;remove old bitmap if exists
-
-	if Image is not integer
-		DllCall("DeleteObject", "Uint", hBitmap)
+    SendMessage, BM_SETIMAGE, IMAGE_BITMAP, hBitmap, , ahk_id %hButton%
+	return hBitmap
 }
