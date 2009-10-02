@@ -126,6 +126,7 @@ Form_Close( Name ) {
 			c*		- Gui color. Hexadecimal or integer value.
 			Font	- Gui font (style, face).
 			Name	- Name of the form, by default FormN where N is the number of the forms created.
+			T		- Transparent window.
 			  
  Returns:
 			Form handle.
@@ -136,7 +137,7 @@ Form_Close( Name ) {
 Form_New(Options="") {
 	static no=1
 
-	Form_Parse(Options, "x# y# w# h# a# c* Font Name", x, y, w, h, a, c, font, name, extra)
+	Form_Parse(Options, "x# y# w# h# a# c* Font Name t?", x, y, w, h, a, c, font, name, t, extra)
 
 	ifEqual, name,,SetEnv, Name, % "Form" no++
 	pos := (x!="" ? " x" x : "") (y!="" ? " y" y : "") (w!="" ? " w" w : "") (h!="" ? " h" h : "")
@@ -150,7 +151,13 @@ Form_New(Options="") {
 
 	ifNotEqual, a,,WinSet, Transparent, % a*2.5
 	ifNotEqual, c,,Gui, %n%:Color, %c%
-
+	if (t) {
+		Gui, Color, 12345
+		WinSet, TransColor, 12345
+		w1 := w-5, h1 := h-5
+		WinSet, Region, 5-5 w%w1% h%h1%
+	}
+		
 	if (font != "") {
 		StringSplit, font, font, %A_Space%
 		Gui, %n%:Font, %font1%, %font2%
