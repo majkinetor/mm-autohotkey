@@ -19,7 +19,7 @@ _("mm! e d c w")
 	infoText=
 	(LTrim Join
 		<b>Press F1 to cycle controls. Click + to see docs.
-		Click control name to switch to its tab page. Press & hold F1 and resize window as experiment.
+		Click control name to switch to its tab page. Press & hold F1 and resize window as experiment.</b><br><br>
 		%htmlCtrls%
 	)
 	hInfo  := Form_Add(hForm, "QHTM", infoText, "gOnQHTM", "Align T, 200", "Attach w")
