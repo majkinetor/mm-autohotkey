@@ -1,7 +1,7 @@
 /*
   Function:	Align
  			Aligns controls inside the parent.
- 
+
   Parameter:
  			HCtrl	- Control's handle or Parent handle. If other parameters are omitted, hCtrl represents Parent that
 					  should be re-aligned. Use re-align when you hide/show/resize controls to reposition remaining controls.
