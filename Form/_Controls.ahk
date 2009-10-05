@@ -1,15 +1,15 @@
-;_("mo! e d c w")
+_("mo! e d c w")
 #SingleInstance, force
 #MaxThreads, 255		;Required for this sample with cursor/tooltip extensions.
 #NoEnv
 
 	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter ScrollBar Property
-	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress GroupBox StatusBar Tab2 UpDown
+	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress GroupBox StatusBar Tab2 UpDown		;updown may somehow make problem for other controls. in this setup if you put tab2 after updown it will work ok, otherwise it will initially apear on wrong position. There were other kinds of problems all related to UpDo
 	init    = HiEdit
 	;===============================================
 	
 	ctrls := custom " " ahk
-
+	
 	SetWorkingDir, inc		;required to load some dll's that are put there
 	hForm  := Form_New("w700 h620 Resize")
 
@@ -30,12 +30,12 @@
 
 	loop, parse, ctrls, %A_Space%
 	{		
-		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "Panel " A_LoopField, "w100 h100 style='hidden sunken'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
+		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "Panel " A_LoopField, "w100 h100 style='hidden'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
 		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, MakeOptions(A_LoopField), "Align F", "Attach p", "Cursor HAND", "Tooltip Tooltip for " A_LoopField), ctrl%hCtrl% := A_LoopField
 		InitControl(A_LoopField, hCtrl), %A_LoopField% := ctrlNo := A_Index
-;		if !hFont ;create font only once, then use it for every control.
-;			 hFont := Font(hCtrl, "S9, Courier New")
-;		else Font(hCtrl, hFont)
+		if !hFont ;create font only once, then use it for every control.
+			 hFont := Font(hCtrl, "s9, Courier New")
+		else Font(hCtrl, hFont)
 	}	
 	QHTM_AddHtml(hInfo, "<br><h6>Total: " ctrlNo)
 	Form_Show(), OnQHTM("", "", init )
@@ -192,9 +192,11 @@ InitControl(Name, HCtrl) {
 	}
 	else if Name = Splitter
 	{		
-		hp1 := Form_Add(hPanel%A_Index%	, "Panel", "Panel 1", "style='center sunken'", "Align T, 130", "Attach w r")
+		hp1 := Form_Add(hPanel%A_Index%	, "Panel", "Panel 1", "style='border'", "Align T, 130", "Attach w r")
+		Form_Add(hp1,  "Text", "Panel 1", "center 0x200", "Align F", "Attach p")
 		Align(hCtrl, "T", 30), Attach(hCtrl, "w r")
-		hp2 := Form_Add(hPanel%A_Index%	, "Panel", "Panel 2", "style='center sunken'", "Align F", "Attach w h r")
+		hp2 := Form_Add(hPanel%A_Index%	, "Panel", "Panel 2", "style='border'", "Align F", "Attach w h r")
+		Form_Add(hp2,  "Text", "Panel 2", "center 0x200", "Align F", "Attach p")
 		Splitter_Set(HCtrl, hp1 " - " hp2)
 		hSplitter := HCtrl
 	}
