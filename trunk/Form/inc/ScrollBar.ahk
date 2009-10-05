@@ -10,7 +10,8 @@
  Parameters:	
 				HParent		- Handle of the parent window.
 				X..H		- Position. You can omit width and height to use system's default for vertical or horizontal scroll bar.
-							  To glue scroll bar to another GUI control, specify control's handle as X parameter and omit Y parameter.							  
+							  To glue scroll bar to another GUI control, specify control's handle as X parameter and omit Y parameter.
+							  In glue mode, y parameter is ignored; w is ignored for horizontal, and h for vertical scroll bar.
 				Handler		- Handler routine. See below.
 				o1..o5		- Optional parameters.
 

@@ -19,7 +19,8 @@
  			Ctrl	- Control name or handle. All AHK controls are supported by default. Custom controls must be included if needed. See below for details.
  			Txt		- Text of the new control (optional).
 			Opt		- Space separated list of control options (optional).
-			E1..E5  - Control extensions (optional). Extension function must exist in the script in order to use it. See below for details.
+			E1..E5  - Control extensions (optional). Extension function must exist in the script in order to use it. Option string may preceed 
+					  extension name in the RegEx manner. See below for details.
  
  Adding Controls:
  			Form can make any internal AHK control and any custom control.
@@ -57,8 +58,7 @@
  Using Extensions:
 			Extension is any AHK function that accepts handle of the control as its first parameter. It can have any number of of additional parameters.
 			You can quickly write new extension when you need it and it will instantly become available, or you can include 3thd party extensions.
-			Extensions are used similarly to AHK commands - you specify extension name followed by a space (but not comma)
-			and list of its parameters between commas.
+			Extensions are used similarly to AHK commands - you specify extension name followed by a space (not comma !) and list of its parameters between commas.
 		
 		>	hButton :=	Form_Add(hForm1, "Button", "Cancel", "gOnButton", "Align F, 250", "Attach p r", "Tooltip I pwn")
 		    
@@ -75,10 +75,14 @@
 			set, so Align extension is placed before it (in this case, the same could be achieved without Align extension by specifying x..w options). 
 			Tooltip extension, however, doesn't depend on anything so it can be put anywhere in extension list. 
 
-
+			You can customize parameter extraction with 2 chars that can optionally preceed the extension name. For instance "Font s18, Courier New" will 
+			use Font extension with 2 parameters "s18" and " Courier New". Since Font extension accepts comma in input this is wrong interpretation.
+			To specify that sentence containing comma is part of the argument itself, set "*|)Font s18, Courier New". First parameter sets the mode. * is
+			normal mode, "!" is trimmed mode. Second option sets separator char, by default comma. In this case its changed to | so Font extension will be called
+			with single argument "s18, Courier New".
+			
  Returns:
- 			Control's handle if successful, 0 if control can't be created. Error message on invalid usage.
-
+ 			Control's handle if successful. 0 or error mesage if control can't be created. Error message on invalid usage.
  */
 Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
 	static integrated = "Text,Edit,UpDown,Picture,Button,Checkbox,Radio,DropDownList,ComboBox,ListBox,ListView,TreeView,Hotkey,DateTime,MonthCal,Slider,Progress,GroupBox,Tab2,StatusBar"
@@ -92,14 +96,14 @@ Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
 			 hCtrl := %f_Add%(HParent, Txt, Opt)
 		else return A_ThisFunc "> Custom control doesn't have Add2Form function: " Ctrl 
 	} else 	DllCall("SetParent", "uint", hCtrl := Ctrl, "uint", HParent)
-
+	
   ;apply extensions
 	loop {
 		o := E%A_Index%
 		ifEqual,o,,break
-
-		f_Extension := SubStr(o, 1, k:=InStr(o, " ")-1), k := SubStr(o, k+2)
-		Form_split(k, p1, p2, p3, p4, p5)
+		f_Extension := SubStr(o, 1, k:=InStr(o, " ")-1), k := SubStr(o, k+2), iOpt := InStr(f_Extension, ")")
+		opt := iOpt ? (SubStr(f_Extension, 1, iOpt-1), f_Extension := SubStr(f_Extension, iOpt+1)) : ""
+		Form_split(opt, k, p1, p2, p3, p4, p5)
 		if !(IsFunc(f_Extension) || IsFunc( f_Extension := "Ext_" f_Extension ))
 			return A_ThisFunc "> Unsupported extension: " f_Extension
 		%f_Extension%(hCtrl, p1, p2, p3, p4, p5)
@@ -155,7 +159,7 @@ Form_New(Options="") {
 		Gui, Color, 12345
 		WinSet, TransColor, 12345
 		w1 := w-5, h1 := h-5
-		WinSet, Region, 5-5 w%w1% h%h1%
+		WinSet, Region, 5-5 w%w1% h%h1%	;remove border on some systems...
 		Gui, -Resize
 	}
 		
@@ -389,10 +393,10 @@ Form_getFreeGuiNum(){
 	return 0
 }
 
-Form_split(s, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="") {
-	loop, 5
-		o%A_Index% := ""
-	StringSplit, o, s, `, ,%A_Space%
+Form_split(opt, s, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="") {
+	o1 := o2 := o3 := o4 := o5 := "", sep := (mode := SubStr(opt, 1, 1)) ? SubStr(opt, 2,1) : ",", omit := mode = "!" ? A_Space A_Tab : ""
+	ifEqual, sep,,SetEnv, sep, `,
+	StringSplit, o, s, %sep%, %omit%
 	return o0
 }
 

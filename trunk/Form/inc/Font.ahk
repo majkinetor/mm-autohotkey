@@ -29,8 +29,7 @@ Font(hCtrl="", Font="", bRedraw=1) {
 
 	  ;height 
 
-		RegExMatch(Font, "(?<=[S|s])(\d{1,2})(?=[ ,])", height) 
-		m(height)
+		RegExMatch(Font, "(?<=[S|s])(\d{1,2})(?=[ ,]*)", height) 
 		if (height = "") 
 		  height := 10 
 		RegRead, LogPixels, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontDPI, LogPixels 
