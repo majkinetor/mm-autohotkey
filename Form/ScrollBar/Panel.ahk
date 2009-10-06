@@ -65,7 +65,7 @@ Panel_Add(HParent, X, Y, W, H, Style="", Text="") {
 
 Panel_wndProc(Hwnd, UMsg, WParam, LParam) { 
 	static WM_SIZE:=5, GWL_ROOT := 2, WM_SHOWWINDOW=0x18, anc, attach, init		
-	static redirect = "32,78,273,276,277"  ;WM_SETCURSOR=32, WM_COMMAND=78, WM_NOTIFY=273, WM_HSCROLL=276, WM_VSCROLL=277
+	static redirect = "78,273,276,277"  ;WM_SETCURSOR=32 !!!, WM_COMMAND=78, WM_NOTIFY=273, WM_HSCROLL=276, WM_VSCROLL=277
 
 	if !init {
 		ifEqual, attach, %A_Space%, return
@@ -74,8 +74,13 @@ Panel_wndProc(Hwnd, UMsg, WParam, LParam) {
 	}
 
 	if UMsg in %redirect%
-		ifEqual, anc,,SetEnv, anc, % DllCall("GetAncestor", "uint", Hwnd, "uint", GWL_ROOT)
-		else return DllCall("SendMessage", "uint", anc, "uint", UMsg, "uint", WParam, "uint", LParam)
+		if anc =
+		{	
+			anc := DllCall("GetAncestor", "uint", Hwnd, "uint", GWL_ROOT)
+			anc := DllCall("GetWindowLong", "uint", anc, "uint", -4)
+		}
+;		else return DllCall("SendMessage", "uint", anc, "uint", UMsg, "uint", WParam, "uint", LParam)
+		else return DllCall(anc, "uint", Hwnd, "uint", UMsg, "uint", WParam, "uint", LParam)
 	
 	if (UMsg = WM_SIZE)
 		%attach%(Wparam, LParam, UMsg, Hwnd), Scroller_UpdateBars(Hwnd)
