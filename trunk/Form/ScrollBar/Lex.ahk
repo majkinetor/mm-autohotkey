@@ -3,11 +3,11 @@ _("mo!")
 	Gui, Margin, 0, 0
 	hGui := WinExist()
 
-	hP := Panel_Add(hGui, 20, 20, 221, 400, "resizable", "My Panel")
+;	hP := Panel_Add(hGui, 20, 20, 221, 400, "resizable", "My Panel")
 	Loop, 15
 	{
 		Gui, Add, Edit, HWNDhc H100 W200 -vscroll, Edit %A_Index%
-		Win_SetParent(hc, hP)
+;		Win_SetParent(hc, hP)
 	}
 
 	Gui, Show, W500 H500 
@@ -74,13 +74,13 @@ Scroller_getScrollArea(hParent, ByRef left, ByRef top, ByRef right, ByRef bottom
 	Win_Get(hParent, "NhBxy", th, bx, by)
 	ifGreater, th, 100, SetEnv, th, 0
 
-    WinGet, ctrlList, ControlListHwnd, ahk_id %hParent% 
-	WinGet, style, Style, ahk_id %hParent%
+    WinGet, ctrlList, ControlListHwnd, ahk_id %hParent%		;!!! get list of ctrls for this parent only, not its children...
+	WinGet, style, Style, ahk_id %hParent%	
 	bHor := (style & WS_HSCROLL) != 0,		bVer := (style & WS_VSCROLL) != 0
     Loop, Parse, ctrlList, `n
     { 
 		ifEqual, A_LoopField,, continue
-;        ControlGetPos, cx, cy, cw, ch,, ahk_id %A_LoopField%
+;       ControlGetPos, cx, cy, cw, ch,, ahk_id %A_LoopField%
 		Win_GetRect(A_LoopField, "*xywh", cx, cy, cw, ch)
 		cr := cx+cw, cb := cy+ch
 
@@ -90,14 +90,12 @@ Scroller_getScrollArea(hParent, ByRef left, ByRef top, ByRef right, ByRef bottom
 		ifGreater, cb, %bottom%, SetEnv, bottom, %cb%
     }
 	left-=bx, right +=bx+sbs*bVer, top -= by, bottom += by + th + sbs*bHor
-	m(left, right, top, bottom)
-	
 }
 
 Scroller_onScroll(WParam, LParam, Msg, Hwnd){
     static SIF_ALL=0x17, SCROLL_STEP=10 
 
-	bar := Msg = 0x115		; SB_HORZ=0, SB_VERT=1 
+	bar := Msg = 0x115
     
     VarSetCapacity(si, 28, 0), NumPut(28, si) 
     NumPut(SIF_ALL, si, 4) ; fMask 
