@@ -32,6 +32,7 @@
 		o <HLink>		- HyperLink custom control.
 		o <Splitter>	- Splitter custom control.
 		o <ScrollBar>	- Scrollbar custom control.
+		o <Scroller>	- Makes windows scrollable.
 		o <HiEdit>		- HiEdit custom control.
 		o <QHTM>		- Qhtm custom control.
 		o <SpreadSheet> - SpreadSheet custom control.
@@ -46,7 +47,7 @@
 		o <Cursor>		- Set cursor shape for control or window.
 		o <Tooltip>		- Adds tooltips to GUI controls.
 		o <Image>		- Adds image to the Button control.
-		o <Font>	- Sets font for the control.
+		o <Font>		- Sets font for the control.
  */
 #include *i Form.ahk
 
@@ -67,19 +68,21 @@
 #include *i Scrollbar.ahk
 #include *i Property.ahk
 
+;dll controls
 #include *i HiEdit.ahk
 #include *i SpreadSheet.ahk
 #include *i RaGrid.ahk
 #include *i Qhtm.ahk
 
 
-;dependencies and utils
-#include Win.ahk  ; required by Align atm too.
-#include Dlg.ahk
+;utilities
+#include *i Dlg.ahk
+#include *i Scroller.ahk
+#include *i Win.ahk
 
 /* 
  Group: About
-	o v0.3 by majkinetor.
+	o v0.35 by majkinetor.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> .
 
 	(see _Forms.png)

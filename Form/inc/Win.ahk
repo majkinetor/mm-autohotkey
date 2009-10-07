@@ -238,6 +238,28 @@ Win_GetRect(hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="") {
 	return retAll ? o1 " " o2 " " o3 " " o4 : o1
 }
 
+/*
+ Function:	GetChildren
+			Get child windows for a window.
+ 
+ Parameters:
+			Hwnd	- Handle of the parent window.
+
+ Returns:
+			New line separated list of child control handles.
+  
+ */
+Win_GetChildren(Hwnd){
+	static GW_HWNDNEXT=2, GW_CHILD=5, adrGetWindow
+	if !adrGetWindow
+		adrGetWindow := DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), "str", "GetWindow")
+	s := hChild := DllCall(adrGetWindow, "uint", Hwnd, "uint", GW_CHILD)
+	ifEqual, s,0, return
+	while (hChild := DllCall(adrGetWindow, "uint", hChild, "uint", GW_HWNDNEXT))
+		s .= "`n" hChild
+	return s	
+}
+
 
 /*
  Function:	Is
