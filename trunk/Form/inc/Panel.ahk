@@ -41,7 +41,7 @@ Panel_Add(HParent, X, Y, W, H, Style="", Text="") {
 	  , "str",    "Panel"	
 	  , "str",    Text
 	  , "Uint",   WS_CHILD	| WS_CLIPCHILDREN
-	  , "int",    X, "int", Y, "int", W, "int",H
+	  , "int",    X, "int", Y, "int", W, "int", H
 	  , "Uint",   HParent
 	  , "Uint",   0, "Uint",0, "Uint",0, "Uint")
 
@@ -76,7 +76,7 @@ Panel_wndProc(Hwnd, UMsg, WParam, LParam) {
 		
 	if (UMsg = WM_CHANGEUISTATE)		;Panel sends this message to itself when it sets scrollbars style.
 		if (bar := DllCall(adrGetWindowLong, "uint", Hwnd, "int", -21)) & 3
-			%Scroller_UpdateBars%(Hwnd, bar)
+			return %Scroller_UpdateBars%(Hwnd, bar)
 	
 	if (Umsg = WM_SHOWWINDOW)
 		%attach%(Hwnd, WParam ? "+" : "-", "", "")
@@ -93,7 +93,7 @@ Panel_wndProc(Hwnd, UMsg, WParam, LParam) {
  
  Parameters:
 			Hwnd	- Handle of the parent. If omitted, function returns hStyle in p3 and hExStyle in p4.
-			Style	- White space separated list of styles to set. HIDDEN DISABLED VSCROLL HSCROLL SCROLL RESIZABLE BORDER FRAME SUNKEN STATIC.
+			Style	- White space separated list of styles to set. HIDDEN DISABLED VSCROLL HSCROLL SCROLL RESIZE BORDER FRAME SUNKEN STATIC.
 					  Any integer is accepted as style. Invalid styles are skipped.
 			p3, p4  - If Hwnd is omitted, result is returned in this output variables.
 
@@ -109,7 +109,7 @@ Panel_wndProc(Hwnd, UMsg, WParam, LParam) {
  */
 Panel_SetStyle(Hwnd, Style, ByRef hStyle="", ByRef hExStyle="") {
 	static WS_VISIBLE=0x10000000, PS_HIDDEN=0, PS_DISABLED=0x8000000, GWL_USERDATA=-21
-		   ,PS_BORDER=0x800000, PS_RESIZABLE=0x40000, PS_CAPTION=0xC00000, PS_CLOSE=0x80000, PS_MAX=0x10000, PS_MIN=0x20000, PS_TOOL=0x80
+		   ,PS_BORDER=0x800000, PS_RESIZE=0x40000, PS_CAPTION=0xC00000, PS_CLOSE=0x80000, PS_MAX=0x10000, PS_MIN=0x20000, PS_TOOL=0x80
 		   ,PSEX_FRAME=1, PSEX_SUNKEN=0x200, PSEX_STATIC = 0x20000, PS_SCROLL=0  ;PS_SCROLL=0x300000 PS_VSCROLL=0x200000, PS_HSCROLL=0x100000
 
 	pStyle := " " Style " "
@@ -135,7 +135,7 @@ Panel_SetStyle(Hwnd, Style, ByRef hStyle="", ByRef hExStyle="") {
 			ifEqual, c, h, SetEnv, r, % DllCall("SetWindowLong", "uint", Hwnd, "int", GWL_USERDATA, "Uint", 1)
 			ifEqual, c, v, SetEnv, r, % DllCall("SetWindowLong", "uint", Hwnd, "int", GWL_USERDATA, "Uint", 2)
 			ifEqual, c, %A_Space%, SetEnv, r, % DllCall("SetWindowLong", "uint", Hwnd, "int", GWL_USERDATA, "Uint", 3)
-			SendMessage, 0x127,UIS_INITIALIZE,,,ahk_id %Hwnd%	; WM_CHANGEUISTATE=, UIS_INITIALIZE=3
+			SendMessage, 0x127,3,,,ahk_id %Hwnd%	; WM_CHANGEUISTATE=, UIS_INITIALIZE=3
 		}
 	}
 }

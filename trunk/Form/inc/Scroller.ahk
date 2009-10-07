@@ -6,22 +6,68 @@
  */
 
 /*
- Function:	Init
-			Sets scrolling for a window.
-
- Parameters:
-			Hwnd, Bar	- If present, function will call <UpdateBars> for given window.
+ Function:	UpdateBars
+			Updates horizontal and/or vertical scroll bar.	
  
- Remarks:
-			After calling this function, all windows can be made scrollable. 
-			To add scrollbars to the window, simply call <UpdateBars> after adding controls.
-			To remove scrollbars for window, remove its WS_HSCROLL=0x100000 and/or WS_VSCROLL=0x200000 (or both 0x300000) and
-			stop calling UpdateBars. You will also have to add UpdateBars in GuiSize routine.
+ Parameters:
+			Hwnd	- Window that contains system created scrollbars.
+			Bars	- 1 to updates only horizontal bar, 2 updates only vertical bar, 3 (default) updates both.
+			MX, MY	- Set here x & y margin of your Gui. By default 0.
 
+ Remarks:			
+			You need to call this function after adding new controls to the GUI and after resizing window.
+			If used with resizable window, its enough to put call to this function in GuiSize routine (this might not work in same advanced
+			GUI creation scenarios). In any case, you need to update scrollbars after adding new controls to the GUI.
 			Scroller replaces message handlers for WM_VSCROLL & WM_HSCROLL messages at the moment which will influence <ScrollBar> control
-			if you have it. There is usualy no need to use both in the same script.
- */
-Scroller_Init(Hwnd="", Bar=3){
+			if you have it (or vice-versa).
+  */
+Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
+    static SIF_RANGE=0x1, SIF_PAGE=0x2, SIF_DISABLENOSCROLL=0x8, SB_HORZ=0, SB_VERT=1, sbs
+
+	if !sbs		;ScrollBar Size
+	{
+		Scroller_init()
+		SysGet, sbs, 2
+	}
+
+	Scroller_getScrollArea(Hwnd, left, top, right, bottom)
+	sWidth := right - left + MX, sHeight := bottom - top + MY
+
+  ;Adjust scroll area to take into account scrollbars.
+	WinGetPos,,,pw,ph, ahk_id %Hwnd%
+	sWidth += (sHeight > ph) ? sbs : 0,  sHeight += (sWidth > pw) ? sbs : 0
+
+	VarSetCapacity(SI, 28, 0), NumPut(28, SI)
+	NumPut(SIF_RANGE | SIF_PAGE, SI, 4)
+
+  ;Update horizontal scroll bar. 
+	if Bars in 1,3
+	{
+		NumPut(sWidth, SI, 12)	; nMax 
+		NumPut(pw, SI, 16)		; nPage 
+		DllCall("SetScrollInfo", "uint", Hwnd, "uint", SB_HORZ, "uint", &si, "int", 1)
+	} else DllCall("ShowScrollBar", "uint", HCtrl, "uint", SB_HORZ, "uint", 0)
+
+  ;Update vertical scroll bar. 
+    ;NumPut(SIF_RANGE | SIF_PAGE | SIF_DISABLENOSCROLL, SI, 4) ; fMask 
+   	if Bars in 2,3
+	{
+	    NumPut(sHeight, SI, 12) ; nMax 
+		NumPut(ph, SI, 16)		; nPage 
+	    DllCall("SetScrollInfo", "uint", Hwnd, "uint", SB_VERT, "uint", &si, "int", 1) 
+	} else DllCall("ShowScrollBar", "uint", Hwnd, "uint", SB_VERT, "uint", 0)
+
+  ;Scroll window if needed
+	if (left < 0 && right < pw)
+        x := Abs(left) > pw-right ? pw-right : Abs(left) 
+    if (top < 0 && bottom < ph) 
+        y := Abs(top) > ph-bottom ? ph-bottom : Abs(top) 
+    if (x || y)
+        DllCall("ScrollWindow", "uint", Hwnd, "int", x, "int", y, "uint", 0, "uint", 0) 
+}
+
+;=============================================== PRIVATE =====================================================
+Scroller_init(){
 	static WM_VSCROLL=0x115, WM_HSCROLL=0x114, old1, old2
 	
 	if old1 =
@@ -31,64 +77,11 @@ Scroller_Init(Hwnd="", Bar=3){
 		Scroller_UpdateBars(Hwnd, Bar)
 }
 
-/*
- Function:	UpdateBars
-			Updates horizontal and/or vertical scroll bar.	
- 
- Parameters:
-			Hwnd	- Window that contains system created scrollbars.
-			Bars	- 1 to updates only horizontal bar, 2 updates only vertical bar, 3 (default) updates both.
-  */
-Scroller_UpdateBars(Hwnd, Bars=3){
-    static SIF_RANGE=0x1, SIF_PAGE=0x2, SIF_DISABLENOSCROLL=0x8, SB_HORZ=0, SB_VERT=1
-
-	Scroller_getScrollArea(Hwnd, left, top, right, bottom)
-	sWidth := right - left, sHeight := bottom - top
-	WinGetPos,,,pw,ph, ahk_id %Hwnd%
-	VarSetCapacity(SI, 28, 0), NumPut(28, SI)
-	NumPut(SIF_RANGE | SIF_PAGE, SI, 4)
-
-  ; Update horizontal scroll bar. 
-	if Bars in 1,3
-	{
-		NumPut(sWidth, SI, 12)	; nMax 
-		NumPut(pw, SI, 16)		; nPage 
-		DllCall("SetScrollInfo", "uint", Hwnd, "uint", SB_HORZ, "uint", &si, "int", 1) 
-	} else DllCall("ShowScrollBar", "uint", HCtrl, "uint", SB_HORZ, "uint", 0)
-    
-  ; Update vertical scroll bar. 
-   ;NumPut(SIF_RANGE | SIF_PAGE | SIF_DISABLENOSCROLL, SI, 4) ; fMask 
-   	if Bars in 2,3
-	{
-	    NumPut(sHeight, SI, 12) ; nMax 
-		NumPut(ph, SI, 16)		; nPage 
-	    DllCall("SetScrollInfo", "uint", Hwnd, "uint", SB_VERT, "uint", &si, "int", 1) 
-	} else DllCall("ShowScrollBar", "uint", Hwnd, "uint", SB_VERT, "uint", 0)
-
-  ; scroll window if needed
-	if (left < 0 && right < pw) 
-        x := Abs(left) > pw-right ? pw-right : Abs(left) 
-    if (top < 0 && bottom < ph) 
-        y := Abs(top) > ph-bottom ? ph-bottom : Abs(top) 
-    if (x || y)
-        DllCall("ScrollWindow", "uint", Hwnd, "int", x, "int", y, "uint", 0, "uint", 0) 
-}
-
-;=============================================== PRIVATE =====================================================
-
 Scroller_getScrollArea(Hwnd, ByRef left, ByRef top, ByRef right, ByRef bottom) {
-	static WS_HSCROLL=0x100000, WS_VSCROLL=0x200000 , sbs
     left := top := 99999,   right := bottom := 0
-
-	if !sbs		;ScrollBar Size
-		SysGet, sbs, 2
-
 	Win_Get(Hwnd, "NhBxy", th, bx, by)
-
-    WinGet, ctrlList, ControlListHwnd, ahk_id %Hwnd%		;!!! get list of ctrls for this parent only, not its children...
-	WinGet, style, Style, ahk_id %Hwnd%	
-	bHor := (style & WS_HSCROLL) != 0,		bVer := (style & WS_VSCROLL) != 0
-    Loop, Parse, ctrlList, `n
+	children := Win_GetChildren(Hwnd)
+    Loop, Parse, children, `n
     { 
 		ifEqual, A_LoopField,, continue
 		Win_GetRect(A_LoopField, "*xywh", cx, cy, cw, ch)
@@ -99,7 +92,8 @@ Scroller_getScrollArea(Hwnd, ByRef left, ByRef top, ByRef right, ByRef bottom) {
 		ifGreater, cr, %right%,  SetEnv, right, %cr%
 		ifGreater, cb, %bottom%, SetEnv, bottom, %cb%
     }
-	right +=sbs*bVer + 2*bx, bottom += th + sbs*bHor + 2*by
+	right +=2*bx, bottom += th + 2*by
+	m(left, top, right, bottom)
 }
 
 Scroller_onScroll(WParam, LParam, Msg, Hwnd){
@@ -151,3 +145,11 @@ Scroller_onScroll(WParam, LParam, Msg, Hwnd){
     NumPut(new_pos, SI, 20, "int") ; nPos 
     DllCall("SetScrollInfo", "uint", Hwnd, "int", bar, "uint", &si, "int", 1) 
 }
+
+/* Group: About
+	o Version 1.0 by majkinetor.
+	o Original code by Lexikos. See <http://www.autohotkey.com/forum/viewtopic.php?p=177673#177673>.
+	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+ */
+
+#include *i Win.ahk

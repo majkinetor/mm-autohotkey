@@ -240,7 +240,7 @@ Win_GetRect(hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="") {
 
 /*
  Function:	GetChildren
-			Get child windows for a window.
+			Get first level child windows for a window.
  
  Parameters:
 			Hwnd	- Handle of the parent window.
