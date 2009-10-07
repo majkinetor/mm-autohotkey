@@ -28,19 +28,16 @@ _("mo! e d c w")
 	hTab   := Form_Add(hForm, "Panel", "", "", "Align F", "Attach w h")
 	Splitter_Set( hSep, hTab " | " hLog)
 
+	hFont := Font("", "s9, Courier New") 	;create font only once, then use it for every control.
 	loop, parse, ctrls, %A_Space%
 	{		
 		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "Panel " A_LoopField, "w100 h100 style='hidden'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
-		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, MakeOptions(A_LoopField), "Align F", "Attach p", "Cursor HAND", "Tooltip Tooltip for " A_LoopField), ctrl%hCtrl% := A_LoopField
+		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, MakeOptions(A_LoopField), "Align F", "Attach p", "Cursor HAND", "Tooltip Tooltip for " A_LoopField, "Font " hFont), ctrl%hCtrl% := A_LoopField
 		InitControl(A_LoopField, hCtrl), %A_LoopField% := ctrlNo := A_Index
-		if !hFont ;create font only once, then use it for every control.
-			 hFont := Font(hCtrl, "s9, Courier New")
-		else Font(hCtrl, hFont)
 	}	
 	QHTM_AddHtml(hInfo, "<br><h6>Total: " ctrlNo)
 	Form_Show(), OnQHTM("", "", init )
 	SB_SetText("Forms test")
-
 ;	Attach("OnAttach")
 return
 
