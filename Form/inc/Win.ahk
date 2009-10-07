@@ -124,6 +124,8 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
 				rect := "title"
 				VarSetCapacity(TBI, 44, 0), NumPut(44, TBI, 0), DllCall("GetTitleBarInfo", "uint", hwnd, "str", TBI)
 				title_x := NumGet(TBI, 4, "Int"), title_y := NumGet(TBI, 8, "Int"), title_w := NumGet(TBI, 12) - title_x, title_h := NumGet(TBI, 16) - title_y 
+				WinGet, style, style, ahk_id %Hwnd%				
+				title_h :=  style & 0xC00000 ? title_h : 0			  ; if no WS_CAPTION style , set 0 as win sets randoms otherwise...
 				goto Win_Get_Rect
 		Win_Get_B:
 				rect := "border"
@@ -564,13 +566,30 @@ Win_SetIcon( Hwnd, Icon="", Flag=1){
  			Changes the parent window of the specified window.
  
  Parameters:
-			hParent	- Handle to the parent window. If this parameter is 0, the desktop window becomes the new parent window.
-
+			Hwnd	- Handle of the window for which to send parent.
+			HParent	- Handle to the parent window. If this parameter is 0, the desktop window becomes the new parent window.
+			bFixStyle - Set to TRUE to fix WS_CHILD & WS_POPUP styles. SetParent does not modify the WS_CHILD or WS_POPUP window styles of the window whose parent is being changed.
+						If HParent is 0, you should also clear the WS_CHILD bit and set the WS_POPUP style after calling SetParent (and vice-versa).
  Returns:
-			If the function succeeds, the return value is a handle to the previous parent window.
+			If the function succeeds, the return value is a handle to the previous parent window. Otherwise, its 0.
+
+ Remarks:
+			If the window identified by the Hwnd parameter is visible, the system performs the appropriate redrawing and repainting.
+			The function sends WM_CHANGEUISTATE to the parent after succesifull operation uncoditionally.
+			See <http://msdn.microsoft.com/en-us/library/ms633541(VS.85).aspx> for more information.
  */
-Win_SetParent(Hwnd, hParent=0){
-	return DllCall("SetParent", "uint", Hwnd, "uint", hParent)
+Win_SetParent(Hwnd, HParent=0, bFixStyle=false){
+	static WS_POPUP=0x80000000, WS_CHILD=0x40000000, WM_CHANGEUISTATE=0x127, UIS_INITIALIZE=3
+	
+	if (bFixStyle) {
+		s1 := Hwnd ? "+" : "-", s2 := Hwnd ? "-" : "+"
+		WinSet, Style, %s1%%WS_CHILD%, ahk_id %Hwnd%
+		WinSet, Style, %s2%%WS_POPUP%, ahk_id %Hwnd%
+	}
+	r := DllCall("SetParent", "uint", Hwnd, "uint", HParent)
+	ifEqual, r, 0, return 0
+
+	SendMessage, WM_CHANGEUISTATE,UIS_INITIALIZE,,,ahk_id %HParent%
 }
 
 
@@ -706,7 +725,7 @@ Win_Subclass(hCtrl, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.21 by majkinetor.
+	o v1.22 by majkinetor.
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*
