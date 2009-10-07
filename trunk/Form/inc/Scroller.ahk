@@ -11,15 +11,19 @@
  
  Parameters:
 			Hwnd	- Window that contains system created scrollbars.
-			Bars	- 1 to updates only horizontal bar, 2 updates only vertical bar, 3 (default) updates both.
-			MX, MY	- Set here x & y margin of your Gui. By default 0.
+			Bars	- Set to 1 to update only horizontal bar, 2 updates only vertical bar, 3 (default) updates both.
+			MX, MY	- Set here x & y margin of your window. By default 0.
 
  Remarks:			
+			The function will make scrollbars visible only if needed. You don't need to have scroll styles on window prior to calling it.
 			You need to call this function after adding new controls to the GUI and after resizing window.
 			If used with resizable window, its enough to put call to this function in GuiSize routine (this might not work in same advanced
 			GUI creation scenarios). In any case, you need to update scrollbars after adding new controls to the GUI.
 			Scroller replaces message handlers for WM_VSCROLL & WM_HSCROLL messages at the moment which will influence <ScrollBar> control
 			if you have it (or vice-versa).
+
+			You can change the position of the vertical scrollbars by setting WS_EX_LEFTSCROLLBAR=0x4000.
+			For more control over scrollbars you need to use <ScrollBar> control.
   */
 Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
     static SIF_RANGE=0x1, SIF_PAGE=0x2, SIF_DISABLENOSCROLL=0x8, SB_HORZ=0, SB_VERT=1, sbs
@@ -72,9 +76,6 @@ Scroller_init(){
 	
 	if old1 =
 		old1 := OnMessage(WM_VSCROLL, "Scroller_OnScroll"), old2 := OnMessage(WM_HSCROLL, "Scroller_OnScroll")
-
-	if Hwnd != 
-		Scroller_UpdateBars(Hwnd, Bar)
 }
 
 Scroller_getScrollArea(Hwnd, ByRef left, ByRef top, ByRef right, ByRef bottom) {
@@ -93,7 +94,6 @@ Scroller_getScrollArea(Hwnd, ByRef left, ByRef top, ByRef right, ByRef bottom) {
 		ifGreater, cb, %bottom%, SetEnv, bottom, %cb%
     }
 	right +=2*bx, bottom += th + 2*by
-	m(left, top, right, bottom)
 }
 
 Scroller_onScroll(WParam, LParam, Msg, Hwnd){
