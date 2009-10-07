@@ -1,17 +1,16 @@
-_("mo!")
+_("mo! w")
 	Gui, +Resize +LastFound ; WS_VSCROLL | WS_HSCROLL 
 	Gui, Margin, 0, 0
 	hGui := WinExist()
 
-;	hP := Panel_Add(hGui, 20, 20, 221, 400, "resizable", "My Panel")
-	Loop, 15
+	hP := Panel_Add(hGui, 20, 20, 100, 400, "scroll resizable", "My Panel")
+	Loop, 10
 	{
-		Gui, Add, Edit, HWNDhc H100 W200 -vscroll, Edit %A_Index%
-;		Win_SetParent(hc, hP)
+		Gui, Add, Edit, HWNDhc vscroll H100 W200, Edit %A_Index%
+		Win_SetParent(hc, hP)
 	}
 
 	Gui, Show, W500 H500 
-	Scroller_Set(hGui)
 return 
 
 
@@ -19,7 +18,7 @@ GuiClose:
 ExitApp 
 
 GuiSize:
-	Scroller_UpdateBars(hGui)
+	;Scroller_UpdateBars(hGui)
 return
 
 
@@ -34,34 +33,39 @@ Scroller_Set(hParent){
 	OnMessage(WM_HSCROLL, "Scroller_OnScroll")
 }
 
-Scroller_UpdateBars(hParent){
+Scroller_UpdateBars(HParent, Bars=3){
     static SIF_RANGE=0x1, SIF_PAGE=0x2, SIF_DISABLENOSCROLL=0x8, SB_HORZ=0, SB_VERT=1
 
-	Scroller_getScrollArea(hParent, left, top, right, bottom)
+	Scroller_getScrollArea(HParent, left, top, right, bottom)
 	sWidth := right - left, sHeight := bottom - top
 	WinGetPos,,,pw,ph, ahk_id %hParent%
-	
 	VarSetCapacity(si, 28, 0), NumPut(28, si)
 	NumPut(SIF_RANGE | SIF_PAGE, si, 4)
 
   ; Update horizontal scroll bar. 
-    NumPut(sWidth, si, 12)	; nMax 
-    NumPut(pw, si, 16)		; nPage 
-    DllCall("SetScrollInfo", "uint", hParent, "uint", SB_HORZ, "uint", &si, "int", 1) 
+	if Bars in 1,3
+	{
+		NumPut(sWidth, si, 12)	; nMax 
+		NumPut(pw, si, 16)		; nPage 
+		DllCall("SetScrollInfo", "uint", HParent, "uint", SB_HORZ, "uint", &si, "int", 1) 
+	} else DllCall("ShowScrollBar", "uint", HCtrl, "uint", SB_HORZ, "uint", 0)
     
   ; Update vertical scroll bar. 
    ;NumPut(SIF_RANGE | SIF_PAGE | SIF_DISABLENOSCROLL, si, 4) ; fMask 
-    NumPut(sHeight, si, 12) ; nMax 
-    NumPut(ph, si, 16)		; nPage 
-    DllCall("SetScrollInfo", "uint", hParent, "uint", SB_VERT, "uint", &si, "int", 1) 
+   	if Bars in 2,3
+	{
+	    NumPut(sHeight, si, 12) ; nMax 
+		NumPut(ph, si, 16)		; nPage 
+	    DllCall("SetScrollInfo", "uint", HParent, "uint", SB_VERT, "uint", &si, "int", 1) 
+	} else DllCall("ShowScrollBar", "uint", HParent, "uint", SB_VERT, "uint", 0)
 
   ; scroll window if needed
 	if (left < 0 && right < pw) 
         x := Abs(left) > pw-right ? pw-right : Abs(left) 
-    if (Top < 0 && Bottom < ph) 
+    if (top < 0 && bottom < ph) 
         y := Abs(top) > ph-bottom ? ph-bottom : Abs(top) 
-    if (x || y) 
-        DllCall("ScrollWindow", "uint", hParent, "int", x, "int", y, "uint", 0, "uint", 0) 
+    if (x || y)
+        DllCall("ScrollWindow", "uint", HParent, "int", x, "int", y, "uint", 0, "uint", 0) 
 }
 
 Scroller_getScrollArea(hParent, ByRef left, ByRef top, ByRef right, ByRef bottom) {
@@ -72,7 +76,6 @@ Scroller_getScrollArea(hParent, ByRef left, ByRef top, ByRef right, ByRef bottom
 		SysGet, sbs, 2
 
 	Win_Get(hParent, "NhBxy", th, bx, by)
-	ifGreater, th, 100, SetEnv, th, 0
 
     WinGet, ctrlList, ControlListHwnd, ahk_id %hParent%		;!!! get list of ctrls for this parent only, not its children...
 	WinGet, style, Style, ahk_id %hParent%	
@@ -90,6 +93,7 @@ Scroller_getScrollArea(hParent, ByRef left, ByRef top, ByRef right, ByRef bottom
 		ifGreater, cb, %bottom%, SetEnv, bottom, %cb%
     }
 	left-=bx, right +=bx+sbs*bVer, top -= by, bottom += by + th + sbs*bHor
+;	right +=sbs*bVer + 2*bx, bottom += th + sbs*bHor + 2*by
 }
 
 Scroller_onScroll(WParam, LParam, Msg, Hwnd){
@@ -148,3 +152,4 @@ Scroller_onScroll(WParam, LParam, Msg, Hwnd){
 #include Panel.ahk
 #include ..\inc\Attach.ahk
 #include ..\inc\Align.ahk
+#include ..\inc\Win.ahk
