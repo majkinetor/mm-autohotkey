@@ -1,4 +1,4 @@
-/*
+/*	
  Function:	Add
 			Adds new panel.
  
@@ -9,7 +9,7 @@
 			Text		- Text to display.
 
  Styles:
-			HIDDEN, SIMPLE, VCENTER, HCENTER, CENTER, RIGHT, SUNKEN, BLACKFRAME, BLACKRECT, GRAYFRAME, GRAYRECT, WHITEFRAME, WHITERECT.
+			HIDDEN DISSABLED VSCROLL HSCROLL SCROLL RESIZABLE BORDER FRAME SUNKEN STATIC.
 			
  Returns:
 		    Handle of the control or error messge if control couldn't be created.
@@ -30,60 +30,114 @@
  >			redirect = "32,78,273,276,277"  ;WM_SETCURSOR=32, WM_COMMAND=78, WM_NOTIFY=273, WM_HSCROLL=276, WM_VSCROLL=277
  */
 Panel_Add(HParent, X, Y, W, H, Style="", Text="") {
-	static WS_VISIBLE=0x10000000, WS_CHILD=0x40000000, WS_CLIPCHILDREN=0x2000000
-		   ,PS_HIDDEN=0, PS_VSCROLL=0x200000, PS_HSCROLL=0x100000, PS_SCROLL=0x300000, PS_DISABLED=0x8000000, PS_BORDER=0x800000, PS_TITLE=0x400000, PS_SUNKEN=0x200
-		   ,init=0
+	static WS_CHILD=0x40000000, WS_CLIPCHILDREN=0x2000000,init=0
 
 	if !init
 		if !(init := Panel_registerClass())
 			return A_ThisFunc "> Failed to register class."
-
-	hStyle := InStr(" " Style " ", " hidden ") ? 0 : WS_VISIBLE
-	hExStyle := !InStr(" " Style " ", " sunken ") ? 0 : PS_SUNKEN
-	loop, parse, Style, %A_Tab%%A_Space%, %A_Tab%%A_Space%
-	{
-		IfEqual, A_LoopField, , continue
-		if A_LoopField is integer
-			 hStyle |= A_LoopField
-		else if (PS_%A_LOOPFIELD%)
-			hStyle |= PS_%A_LOOPFIELD%
-		else hExStyle |= 
-	}
-
+	
 	hCtrl := DllCall("CreateWindowEx" 
-	  , "Uint",	  hExStyle 
+	  , "Uint",	  0
 	  , "str",    "Panel"	
 	  , "str",    Text
-	  , "Uint",   WS_CHILD	| WS_CLIPCHILDREN | hStyle
+	  , "Uint",   WS_CHILD	| WS_CLIPCHILDREN
 	  , "int",    X, "int", Y, "int", W, "int",H
 	  , "Uint",   HParent
 	  , "Uint",   0, "Uint",0, "Uint",0, "Uint")
+
+	Panel_SetStyle(hCtrl, Style)
 
 	IfEqual, hCtrl,0,return A_ThisFunc "> Failed to create control."
 	return hCtrl
 } 
 
 Panel_wndProc(Hwnd, UMsg, WParam, LParam) { 
-	static WM_SIZE:=5, GWL_ROOT := 2, WM_SHOWWINDOW=0x18, anc, attach, init		
-	static redirect = "32,78,273,276,277"  ;WM_SETCURSOR=32, WM_COMMAND=78, WM_NOTIFY=273, WM_HSCROLL=276, WM_VSCROLL=277
+	static WM_SIZE:=5, WM_SHOWWINDOW=24, WM_CHANGEUISTATE=295, GWL_ROOT=2, GWL_WNDPROC=-4, GWL_USERDATA=-2, anc, attach		
+	static redirect = "78,273"  ;WM_SETCURSOR=32 !!!, WM_COMMAND=78, WM_NOTIFY=273, WM_HSCROLL=276, WM_VSCROLL=277
 
-	if !init {
-		ifEqual, attach, %A_Space%, return
-		ifEqual, attach,, SetEnv, attach, % IsFunc("Attach_") ? "Attach_" : A_Space
-		init := true
+	critical 100
+
+	if !anc {
+		attach := "Attach_", scroller_onscroll := "Scroller_onScroll", scroller_updatebars := "Scroller_UpdateBars"
+		rootProc := DllCall("GetWindowLong", "uint", DllCall("GetAncestor", "uint", Hwnd, "uint", GWL_ROOT), "uint", GWL_WNDPROC)
+		adrGetWindowLong := DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), "str", "GetWindowLongA")
 	}
 
 	if UMsg in %redirect%
-		ifEqual, anc,,SetEnv, anc, % DllCall("GetAncestor", "uint", Hwnd, "uint", GWL_ROOT)
-		else return DllCall("SendMessage", "uint", anc, "uint", UMsg, "uint", WParam, "uint", LParam)
+		return DllCall(rootProc, "uint", Hwnd, "uint", UMsg, "uint", WParam, "uint", LParam)
 	
-	if (UMsg = WM_SIZE) 
+	if (UMsg = WM_SIZE) {
 		%attach%(Wparam, LParam, UMsg, Hwnd)
+		bar := DllCall(adrGetWindowLong, "uint", Hwnd, "int", -21) & 3	
+		if (bar)
+			%Scroller_UpdateBars%(Hwnd, bar)
+		return 
+	}
+		
+	if (UMsg = WM_CHANGEUISTATE)		;Panel sends this message to itself when it sets scrollbars style.
+		if (bar := DllCall(adrGetWindowLong, "uint", Hwnd, "int", -21)) & 3
+			%Scroller_UpdateBars%(Hwnd, bar)
 	
 	if (Umsg = WM_SHOWWINDOW)
 		%attach%(Hwnd, WParam ? "+" : "-", "", "")
+	
+	if UMsg in 276,277		
+		ifNotEqual, LParam, 0, return DllCall(rootProc, "uint", Hwnd, "uint", UMsg, "uint", WParam, "uint", LParam)	 ;scrollbar control.
+		else return %scroller_onScroll%(Wparam, LParam, UMsg, Hwnd)
+	
+	return DllCall("DefWindowProc", "uint", Hwnd, "uint", Umsg, "uint", WParam, "uint", LParam)
+}
+/*
+ Function:	SetStyle
+			Set the panel style. 
+ 
+ Parameters:
+			Hwnd	- Handle of the parent. If omitted, function returns hStyle in p3 and hExStyle in p4.
+			Style	- White space separated list of styles to set. HIDDEN DISABLED VSCROLL HSCROLL SCROLL RESIZABLE BORDER FRAME SUNKEN STATIC.
+					  Any integer is accepted as style. Invalid styles are skipped.
+			p3, p4  - If Hwnd is omitted, result is returned in this output variables.
 
-	return DllCall("DefWindowProc", "uint", hwnd, "uint", umsg, "uint", wParam, "uint", lParam)
+ Remarks:
+			Scroll styles require <Scroller> module.
+			If you are adding big number of controls into the scrollable Panel, you can greatly improve performance by setting those flags after
+			all control are added. Otherwise, after each new control is added to the Panel it will readjust the scrollbars.
+			Panel will update scrollbars if you use this function to set any of the scroll styles and after resizing. If you don't have any of that,
+			you need to call Scroller_UpdateBars to set up scrollbars initially.
+
+			You can't use border and scroll styles together. You can't use 2 scroll types together. The combination of "vscroll hscroll" should be
+			specified just as "scroll".
+ */
+Panel_SetStyle(Hwnd, Style, ByRef hStyle="", ByRef hExStyle="") {
+	static WS_VISIBLE=0x10000000, PS_HIDDEN=0, PS_DISABLED=0x8000000, GWL_USERDATA=-21
+		   ,PS_BORDER=0x800000, PS_RESIZABLE=0x40000, PS_CAPTION=0xC00000, PS_CLOSE=0x80000, PS_MAX=0x10000, PS_MIN=0x20000, PS_TOOL=0x80
+		   ,PSEX_FRAME=1, PSEX_SUNKEN=0x200, PSEX_STATIC = 0x20000, PS_SCROLL=0  ;PS_SCROLL=0x300000 PS_VSCROLL=0x200000, PS_HSCROLL=0x100000
+
+	pStyle := " " Style " "
+	hStyle := InStr(pStyle, " hidden ") ? 0 : WS_VISIBLE,  hExStyle := 0
+	loop, parse, Style, %A_Tab%%A_Space%
+		IfEqual, A_LoopField, , continue
+		else if A_LoopField is integer
+			 hStyle |= A_LoopField
+		else if (v := PS_%A_LOOPFIELD%)
+			hStyle |= v
+		else if (v := PSEX_%A_LOOPFIELD%)
+			hExStyle |= v
+		else continue
+
+	if (Hwnd) {
+		WinSet, Style, +%hStyle%, ahk_id %Hwnd%
+		WinSet, ExStyle, +%hExStyle%, ahk_id %Hwnd%
+	
+	;set custom styles
+		if j := InStr(pStyle, "scroll")
+		{
+			c := SubStr(pStyle, j-1, 1)
+			ifEqual, c, h, SetEnv, r, % DllCall("SetWindowLong", "uint", Hwnd, "int", GWL_USERDATA, "Uint", 1)
+			ifEqual, c, v, SetEnv, r, % DllCall("SetWindowLong", "uint", Hwnd, "int", GWL_USERDATA, "Uint", 2)
+			ifEqual, c, %A_Space%, SetEnv, r, % DllCall("SetWindowLong", "uint", Hwnd, "int", GWL_USERDATA, "Uint", 3)
+			SendMessage, 0x127,UIS_INITIALIZE,,,ahk_id %Hwnd%	; WM_CHANGEUISTATE=, UIS_INITIALIZE=3
+		}
+	}
 }
 
 Panel_registerClass() {
@@ -94,8 +148,9 @@ Panel_registerClass() {
 	procAdr := RegisterCallback("Panel_WndProc")
 
    VarSetCapacity(WC, 40, 0) 
-    , NumPut(3, WC, 0)							
+    , NumPut(CS_REDRAW | CS_PARENTDC, WC, 0)							
     , NumPut(procAdr, WC, 4) 
+;    , NumPut(1, WC, 12)				;cbWndExtra
     , NumPut(cursor, WC, 24)		;curcor
     , NumPut(COLOR_WINDOW, WC, 28)	;background 
     , NumPut(&clsName, WC, 36)		;class 
@@ -106,11 +161,11 @@ Panel_registerClass() {
 Panel_add2Form(hParent, Txt, Opt){
 	static parse = "Form_Parse"
 	%parse%(Opt, "x# y# w# h# style", x, y, w, h, style)
-	hCtrl := Panel_Add(hParent, x, y, w, h, style, Txt)	
+	hCtrl := Panel_Add(hParent, x, y, w, h, style, Txt)
 	return hCtrl
 }
 
 /* Group: About
-	o Ver 0.1 by majkinetor. 
+	o Ver 0.2 by majkinetor. 
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
 */
