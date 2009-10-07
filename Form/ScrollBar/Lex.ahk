@@ -92,8 +92,8 @@ Scroller_getScrollArea(hParent, ByRef left, ByRef top, ByRef right, ByRef bottom
 		ifGreater, cr, %right%,  SetEnv, right, %cr%
 		ifGreater, cb, %bottom%, SetEnv, bottom, %cb%
     }
-	left-=bx, right +=bx+sbs*bVer, top -= by, bottom += by + th + sbs*bHor
-;	right +=sbs*bVer + 2*bx, bottom += th + sbs*bHor + 2*by
+;	left-=bx, right +=bx+sbs*bVer, top -= by, bottom += by + th + sbs*bHor
+	right +=sbs*bVer + 2*bx, bottom += th + sbs*bHor + 2*by
 }
 
 Scroller_onScroll(WParam, LParam, Msg, Hwnd){
