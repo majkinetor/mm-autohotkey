@@ -9,7 +9,7 @@ _("mm! d e w")
 
 	hPanel2	:=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align F", "Attach p")
 	
-	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "hidden",		"Align F,," hPanel2, "Attach p -")
+	hPanel3 :=  Form_Add(hForm1,  "Panel",   "",	  "style=hidden",		"Align F,," hPanel2, "Attach p -")
 	
 	hLink	:=  Form_Add(hPanel3, "HLink",	"Click 'here':www.Google.com to go to Google", "", "Align B", "Attach y")
 	hToolbar:=  Form_Add(hPanel3, "Toolbar", "new, 7,`nopen, 8`nsave, 9, disabled`n-`nstate, 11, checked,check", "style='FLAT TOOLTIPS' gOnToolbar")	
