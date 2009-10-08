@@ -6,6 +6,17 @@
  */
 
 /*
+ Function:	Init
+			Initialization function.
+ */
+Scroller_Init(){
+	static WM_VSCROLL=0x115, WM_HSCROLL=0x114, old1, old2
+	
+	if old1 =
+		old1 := OnMessage(WM_VSCROLL, "Scroller_OnScroll"), old2 := OnMessage(WM_HSCROLL, "Scroller_OnScroll")
+}
+
+/*
  Function:	UpdateBars
 			Updates horizontal and/or vertical scroll bar.	
  
@@ -29,25 +40,22 @@ Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
     static SIF_RANGE=0x1, SIF_PAGE=0x2, SIF_DISABLENOSCROLL=0x8, SB_HORZ=0, SB_VERT=1, sbs
 
 	if !sbs		;ScrollBar Size
-	{
-		Scroller_init()
 		SysGet, sbs, 2
-	}
 
 	Scroller_getScrollArea(Hwnd, left, top, right, bottom)
 	sWidth := right - left + MX, sHeight := bottom - top + MY
 
+
   ;Adjust scroll area to take into account scrollbars.
 	WinGetPos,,,pw,ph, ahk_id %Hwnd%
 	sWidth += (sHeight > ph) ? sbs : 0,  sHeight += (sWidth > pw) ? sbs : 0
-
 	VarSetCapacity(SI, 28, 0), NumPut(28, SI)
 	NumPut(SIF_RANGE | SIF_PAGE, SI, 4)
 
   ;Update horizontal scroll bar. 
 	if Bars in 1,3
 	{
-		NumPut(sWidth, SI, 12)	; nMax 
+		NumPut(sWidth-1, SI, 12)	; Add -1 since if sWidth=pw scrollbar will still be visible.
 		NumPut(pw, SI, 16)		; nPage 
 		DllCall("SetScrollInfo", "uint", Hwnd, "uint", SB_HORZ, "uint", &si, "int", 1)
 	} else DllCall("ShowScrollBar", "uint", HCtrl, "uint", SB_HORZ, "uint", 0)
@@ -56,7 +64,7 @@ Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
     ;NumPut(SIF_RANGE | SIF_PAGE | SIF_DISABLENOSCROLL, SI, 4) ; fMask 
    	if Bars in 2,3
 	{
-	    NumPut(sHeight, SI, 12) ; nMax 
+	    NumPut(sHeight-1, SI, 12) ; nMax 
 		NumPut(ph, SI, 16)		; nPage 
 	    DllCall("SetScrollInfo", "uint", Hwnd, "uint", SB_VERT, "uint", &si, "int", 1) 
 	} else DllCall("ShowScrollBar", "uint", Hwnd, "uint", SB_VERT, "uint", 0)
@@ -71,13 +79,6 @@ Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
 }
 
 ;=============================================== PRIVATE =====================================================
-Scroller_init(){
-	static WM_VSCROLL=0x115, WM_HSCROLL=0x114, old1, old2
-	
-	if old1 =
-		old1 := OnMessage(WM_VSCROLL, "Scroller_OnScroll"), old2 := OnMessage(WM_HSCROLL, "Scroller_OnScroll")
-}
-
 Scroller_getScrollArea(Hwnd, ByRef left, ByRef top, ByRef right, ByRef bottom) {
     left := top := 99999,   right := bottom := 0
 	Win_Get(Hwnd, "NhBxy", th, bx, by)

@@ -5,7 +5,7 @@ _("mo! e d c w")
 
 	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter ScrollBar Property
 	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress GroupBox StatusBar Tab2 UpDown		;updown may somehow make problem for other controls. in this setup if you put tab2 after updown it will work ok, otherwise it will initially apear on wrong position. There were other kinds of problems all related to UpDo
-	init    = HiEdit
+	init    = Button
 	;===============================================
 	
 	ctrls := custom " " ahk
@@ -31,16 +31,25 @@ _("mo! e d c w")
 	hFont := Font("", "s9, Courier New") 	;create font only once, then use it for every control.
 	loop, parse, ctrls, %A_Space%
 	{		
-		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "Panel " A_LoopField, "w100 h100 style='hidden'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
-		hCtrl := Form_Add(hPanel%A_Index%, A_LoopField,	A_LoopField, MakeOptions(A_LoopField), "Align F", "Attach p", "Cursor HAND", "Tooltip Tooltip for " A_LoopField, "Font " hFont), ctrl%hCtrl% := A_LoopField
-		InitControl(A_LoopField, hCtrl), %A_LoopField% := ctrlNo := A_Index
+		lf := A_LoopField
+		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "Panel " lf, "w100 h100 style='hidden'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
+		hCtrl := Form_Add(hPanel%A_Index%, lf,	lf, MakeOptions(lf), "Align F", "Attach p", "Cursor HAND", "Tooltip Tooltip for " lf, "Font " hFont), ctrl%hCtrl% := A_LoopField
+		InitControl(lf, hCtrl), %lf% := ctrlNo := A_Index, h%lf% := hCtrl
 	}	
 	QHTM_AddHtml(hInfo, "<br><h6>Total: " ctrlNo)
 	Form_Show(), OnQHTM("", "", init )
 	SB_SetText("Forms test")
+
+;
+	Panel_SetStyle(hTab, "scroll")
+	Scroller_UpdateBars(hTab)
+
 ;	Attach("OnAttach")
 return
 
+F4::	
+	Scroller_UpdateBars(hTab)
+return
 
 OnAttach(Hwnd) {
 	global

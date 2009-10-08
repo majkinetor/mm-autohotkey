@@ -52,31 +52,38 @@ Panel_Add(HParent, X, Y, W, H, Style="", Text="") {
 } 
 
 Panel_wndProc(Hwnd, UMsg, WParam, LParam) { 
-	static WM_SIZE:=5, WM_SHOWWINDOW=24, WM_CHANGEUISTATE=295, GWL_ROOT=2, GWL_WNDPROC=-4, GWL_USERDATA=-2, anc, attach		
-	static redirect = "78,273"  ;WM_SETCURSOR=32 !!!, WM_COMMAND=78, WM_NOTIFY=273, WM_HSCROLL=276, WM_VSCROLL=277
+	global hButton
+	static	WM_SIZE:=5, WM_SHOWWINDOW=24, WM_CHANGEUISTATE=295, GWL_ROOT=2, GWL_WNDPROC=-4, GWL_USERDATA=-2
+			,rootProc, attach, scroller_updatebars, scroller_onscroll, adrGetWindowLong, adrDefWindowProc, hRoot
+			,redirect="78,273"  ;WM_SETCURSOR=32 !!!, WM_COMMAND=78, WM_NOTIFY=273, WM_HSCROLL=276, WM_VSCROLL=277
 
 	critical 100
-
-	if !anc {
-		attach := "Attach_", scroller_onscroll := "Scroller_onScroll", scroller_updatebars := "Scroller_UpdateBars"
-		rootProc := DllCall("GetWindowLong", "uint", DllCall("GetAncestor", "uint", Hwnd, "uint", GWL_ROOT), "uint", GWL_WNDPROC)
+	if !rootProc {
+		rootProc := DllCall("GetWindowLong", "uint", hRoot := DllCall("GetAncestor", "uint", Hwnd, "uint", GWL_ROOT), "uint", GWL_WNDPROC)
 		adrGetWindowLong := DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), "str", "GetWindowLongA")
+		adrDefWindowProc := DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), "str", "DefWindowProcA")
+		attach := "Attach_", scroller_onscroll := "Scroller_onScroll", scroller_updatebars := "Scroller_UpdateBars"
 	}
 
 	if UMsg in %redirect%
-		return DllCall(rootProc, "uint", Hwnd, "uint", UMsg, "uint", WParam, "uint", LParam)
-	
+	{
+;		return DllCall(rootProc, "uint", Hwnd, "uint", UMsg, "uint", WParam, "uint", LParam)		;redirection type 1 - transfers hwnd too, doesn't work with Button for example.
+;		return DllCall("SendMessage", "uint", hRoot, "uint", UMsg, "uint", WParam, "uint", LParam)  ;redirection type 2	- use root hwnd
+		SendMessage, Umsg, Wparam, Lparam, , ahk_id %hRoot%
+		return ErrorLevel
+	}
+
 	if (UMsg = WM_SIZE) {
 		%attach%(Wparam, LParam, UMsg, Hwnd)
 		bar := DllCall(adrGetWindowLong, "uint", Hwnd, "int", -21) & 3	
 		if (bar)
-			%Scroller_UpdateBars%(Hwnd, bar)
+			%scroller_UpdateBars%(Hwnd, bar)
 		return 
 	}
 		
 	if (UMsg = WM_CHANGEUISTATE)		;Panel sends this message to itself when it sets scrollbars style.
 		if (bar := DllCall(adrGetWindowLong, "uint", Hwnd, "int", -21)) & 3
-			return %Scroller_UpdateBars%(Hwnd, bar)
+			return %scroller_UpdateBars%(Hwnd, bar)
 	
 	if (Umsg = WM_SHOWWINDOW)
 		%attach%(Hwnd, WParam ? "+" : "-", "", "")
@@ -85,7 +92,7 @@ Panel_wndProc(Hwnd, UMsg, WParam, LParam) {
 		ifNotEqual, LParam, 0, return DllCall(rootProc, "uint", Hwnd, "uint", UMsg, "uint", WParam, "uint", LParam)	 ;scrollbar control.
 		else return %scroller_onScroll%(Wparam, LParam, UMsg, Hwnd)
 	
-	return DllCall("DefWindowProc", "uint", Hwnd, "uint", Umsg, "uint", WParam, "uint", LParam)
+	return DllCall(adrDefWindowProc, "uint", Hwnd, "uint", Umsg, "uint", WParam, "uint", LParam)
 }
 /*
  Function:	SetStyle
