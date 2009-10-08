@@ -876,7 +876,8 @@ HE_SetCurrentFile(hEdit, idx){
 			Handler	- Function that handles events. If empty, any existing handler will be removed.
 			Events	- White space separated list of events to monitor (by default "selchange").
 
- Handler:
+ Handler:	
+			Hwnd		- Handle of the HiEdit that sends notification.
 			Event		- Specifies event that occurred. Event must be registered to be able to monitor them. Events "tabmclick" and "filechange" are registered automatically.
 			EventInfo	- Specifies event info.
 
