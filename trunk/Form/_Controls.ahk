@@ -40,10 +40,6 @@ _("mo! e d c w")
 	Form_Show(), OnQHTM("", "", init )
 	SB_SetText("Forms test")
 
-;
-	Panel_SetStyle(hTab, "scroll")
-	Scroller_UpdateBars(hTab)
-
 ;	Attach("OnAttach")
 return
 
