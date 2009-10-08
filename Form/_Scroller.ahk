@@ -14,6 +14,7 @@ _("mo!")
 	Panel_SetStyle(hPanel, "scroll")
 	Scroller_UpdateBars(hP)
 
+	Scroller_init()	
 	Form_Show()
 return 
 

@@ -3,11 +3,11 @@ _("mo e w")
 
 	;=======================================================
 	
-	siblings  = 5		;desn't make a difference, except for update speed
+	siblings  = 15		;desn't make a difference, except for update speed
 	nestlevel = 5		;makes the difference; tests:  vista(32b, quad)=15, xppro(64b, quad)=5
 
 	;=======================================================
-	hForm1	:=	Form_New("w500 h900 Resize")
+	hForm1	:=	Form_New("w500 h900")
 	loop, %siblings%
 	{
 		hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "",			"Align T, 300", "Attach p")
@@ -19,7 +19,8 @@ _("mo e w")
 		hCal1	:=  Form_Add(hPanel,  "ListView", "col",  "gOnControl",	"Align F",		"Attach p r2")
 		LV_Add("",A_TickCount)
 	}
-
+	Scroller_init()
+	Scroller_UpdateBars(hForm1)
 	Form_Show()
 return
 
