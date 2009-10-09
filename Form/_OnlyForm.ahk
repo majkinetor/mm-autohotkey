@@ -1,5 +1,5 @@
 _()
-	hForm1	:=	Form_New("w500 h440  Resize T Font='s8, Courier New' -Caption +ToolWindow")
+	hForm1	:=	Form_New("w500 h440 Resize T Font='s8, Courier New' -Caption +ToolWindow")
 
 	Form_Add(hForm1, "Picture", "res\test.bmp", "x5 y65 GuiMove")
 	Form_Add(hForm1, "Edit", "ESC to hide F1 to show. Drag picture to move.", "-vscroll x5 y5 w200 r3 0x8000")
