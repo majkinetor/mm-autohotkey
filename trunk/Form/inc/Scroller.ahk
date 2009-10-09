@@ -7,7 +7,7 @@
 
 /*
  Function:	Init
-			Initialization function.
+			Initialization function. Must not be used with scrollable <Panel>.
  */
 Scroller_Init(){
 	static WM_VSCROLL=0x115, WM_HSCROLL=0x114, old1, old2
@@ -28,13 +28,18 @@ Scroller_Init(){
  Remarks:			
 			The function will make scrollbars visible only if needed. You don't need to have scroll styles on window prior to calling it.
 			You need to call this function after adding new controls to the GUI and after resizing window.
-			If used with resizable window, its enough to put call to this function in GuiSize routine (this might not work in same advanced
-			GUI creation scenarios). In any case, you need to update scrollbars after adding new controls to the GUI.
+			If used with resizable window, its enough to put call to this function in GuiSize routine (this might not work in same cases
+			of GUI creation). In any case, you need to update scrollbars after adding new controls to the GUI.
 			Scroller replaces message handlers for WM_VSCROLL & WM_HSCROLL messages at the moment which will influence <ScrollBar> control
 			if you have it (or vice-versa).
 
 			You can change the position of the vertical scrollbars by setting WS_EX_LEFTSCROLLBAR=0x4000.
 			For more control over scrollbars you need to use <ScrollBar> control.
+
+			If you use <Attach> function, you may experience some miscalculation of scrollable area (not happening if <Panel> is the host).
+			This is due to the fact that attached controls may be resized as a consequence of window resizing (WM_SIZE message is sent 
+			scrollbars are added and it will trigger Attach handler) and module doesn't take that change into account. 
+			You can try to call this function 3 times in a row to fix the problem.
   */
 Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
     static SIF_RANGE=0x1, SIF_PAGE=0x2, SIF_DISABLENOSCROLL=0x8, SB_HORZ=0, SB_VERT=1, sbs
@@ -55,8 +60,8 @@ Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
   ;Update horizontal scroll bar. 
 	if Bars in 1,3
 	{
-		NumPut(sWidth-1, SI, 12)	; Add -1 since if sWidth=pw scrollbar will still be visible.
-		NumPut(pw, SI, 16)		; nPage 
+		NumPut(sWidth-1, SI, 12) ; Add -1 since if sWidth=pw scrollbar will still be visible.
+		NumPut(pw, SI, 16)		 ; nPage 
 		DllCall("SetScrollInfo", "uint", Hwnd, "uint", SB_HORZ, "uint", &si, "int", 1)
 	} else DllCall("ShowScrollBar", "uint", HCtrl, "uint", SB_HORZ, "uint", 0)
 
@@ -95,7 +100,6 @@ Scroller_getScrollArea(Hwnd, ByRef left, ByRef top, ByRef right, ByRef bottom) {
 		ifGreater, cb, %bottom%, SetEnv, bottom, %cb%
     }
 	right +=2*bx, bottom += th + 2*by
-	m(left, top, right, bottom)
 }
 
 Scroller_onScroll(WParam, LParam, Msg, Hwnd){
