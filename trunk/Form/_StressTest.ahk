@@ -3,15 +3,15 @@ _("mo! e w")
 
 	;=======================================================
 	
-	siblings  = 100		;desn't make a difference, except for update speed
-	nestlevel = 5		;makes the difference; tests:  vista(32b, quad)=15, xppro(64b, quad)=5
+	siblings  = 100		;desn't make a difference.
+	depthlevel = 5		;makes the difference; tests:  vista(32b, quad)=15, xppro(64b, quad)=5
 
 	;=======================================================
 	hForm1	:=	Form_New("w500 h900")
 	loop, %siblings%
 	{
 		hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "",		"Align T, 300", "Attach p")
-		loop, %nestlevel%	
+		loop, %depthlevel%	
 			hPanel	 :=	Form_Add(hPanel,  "Panel",	 "",	  "",	"Align F", "Attach p r2")
 
 		hButton1 :=	Form_Add(hPanel,  "Button",  A_Index,	  "",	"Align T, 50",  "Attach p r2", "Cursor hand", "Tooltip I have hand cursor")
