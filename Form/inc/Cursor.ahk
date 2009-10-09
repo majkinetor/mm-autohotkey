@@ -14,7 +14,7 @@
       ibeam        - I-beam.
       icon         - Obsolete for applications marked version 4.0 or later. 
       no           - Slashed circle.
-      size         - Obsolete for applications marked version 4.0 or later. Use IDC_SIZEALL.
+      size         - Obsolete for applications marked version 4.0 or later. Use SIZEALL.
       sizeall      - Four-pointed arrow pointing north, south, east, and west.
       sizenesw     - Double-pointed arrow pointing northeast and southwest.
       sizens       - Double-pointed arrow pointing north and south.
