@@ -1,3 +1,7 @@
+/* Title:	Panel
+			Control container.
+*/
+
 /*	
  Function:	Add
 			Adds new panel.

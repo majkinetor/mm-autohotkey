@@ -112,6 +112,28 @@ Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
 	return hCtrl
 }
 
+/*  
+ Function:	AutoSize
+ 			Resize the window so all controls fit. 
+
+ Dependencies:
+			Win <1.22>
+ */
+Form_AutoSize( Hwnd ) {
+    width := height := 0
+	Win_Get(Hwnd, "NhBxy", th, bx, by)
+	children := Win_GetChildren(Hwnd)
+    Loop, Parse, children, `n
+    { 
+		ifEqual, A_LoopField,, continue
+		Win_GetRect(A_LoopField, "*xywh", cx, cy, cw, ch),   w := cx+cw,   h := cy+ch
+		ifGreater, w, %width%,  SetEnv, width, %w%
+		ifGreater, h, %height%, SetEnv, height, %h%
+    }
+	width +=2*bx, height += th + 2*by
+	Win_Move(Hwnd, "", "", width, height)
+}
+
 Form_Close( Name ) {
 	local g
 	g := "Form_" Name, g := %g%
@@ -141,7 +163,7 @@ Form_Close( Name ) {
 Form_New(Options="") {
 	static no=1
 
-	Form_Parse(Options, "x# y# w# h# a# c* Font Name t?", x, y, w, h, a, c, font, name, t, extra)
+	Form_Parse(Options, "x# y# w# h# a# c* Font Label* t?", x, y, w, h, a, c, font, name, t, extra)
 
 	ifEqual, name,,SetEnv, Name, % "Form" no++
 	pos := (x!="" ? " x" x : "") (y!="" ? " y" y : "") (w!="" ? " w" w : "") (h!="" ? " h" h : "")
@@ -158,9 +180,8 @@ Form_New(Options="") {
 	if (t) {
 		Gui, Color, 12345
 		WinSet, TransColor, 12345
-		w1 := w-5, h1 := h-5
-		WinSet, Region, 5-5 w%w1% h%h1%	;remove border on some systems...
-		Gui, -Resize
+		;w1 := w-5, h1 := h-5
+		;WinSet, Region, 5-5 w%w1% h%h1%	;remove border on some systems...
 	}
 		
 	if (font != "") {
