@@ -95,6 +95,7 @@ Scroller_getScrollArea(Hwnd, ByRef left, ByRef top, ByRef right, ByRef bottom) {
 		ifGreater, cb, %bottom%, SetEnv, bottom, %cb%
     }
 	right +=2*bx, bottom += th + 2*by
+	m(left, top, right, bottom)
 }
 
 Scroller_onScroll(WParam, LParam, Msg, Hwnd){
