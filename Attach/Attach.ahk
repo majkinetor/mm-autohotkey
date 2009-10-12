@@ -92,7 +92,7 @@
 	(end code)
 
 	About:
-			o 1.04 by majkinetor
+			o 1.05 by majkinetor
 			o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
 Attach(hCtrl="", aDef="") {
@@ -101,9 +101,11 @@ Attach(hCtrl="", aDef="") {
 
 Attach_(hCtrl, aDef, Msg, hParent){
 	static
-	local s1,s2, enable, reset
+	local s1,s2, enable, reset, oldCritical
 
+	oldCritical := A_IsCritical
 	critical, 100
+
 
 	if (aDef = "") {							;Reset if integer, Handler if string
 		if IsFunc(hCtrl)
@@ -127,8 +129,8 @@ Attach_(hCtrl, aDef, Msg, hParent){
 
 	if (hParent = "")  {						;Initialize controls 
 		if !adrSetWindowPos
-			adrSetWindowPos		:= DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "SetWindowPos")
-			,adrWindowInfo		:= DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "GetWindowInfo")
+			adrSetWindowPos		:= DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), "str", "SetWindowPos")
+			,adrWindowInfo		:= DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), "str", "GetWindowInfo")
 			,OnMessage(5, A_ThisFunc),	VarSetCapacity(B, 60), NumPut(60, B), adrB := &B
 
 		hGui := hParent := DllCall("GetParent", "uint", hCtrl, "Uint") 
@@ -187,11 +189,11 @@ Attach_(hCtrl, aDef, Msg, hParent){
 			else c%z1% := z3 + z2*(z1="x" || z1="w" ?  %hParent%_pw-s1 : %hParent%_ph-s2), 	u%z1% := true
 		}
 		flag := 4 | (r=1 ? 0x100 : 0) | (uw OR uh ? 0 : 1) | (ux OR uy ? 0 : 2)			; nozorder=4 nocopybits=0x100 SWP_NOSIZE=1 SWP_NOMOVE=2
-		m(hParent, %hParent%a, hCtrl, %hCTRL%)
+		;m(hParent, %hParent%a, hCtrl, %hCTRL%)
 		DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag)
 		r+0=2 ? Attach_redrawDelayed(hCtrl) : 
 	}
-
+	critical %oldCritical%
 	return Handler != "" ? %Handler%(hParent) : ""
 
  Attach_GetPos:									;hParent & hCtrl must be set up at this point
