@@ -1,15 +1,14 @@
-_()
+_("mo")
 #SingleInstance, force
 #MaxThreads, 255		;Required for this sample with cursor/tooltip extensions.
 #NoEnv
 
 
-	n := 1				;create 28 * 2^n controls
+	n := 5				;create 28 * 2**n controls
 
 	;===============
 	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter ScrollBar Property
 	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress Tab2 GroupBox		;updown may somehow make problem for other controls. in this setup if you put tab2 after updown it will work ok, otherwise it will initially apear on wrong position. There were other kinds of problems all related to UpDo
-	init    = HiEdit
 	
 	ctrls := custom " " ahk
 	loop, %n%
@@ -17,8 +16,6 @@ _()
 	
 	SetWorkingDir, inc		;required to load some dll's that are put there
 	hForm  := Form_New("w700 h620 Resize")
-
-	htmlCtrls := RegExReplace(ctrls, "\w+", "<a href=$0 id=$0>$0</a>&nbsp;&nbsp;")
 
 	infoText=
 	(LTrim Join
@@ -34,27 +31,28 @@ _()
 
 	hFont := Font("", "s9, Courier New") 	;create font only once, then use it for every control.
 	m := 28*(2**n)
-
 	Progress, R0-%m%, creating controls
 	loop, parse, ctrls, %A_Space%
 	{		
 		lf := A_LoopField
-		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "Panel " lf, "w100 h100 style='hidden'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
-		hCtrl := Form_Add(hPanel%A_Index%, lf,	lf, MakeOptions(lf), "Align F", "Attach p r2", "Cursor HAND", "Tooltip Tooltip for " lf, "Font " hFont), ctrl%hCtrl% := A_LoopField
+		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "Panel " A_Index, "w100 h100 style='hidden'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
+		hCtrl := Form_Add(hPanel%A_Index%, lf,	lf  "(" A_Index ")", MakeOptions(lf), "Align F", "Attach p r2", "Cursor HAND", "Tooltip Tooltip for " lf, "Font " hFont)
+		ctrl%hCtrl% := A_LoopField, ctrl%hCtrl%i := A_Index
 		InitControl(lf, hCtrl), %lf% := ctrlNo := A_Index, h%lf% := hCtrl
-		Progress, %A_Index%, creating control %A_index% / %m%
+
+		htmlCtrls .= "<a href=1 id=" A_Index ">" LF "</a>&nbsp;&nbsp;"
+		Progress, %A_Index%, creating control %A_index% / %m% * 2
 	}	
 	Progress, off
-	QHTM_AddHtml(hInfo, "<br><h6>Total: " ctrlNo)
-	Form_Show(), OnQHTM("", "", init )
-	SB_SetText("StatusBar")
+	QHTM_AddHtml(hInfo, htmlCtrls "<br><h6>Total: " ctrlNo)
+	Form_Show(), OnQHTM("", "", 1 )
 
 ;	Attach("OnAttach")
 return
 
-F4::	
-	Scroller_UpdateBars(hTab)
-return
+;F4::	
+;	Scroller_UpdateBars(hTab)
+;return
 
 OnAttach(Hwnd) {
 	global
@@ -93,17 +91,14 @@ return
 
 Handler(HCtrl, p2="", p3="",p4="") {
 	global
-	Log(ctrl%hCtrl% ":   ",p2,p3,p4)
+	Log(ctrl%hCtrl% " (" ctrl%hCtrl%i ") :   ",p2,p3,p4)
 }
-
-Tooltip:
-	Tooltip
-return
 
 OnQHTM(Hwnd, Link, Id) {
 	local n
+
 	if (id)
-		n := %Id%, Win_Show(hPanel%gCur%, false), Win_Show(hPanel%n%), gCur := n
+		Win_Show(hPanel%gCur%, false), Win_Show(hPanel%id%), gCur := id
 	else return 1
 }
 
@@ -216,9 +211,6 @@ InitControl(Name, HCtrl) {
 	}
 }
 
-F2::
-	WinMove, ahk_id %hForm%, , , , 300, 300
-return
 
 F1::
 	Win_Show(hPanel%gCur%, false), gCur++
