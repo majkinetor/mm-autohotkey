@@ -92,7 +92,7 @@
 	(end code)
 
 	About:
-			o 1.04 by majkinetor
+			o 1.05 by majkinetor
 			o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
 Attach(hCtrl="", aDef="") {
@@ -101,9 +101,11 @@ Attach(hCtrl="", aDef="") {
 
 Attach_(hCtrl, aDef, Msg, hParent){
 	static
-	local s1,s2, enable, reset
+	local s1,s2, enable, reset, oldCritical
 
+	oldCritical := A_IsCritical
 	critical, 100
+
 
 	if (aDef = "") {							;Reset if integer, Handler if string
 		if IsFunc(hCtrl)
@@ -191,7 +193,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		DllCall(adrSetWindowPos, "uint", hCtrl, "uint", 0, "uint", cx, "uint", cy, "uint", cw, "uint", ch, "uint", flag)
 		r+0=2 ? Attach_redrawDelayed(hCtrl) : 
 	}
-
+	critical %oldCritical%
 	return Handler != "" ? %Handler%(hParent) : ""
 
  Attach_GetPos:									;hParent & hCtrl must be set up at this point

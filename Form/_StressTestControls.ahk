@@ -1,20 +1,24 @@
-_("mo! e d c w")
+_()
 #SingleInstance, force
 #MaxThreads, 255		;Required for this sample with cursor/tooltip extensions.
 #NoEnv
 
+
+	n := 5				;create 28 * 2^n controls
+
+	;===============
 	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter ScrollBar Property
-	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress StatusBar Tab2 GroupBox		;updown may somehow make problem for other controls. in this setup if you put tab2 after updown it will work ok, otherwise it will initially apear on wrong position. There were other kinds of problems all related to UpDo
+	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress Tab2 GroupBox		;updown may somehow make problem for other controls. in this setup if you put tab2 after updown it will work ok, otherwise it will initially apear on wrong position. There were other kinds of problems all related to UpDo
 	init    = HiEdit
-	;===============================================
 	
 	ctrls := custom " " ahk
+	loop, %n%
+		ctrls .= " " ctrls
 	
 	SetWorkingDir, inc		;required to load some dll's that are put there
 	hForm  := Form_New("w700 h620 Resize")
 
-	htmlCtrls := RegExReplace(custom, "\w+", "<a href=$0 id=$0>$0</a><a href='" A_ScriptDir "\_doc\files\inc\$0-ahk.html'>&nbsp;+</a>&nbsp;&nbsp;")
-			   . "<br><br>" RegExReplace(ahk, "\w+", "<a href=$0 id=$0>$0</a>&nbsp;&nbsp;")
+	htmlCtrls := RegExReplace(ctrls, "\w+", "<a href=$0 id=$0>$0</a>&nbsp;&nbsp;")
 
 	infoText=
 	(LTrim Join
@@ -55,10 +59,8 @@ OnAttach(Hwnd) {
 
 
 MakeOptions(Name) {
-	global ListBox, MonthCal,TreeView,Hotkey,Slider,UpDown
-
 	if Name in MonthCal,ListBox,TreeView,Hotkey,Slider,UpDown
-		return "v" Name " gHandler"
+		return "gHandler"
 
 	if Name=Splitter
 		return "center handler=Handler"

@@ -46,7 +46,7 @@
 			}
 
 			;with above in place you can use:
-			hPanel := Form_Add(hForm, "Panel", "Panel1", "w100 h200 hidden")
+			hPanel := Form_Add(hForm, "Panel", "Panel1", "w100 h200 style=hidden")
 			(end code)
 	
 			When executing Add function, Form will check if there is Panel_add2Form function and if that's true, it will call it with 
