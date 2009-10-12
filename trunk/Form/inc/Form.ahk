@@ -120,9 +120,7 @@ Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
 			Win <1.22>
  */
 Form_AutoSize( Hwnd ) {
-    width := height := 0
-	Win_Get(Hwnd, "NhBxy", th, bx, by)
-	children := Win_GetChildren(Hwnd)
+    width := height := 0, Win_Get(Hwnd, "NhBxy", th, bx, by), children := Win_GetChildren(Hwnd)
     Loop, Parse, children, `n
     { 
 		ifEqual, A_LoopField,, continue
@@ -161,19 +159,20 @@ Form_Close( Name ) {
 			Margin for the form is set to 0,0 always.
  */
 Form_New(Options="") {
-	static no=1
+	Form_Parse(Options, "x# y# w# h# a# c* Font Label* t? e?", x, y, w, h, a, c, font, label, t, e, extra)
 
-	Form_Parse(Options, "x# y# w# h# a# c* Font Label* t?", x, y, w, h, a, c, font, name, t, extra)
-
-	ifEqual, name,,SetEnv, Name, % "Form" no++
 	pos := (x!="" ? " x" x : "") (y!="" ? " y" y : "") (w!="" ? " w" w : "") (h!="" ? " h" h : "")
 	ifEqual, pos,, SetEnv, pos, w400 h200
 
 	if !(n := Form_getFreeGuiNum())
 		return A_ThisFunc "> Maximum number of windows created."
 
-	Gui, %n%:+LastFound +Label%Name%_ %extra%
+	ifEqual, label,,SetEnv, label, Form%n%
+
+	Gui, %n%:+LastFound +Label%label%_ %extra%
 	hForm := WinExist()+0
+	if e
+		Form_SetEsc(hForm)
 
 	ifNotEqual, a,,WinSet, Transparent, % a*2.5
 	ifNotEqual, c,,Gui, %n%:Color, %c%
@@ -189,11 +188,20 @@ Form_New(Options="") {
 		Gui, %n%:Font, %font1%, %font2%
 	}
 	
-	Gui, %n%:Show, %pos% Hide, %Name%
+	Gui, %n%:Show, %pos% Hide, %label%
 	Gui, %n%:Margin, 0, 0		;this makes Add function behave normaly i.e. if you add control on pos X,Y it will not be X+mx and Y+my. This is important for Panel.
 
-	Form(Name, n), Form(hForm, n)
+	Form(label, n), Form(hForm, n)
 	return hForm
+}
+
+Form_SetEsc(Hwnd) {
+	static list
+	return list .= Hwnd " "
+
+ Form_SetEsc:
+		
+ return
 }
 
 /*
@@ -251,7 +259,7 @@ Form_New(Options="") {
  Returns:
 			Number of options in the string.
  */
-Form_Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",ByRef o6="",ByRef o7="",ByRef o8="", ByRef o9="", ByRef o10=""){
+Form_Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",ByRef o6="",ByRef o7="",ByRef o8="", ByRef o9="", ByRef o10="", ByRef o11="", ByRef o12="", ByRef o13="", ByRef o14="", ByRef o15=""){
 	cS := " ", cA := "=", cQ := "'", cE := "``", cC := 0
 	if (j := InStr(pQ, ")")) && (opts := SubStr(pQ, 1, j-1), pQ := SubStr(pQ, j+1))
 		Loop, parse, opts
@@ -305,11 +313,10 @@ Form_Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",By
 	return p__0
 }
 
-Form_Show( Name="", Title="" ){
-	if Name=
-		Name := "Form1"
-
-	n := Form(Name)
+Form_Show( Label="", Title="" ){
+	if Label = 
+		 Label := "Form1", n := 1
+	else n := Form(Label)
 	Gui, %n%:Show, ,%Title%
 }
 
