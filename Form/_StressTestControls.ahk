@@ -35,15 +35,16 @@ _()
 	hFont := Font("", "s9, Courier New") 	;create font only once, then use it for every control.
 	m := 28*(2**n)
 
-	Progress, R0-%m%
+	Progress, R0-%m%, creating controls
 	loop, parse, ctrls, %A_Space%
 	{		
 		lf := A_LoopField
 		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "Panel " lf, "w100 h100 style='hidden'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
 		hCtrl := Form_Add(hPanel%A_Index%, lf,	lf, MakeOptions(lf), "Align F", "Attach p r2", "Cursor HAND", "Tooltip Tooltip for " lf, "Font " hFont), ctrl%hCtrl% := A_LoopField
 		InitControl(lf, hCtrl), %lf% := ctrlNo := A_Index, h%lf% := hCtrl
-		Progress
+		Progress, %A_Index%, creating control %A_index% / %m%
 	}	
+	Progress, off
 	QHTM_AddHtml(hInfo, "<br><h6>Total: " ctrlNo)
 	Form_Show(), OnQHTM("", "", init )
 	SB_SetText("StatusBar")
