@@ -224,6 +224,7 @@ RG_ComboClear(hGrd, Col) {
 	return ErrorLevel
 }
 
+
 /*
  Function:	EnterEdit
 			Edit cell.
@@ -525,6 +526,16 @@ RG_ResetContent(hGrd) {
 	static GM_RESETCONTENT=0x422
 	SendMessage,GM_RESETCONTENT,,,, ahk_id %hGrd%
 	return ErrorLevel
+}
+
+/* 
+  Function: ResetColumns 
+			Reset columns of the control. 
+*/ 
+RG_ResetColumns(hGrd) { 
+  static GM_RESETCOLUMNS=0x429 
+  SendMessage,GM_RESETCOLUMNS,,,, ahk_id %hGrd% 
+  return ErrorLevel 
 }
 
 /*
@@ -831,7 +842,7 @@ RaGrid_add2Form(hParent, Txt, Opt) {
 
 /* Group: About
 	o RaGrid control version: 2.0.1.6 by KetilO. See <http://www.masm32.com/board/index.php?topic=55>
-	o AHK module ver 2.0.1.6-1 by majkinetor.
+	o AHK module ver 2.0.1.6-2 by majkinetor.
 	o RaGrid is freely distributed for any kind of purpose.
 	o AHK module licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */
