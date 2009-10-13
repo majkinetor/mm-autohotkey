@@ -92,7 +92,7 @@
 	(end code)
 
 	About:
-			o 1.05 by majkinetor
+			o 1.06 by majkinetor
 			o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
 Attach(hCtrl="", aDef="") {
@@ -102,10 +102,6 @@ Attach(hCtrl="", aDef="") {
 Attach_(hCtrl, aDef, Msg, hParent){
 	static
 	local s1,s2, enable, reset, oldCritical
-
-	oldCritical := A_IsCritical
-	critical, 100
-
 
 	if (aDef = "") {							;Reset if integer, Handler if string
 		if IsFunc(hCtrl)
@@ -170,6 +166,9 @@ Attach_(hCtrl, aDef, Msg, hParent){
 
 	if !%hParent%_s
 		%hParent%_s := %hParent%_pw " " %hParent%_ph
+
+	oldCritical := A_IsCritical
+	critical, 100
 
 	StringSplit, s, %hParent%_s, %A_Space%
 	loop, parse, %hParent%a, %A_Space%
