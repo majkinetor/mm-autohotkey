@@ -1,6 +1,9 @@
 /* Function: Tooltip
 			 Add tooltips to GUI controls.
  
+ Dependencies:
+			 <Win>
+
  Parameters:
 			 HCtrl	- Handle of the control.
 			 Text	- Tooltip text.
@@ -29,7 +32,7 @@ Ext_Tooltip(HCtrl, Text){
 		ControlGet, HCtrl, HWND,,Edit1, ahk_id %HCtrl%	; while in combo, it happens in edit owned by the combo
 
 ;	Form_SubClass(HCtrl, adrWndProc, "", adrWndProc)	;subclassing with the same function all the time makes problem when instantiated bunch of times...
-	Form_SubClass(HCtrl, "Ext_Tooltip_WndProc")
+	Win_SubClass(HCtrl, "Ext_Tooltip_WndProc")
 
 	Ext_Tooltip_wndProc(0, 0, Text, HCtrl)
 	return 1

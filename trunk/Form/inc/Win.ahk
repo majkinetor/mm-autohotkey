@@ -65,6 +65,26 @@ Win_FromPoint(X="mouse", Y="") {
 }
 
 /*
+ Function:	Align
+			Position window relative to the another window.
+
+ 
+ Parameters:
+			Hwnd		- Handle of the form.
+			HDockWnd	- Handle of the dock window.
+			Type		- Dock type. Two characters that determine horizontal and vertical position: L, M, R (horizontal)  T, M, B (vertical).
+						  By default RT (Right Top).
+ */
+Win_Align( Hwnd, HDockWnd, Type="RT") {
+	WinGetPos, dx, dy, dw, dh, ahk_id %HDockWnd%
+	WinGetPos, , , fw, fh, ahk_id %HForm%
+	StringSplit, Type, Type
+	x := Type1="L" ? dx - dw : Type1="R" ? dx+dw : dx + Abs(dw-fw)//2
+	y := Type2="T" ? dy : Type1="B" ? dy+dh : dy + Abs(dh-fh)//2
+	WinMove, ahk_id %HForm%, , x, y
+}
+
+/*
  Function:	Get
  			Get window information
  

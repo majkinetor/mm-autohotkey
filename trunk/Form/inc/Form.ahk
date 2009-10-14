@@ -116,8 +116,12 @@ Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
  Function:	AutoSize
  			Resize the window so all controls fit. 
 
+ Remarks:
+			This function works the same as Gui, Show, autosize.
+			However, it takes into account custom controls too.
+
  Dependencies:
-			Win <1.22>
+			<Win> 1.22
  */
 Form_AutoSize( Hwnd ) {
     width := height := 0, Win_Get(Hwnd, "NhBxy", th, bx, by), children := Win_GetChildren(Hwnd)
@@ -132,10 +136,34 @@ Form_AutoSize( Hwnd ) {
 	Win_Move(Hwnd, "", "", width, height)
 }
 
-Form_Close( Name ) {
-	local g
-	g := "Form_" Name, g := %g%
-	Gui, %g%:Hide
+/*
+ Function:	Destroy
+			Destroy the form.
+ */
+Form_Destroy( Form="") {
+	n := Form_getNum(Form)
+	Gui, %n%:Destroy
+}
+
+/*
+ Function:	Default
+			Set form as default one. 
+ 
+ Remarks:
+			
+ */
+Form_Default( Form ) {
+	n := Form_getNum(Form)
+	Gui, %n%:Default
+}
+
+/*
+ Function:		Hide
+				Hide the form.
+ */
+Form_Hide( Form ) {
+	n := Form_getNum(Form)
+	Gui, %n%:Hide
 }
 
 /*
@@ -147,7 +175,10 @@ Form_Close( Name ) {
 
  Extensions:
 			a#		- Alpha. Range from 0% - 100%
-			c*		- Gui color. Hexadecimal or integer value.
+			c#		- Gui color. Hexadecimal or integer value.
+			e#		- How Escape key works. "e1" will hide the form. "e2" will destroy the form. "e3" will exit the app.
+					  Operation can happen only if form is the active window.
+			m#		- Margin, decimal number in the form X.Y .
 			Font	- Gui font (style, face).
 			Name	- Name of the form, by default FormN where N is the number of the forms created.
 			T		- Transparent window.
@@ -156,10 +187,17 @@ Form_Close( Name ) {
 			Form handle.
 
  Remarks:
-			Margin for the form is set to 0,0 always.
+			Label is not optional. Module will set it even if you don't specify it. By default, label is set as
+			"FormN" where N is the Gui number. That means that GuiXXXXX labels can't be used, but FormN_XXXXX instead.
+			Single label shouldn't be used with more then 1 form.
+			
+			You can reference the form in other functions in several ways: its GUI number, its HWND or its Label.
+			To obtain Gui number use Form_GetNum function with label or hwnd argument. 
+
+			If you are adding control to the panel, Margin
  */
 Form_New(Options="") {
-	Form_Parse(Options, "x# y# w# h# a# c* Font Label* t? e?", x, y, w, h, a, c, font, label, t, e, extra)
+	Form_Parse(Options, "x# y# w# h# a# c* Font Label* t? e# m#", x, y, w, h, a, c, font, label, t, e, m, extra)
 
 	pos := (x!="" ? " x" x : "") (y!="" ? " y" y : "") (w!="" ? " w" w : "") (h!="" ? " h" h : "")
 	ifEqual, pos,, SetEnv, pos, w400 h200
@@ -172,15 +210,18 @@ Form_New(Options="") {
 	Gui, %n%:+LastFound +Label%label%_ %extra%
 	hForm := WinExist()+0
 	if e
-		Form_SetEsc(hForm)
+		Form_SetEsc(hForm, e)
+
+	if (m != "") {
+		StringSplit, m, m, .
+		Gui, Margin, %m1%, %m2%
+	}
 
 	ifNotEqual, a,,WinSet, Transparent, % a*2.5
 	ifNotEqual, c,,Gui, %n%:Color, %c%
 	if (t) {
 		Gui, Color, 12345
 		WinSet, TransColor, 12345
-		;w1 := w-5, h1 := h-5
-		;WinSet, Region, 5-5 w%w1% h%h1%	;remove border on some systems...
 	}
 		
 	if (font != "") {
@@ -189,19 +230,8 @@ Form_New(Options="") {
 	}
 	
 	Gui, %n%:Show, %pos% Hide, %label%
-	Gui, %n%:Margin, 0, 0		;this makes Add function behave normaly i.e. if you add control on pos X,Y it will not be X+mx and Y+my. This is important for Panel.
-
-	Form(label, n), Form(hForm, n)
+	Form(hForm, n), Form(label, n), Form(n, label)
 	return hForm
-}
-
-Form_SetEsc(Hwnd) {
-	static list
-	return list .= Hwnd " "
-
- Form_SetEsc:
-		
- return
 }
 
 /*
@@ -313,56 +343,20 @@ Form_Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",By
 	return p__0
 }
 
-Form_Show( Label="", Title="" ){
-	if Label = 
-		 Label := "Form1", n := 1
-	else n := Form(Label)
-	Gui, %n%:Show, ,%Title%
-}
-
 /*
- Function:	Subclass 
-			Subclass child window (control)
+ Function:		Show
+				Show form.
  
- Parameters: 
-			hCtrl   - Handle to the child window to be subclassed.
-			Fun		- New window procedure. You can also pass function address here in order to subclass child window.
-					  with previously created window procedure.
-			Opt		- Optional callback options for Fun, by default "" .
-		   $WndProc - Optional reference to the ouptut variable that will receive address of the new window procedure.
+ Parameters:
+				Form  - Handle of the form (if integer>99), its number (if integer < 99) or its label (if string). By default 1.
 
  Returns:
-			The addresss of to the previous window procedure or 0 on error.	
-
- Remarks:
-			Should be used by extensions if needed.
-			Works only for controls created in the autohotkey process.
-
- Example:
-	(start code)
-  	if !Form_SubClass(hwndList, "MyWindowProc") 
-  	     MsgBox, Subclassing failed. 
-  	... 
-  	MyWindowProc(hwnd, uMsg, wParam, lParam){ 
   
-  	   if (uMsg = .....)  
-            ; my message handling here 
-  
-  	   return DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", hwnd, "UInt", uMsg, "UInt", wParam, "UInt", lParam) 
-  	}
-	(end code)
  */
-Form_Subclass(hCtrl, Fun, Opt="", ByRef $WndProc="") { 
-	if Fun is not integer
-	{
-		 oldProc := DllCall("GetWindowLong", "uint", hCtrl, "uint", -4) 
-		 ifEqual, oldProc, 0, return 0 
-		 $WndProc := RegisterCallback(Fun, Opt, 4, oldProc) 
-		 ifEqual, $WndProc, , return 0
-	}
-	else $WndProc := Fun
-	   
-    return DllCall("SetWindowLong", "UInt", hCtrl, "Int", -4, "Int", $WndProc, "UInt")
+Form_Show( Form="", Title="~ `a" ){
+	n := Form_getNum(Form)
+	ifEqual, Title,~ `a, SetEnv, Title, % Form(n)
+	Gui, %n%:Show, ,%Title%
 }
 
 /*
@@ -407,6 +401,14 @@ Form(Var="", Value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", B
 ;==================================== PRIVATE ================================================
 
 Form_addAhkControl(hParent, Ctrl, Txt, Opt ) {
+	Form_Parse(Opt, "x# y#", x, y)
+	WinGetClass, cls, ahk_id %hParent%
+;	if (cls = "Panel") {	;prevent Panel having GUI margin.
+;		if x =
+;			Opt .= " x0"
+;		if y =
+;			Opt .= " y0"
+;	}
 	Gui, Add, %Ctrl%, HWNDhCtrl %Opt%, %Txt%
 	DllCall("SetParent", "uint", hCtrl, "uint", hParent)	
 	return hCtrl+0
@@ -421,6 +423,14 @@ Form_getFreeGuiNum(){
 	return 0
 }
 
+Form_getNum( Form="" ) {
+	ifEqual, Form,,return 1
+	if Form is integer
+		ifLess, Form, 100, return Form
+		else return Form(Form)
+	else return Form(Form)
+}
+
 Form_split(opt, s, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="") {
 	o1 := o2 := o3 := o4 := o5 := "", sep := (mode := SubStr(opt, 1, 1)) ? SubStr(opt, 2,1) : ",", omit := mode = "!" ? A_Space A_Tab : ""
 	ifEqual, sep,,SetEnv, sep, `,
@@ -428,8 +438,29 @@ Form_split(opt, s, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5=
 	return o0
 }
 
-/*
-Group: About
-	o v0.6 by majkinetor.
+Form_setEsc(Hwnd, Type) {
+	static
+
+	if list =
+		Hotkey, ~ESC, %A_ThisFunc%
+	
+	return list .= Hwnd "-" Type " "
+
+ Form_setEsc:
+	hActive := WinExist("A")+0
+	if (j := InStr(list, hActive))
+		t := SubStr(list, j + StrLen(hActive) + 1, 1)
+	else return
+
+	ifEqual, t, 1, WinHide
+	else if t = 2 
+		Form_Destroy(hActive)
+	else if t = 3
+		ExitApp
+ return
+}
+
+/* Group: About
+	o v0.7 by majkinetor.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
 /*
