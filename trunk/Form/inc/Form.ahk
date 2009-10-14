@@ -124,16 +124,18 @@ Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
 			<Win> 1.22
  */
 Form_AutoSize( Hwnd ) {
-    width := height := 0, Win_Get(Hwnd, "NhBxy", th, bx, by), children := Win_GetChildren(Hwnd)
+	static win_GetChildren = "Win_GetChildren", win_Get = "Win_Get", win_Move = "Win_Move", win_GetRect = "Win_GetRect"
+
+    width := height := 0, %win_Get%(Hwnd, "NhBxy", th, bx, by), children := %win_GetChildren%(Hwnd)
     Loop, Parse, children, `n
     { 
 		ifEqual, A_LoopField,, continue
-		Win_GetRect(A_LoopField, "*xywh", cx, cy, cw, ch),   w := cx+cw,   h := cy+ch
+		%win_GetRect%(A_LoopField, "*xywh", cx, cy, cw, ch),   w := cx+cw,   h := cy+ch
 		ifGreater, w, %width%,  SetEnv, width, %w%
 		ifGreater, h, %height%, SetEnv, height, %h%
     }
 	width +=2*bx, height += th + 2*by
-	Win_Move(Hwnd, "", "", width, height)
+	%win_Move%(Hwnd, "", "", width, height)
 }
 
 /*

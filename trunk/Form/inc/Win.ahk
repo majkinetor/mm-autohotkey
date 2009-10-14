@@ -120,6 +120,9 @@ Win_Align( Hwnd, HDockWnd, Type="RT") {
 Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="", ByRef o7="", ByRef o8="", ByRef o9="") {
 	if pQ contains R,B,L
 		VarSetCapacity(WI, 60, 0), NumPut(60, WI),  DllCall("GetWindowInfo", "uint", Hwnd, "uint", &WI)
+	
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
 
 	k := i := 0
 	loop
@@ -199,7 +202,7 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
 			o%i% := buf 
 		continue
 	}	
-	
+	DetectHiddenWindows, %oldDetect%
 	return o1
 }
 
