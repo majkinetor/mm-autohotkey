@@ -1,6 +1,9 @@
 /* Function: Cursor
 			Set cursor shape for control or window.
  
+ Dependencies: 
+			<Win> 1.22
+
  Parameters: 
 			HCtrl	- Contorls handle.
             Shape   - Name of the system cursor to set or cursor handle or full cursor path (must have .ani or .cur extension).
@@ -43,7 +46,7 @@
 Ext_Cursor(HCtrl, Shape) { 
 ;	static adrWndProc = "Ext_Cursor_wndProc"
 ;	Form_SubClass(HCtrl, adrWndProc, "", adrWndProc)	;subclassing with the same function all the time makes problem when instantiated bunch of times...
-	Form_SubClass(HCtrl, "Ext_Cursor_wndProc")
+	Win_SubClass(HCtrl, "Ext_Cursor_wndProc")
 	return Ext_Cursor_WndProc(0, 0, Shape, HCtrl)
 } 
 

@@ -1,4 +1,4 @@
-_("mo! e d c w")
+;_("mo! e d c w")
 #SingleInstance, force
 #MaxThreads, 255		;Required for this sample with cursor/tooltip extensions.
 #NoEnv
@@ -11,7 +11,7 @@ _("mo! e d c w")
 	ctrls := custom " " ahk
 	
 	SetWorkingDir, inc		;required to load some dll's that are put there
-	hForm  := Form_New("w700 h620 Resize")
+	hForm  := Form_New("w700 h620 e3 Resize")
 
 	htmlCtrls := RegExReplace(custom, "\w+", "<a href=$0 id=$0>$0</a><a href='" A_ScriptDir "\_doc\files\inc\$0-ahk.html'>&nbsp;+</a>&nbsp;&nbsp;")
 			   . "<br><br>" RegExReplace(ahk, "\w+", "<a href=$0 id=$0>$0</a>&nbsp;&nbsp;")
@@ -39,7 +39,6 @@ _("mo! e d c w")
 	QHTM_AddHtml(hInfo, "<br><h6>Total: " ctrlNo)
 	Form_Show(), OnQHTM("", "", init )
 	SB_SetText("StatusBar")
-
 ;	Attach("OnAttach")
 return
 
