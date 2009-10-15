@@ -376,7 +376,7 @@ Form_Show( HForm="", Options="", Title="" ){
 	ifEqual, HForm,, SetEnv, n, 1
 	else n := Form(HForm)
 
-	Gui, %n%:Show, %Options% ,%Title%
+	Gui, %n%:Show, %Options%, %Title%
 }
 
 /*
@@ -421,7 +421,7 @@ Form_Set(hForm, Options="", n="") {
 	hide := style & 0x10000000 ? "" : "Hide"
 	
 	ifEqual, n,, SetEnv, label,					;n is valid only when new form is created.
-	Gui, %n%:Show, %hide% %pos%, %label%
+	Gui, %n%:Show, %pos% %hide%, %label%
 	Form(label, n), Form(n, label)
 }
 

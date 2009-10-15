@@ -4,14 +4,17 @@ _()
 	Form_Add(hForm1, "Picture", "res\test.bmp", "gPictureDrag", "Cursor size")
 
 	hFont := Font("", "s12 italic, Courier New")
-	sz := Font_DrawText("Ask Google not me", "", hFont, "calcrect ahksize")
+	sz := Font_DrawText("Click here to go to Google", "", hFont, "calcrect ahksize")
 	pos := Form_GetNextPos(hForm1, sz)
-	Form_Add(hForm1, "HLink", "Ask 'Google':www.google.com, not me", pos " " sz, "Font " hFont)
+	Form_Add(hForm1, "HLink", "Click 'here':www.google.com to go to Google", pos " " sz, "Font " hFont)
 	pos := Form_GetNextPos(hForm1, "x+50 yp")
-	Form_Add(hForm1, "HLink", "Ask 'Google':www.google.com not me", pos " " sz, "Font " hFont)
+	Form_Add(hForm1, "HLink", "Click 'here':www.google.com to go to Google", pos " " sz, "Font " hFont)
 
 	Form_AutoSize( hForm1, 10.5)
 	Form_Show(hForm1, "xCenter yCenter")
+
+	hForm2 := Form_New("e2 w100 h100")
+	Form_Show(hForm2, "y0")
 return
 
 PictureDrag: 
