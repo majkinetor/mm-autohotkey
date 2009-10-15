@@ -121,7 +121,7 @@ Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
 			it isn't connected to other gui operations.
 
 			HForm	- Form handle.
-			Delta	- Dot delimited string, DeltaW "." DeltaH. Delta is added to the calculated window size.
+			Delta	- Dot delimited string, DeltaW "." DeltaH. Delta is added to the calculated window size. Both arguments are optional.
 
  Dependencies:
 			<Win> 1.22
@@ -138,7 +138,8 @@ Form_AutoSize( HForm, Delta="" ) {
 		ifGreater, h, %height%, SetEnv, height, %h%
     }
 	ifNotEqual, Delta,, StringSplit, Delta, Delta, .
-	else Delta1 := Delta2 := 0
+	IfEqual, Delta1, , SetEnv, Delta1, 0
+	IfEqual, Delta2, , SetEnv, Delta2, 0
 	width +=2*bx + Delta1 , height += th + 2*by + Delta2
 	%win_Move%(HForm, "", "", width, height)
 }
@@ -173,8 +174,24 @@ Form_Hide( HForm ) {
 	Gui, %n%:Hide
 }
 
-Form_GetNextPos( HForm ) {
-	Gui, %n%
+/*
+ Function:		GetNextPos
+				Obtain the position of next control.
+ 
+ Parameters:
+				HForm	- Handle of the form.
+				Options	- Form control options. Optional.
+				x, y	- Reference to output variables. Optional.
+ Returns:
+				"x" x " y" y
+  
+ */
+Form_GetNextPos( HForm, Options="",  ByRef x="", ByRef y="") {
+	n := Form(HForm)
+	Gui, %n%:Add, Text, %Options% HWNDhDummy, Dummy
+	ControlGetPos, x, y,,,,ahk_id %hDummy%
+	WinKill, ahk_id %hDummy%
+	return "x" x " y" y
 }
 
 /*
@@ -335,16 +352,18 @@ Form_Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",By
 				Show form.
  
  Parameters:
-				Form  - Handle of the form (if integer>99), its number (if integer < 99) or its label (if string). By default 1.
+				HForm	- Handle of the form. Defaults to first form created.
+				Options	- Any option that can be specified in Gui, Show.
+				Title	- Title of the window. By default Label name.
 
  Returns:
   
  */
-Form_Show( HForm="", Title="~ `a" ){
+Form_Show( HForm="", Options="", Title="" ){
 	ifEqual, HForm,, SetEnv, n, 1
 	else n := Form(HForm)
-	ifEqual, Title,~ `a, SetEnv, Title, % Form(n)
-	Gui, %n%:Show, ,%Title%
+
+	Gui, %n%:Show, %Options% ,%Title%
 }
 
 /*
@@ -353,7 +372,8 @@ Form_Show( HForm="", Title="~ `a" ){
  
  Parameters:
 				hForm	- Handle of the form.
-				Options	- Form options. See <New> for details.  
+				Options	- Form options. See <New> for details.
+				n		- Internally used.
  */
 Form_Set(hForm, Options="", n="") {
 
@@ -388,7 +408,6 @@ Form_Set(hForm, Options="", n="") {
 	hide := style & 0x10000000 ? "" : "Hide"
 	
 	ifEqual, n,, SetEnv, label,					;n is valid only when new form is created.
-
 	Gui, %n%:Show, %hide% %pos%, %label%
 	Form(label, n), Form(n, label)
 }
