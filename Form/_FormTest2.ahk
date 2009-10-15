@@ -1,6 +1,6 @@
 _()
-	hForm1	:=	Form_New("m0.0 e3 w200 h500 -Caption")
-	Form_Add(hForm1, "Edit", "ESC to hide F1 to show. F2 to resize. Drag picture to move.", "-vscroll w200 r3 0x8000","Align T", "Attach w")
+	hForm1	:=	Form_New("e3 w200 h500")
+	Form_Add(hForm1, "Edit", "ESC to hide F1 to show. F2 to resize. Drag picture to move.", "-vscroll w200 r3 0x8000", "Align T", "Attach w")
 	Form_Add(hForm1, "Picture", "res\test.bmp", "gPictureDrag", "Cursor size")
 
 	hFont := Font("", "s12 italic, Courier New")
@@ -10,7 +10,7 @@ _()
 	pos := Form_GetNextPos(hForm1, "x+50 yp")
 	Form_Add(hForm1, "HLink", "Ask 'Google':www.google.com not me", pos " " sz, "Font " hFont)
 
-	Form_AutoSize( hForm1 )
+	Form_AutoSize( hForm1, 10.5)
 	Form_Show(hForm1, "xCenter yCenter")
 return
 
