@@ -1,9 +1,14 @@
-_()
-	hForm1	:=	Form_New("w400 m0.0 e3 h500 Font='s8, Courier New'")
-	Form_Add(hForm1, "Edit", "ESC to hide F1 to show. F2 to resize. Drag picture to move.", "-vscroll w200 r3 0x8000", "Cursor hand")
+_("")
+	hForm1	:=	Form_New("m0.0 e3 w200 h500 -Caption")
+	Form_Add(hForm1, "Edit", "ESC to hide F1 to show. F2 to resize. Drag picture to move.", "-vscroll w200 r3 0x8000","Align T", "Attach w")
 	Form_Add(hForm1, "Picture", "res\test.bmp", "gPictureDrag", "Cursor size")
 
-	Form_AutoSize( hForm1 )
+	hFont := Font("", "s16 italic, Courier New")
+	pos := Font_DrawText("Ask Google and don't trouble me", "", hFont, "calcrect ahksize")
+	hlink := Form_Add(hForm1, "HLink", "Ask 'Google':www.google.com and don't trouble me", pos " y200", "Font " hFont)
+	Font(hlink, hFont), Font(htext, hFont)
+
+	Form_AutoSize( hForm1, 10.10)
 	Form_Show()
 return
 
@@ -22,7 +27,5 @@ F2::
 	Win_Redraw()
 return
 
-#include inc\Form.ahk
-#include inc\Win.ahk
-#include inc\Attach.ahk
-#include inc\Cursor.ahk
+#include inc
+#include _Forms.ahk
