@@ -5,8 +5,7 @@ _("")
 
 	hFont := Font("", "s16 italic, Courier New")
 	pos := Font_DrawText("Ask Google and don't trouble me", "", hFont, "calcrect ahksize")
-	hlink := Form_Add(hForm1, "HLink", "Ask 'Google':www.google.com and don't trouble me", pos " y200", "Font " hFont)
-	Font(hlink, hFont), Font(htext, hFont)
+	Form_Add(hForm1, "HLink", "Ask 'Google':www.google.com and don't trouble me", pos " y200", "Font " hFont)
 
 	Form_AutoSize( hForm1, 10.10)
 	Form_Show()
