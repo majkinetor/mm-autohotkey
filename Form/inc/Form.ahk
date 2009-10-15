@@ -182,15 +182,28 @@ Form_Hide( HForm ) {
 				HForm	- Handle of the form.
 				Options	- Form control options. Optional.
 				x, y	- Reference to output variables. Optional.
+
  Returns:
 				"x" x " y" y
-  
+
+ Remarks:
+				This is very slow function. It is created just because there might be a need for it in some scenarios.
+				It creates dummy control with given options, take its x & y coordinates and then deletes it.
  */
 Form_GetNextPos( HForm, Options="",  ByRef x="", ByRef y="") {
 	n := Form(HForm)
+
+	oldDelayC := A_ControlDelay, oldDelayW := A_WinDelay 
+
 	Gui, %n%:Add, Text, %Options% HWNDhDummy, Dummy
+
+	SetControlDelay, 0
 	ControlGetPos, x, y,,,,ahk_id %hDummy%
+	SetControlDelay, %oldDelayC%
+
+	SetWinDelay, 0
 	WinKill, ahk_id %hDummy%
+	SetWinDelay, oldDelayW
 	return "x" x " y" y
 }
 
