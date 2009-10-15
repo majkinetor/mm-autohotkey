@@ -1,14 +1,17 @@
-_("")
+_()
 	hForm1	:=	Form_New("m0.0 e3 w200 h500 -Caption")
 	Form_Add(hForm1, "Edit", "ESC to hide F1 to show. F2 to resize. Drag picture to move.", "-vscroll w200 r3 0x8000","Align T", "Attach w")
 	Form_Add(hForm1, "Picture", "res\test.bmp", "gPictureDrag", "Cursor size")
 
-	hFont := Font("", "s16 italic, Courier New")
-	pos := Font_DrawText("Ask Google and don't trouble me", "", hFont, "calcrect ahksize")
-	Form_Add(hForm1, "HLink", "Ask 'Google':www.google.com and don't trouble me", pos " y200", "Font " hFont)
+	hFont := Font("", "s12 italic, Courier New")
+	sz := Font_DrawText("Ask Google not me", "", hFont, "calcrect ahksize")
+	pos := Form_GetNextPos(hForm1, sz)
+	Form_Add(hForm1, "HLink", "Ask 'Google':www.google.com, not me", pos " " sz, "Font " hFont)
+	pos := Form_GetNextPos(hForm1, "x+50 yp")
+	Form_Add(hForm1, "HLink", "Ask 'Google':www.google.com not me", pos " " sz, "Font " hFont)
 
-	Form_AutoSize( hForm1, 10.10)
-	Form_Show()
+	Form_AutoSize( hForm1 )
+	Form_Show(hForm1, "xCenter yCenter")
 return
 
 PictureDrag: 

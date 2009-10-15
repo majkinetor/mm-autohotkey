@@ -331,34 +331,29 @@ Win_Is(Hwnd, pQ="win") {
 			WinMove produces the same effect as Win_Move on child controls, except its X and Y parameters are not optional which makes lot of addtional code for frequent operation: moving the control by some offset of its current position. 
 			In order to do that you must get the current position of the control. That can be done with ControlGetPos which works in pair with ControlMove hence it is not relative to the client rect or WinGetPos which returns screen coordinates of child control so those can not 
 			be imediatelly used in WinMove as it positions child window relative to the parents client rect. This scenario can be additionaly complicated by the fact that each window may have its own theme which influences the size of its borders, non client area, etc...
-
  */
 Win_Move(Hwnd, X="", Y="", W="", H="", Flags="") {
 ;	static SWP_NOMOVE=2, SWP_NOREDRAW=8, SWP_NOSIZE=1, SWP_NOZORDER=4, SWP_NOACTIVATE = 0x10, SWP_ASYNCWINDOWPOS=0x4000, HWND_BOTTOM=1, HWND_TOPMOST=-1, HWND_NOTOPMOST = -2
-	static SWP_NOMOVE=2, SWP_NOSIZE=1, SWP_NOZORDER=4, SWP_NOACTIVATE = 0x10, SWP_R=8, SWP_A=0x4000
+	static SWP_NOMOVE=2, SWP_NOSIZE=1, SWP_NOZORDER=4, SWP_NOACTIVATE=16, SWP_R=8, SWP_A=0x4000
 
 	hFlags := SWP_NOZORDER | SWP_NOACTIVATE
 	loop, parse, Flags
 		hFlags |= SWP_%A_LoopField%
 		
-	if (x y != "") {
-		p := DllCall("GetParent", "uint", hwnd), Win_Get(p, "Lxy", px, py), Win_GetRect(hwnd, "xywh", cx, cy, cw, ch)
-		if x=
-			x := cx - px
-		if y=
-			y := cy - py
+	if (X Y != "") {
+		p := DllCall("GetParent", "uint", Hwnd), Win_Get(p, "Lxy", px, py), Win_GetRect(Hwnd, "xywh", cx, cy, cw, ch)
+		ifEqual, X,, SetEnv, X, % cx - px
+		ifEqual, Y,, SetEnv, Y, % cy - py
 	} else hFlags |= SWP_NOMOVE
 
-	if (h w != "") {
+	if (W H != "") {
 		if !cx
-			Win_GetRect(hwnd, "wh", cw, ch)
-		if w=
-			w := cw
-		if h=
-			h := ch
-	} else  hFlags |= SWP_NOSIZE
+			Win_GetRect(Hwnd, "wh", cw, ch)
+		ifEqual, W,, SetEnv, W, %cw%
+		ifEqual, H,, SetEnv, H, %ch%
+	} else hFlags |= SWP_NOSIZE
 
-	return DllCall("SetWindowPos", "uint", Hwnd, "uint", 0, "int", x, "int", y, "int", w, "int", h, "uint", hFlags)
+	return DllCall("SetWindowPos", "uint", Hwnd, "uint", 0, "int", X, "int", Y, "int", W, "int", H, "uint", hFlags)
 }
 
 /*
