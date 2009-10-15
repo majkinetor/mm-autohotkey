@@ -117,16 +117,19 @@ Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
  			Resize the window so all controls fit. 
 
  Remarks:
-			This function works the same as Gui, Show, autosize.
-			However, it takes into account custom controls too.
+			This function works similar to Gui, Show, AutoSize. The difference is that it takes into account custom controls and
+			it isn't connected to other gui operations.
+
+			HForm	- Form handle.
+			Delta	- Dot delimited string, DeltaW "." DeltaH. Delta is added to the calculated window size.
 
  Dependencies:
 			<Win> 1.22
  */
-Form_AutoSize( Hwnd ) {
+Form_AutoSize( HForm, Delta="" ) {
 	static win_GetChildren = "Win_GetChildren", win_Get = "Win_Get", win_Move = "Win_Move", win_GetRect = "Win_GetRect"
 
-    width := height := 0, %win_Get%(Hwnd, "NhBxy", th, bx, by), children := %win_GetChildren%(Hwnd)
+    width := height := 0, %win_Get%(HForm, "NhBxy", th, bx, by), children := %win_GetChildren%(HForm)
     Loop, Parse, children, `n
     { 
 		ifEqual, A_LoopField,, continue
@@ -134,16 +137,18 @@ Form_AutoSize( Hwnd ) {
 		ifGreater, w, %width%,  SetEnv, width, %w%
 		ifGreater, h, %height%, SetEnv, height, %h%
     }
-	width +=2*bx, height += th + 2*by
-	%win_Move%(Hwnd, "", "", width, height)
+	ifNotEqual, Delta,, StringSplit, Delta, Delta, .
+	else Delta1 := Delta2 := 0
+	width +=2*bx + Delta1 , height += th + 2*by + Delta2
+	%win_Move%(HForm, "", "", width, height)
 }
 
 /*
  Function:	Destroy
 			Destroy the form.
  */
-Form_Destroy( Form="") {
-	n := Form_getNum(Form)
+Form_Destroy( HForm="") {
+	n := Form(HForm)
 	Gui, %n%:Destroy
 }
 
@@ -154,8 +159,8 @@ Form_Destroy( Form="") {
  Remarks:
 			
  */
-Form_Default( Form ) {
-	n := Form_getNum(Form)
+Form_Default( HForm ) {
+	n := Form(HForm)
 	Gui, %n%:Default
 }
 
@@ -163,9 +168,13 @@ Form_Default( Form ) {
  Function:		Hide
 				Hide the form.
  */
-Form_Hide( Form ) {
-	n := Form_getNum(Form)
+Form_Hide( HForm ) {
+	n := Form(HForm)
 	Gui, %n%:Hide
+}
+
+Form_GetNextPos( HForm ) {
+	Gui, %n%
 }
 
 /*
@@ -176,7 +185,7 @@ Form_Hide( Form ) {
 			Options	- Form options. Any AHK Gui option can be set plus extensions listed bellow:
 
  Extensions:
-			a#		- Alpha. Range from 0% - 100%
+			a#		- Alpha, procentage.
 			c#		- Gui color. Hexadecimal or integer value.
 			e#		- How Escape key works. "e1" will hide the form. "e2" will destroy the form. "e3" will exit the app.
 					  Operation can happen only if form is the active window.
@@ -198,43 +207,19 @@ Form_Hide( Form ) {
 
 			If you are adding control to the panel, Margin
  */
-Form_New(Options="") {
-	Form_Parse(Options, "x# y# w# h# a# c* Font Label* t? e# m#", x, y, w, h, a, c, font, label, t, e, m, extra)
-
-	pos := (x!="" ? " x" x : "") (y!="" ? " y" y : "") (w!="" ? " w" w : "") (h!="" ? " h" h : "")
-	ifEqual, pos,, SetEnv, pos, w400 h200
-
+Form_New(Options="") {			
 	if !(n := Form_getFreeGuiNum())
 		return A_ThisFunc "> Maximum number of windows created."
 
-	ifEqual, label,,SetEnv, label, Form%n%
+	Gui, %n%:+LastFound
+	hForm := WinExist()+0, 	Form(hForm, n)
 
-	Gui, %n%:+LastFound +Label%label%_ %extra%
-	hForm := WinExist()+0
-	if e
-		Form_SetEsc(hForm, e)
+	if Options !=
+		Form_set(hForm, Options, n)
 
-	if (m != "") {
-		StringSplit, m, m, .
-		Gui, Margin, %m1%, %m2%
-	}
-
-	ifNotEqual, a,,WinSet, Transparent, % a*2.5
-	ifNotEqual, c,,Gui, %n%:Color, %c%
-	if (t) {
-		Gui, Color, 12345
-		WinSet, TransColor, 12345
-	}
-		
-	if (font != "") {
-		StringSplit, font, font, %A_Space%
-		Gui, %n%:Font, %font1%, %font2%
-	}
-	
-	Gui, %n%:Show, %pos% Hide, %label%
-	Form(hForm, n), Form(label, n), Form(n, label)
 	return hForm
 }
+
 
 /*
  Function:	Parse
@@ -355,10 +340,57 @@ Form_Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",By
  Returns:
   
  */
-Form_Show( Form="", Title="~ `a" ){
-	n := Form_getNum(Form)
+Form_Show( HForm="", Title="~ `a" ){
+	ifEqual, HForm,, SetEnv, n, 1
+	else n := Form(HForm)
 	ifEqual, Title,~ `a, SetEnv, Title, % Form(n)
 	Gui, %n%:Show, ,%Title%
+}
+
+/*
+ Function:		Set
+				Set Form options.
+ 
+ Parameters:
+				hForm	- Handle of the form.
+				Options	- Form options. See <New> for details.  
+ */
+Form_Set(hForm, Options="", n="") {
+
+	ifEqual, n,, SetEnv, n, % Form(hForm)
+	Form_Parse(Options, "x# y# w# h# a# c* Font Label* t? e# m#", x, y, w, h, a, c, font, label, t, e, m, extra)
+	pos := (x!="" ? " x" x : "") (y!="" ? " y" y : "") (w!="" ? " w" w : "") (h!="" ? " h" h : "")
+
+	ifEqual, label,,SetEnv, label, Form%n%
+	Gui, %n%:+Label%label%_ %extra%
+
+	if e
+		Form_SetEsc(hForm, e)
+
+	if (m != "") {
+		StringSplit, m, m, .
+		Gui,%n%:Margin, %m1%, %m2%
+	}
+
+	ifNotEqual, a,,WinSet, Transparent, % a*2.5
+	ifNotEqual, c,,Gui, %n%:Color, %c%
+	if (t) {
+		Gui, %n%:Color, 12345
+		WinSet, TransColor, 12345, ahk_id %hForm%
+	}
+		
+	if (font != "") {
+		StringSplit, font, font, %A_Space%
+		Gui, %n%:Font, %font1%, %font2%
+	}
+
+	WinGet, style, Style, ahk_id %hForm%
+	hide := style & 0x10000000 ? "" : "Hide"
+	
+	ifEqual, n,, SetEnv, label,					;n is valid only when new form is created.
+
+	Gui, %n%:Show, %hide% %pos%, %label%
+	Form(label, n), Form(n, label)
 }
 
 /*
@@ -423,14 +455,6 @@ Form_getFreeGuiNum(){
 			return A_Index
 	}
 	return 0
-}
-
-Form_getNum( Form="" ) {
-	ifEqual, Form,,return 1
-	if Form is integer
-		ifLess, Form, 100, return Form
-		else return Form(Form)
-	else return Form(Form)
 }
 
 Form_split(opt, s, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="") {

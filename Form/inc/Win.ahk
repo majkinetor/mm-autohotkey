@@ -148,7 +148,7 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
 				VarSetCapacity(TBI, 44, 0), NumPut(44, TBI, 0), DllCall("GetTitleBarInfo", "uint", hwnd, "str", TBI)
 				title_x := NumGet(TBI, 4, "Int"), title_y := NumGet(TBI, 8, "Int"), title_w := NumGet(TBI, 12) - title_x, title_h := NumGet(TBI, 16) - title_y 
 				WinGet, style, style, ahk_id %Hwnd%				
-				title_h :=  style & 0xC00000 ? title_h : 0			  ; if no WS_CAPTION style , set 0 as win sets randoms otherwise...
+				title_h :=  style & 0xC00000 ? title_h : 0			  ; if no WS_CAPTION style, set 0 as win sets randoms otherwise...
 				goto Win_Get_Rect
 		Win_Get_B:
 				rect := "border"

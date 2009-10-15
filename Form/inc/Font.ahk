@@ -14,34 +14,34 @@
  Returns:	
 			Font handle.
  */
-Font(hCtrl="", Font="", bRedraw=1) {
+Font(HCtrl="", Font="", BRedraw=1) {
 	static WM_SETFONT := 0x30
 
-	StringSplit, Font, Font, `,,%A_Space%%A_Tab%
-	fontStyle := Font1, fontFace := Font2
-	if fontStyle is not integer
+	if Font is not integer
 	{
+		StringSplit, Font, Font, `,,%A_Space%%A_Tab%
+		fontStyle := Font1, fontFace := Font2
+
 	  ;parse font 
-		italic      := InStr(fontStyle, "italic")    ?  1    :  0 
-		underline   := InStr(fontStyle, "underline") ?  1    :  0 
-		strikeout   := InStr(fontStyle, "strikeout") ?  1    :  0 
-		weight      := InStr(fontStyle, "bold")      ? 700   : 400 
+		italic      := InStr(Font1, "italic")    ?  1    :  0 
+		underline   := InStr(Font1, "underline") ?  1    :  0 
+		strikeout   := InStr(Font1, "strikeout") ?  1    :  0 
+		weight      := InStr(Font1, "bold")      ? 700   : 400 
 
 	  ;height 
 
-		RegExMatch(Font, "(?<=[S|s])(\d{1,2})(?=[ ,]*)", height) 
-		if (height = "") 
-		  height := 10 
+		RegExMatch(Font1, "(?<=[S|s])(\d{1,2})(?=[ ,]*)", height) 
+		ifEqual, height,, SetEnv, height, 10
 		RegRead, LogPixels, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontDPI, LogPixels 
 		height := -DllCall("MulDiv", "int", Height, "int", LogPixels, "int", 72) 
 	
-		IfEqual, FontFace,,SetEnv FontFace, MS Sans Serif
+		IfEqual, Font2,,SetEnv Font2, MS Sans Serif
 	 ;create font 
-	   hFont   := DllCall("CreateFont", "int",  height, "int",  0, "int",  0, "int", 0 
+		hFont   := DllCall("CreateFont", "int",  height, "int",  0, "int",  0, "int", 0
 						  ,"int",  weight,   "Uint", italic,   "Uint", underline 
-						  ,"uint", strikeOut, "Uint", nCharSet, "Uint", 0, "Uint", 0, "Uint", 0, "Uint", 0, "str", fontFace, "Uint")
-	} else hFont := fontStyle
-	ifNotEqual, hCtrl,,SendMessage,WM_SETFONT, hFont, bRedraw,,ahk_id %hCtrl%
+						  ,"uint", strikeOut, "Uint", nCharSet, "Uint", 0, "Uint", 0, "Uint", 0, "Uint", 0, "str", Font2, "Uint")
+	} else hFont := Font
+	ifNotEqual, HCtrl,,SendMessage, WM_SETFONT, hFont, BRedraw,,ahk_id %HCtrl%
 	return hFont
 }
 
@@ -58,10 +58,14 @@ Font(hCtrl="", Font="", bRedraw=1) {
 				  Width could also be used with CALCRECT WORDBREAK style to calculate word-wrapped height of the text given its width.
 				
  Flags:
-		CALCRECT, BOTTOM, CALCRECT, CENTER, VCENTER, TABSTOP, SINGLELINE, RIGHT, NOPREFIX, NOCLIP, INTERNAL, EXPANDTABS.
+		CALCRECT, BOTTOM, CALCRECT, CENTER, VCENTER, TABSTOP, SINGLELINE, RIGHT, NOPREFIX, NOCLIP, INTERNAL, EXPANDTABS, AHKSIZE.
+
+ Returns:
+		Decimal number. Width "." Height of text. If AHKSIZE flag is set, the size will be returned as w%w% h%h%
+
  */    
 Font_DrawText(Text, DC="", Font="", Flags="", Rect="") {
-	static DT_CALCRECT=0x400, DT_WORDBREAK=0x10, DT_BOTTOM=0x8, DT_CALCRECT=0x400, DT_CENTER=0x1, DT_VCENTER=0x4, DT_TABSTOP=0x80, DT_SINGLELINE=0x20, DT_RIGHT=0x2, DT_NOPREFIX=0x800, DT_NOCLIP=0x100, DT_INTERNAL=0x1000, DT_EXPANDTABS=0x40
+	static DT_AHKSIZE=0, DT_CALCRECT=0x400, DT_WORDBREAK=0x10, DT_BOTTOM=0x8, DT_CALCRECT=0x400, DT_CENTER=0x1, DT_VCENTER=0x4, DT_TABSTOP=0x80, DT_SINGLELINE=0x20, DT_RIGHT=0x2, DT_NOPREFIX=0x800, DT_NOCLIP=0x100, DT_INTERNAL=0x1000, DT_EXPANDTABS=0x40
 
 	hFlag := (Rect = "") ? DT_NOCLIP : 0
 
@@ -71,7 +75,7 @@ Font_DrawText(Text, DC="", Font="", Flags="", Rect="") {
 		else hFlag |= DT_%A_LoopField%
 
 	if Font is integer
-		hFont := Font
+		hFont := Font, bUserHandle := 1
 	else if (Font != "")
 		hFont := Font( "", Font) 
 	else hFlag |= DT_INTERNAL
@@ -87,10 +91,11 @@ Font_DrawText(Text, DC="", Font="", Flags="", Rect="") {
 	h := DllCall("DrawTextA", "Uint", hDC, "Str", Text, "int", StrLen(Text), "uint", &RECT, "uint", hFlag)
 
   ;clean
-    DllCall("SelectObject", "Uint", hDC, "Uint", hOldFont) 
-	DllCall("DeleteObject", "Uint", hFont), DllCall("ReleaseDC", "Uint", 0, "Uint", hDC) 
+   	ifNotEqual, hOldFont,,DllCall("SelectObject", "Uint", hDC, "Uint", hOldFont) 
+	ifNotEqual, bUserHandle, 1, DllCall("DeleteObject", "Uint", hFont)
+	ifNotEqual, DC,,DllCall("ReleaseDC", "Uint", 0, "Uint", hDC) 
 
-	return NumGet(RECT, 8) " " h
+	return InStr(Flags, "AHKSIZE") ? "w" NumGet(RECT, 8) " h" h : NumGet(RECT, 8) "." h
 } 
 
 /* Group: About
