@@ -42,6 +42,7 @@
 		o <Dlg>			- Common dialogs.
 		o <DockA>		- Docking system for AutoHotKey windows.
 		o <_>			- Script initializer and set of helper functions.
+		o <ShowMenu>	- Show menu from the text.
 
  Group: Extensions
 		o <Align>		- Aligns controls inside the parent.
@@ -82,6 +83,7 @@
 #include *i DockA.ahk
 #include *i Dlg.ahk
 #include *i Scroller.ahk
+#include *i ShowMenu.ahk
 #include *i Win.ahk
 
 /* 
