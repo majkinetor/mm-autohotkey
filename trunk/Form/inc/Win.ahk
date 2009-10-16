@@ -628,8 +628,8 @@ Win_SetParent(Hwnd, HParent=0, bFixStyle=false){
 	}
 	r := DllCall("SetParent", "uint", Hwnd, "uint", HParent)
 	ifEqual, r, 0, return 0
-
-	SendMessage, WM_CHANGEUISTATE,UIS_INITIALIZE,,,ahk_id %HParent%
+	SendMessage, WM_CHANGEUISTATE, UIS_INITIALIZE,,,ahk_id %HParent%
+	return r
 }
 
 

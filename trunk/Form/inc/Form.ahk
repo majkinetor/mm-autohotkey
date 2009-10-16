@@ -193,17 +193,14 @@ Form_Hide( HForm ) {
 Form_GetNextPos( HForm, Options="",  ByRef x="", ByRef y="") {
 	n := Form(HForm)
 
-	oldDelayC := A_ControlDelay, oldDelayW := A_WinDelay 
-
+	oldDelay := A_WinDelay 
 	Gui, %n%:Add, Text, %Options% HWNDhDummy, Dummy
 
-	SetControlDelay, 0
 	ControlGetPos, x, y,,,,ahk_id %hDummy%
-	SetControlDelay, %oldDelayC%
 
-	SetWinDelay, 0
+	SetWinDelay, -1
 	WinKill, ahk_id %hDummy%
-	SetWinDelay, oldDelayW
+	SetWinDelay, oldDelay
 	return "x" x " y" y
 }
 
