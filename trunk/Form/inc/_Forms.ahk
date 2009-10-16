@@ -41,6 +41,7 @@
 		o <Win>			- Set of window functions.
 		o <Dlg>			- Common dialogs.
 		o <DockA>		- Docking system for AutoHotKey windows.
+		o <_>			- Script initializer and set of helper functions.
 
  Group: Extensions
 		o <Align>		- Aligns controls inside the parent.
@@ -77,6 +78,7 @@
 
 
 ;utilities
+#include *i _.ahk
 #include *i DockA.ahk
 #include *i Dlg.ahk
 #include *i Scroller.ahk
