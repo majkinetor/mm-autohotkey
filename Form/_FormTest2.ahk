@@ -12,11 +12,6 @@ _()
 
 	Form_AutoSize( hForm1, 10.5)
 	Form_Show(hForm1, "xCenter yCenter")
-
-	hForm2 := Form_New("e2 w100 h100 +ToolWindow")
-
-	Form_Show(hForm2, "x0")
-	Win_SetOwner(hForm2, WinExist("Untitled"))
 return
 
 PictureDrag: 
