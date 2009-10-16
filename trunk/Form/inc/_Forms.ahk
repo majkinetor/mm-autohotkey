@@ -37,9 +37,10 @@
 		o <QHTM>		- Qhtm custom control.
 		o <SpreadSheet> - SpreadSheet custom control.
 		o <Property>	- Property custom control.
-		o <RaGrid>		- Ragrid custom control.
+		o <RaGrid>		- Ragrid custom control.]
 		o <Win>			- Set of window functions.
 		o <Dlg>			- Common dialogs.
+		o <DockA>		- Docking system for AutoHotKey windows.
 
  Group: Extensions
 		o <Align>		- Aligns controls inside the parent.
@@ -76,6 +77,7 @@
 
 
 ;utilities
+#include *i DockA.ahk
 #include *i Dlg.ahk
 #include *i Scroller.ahk
 #include *i Win.ahk
