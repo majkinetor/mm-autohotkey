@@ -1,4 +1,5 @@
 _("mo! w d")
+DetectHiddenWindows, on
 	SetWorkingDir, inc
 	hForm1	:=	Form_New("w400 e3 h300 +Resize ")
 
@@ -9,18 +10,39 @@ _("mo! w d")
 	Form_Add(hForm3, "SpreadSheet", "", "", "Align F", "Attach h w")
 
 	DockA(hForm1, hForm2, "x(1) y() h(1)")
-	DockA(hForm1, hForm3, "x() y(,,30) w(1,-5)")
+	DockA(hForm1, hForm3, "x(,,-24) y(,,30) w(1,20)")
 	DockA(hForm1)
 
 	ShowForms(true)
+	OnMessage(0x47, "a") ;WM_WINDOWPOSCHANGED 
 return
 
 Form1_Size:
 	DockA( hForm1 )
 return
 
+a(w,LParam,m,h){
+	global
+
+	if	(h = hForm2)
+	{
+		WinGetPos hX, hY, hW,, ahk_id %hForm1%
+		WinGetPos cX, cY,,, ahk_id %h%
+		DockA(hForm1, h, "x(1,," cX-(hX+hW) ") y() h(1)")
+	}
+}
+
+
 Form1_Close:
 	ShowForms(false)
+return
+
+Form2_ContextMenu:
+	ShowMenu("[cm]`nset left|set right|set top|set bottom", "", "", "|")
+return
+
+cm:
+
 return
 
 ShowForms(BShow) {

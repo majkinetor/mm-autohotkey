@@ -373,7 +373,7 @@ d_(hwnd, msg, id="", time=""){
 	static 
 	ifEqual, id, , return %hwnd% := msg
 	DllCall(adrKillTimer, "uint", 0, "uint", id)
-	fun := %id%, %fun%( %id%_1, %id%_2 )
+	fun := %id%, %fun%( %id%_1, %id%_2 ), %id%_1 := %id%_2 := ""
 }
 
 /*
