@@ -1,8 +1,5 @@
-_("mo")
-#SingleInstance, force
+_()
 #MaxThreads, 255		;Required for this sample with cursor/tooltip extensions.
-#NoEnv
-
 
 	n := 5				;create 28 * 2**n controls
 

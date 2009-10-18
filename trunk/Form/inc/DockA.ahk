@@ -44,10 +44,11 @@ DockA_(HHost, HClient, DockDef, Hwnd) {
 			init := OnMessage(3, A_ThisFunc) ; WM_MOVE 	;adrSetWindowPos := DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), "str", "SetWindowPos")
 
 		HClient += 0, HHost += 0
-		if (DockDef="-") && InStr(%HHost%, HClient) {
-			StringReplace, %HHost%, %HHost%, %A_Space%%HClient%
-			return
-		}
+		if (DockDef="-") 
+			if InStr(%HHost%, HClient) {
+				StringReplace, %HHost%, %HHost%, %A_Space%%HClient%
+				return
+			} else return
 
 	   if (DockDef = "") {		;pin
 	      WinGetPos hX, hY,,, ahk_id %HHost%
