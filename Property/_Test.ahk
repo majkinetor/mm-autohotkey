@@ -1,4 +1,4 @@
-_("mo")
+;_("mo")
 DetectHiddenWindows, on
 #SingleInstance, force
 SetBatchLines, -1
@@ -19,11 +19,6 @@ SetBatchLines, -1
 
 	p = 
 		(LTrim
-		Name=My Checkbox
-		Type=CheckBox
-		Value=is that ok ?
-		Param=0
-
 		Name=My Checkbox
 		Type=CheckBox
 		Value=is that ok ?
