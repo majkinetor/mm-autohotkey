@@ -501,23 +501,23 @@ Property_add2Form(hParent, Txt, Opt){
 }
 
 Property_handler(hCtrl, event, earg, col, row){
-	static lastParam, lastSel, _hctrl, rowToSet
+	static lastParam, lastSel=1, _hctrl, rowToSet
 
 	if (event = "S") {		
-		if (SS_GetCellType(hCtrl, 2, row) = "EXPANDED") {
-			rowToSet := lastSel > row ? row-1 : row+1
-			lastSel := row, _hctrl := hCtrl
-			SetTimer, Property_timer, -1
+		ifEqual, lastSel, %row%, return
 
-			return 1				;don't allow selection of separators.
-		} 
-
-		if (col = 1) {
-			rowToSet := row, _hctrl := hCtrl
+		bSeparator := SS_GetCellType(hCtrl, 2, row)	= "Expanded"
+		if (col = 1) && !bSeparator {
+			_hctrl := hCtrl
 			SetTimer, Property_timer, -1					;if user selects first column, switch to 2nd so he can use shortcuts on combobox, checkbox etc...	
 			return 	"", 
 		} 
 
+		if (bSeparator) {
+			rowToSet := abs(lastSel-row) > 1 ? row+1 : lastSel-row > 0 ? row -1 : row+1,  _hctrl := hCtrl
+			SetTimer, Property_timer, -1
+			return 1				;don't allow selection of separators.
+		} 
 		lastSel := row
 	}
 
@@ -549,7 +549,7 @@ Property_handler(hCtrl, event, earg, col, row){
 	return r
 
  Property_timer:
-	SS_SetCurrentCell(_hCtrl, 2, rowtoSet), SS_Redraw(_hCtrl)
+	SS_SetCurrentCell(_hCtrl, 2, lastSel := rowToSet), SS_Redraw(_hCtrl), Property_handler(_hCtrl, "S", "", 2, rowToSet)
  return
 }
 
@@ -565,7 +565,6 @@ Property_SetColSize(hCtrl, C=120) {
 	ifEqual, w, 0, SetEnv, w, 300
 	SS_SetColWidth(hCtrl, 1, C-b), SS_SetColWidth(hCtrl, 2, w-C-b)
 }
-
 
 /*
 	Storage function

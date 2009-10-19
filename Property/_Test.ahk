@@ -1,3 +1,4 @@
+_("mo")
 DetectHiddenWindows, on
 #SingleInstance, force
 SetBatchLines, -1
