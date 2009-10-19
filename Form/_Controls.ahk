@@ -39,17 +39,16 @@
 	QHTM_AddHtml(hInfo, "<br><h6>Total: " ctrlNo)
 	Form_Show(), OnQHTM("", "", init )
 	SB_SetText("StatusBar")
-;	Attach("OnAttach")
-return
-
-F4::	
-	Scroller_UpdateBars(hTab)
+	Attach("OnAttach")
 return
 
 OnAttach(Hwnd) {
 	global
 	;if (Hwnd = hButtonPanel) /* Could be used to stretch button image on resizing */
 	;	hbitmap := Ext_Image(hButton, "..\res\test.bmp") ;remove old bitmap....
+
+	if (Hwnd = pProperty)
+		Property_SetColSize(Win_GetChildren(pProperty), 150)
 }
 
 
@@ -148,6 +147,8 @@ InitControl(Name, HCtrl) {
 		Property_SetFont(hCtrl, "Separator", "bold s9, verdana")
 		Property_SetRowHeight(hCtrl, 25)
 		Property_Insert(HCtrl, p)
+		Property_SetColSize(Hctrl, 150)
+		pProperty := Win_Get(HCtrl, "P")
 	}
 
 	if Name = Scrollbar

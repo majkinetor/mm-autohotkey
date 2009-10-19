@@ -1002,43 +1002,42 @@ SS_SetColCount(hCtrl, nCols){
 			  Set font.
 	
 	Parameters:
-			  idx	- Font index to set (0-15).
-			  pFont	- Font description in usual AHK format ( "style, name").
+			  Idx	- Font index to set (0-15).
+			  Font	- Font description in usual AHK format ( "style, name").
 
 	Returns:
 			  Font handle
   */
-SS_SetFont(hCtrl, idx, pFont) {
+SS_SetFont(HCtrl, Idx, Font) {
 	static SPRM_SETFONT=0x487		;wParam=index, lParam=pointer to FONT struct. Returns font handle
 	
+
+	StringSplit, Font, Font, `,,%A_Space%%A_Tab%
+	fontStyle := Font1, fontFace := Font2
+
  ;parse font 
-    italic      := InStr(pFont, "italic")    ?  1 : 0 
-    underline   := InStr(pFont, "underline") ?  1 : 0 
-    strikeout   := InStr(pFont, "strikeout") ?  1 : 0 
-    bold		:= InStr(pFont, "bold")      ?  1 : 0
+    italic      := InStr(fontStyle, "italic")    ?  1 : 0 
+    underline   := InStr(fontStyle, "underline") ?  1 : 0 
+    strikeout   := InStr(fontStyle, "strikeout") ?  1 : 0 
+    bold		:= InStr(fontStyle, "bold")      ?  1 : 0
 
  ;height 
-    RegExMatch(pFont, "(?<=[S|s])(\d{1,2})(?=[ ,])", height) 
+    RegExMatch(fontStyle, "S)(?<=[S|s])(\d{1,2})(?=[ ,]*)", height) 
     ifEqual, height,, SetEnv, height, 0 
 
     RegRead, LogPixels, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontDPI, LogPixels 
     height := -DllCall("MulDiv", "int", Height, "int", LogPixels, "int", 72) 
 
- ;face 
-    RegExMatch(pFont, "S)(?<=,).+", face)    
-    if (face != "") 
-        face := RegExReplace( face, "S)(^\s*)|(\s*$)")      ;trim 
+	VarSetCapacity(FONT,48,0 )
+	DllCall("RtlMoveMemory", "uint", &FONT+4, "str", fontFace, "uint", StrLen(fontFace))
 
-	VarSetCapacity(FONT,48,0 )			;FONT struct       
-	DllCall("RtlMoveMemory", "uint", &FONT, "str", face, "uint", StrLen(face))
-
-	NumPut(height,	  FONT, 40)				;	ht			40	dd ?					;Height       
+	NumPut(height,	  FONT, 40)				;	ht			40	dd ?					;Height   
 	NumPut(bold,	  FONT, 44,"UChar")		;	bold		44	db ?					;Bold   
 	NumPut(italic,	  FONT, 45,"UChar")		;	italic		45	db ?					;Italics 
 	NumPut(underline, FONT, 46,"UChar")		;	underline	46	db ?					;Underline    
 	NumPut(strikeout, FONT, 47,"UChar")		;	strikeout	47	db ?					;Strikeout    
 
-	SendMessage,SPRM_SETFONT,idx,&FONT,, ahk_id %hCtrl%
+	SendMessage,SPRM_SETFONT,Idx,&FONT,, ahk_id %hCtrl%
 	return ErrorLevel 	
 }
 
