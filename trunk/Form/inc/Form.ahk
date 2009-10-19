@@ -385,15 +385,15 @@ Form_Show( HForm="", Options="", Title="" ){
 				Options	- Form options. See <New> for details.
 				n		- Internally used.
  */
-Form_Set(hForm, Options="", n="") {
+Form_Set(HForm, Options="", n="") {
 
 	ifEqual, n,, SetEnv, n, % Form(hForm)
 	Form_Parse(Options, "x# y# w# h# a# c* Font Label* t? e# m#", x, y, w, h, a, c, font, label, t, e, m, extra)
 	pos := (x!="" ? " x" x : "") (y!="" ? " y" y : "") (w!="" ? " w" w : "") (h!="" ? " h" h : "")
 
 	ifEqual, label,,SetEnv, label, Form%n%
-	Gui, %n%:+Label%label%_ %extra%
-
+	Gui, %n%:+LastFound +Label%label%_ %extra%
+ 
 	if e
 		Form_SetEsc(hForm, e)
 
@@ -406,7 +406,7 @@ Form_Set(hForm, Options="", n="") {
 	ifNotEqual, c,,Gui, %n%:Color, %c%
 	if (t) {
 		Gui, %n%:Color, 12345
-		WinSet, TransColor, 12345, ahk_id %hForm%
+		WinSet, TransColor, 12345
 	}
 		
 	if (font != "") {
@@ -414,7 +414,7 @@ Form_Set(hForm, Options="", n="") {
 		Gui, %n%:Font, %font1%, %font2%
 	}
 
-	WinGet, style, Style, ahk_id %hForm%
+	WinGet, style, Style
 	hide := style & 0x10000000 ? "" : "Hide"
 	
 	ifEqual, n,, SetEnv, label,					;n is valid only when new form is created.
