@@ -1,8 +1,8 @@
 /*  
 	Title:  SpreadSheet 
-			*SpreadSheet control*
+			SpreadSheet control is extremelly fast and small Excell like control, developed in Assembler.
 
-			SpreadSheet control is extremelly fast and small Excell like control, developed in Assembler. 
+			(See SpreadSheet.png)
  */
 
 /*
@@ -10,25 +10,25 @@
 			  Add control to the Gui
 
 	Parameters:
-			  hGui	- Parent's hwnd
-			  X-H	- Control coordinates
-			  Style	- White separated list of control styles, by default VSCROLL HSCROLL
-			  Handler - Notification handler, optional
+			  HParent	- Parent's handle.
+			  X..H		- Control coordinates.
+			  Style		- White separated list of control styles.
+			  Handler	- Notification handler, optional.
 			  DllPath	- Path to the dll, by default look at the working folder.
 
 	Styles:
 			 VSCROLL  HSCROLL  STATUS  GRIDLINES  ROWSELECT  CELLEDIT  GRIDMODE  COLSIZE  ROWSIZE  WINSIZE  MULTISELECT 
 	
 	Handler:
->			result := Handler(hWnd, Event, EArg, Col, Row)
+>			result := Handler(HCtrl, Event, EArg, Col, Row)
 
-			hWnd	- Handle of the speradsheet control that sends notification
+			HCtrl	- Handle of the speradsheet control that sends the notification.
 			Event	- Event that ocured. Can be *S* (select), *EB* (before edit), *EA* (after edit), *UB* (before update), *UA* (after update), *C* (click) and *D* (draw)
 			EArg    - Event argument. Depends on event. See below.
 			Col		- Column of the associated cell.
 			Row		- Row of the associated cell.
 			
-			result	- Handler result, depends on event. See bellow
+			result	- Handler result, depends on event. See bellow.
 			
 
 	Event types and returns:
@@ -38,22 +38,23 @@
 			EA	- User input. Return 1 to discard user input.
 			C	- B (Button) or H (Hyperlink). Return value isn't used.
 			EB,UB,UB - Empty (argument isn't used). Return value isn't used.
-			D	- Pointer to DRAWITEMSTRUCT. See http://msdn.microsoft.com/en-us/library/bb775802(VS.85).aspx
+			D	- Pointer to DRAWITEMSTRUCT. See <http://msdn.microsoft.com/en-us/library/bb775802(VS.85).aspx>.
 
 	Returns:
-			Control's handle	
+			Control's handle.	
 
   */
-SS_Add(hGui,X=0,Y=0,W=200,H=100, Style="VSCROLL HSCROLL", Handler="", DllPath="SprSht.dll"){
-	static SS_MODULEID
+SS_Add(HParent,X,Y,W,H, Style="", Handler="", DllPath=""){
+	static MODULEID
 	static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
 	static VSCROLL=0x0001, HSCROLL=0x0002, STATUS=0x0004, GRIDLINES=0x0008, ROWSELECT=0x0010, CELLEDIT=0x0020, GRIDMODE=0x0040, COLSIZE=0x0080, ROWSIZE=0x0100, WINSIZE=0x0200, MULTISELECT=0x0400
 
   ;standard registering procedure
-	if !SS_MODULEID { 
+	if !MODULEID { 
+		ifEqual, DllPath,,SetEnv, DllPath, SprSht.dll
 		if !DllCall("LoadLibrary", "str", DllPath)	
 			return A_ThisFunc "> Can't load library - " DllPath		
-		old := OnMessage(0x4E, "SS_onNotify"),	SS_MODULEID := 260609
+		old := OnMessage(0x4E, "SS_onNotify"),	MODULEID := 260609
 		if old != SS_onNotify
 			SS("oldNotify", RegisterCallback(old))
 	}
@@ -73,8 +74,8 @@ SS_Add(hGui,X=0,Y=0,W=200,H=100, Style="VSCROLL HSCROLL", Handler="", DllPath="S
       , "int",  y				; Top
       , "int",  w				; Width
       , "int",  h				; Height
-      , "Uint", hGui			; hWndParent
-      , "Uint", SS_MODULEID		; hMenu
+      , "Uint", HParent			; hWndParent
+      , "Uint", MODULEID		; hMenu
       , "Uint", 0				; hInstance
       , "Uint", 0, "Uint")
 	ifEqual, hCtrl, 0, return A_ThisFunc "> Error creating control"
@@ -87,7 +88,7 @@ SS_Add(hGui,X=0,Y=0,W=200,H=100, Style="VSCROLL HSCROLL", Handler="", DllPath="S
 
 /*
 	Function:	BlankCell
-				Erase the cell
+				Erase the cell.
   */
 SS_BlankCell(hCtrl, Col="", Row="") {
 	static SPRM_BLANKCELL=0x477		;Blank a cell. wParam=col, lParam=row
@@ -99,7 +100,7 @@ SS_BlankCell(hCtrl, Col="", Row="") {
 
 /*
 	Function: CreateCombo
-			  Creates COMBOBOX cell type
+			  Creates COMBOBOX cell type.
 	
 	Parameters:
 			  Content	- | separated list of ComboBox items.
@@ -127,7 +128,7 @@ SS_CreateCombo(hCtrl, Content, Height=150) {
 
 /*
 	Function: ConvertDate
-			  Converts date from / to integer
+			  Converts date from / to integer.
 	
 	Parameters:
 			  Date			- Integer or textual representation of the date.
@@ -163,10 +164,10 @@ SS_ConvertDate(hCtrl, Date, RefreshFormat=false) {
 
 /*
 	Function: DeleteCell
-			  Delete cell
+			  Delete cell.
 	
 	Remarks:
-			  Its misterious to me what is the difference between this one and <BlankCell>
+			  Its misterious to me what is the difference between this one and <BlankCell>.
   */
 SS_DeleteCell(hCtrl, Col="", Row="") {
 	static SPRM_DELETECELL=0x493	;Deletes a cell. wParam=col, lParam=row
@@ -178,7 +179,7 @@ SS_DeleteCell(hCtrl, Col="", Row="") {
 
 /*
 	Function: DeleteCol
-			  Delete column
+			  Delete column.
 	
 	Parameters:
 			  Col - Column index. Of omited, current column is used.
@@ -211,10 +212,10 @@ SS_DeleteRow(hCtrl, Row="") {
 
 /*
 	Function: ExpandCell
-			  Expand a cell to cover more than one cell
+			  Expand a cell to cover more than one cell.
 	
 	Parameters:
-			  Left, Top, Right, Bottom	- Coordinates of the expanded cell
+			  Left, Top, Right, Bottom	- Coordinates of the expanded cell.
   */
 SS_ExpandCell(hCtrl, Left, Top, Right, Bottom ){
 	static SPRM_EXPANDCELL=0x48E		;wParam=0, lParam=pointer to RECT struct
@@ -233,7 +234,7 @@ SS_ExpandCell(hCtrl, Left, Top, Right, Bottom ){
 			  o1 .. o5	- Reference to variables to receive output in order specified in pQ parameter.
 
 	Returns:	
-			  o1, so you don't need to use reference variables to grab only 1 field i.e. state := SS_GetCell(hctrl, 1,1, "state")
+			  o1, so you don't need to use reference variables to grab only 1 field i.e. state := SS_GetCell(hctrl, 1,1, "state").
   */
 SS_GetCell(hCtrl, Col, Row, pQ, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5=""){
 	static SPRM_GETCELLDATA=0x482				;wParam=0, lParam=Pointer to SPR_ITEM struct
@@ -496,24 +497,24 @@ SS_GetColWidth(hCtrl, col){
 }
 
 /*
-	Function: GetCurrentCell
-	Get current col/row in active window
+	Function:	GetCurrentCell
+				Get current cell in active window.
 
 	Parameters:
-			col, row	- Reference to variables to receive output.
+				Col, Row - Reference to variables to receive output.
   */
-SS_GetCurrentCell(hCtrl, ByRef col, ByRef row) {
-	static SPRM_GETCURRENTCELL=0x47A		;G. wParam=0, lParam=0. Returns Hiword=row, Loword=col
+SS_GetCurrentCell(hCtrl, ByRef Col, ByRef Row) {
+	static SPRM_GETCURRENTCELL=0x47A		; wParam=0, lParam=0. Returns Hiword=row, Loword=col
 	SendMessage,SPRM_GETCURRENTCELL,,,, ahk_id %hCtrl%
 	VarSetCapacity(s, 4), NumPut(ERRORLEVEL, s), col := NumGet(s, 0, "UShort"), row := NumGet(s, 2, "UShort")
 }
 
 /*
-	Function: GetCurrentCol
-	Get current column in active window. 
+	Function:	GetCurrentCol
+				Get current column in active window. 
 
 	Returns:
-			Current column index
+				Current column index.
   */
 SS_GetCurrentCol(hCtrl) {
  	static SPRM_GETCURRENTCELL=0x47A		;wParam=0, lParam=0. Returns Hiword=row, Loword=col
@@ -528,7 +529,7 @@ SS_GetCurrentCol(hCtrl) {
 	Get current row in active window. 
 
 	Returns:
-			Current row index
+			Current row index.
   */
 SS_GetCurrentRow(hCtrl) {
 	static SPRM_GETCURRENTCELL=0x47A		;GwParam=0, lParam=0. Returns Hiword=row, Loword=col
@@ -540,7 +541,7 @@ SS_GetCurrentRow(hCtrl) {
 
 /*
 	Function: GetCurrentWin
-	Get active splitt window
+	Get active splitt window.
   */
 SS_GetCurrentWin(hCtrl){
 	static SPRM_GETCURRENTWIN=0x478			; wParam=0, lParam=0
@@ -550,7 +551,7 @@ SS_GetCurrentWin(hCtrl){
 
 /*
 	Function: GetDateFormat
-			  Get date format	
+			  Get date format.	
   */
 SS_GetDateFormat(hCtrl) {
 	static SPRM_GETDATEFORMAT=0x494	;Returns date format string. wParam=0, lParam=0
@@ -560,7 +561,7 @@ SS_GetDateFormat(hCtrl) {
 
 /*
 	Function: GetLockCol
-	Get lock cols in active splitt
+	Get lock cols in active splitt.
   */
 SS_GetLockCol(hCtrl){
 	static SPRM_GETLOCKCOL=0x46A	; wParam=0, lParam=0
@@ -580,7 +581,7 @@ SS_GetLockRow(hCtrl){
 
 /*
 	Function: GetMultiSel
-			  Get multiselection
+			  Get multiselection.
 
 	Parameters:
 			  Top, Left, Right, Bottm	- Reference to variables to receive the output. You can omit any you don't need.
@@ -595,7 +596,7 @@ SS_GetMultiSel(hCtrl, ByRef Top="", ByRef Left="", ByRef Right="", ByRef Bottom=
 
 /*
 	Function: GetRowCount
-			  Get number of rows
+			  Get number of rows.
   */
 SS_GetRowCount(hCtrl){ 
 	static SPRM_GETROWCOUNT=0x474
@@ -605,7 +606,7 @@ SS_GetRowCount(hCtrl){
 
 /*
 	Function: GetRowHeight
-			  Returns row height
+			  Returns row height.
   */
 SS_GetRowHeight(hCtrl, Row) {
 	static SPRM_GETROWHEIGHT=0x480		;wParam=row, lParam=0
@@ -620,8 +621,8 @@ SS_GetRowHeight(hCtrl, Row) {
 			   Import a line of data.
 	
 	Parameters:
-			  DataLine	- Text containing the data
-			  SepChar	- Data separator, by default ";"
+			  DataLine	- Text containing the data.
+			  SepChar	- Data separator, by default ";".
   */
 SS_ImportLine(hCtrl, DataLine, SepChar=";") {
 	static SPRM_IMPORTLINE=0x48A ; wParam=SepChar, lParam=pointer to data line.
@@ -631,7 +632,7 @@ SS_ImportLine(hCtrl, DataLine, SepChar=";") {
 
 /*
 	Function: InsertCol
-			  Insert column
+			  Insert column.
 
 	Parameters:
 			  Col - Column index after which to insert column. By deault -1 means to append it.
@@ -648,7 +649,7 @@ SS_InsertCol(hCtrl, Col=-1) {
 
 /*
 	Function: InsertRow
-			  Insert row
+			  Insert row.
 	
 	Parameters:
 			  Row	- Position after which to insert row. By deault -1 means to append it.
@@ -665,10 +666,10 @@ SS_InsertRow(hCtrl, Row=-1) {
 
 /*
 	Function: LoadFile
-			  Load a file
+			  Load a file.
 	
 	Parameters:
-			  File	- File name
+			  File	- File name.
 
   */
 SS_LoadFile(hCtrl, File) {
@@ -689,7 +690,7 @@ SS_NewSheet(hCtrl) {
 
 /*
 	Function: ReCalc
-			  Recalculates the sheet
+			  Recalculates the sheet.
   */
 SS_ReCalc(hCtrl){
 	static SPRM_RECALC=0x476		
@@ -698,7 +699,7 @@ SS_ReCalc(hCtrl){
 }
 
 /*
-	Function: ReCalc
+	Function: Redraw
 			  Redraw the control.
   */
 SS_Redraw(hCtrl){
@@ -708,7 +709,7 @@ SS_Redraw(hCtrl){
 
 /*
 	Function: SaveFile
-			  Save a file	
+			  Save a file.
   */
 SS_SaveFile(hCtrl, File){
 	static SPRM_SAVEFILE=0x48C	;wParam=0, lParam=pointer to filename
@@ -728,7 +729,7 @@ SS_ScrollCell(hCtrl) {
 
 /*
 	Function: SetCell
-			  Set content of the cell
+			  Set content of the cell.
 
 	Parameters:
 			  Col, Row	- Cell coordinates.
@@ -736,12 +737,12 @@ SS_ScrollCell(hCtrl) {
 	
 	Named Parameters:
 			  type		- Type of the cell. See bellow for list of types. You will generally use type when setting up cells initially and omit it when changing existing cells.
-			  w, h	    - Width, height of the cell
-			  bg, fg	- Background, foreground color
-			  state		- Cell state
-			  txtal		- Text alignment and decimals. See aligment section for list of kewords. Use number to set FLOAT precision (1-12, all, sci)
-			  imgal		- Image alignment  and imagelist/control index  
-			  fnt		- Cell font index (0-15) 
+			  w, h	    - Width, height of the cell.
+			  bg, fg	- Background, foreground color.
+			  state		- Cell state.
+			  txtal		- Text alignment and decimals. See aligment section for list of kewords. Use number to set FLOAT precision (1-12, all, sci).
+			  imgal		- Image alignment  and imagelist/control index .
+			  fnt		- Cell font index (0-15).
 
 	Type Dependent Named Parameters:
 			  txt		- String (TEXT,CHECKBOX,*HDR), Number (INTEGER), hwndCombo (COMBOBOX), Formula Definition (FORMULA), Graph Definition (GRAPH)
@@ -757,25 +758,25 @@ SS_ScrollCell(hCtrl) {
 
 	Type Modifiers:
 	
-			BUTTON		- The cell contains button. Can be combined with TEXT or TEXTMULTILINE
-			WIDEBUTTON	- The cell will be entirely covered by button. Can be combined with TEXT or TEXTMULTILINE
+			BUTTON		- The cell contains button. Can be combined with TEXT or TEXTMULTILINE.
+			WIDEBUTTON	- The cell will be entirely covered by button. Can be combined with TEXT or TEXTMULTILINE.
 			DATE		- Can be combined with INTEGER.
 			FORCETYPE	- The cell will preserve its type when edited.
-						  Can be combined with TEXT, INTEGER, FLOAT, TEXTMULTILINE, BUTTON, WIDEBUTTON or HYPERLINK
+						  Can be combined with TEXT, INTEGER, FLOAT, TEXTMULTILINE, BUTTON, WIDEBUTTON or HYPERLINK.
 			FIXEDSIZE	- Will force a 15 by 15 pixel image. To be combined with BUTTON, CHECKBOX or COMBOBOX. 
-						  Can be combined with BUTTON, CHECKBOX or COMBOBOX		
+						  Can be combined with BUTTON, CHECKBOX or COMBOBOX	.	
 
 	States:
 			LOCKED - Cell is locked for editing.
 			HIDDEN - Cell content is not displayed.
 			REDRAW - Cell is being redrawn.
 			RECALC - Cell is being recalculated.
-			ERROR  - There are 4 error states: ERROR DIV0 UNDERFLOW OVERFLOW
+			ERROR  - There are 4 error states: ERROR DIV0 UNDERFLOW OVERFLOW.
 			
 	Aligments:
-			LEFT RIGHT MIDDLE - X aligments
-			TOP CENTER BOTTOM - Y aligments
-			AUTO - Text left middle, numbers right middle
+			LEFT RIGHT MIDDLE - X aligments.
+			TOP CENTER BOTTOM - Y aligments.
+			AUTO - Text left middle, numbers right middle.
 			GLOBAL	- If you omit aligment attribute, this one will be used.
   */
 SS_SetCell(hCtrl, Col="", Row="", o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o9="", o10="", o11=""){
@@ -938,44 +939,44 @@ SS_SetCellString(hCtrl, Txt="", Type=""){
 
 /*
 	Function: SetColWidth
-			  Set column width
+			  Set column width.
   */
-SS_SetColWidth(hCtrl, col, width){
+SS_SetColWidth(hCtrl, Col, Width){
 	static SPRM_SETCOLWIDTH=0x47F	
-	SendMessage,SPRM_SETCOLWIDTH,col,width,, ahk_id %hCtrl%
+	SendMessage,SPRM_SETCOLWIDTH,Col,Width,, ahk_id %hCtrl%
 	return ERRORLEVEL
 }
 
 /*
-	Function: SetCurrentCell
-	Set current cell in active window
+	Function:	SetCurrentCell
+				Set current cell in the active window.
 
 	Parameters:
-			col, row	- Coordinates of the cell to select
+				Col, Row	- Coordinates of the cell to select.
   */
-SS_SetCurrentCell(hCtrl, col, row) {
+SS_SetCurrentCell(hCtrl, Col, Row) {
 	static SPRM_SETCURRENTCELL=0x47B		;wParam=col, lParam=row
-	SendMessage,SPRM_SETCURRENTCELL,col,row,, ahk_id %hCtrl%
+	SendMessage,SPRM_SETCURRENTCELL,Col,Row,, ahk_id %hCtrl%
 	return ErrorLevel 
 }
 
 /*
 	Function:	SetCurrentWin
-				Set active splitt window
+				Set active splitt window.
 	
 	Parameters:
-				nWin	- Window number (0-7)
+				Win	- Window number (0-7).
   */
-SS_SetCurrentWin(hCtrl, nWin){
+SS_SetCurrentWin(hCtrl, Win){
 	static	SPRM_SETCURRENTWIN=0x479		;wParam=0, lParam=nWin (0-7)
-	SendMessage,SPRM_SETCURRENTWIN,,nWin,, ahk_id %hCtrl%
+	SendMessage,SPRM_SETCURRENTWIN,,Win,, ahk_id %hCtrl%
 	return ERRORLEVEL
 }
 
 
 /*
 	Function: SetDateFormat
-			  Set date format
+			  Set date format.
 	
 	Parameters:
 			  Format - Date format. See Date Formats section in FormatTime AHK documentation for details.
@@ -988,7 +989,7 @@ SS_SetDateFormat(hCtrl, Format) {
 
 /*
 	Function: SetColCount
-			  Set number of columns
+			  Set number of columns.
   */
 SS_SetColCount(hCtrl, nCols){
 	static SPRM_SETCOLCOUNT=0x473
@@ -998,52 +999,51 @@ SS_SetColCount(hCtrl, nCols){
 
 /*
 	Function: SetFont
-			  Set font
+			  Set font.
 	
 	Parameters:
-			  idx	- Font index to set (0-15)
-			  pFont	- Font description in usual AHK format ( "style, name")
+			  Idx	- Font index to set (0-15).
+			  Font	- Font description in usual AHK format ( "style, name").
 
 	Returns:
 			  Font handle
   */
-SS_SetFont(hCtrl, idx, pFont) {
+SS_SetFont(HCtrl, Idx, Font) {
 	static SPRM_SETFONT=0x487		;wParam=index, lParam=pointer to FONT struct. Returns font handle
 	
+
+	StringSplit, Font, Font, `,,%A_Space%%A_Tab%
+	fontStyle := Font1, fontFace := Font2
+
  ;parse font 
-    italic      := InStr(pFont, "italic")    ?  1 : 0 
-    underline   := InStr(pFont, "underline") ?  1 : 0 
-    strikeout   := InStr(pFont, "strikeout") ?  1 : 0 
-    bold		:= InStr(pFont, "bold")      ?  1 : 0
+    italic      := InStr(fontStyle, "italic")    ?  1 : 0 
+    underline   := InStr(fontStyle, "underline") ?  1 : 0 
+    strikeout   := InStr(fontStyle, "strikeout") ?  1 : 0 
+    bold		:= InStr(fontStyle, "bold")      ?  1 : 0
 
  ;height 
-    RegExMatch(pFont, "(?<=[S|s])(\d{1,2})(?=[ ,])", height) 
+    RegExMatch(fontStyle, "S)(?<=[S|s])(\d{1,2})(?=[ ,]*)", height) 
     ifEqual, height,, SetEnv, height, 0 
 
     RegRead, LogPixels, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontDPI, LogPixels 
     height := -DllCall("MulDiv", "int", Height, "int", LogPixels, "int", 72) 
 
- ;face 
-    RegExMatch(pFont, "S)(?<=,).+", face)    
-    if (face != "") 
-        face := RegExReplace( face, "S)(^\s*)|(\s*$)")      ;trim 
+	VarSetCapacity(FONT,48,0 )
+	DllCall("RtlMoveMemory", "uint", &FONT+4, "str", fontFace, "uint", StrLen(fontFace))
 
-	VarSetCapacity(FONT,48,0 )			;FONT struct       
-	DllCall("RtlMoveMemory", "uint", &FONT, "str", face, "uint", StrLen(face))
-
-	NumPut(height,	  FONT, 40)				;	ht			40	dd ?					;Height       
+	NumPut(height,	  FONT, 40)				;	ht			40	dd ?					;Height   
 	NumPut(bold,	  FONT, 44,"UChar")		;	bold		44	db ?					;Bold   
 	NumPut(italic,	  FONT, 45,"UChar")		;	italic		45	db ?					;Italics 
 	NumPut(underline, FONT, 46,"UChar")		;	underline	46	db ?					;Underline    
 	NumPut(strikeout, FONT, 47,"UChar")		;	strikeout	47	db ?					;Strikeout    
 
-	SendMessage,SPRM_SETFONT,idx,&FONT,, ahk_id %hCtrl%
+	SendMessage,SPRM_SETFONT,Idx,&FONT,, ahk_id %hCtrl%
 	return ErrorLevel 	
 }
 
 /*
 	Function: SetGlobal
-			  Set all global parameters for the control
+			  Set all global parameters for the control.
 
 	Parameters:
 				g		- Global formating array base name.
@@ -1053,30 +1053,30 @@ SS_SetFont(hCtrl, idx, pFont) {
 				winhdr	- Window header formatting array base name.
 
 	Global array elements:
-				colhdrbtn	- Column header button
-				rowhdrbtn	- Row header button
-				winhdrbtn	- Win header button
-				lockcol     - Back color of locked cell 
-				hdrgrdcol	- Header grid color                     
-				grdcol		- Cell grid color
-				bcknfcol	- Back color of active cell, lost focus 
-				txtnfcol	- Text color of active cell, lost focus 
-				bckfocol	- Back color of active cell, has focus  
-				txtfocol	- Text color of active cell, has focus  
-				ncols		- Number of columns,  0-600, by default 255
-				nrows		- Number of rows, 0-65000, by default 255
-				ghdrwt		- Header width
-				ghdrht		- Header height
-				gcellw		- Cell width
-				gcellht		- Cell height
+				colhdrbtn	- Column header button.
+				rowhdrbtn	- Row header button.
+				winhdrbtn	- Win header button.
+				lockcol     - Back color of locked cell.
+				hdrgrdcol	- Header grid color.                    
+				grdcol		- Cell grid color.
+				bcknfcol	- Back color of active cell, lost focus.
+				txtnfcol	- Text color of active cell, lost focus.
+				bckfocol	- Back color of active cell, has focus.
+				txtfocol	- Text color of active cell, has focus. 
+				ncols		- Number of columns,  0-600, by default 255.
+				nrows		- Number of rows, 0-65000, by default 255.
+				ghdrwt		- Header width.
+				ghdrht		- Header height.
+				gcellw		- Cell width.
+				gcellht		- Cell height.
 
 	Header and cell formating elements:
-				bg			- Background color						
-				fg			- Foreground color
-				imgal		- Image align 
-				txtal		- Text align	
-				fnt			- Font index
-				tpe			- Control type
+				bg			- Background color.
+				fg			- Foreground color.
+				imgal		- Image align.
+				txtal		- Text align.	
+				fnt			- Font index.
+				tpe			- Control type.
 
   */
 SS_SetGlobal(hCtrl, g, cell, colhdr, rowhdr, winhdr) {
@@ -1132,10 +1132,10 @@ SS_SetGlobal(hCtrl, g, cell, colhdr, rowhdr, winhdr) {
 
 /*
 	Function: SetGlobalFields
-			  Set individual global parameters for the control
+			  Set individual global parameters for the control.
 			 
 	Parameters:
-			  fields -	White space separated list of field names to set
+			  fields -	White space separated list of field names to set.
 			  v1 .. v7 - Field values, respecting the order of names in fields argument.
 
 	Example:
@@ -1176,10 +1176,10 @@ SS_SetGlobalFields(hCtrl, Fields, v1="", v2="", v3="", v4="", v5="", v6="", v7="
 
 /*
 	Function: SetLockCol
-			  Lock columns in active split
+			  Lock columns in active split.
 
 	Parameter:
-			  Cols	- Number of columns to lock
+			  Cols	- Number of columns to lock.
   */
 SS_SetLockCol(hCtrl, Cols=1) {
 	static SPRM_SETLOCKCOL = 0x46B	;L wParam=0, lParam=cols
@@ -1189,10 +1189,10 @@ SS_SetLockCol(hCtrl, Cols=1) {
 
 /*
 	Function: SetLockRow
-			  Lock rows in active split			
+			  Lock rows in active split.		
 	
 	Parameter:
-			  Rows	- Number of rows to lock
+			  Rows	- Number of rows to lock.
   */
 SS_SetLockRow(hCtrl, Rows=1) {
 	static SPRM_SETLOCKROW = 0x46D	; wParam=0, lParam=rows
@@ -1213,7 +1213,7 @@ SS_SetMultiSel(hCtrl, Left, Top, Right, Bottom ){
 }
 /*
 	Function: SetRowCount
-			  Set number of rows
+			  Set number of rows.
   */
 SS_SetRowCount(hCtrl, nRows){
 	static SPRM_SETROWCOUNT=0x475
@@ -1223,7 +1223,7 @@ SS_SetRowCount(hCtrl, nRows){
 
 /*
 	Function: SetRowHeight
-			  Set row height
+			  Set row height.
 
 	Parameters:
 			  Row	 - Index of the row, by default 0 (header)
@@ -1248,7 +1248,7 @@ SS_SplittHor(hCtrl) {
 
 /*
 	Function: SplittVer
-	Create vertical splitt in current splitt at current col
+	Create vertical splitt in current splitt at current col.
   */
 SS_SplittVer(hCtrl) {
 	static SPRM_SPLITTVER=0x465		;wParam=0, lParam=0
@@ -1258,7 +1258,7 @@ SS_SplittVer(hCtrl) {
 
 /*
 	Function: SplittClose
-	Close the current splitt
+	Close the current splitt.
   */
 SS_SplittClose(hCtrl) {
 	static SPRM_SPLITTCLOSE=0x466	; wParam=0, lParam=0
@@ -1268,7 +1268,7 @@ SS_SplittClose(hCtrl) {
 
 /*
 	Function:	SplittSync
-				Synchronizes a splitt window with it's parent
+				Synchronizes a splitt window with it's parent.
   */
 SS_SplittSync(hCtrl, Flag=1 ) {	;. wParam=0, lParam=TRUE/FALSE
 	static SPRM_SPLITTSYNC=0x467	
@@ -1276,19 +1276,31 @@ SS_SplittSync(hCtrl, Flag=1 ) {	;. wParam=0, lParam=TRUE/FALSE
 	return ERRORLEVEL
 }
 
+;=============================================== PRIVATE ===============================================
+;required by the Forms framework
+SpreadSheet_add2Form(hParent, Txt, Opt) {
+	static f := "Form_Parse"
+	
+	%f%(Opt, "x# y# w# h# style dllPath g*", x, y, w, h, style, dllPath, handler)
+	h := SS_Add(hParent, x, y, w, h, style, handler, dllPath)
+	ifNotEqual, Txt,, ControlSetText,, %Txt%, ahk_id %h%
+
+	return h
+}
 
 SS_onNotify(wparam, lparam, msg, hwnd){
-	static SS_MODULEID := 260609, oldNotify="*"
+	static MODULEID := 260609, oldNotify="*"
 	static SPRN_SELCHANGE=1, SPRN_BEFOREEDIT=2, SPRN_AFTEREDIT=3, SPRN_BEFOREUPDATE=4, SPRN_AFTERUPDATE=5, SPRN_HYPERLINKENTER=6, SPRN_HYPERLINKLEAVE=7, SPRN_HYPERLINKCLICK=8, SPRN_BUTTONCLICK=9
 
-	if ((NumGet(lparam+4)) != SS_MODULEID){
-		ifEqual, oldNotify, *, SetEnv, ooldNotify, % SS("OldNotify")		
-		ifNotEqual, oldNotify,,return DllCall(OldNotify, "uint", wparam, "uint", lparam, "uint", msg, "uint", hwnd)		
-		return
-	}
+	if (_ := (NumGet(Lparam+4))) != MODULEID
+	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
+	 else {
+		ifEqual, oldNotify, *, SetEnv, oldNotify, % SS("oldNotify")		
+		if oldNotify !=
+			return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
+	 }
 
 	hw := NumGet(lparam+0),  code := NumGet(lparam+8)
-
 	handler := SS(hw "Handler")
 	ifEqual, handler,, return
 	
@@ -1445,28 +1457,7 @@ SS_strAtAdr(adr) {
    Return DllCall("MulDiv", "Int",adr, "Int",1, "Int",1, "str") 
 }
 
-/*
-	Storage function
-			  
-	
-	Parameters:
-			  var		- Variable name to retreive. To get up to 5 variables at once, omit this parameter
-			  value		- Optional variable value to set. If var is empty value contains list of vars to retreive with optional prefix
-			  o1 .. o5	- If present, reference to variables to receive values.
-	
-	Returns:
-			  o	if _value_ is omited, function returns the current value of _var_
-			  o	if _value_ is set, function sets the _var_ to _value_ and returns previous value of the _var_
-			  o if _var_ is empty, function accepts list of variables in _value_ and returns values of those varaiables in o1 .. o5
-
-	Examples:
-			
- >			s(x)	 - return value of x
- >			s(x, v)  - set value of x to v and return previous value
- >			s("", "x y z", x, y, z)  - get values of x, y and z into x, y and z
- >			s("", "preffix_)x y z", x, y, z) - get values of preffix_x, preffix_y and preffix_z into x, y and z
-			
-*/
+;Storage function
 ss(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
 	static
 	if (var = "" ){
@@ -1698,7 +1689,6 @@ return
 */
 
 /* Group: Known Bugs
-
 	o Cell cursor disapears in expanded cells.
 	o Multiselect scrolling by mouse is too fast.
 	o Scroll-locked area does not work well with splitts.
@@ -1706,9 +1696,9 @@ return
 */
 
 /* Group: About
-	o AHK module ver 2.1.1 by majkinetor
-	o SpreadSheet control Version: 0.0.2.1 by KetilO <http://www.masm32.com/board/index.php?topic=6913.0>
-	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
+	o SpreadSheet control version: 0.0.2.1 by KetilO <http://www.masm32.com/board/index.php?topic=6913.0>
+	o AHK module ver 0.0.2.1-2 by majkinetor.
+	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
 
  */
 

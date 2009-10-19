@@ -9,10 +9,12 @@ SetBatchLines, -1
 	Gui, Add, Button, gBtn w60 x+10, Reload
 	Gui, Add, Button, gBtn w60 x+10, Reset
 	Gui, Add, Button, gBtn w60 x+10, Stress
-
-	hCtrl := Property_Add( hGui, 0, 40, w, h-40, "", "Handler")
-	Property_SetColors(hCtrl, "pbAAEEAA sbaaeeaa sffff")
-	Property_SetFont(hCtrl, "Separator", "bold s9, verdana")
+	hCtrl := Property_Add( hGui, 0, 40, w, h-70, "", "Handler")
+	Property_SetColors(hCtrl, "pbAAEEAA sbAAAAA")
+	Property_SetFont(hCtrl, "Property", "s9  italic,")
+	Property_SetFont(hCtrl, "Value", "s9, Courier new")
+	Property_SetFont(hCtrl, "Separator", "s12, Verdana")
+	Property_SetFont(hCtrl, "Hyperlink", "s9 underline, Courier new")
 
 	p = 
 		(LTrim
@@ -23,7 +25,6 @@ SetBatchLines, -1
 
 		Name=My Separator
 		Type=Separator
-		Value=25
 		
 		Name=My Button
 		Type=Button
@@ -33,9 +34,9 @@ SetBatchLines, -1
 		Type=Text
 		Value=default text
 
-		Name=Some longer fat separator
+		Name=Some fat separator
 		Type=Separator
-		Value=55
+		Value=60
 	
  		Name=My HyperLink
 		Type=HyperLink
@@ -58,6 +59,8 @@ SetBatchLines, -1
 	else Property_InsertFile(hCtrl, "properties")
 
 	Property_SetRowHeight(hCtrl, 25)
+	SB_SetText(Property_Count(hCtrl))
+	Gui, Add, StatusBar
 	Gui, Show, w%w% h%h%
 return
 
@@ -96,20 +99,23 @@ Btn:
 
 	if A_GuiControl = Save
 	{
+		SB_SetText("Saving properties ....")
 		Control, Disable, ,Button1,A
 		Property_Save(hCtrl, "Properties", true)
 		Control, Enable, ,Button1,A
+		SB_SetText("")
 	}
 
 	if A_GuiControl = Stress
 	{		
 		Control, Disable, ,Button3,A
 		StartTime := A_TickCount
+		SB_SetText("Adding properties....")
 		Property_Insert(hCtrl, Stress(p, 10)), 
 		time := A_TickCount - StartTime
 		SS_Redraw(hCtrl)
 		Control, Enable, ,Button1,A
-		Msgbox % "Number of Rows: " Property_Count(hCtrl) "`nTime: " time "ms"
+		SB_SetText( "Number of Rows: " Property_Count(hCtrl) "`nTime: " time "ms")
 	}
 return
 
