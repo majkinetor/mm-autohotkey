@@ -1,6 +1,9 @@
 /*
   Title:		Property
 				Properties viewer and editor.
+
+  Dependencies:
+				<SpreadSheet>
  */
 
 /*
@@ -34,16 +37,15 @@
 
  Retunrs:
 				Control's handle.
-
  */
 Property_Add(HParent, X=0, Y=0, W=200, H=100, Style="", Handler="") {
 	hCtrl := SS_Add(HParent, X, Y, W, H, "GRIDMODE CELLEDIT ROWSELECT " style, "Property_handler")
-	Property_initSheet(hCtrl)
+	Property_initSheet(hCtrl), Property_SetColSize(hCtrl)
 	if IsFunc(Handler)
 		Property(hCtrl "handler", Handler)
-	SS_SetLockCol(Hctrl, 1)
 	return hCtrl
 }
+
 
 /*
  Function:		Clear
@@ -537,16 +539,19 @@ Property_timer:
 return
 }
 
-Property_initSheet(hCtrl, c=120){
-	static b
-	ifEqual, b, ,SysGet, b, 46	;get 3d border dim
-	ControlGetPos, ,,w,h,,ahk_id %hCtrl%
-	SS_SetColWidth(hCtrl, 1, c-b)
-	 , SS_SetColWidth(hCtrl, 2, w-c-b)
-	 , SS_SetColCount(hCtrl, 2)
-	 , SS_SetRowCount(hCtrl, 0)
-	 , SS_SetRowHeight(hCtrl, 0, 0)
+Property_initSheet(hCtrl){
+	 SS_SetColCount(hCtrl, 2),  SS_SetLockCol(Hctrl, 1)
+	 SS_SetRowCount(hCtrl, 0),  SS_SetRowHeight(hCtrl, 0, 0)
 }
+
+Property_SetColSize(hCtrl, C=120) {
+	static b
+	ifEqual, b, ,SysGet, b, 46		;get 3d border dim	
+	ControlGetPos, ,,w,,,ahk_id %hCtrl%
+	ifEqual, w, 0, SetEnv, w, 300
+	SS_SetColWidth(hCtrl, 1, C-b), SS_SetColWidth(hCtrl, 2, w-C-b)
+}
+
 
 /*
 	Storage function
@@ -585,7 +590,7 @@ Property(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 }
 
 /* Group: About
-	o Module ver 1.01 by majkinetor
+	o Module ver 1.02 by majkinetor
 	o SpreadSheet control Version: 0.0.2.1 by KetilO <http://www.masm32.com/board/index.php?topic=6913.0>.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
 
