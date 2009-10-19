@@ -8,15 +8,8 @@ _("e d")
 	Gui, 2:Add, Button, gOnButton,Toggle dock
 	Gui, 2:Show,  w300 h200, Form2
 	hForm2 := WinExist()
-	
-	Gui, 3:+LastFound -Caption
-	Gui, 3:Show,  Hide w150 h140, Form3
-	Gui, 3:Add, Listbox, x0 y0,1|2|3
-	Gui, 3:Add, Statusbar
-	hForm3 := WinExist()
 
 	DockA(hForm1, hForm2, "x(1) y() h(1)")
-	DockA(hForm1, hForm3, "x() y(,,30) w(1)")
 	DockA(hForm1), bDockOn := 1
 
 	ShowForms(true)
