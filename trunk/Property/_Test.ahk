@@ -23,6 +23,11 @@ SetBatchLines, -1
 		Value=is that ok ?
 		Param=0
 
+		Name=My Checkbox
+		Type=CheckBox
+		Value=is that ok ?
+		Param=0
+
 		Name=My Separator
 		Type=Separator
 		

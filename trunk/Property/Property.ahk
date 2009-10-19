@@ -46,7 +46,6 @@ Property_Add(HParent, X=0, Y=0, W=200, H=100, Style="", Handler="") {
 	return hCtrl
 }
 
-
 /*
  Function:		Clear
 				Clear Property control.
@@ -502,10 +501,25 @@ Property_add2Form(hParent, Txt, Opt){
 }
 
 Property_handler(hCtrl, event, earg, col, row){
-	static last
+	static lastParam, lastSel, _hctrl, rowToSet
 
-	if (event = "S") and (col=1) 
-		SetTimer, Property_timer, -1					;if user selects first column, switch to 2nd so he can use shortcuts on combobox, checkbox etc...	
+	if (event = "S") {		
+		if (SS_GetCellType(hCtrl, 2, row) = "EXPANDED") {
+			rowToSet := lastSel > row ? row-1 : row+1
+			lastSel := row, _hctrl := hCtrl
+			SetTimer, Property_timer, -1
+
+			return 1				;don't allow selection of separators.
+		} 
+
+		if (col = 1) {
+			rowToSet := row, _hctrl := hCtrl
+			SetTimer, Property_timer, -1					;if user selects first column, switch to 2nd so he can use shortcuts on combobox, checkbox etc...	
+			return 	"", 
+		} 
+
+		lastSel := row
+	}
 
 	handler := Property(hctrl "handler")
 	ifEqual, handler, ,return
@@ -523,7 +537,7 @@ Property_handler(hCtrl, event, earg, col, row){
 			return
 
 		if (event="UB")
-			last := param
+			lastParam := param
 
 		StringReplace, event, event, U, E
 	}
@@ -531,12 +545,12 @@ Property_handler(hCtrl, event, earg, col, row){
 	;tooltip %etype% %event%,300, 300, 4
 	r := %handler%(hCtrl, event, name, value, param)
 	if (r && event="EA" && param != "")	; checkbox & combobox don't have EDIT, but only UPDATE notification and in that case you can't prevent change.
-		SS_SetCellData(hCtrl, last, col, row), SS_Redraw(hCtrl)
+		SS_SetCellData(hCtrl, lastParam, col, row), SS_Redraw(hCtrl)
 	return r
 
-Property_timer:
-	SS_SetCurrentCell(hCtrl, 2, SS_GetCurrentRow(hCtrl))
-return
+ Property_timer:
+	SS_SetCurrentCell(_hCtrl, 2, rowtoSet), SS_Redraw(_hCtrl)
+ return
 }
 
 Property_initSheet(hCtrl){
