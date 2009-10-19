@@ -1,16 +1,23 @@
-DockA(HHost="", HClient="", DockDef="") {
-	DockA_(HHost, HClient, DockDef, "")
-}
+/* Title:   DockA
+			Dock AHK windows.
+
+			Using dock module you can glue windows to an AHK window.
+			Docked windows are called Clients and the window that keeps their  position relative to itself is called the Host. 
+			Once Clients are connected to the Host, this group of windows will behave like single window - moving, sizing, focusing, hiding and other
+			OS events will be handled by the module so that the "composite window" behaves like the single window.
+
+			This module is version of Dock module that supports only AHK hosts (hence A in the name).
+			Unlike Dock module, it doesnt'uses system hook to monitor windows changes.
+*/
 
 /*
-	Function:  Dock 
+	Function:  DockA
  
- 
-	Parameters: 
+ 	Parameters: 
  
             Hwnd	  - HWND of the Client GUI. Dock is created or updated (if already exists) for that hwnd.                           
             DockDef   - Dock definition, see bellow. To remove dock client pass "-". 
-                       If you pass empty string, client will be docked to the host according to its current position relative to the host. 
+						If you pass empty string, client will be docked to the host according to its current position relative to the host. 
 
 	Dock definition:  
 			Dock definition is white space separated combination of parameters which describe Client's position relative to the Host.
@@ -33,8 +40,12 @@ DockA(HHost="", HClient="", DockDef="") {
  >			y(0,1,0) = y(0,1) = y(,1) = y(,1,) = y(,1,0) = ...
 
 			Notice that x() is not the same as omitting x entirely. First case is equal to x(0,0,0) so it will set Client's X coordinate to be equal as Host's. 
-			In second case, x coordinate of the client will not be affected by the module (client will keep whatever x it had before).
+			In second case, x coordinate of the client will not be affected by the module (client will keep whatever x it has).
  */
+DockA(HHost="", HClient="", DockDef="") {
+	DockA_(HHost, HClient, DockDef, "")
+}
+
 DockA_(HHost, HClient, DockDef, Hwnd) {
 	static
 	
@@ -92,3 +103,33 @@ DockA_(HHost, HClient, DockDef, Hwnd) {
 
 	critical %oldCritical%
 }
+
+/*
+ Group: Presets
+		This section contains some common docking setups. You can just copy/paste dock definition strings in your script.
+
+		x(,-1) y()						- top left, own size.
+		x(,-1,10) y()					- top left, own size, 10px padding.
+		x(,-1)  y() h(1)				- top left, use host's height, keep own width.
+		x(,-1,20) y() w(,50) h(1)		- top left, use host's height, set width to 50 and padding to 20px.
+		x(,-1)  y(.5,-.5)				- middle left, keep own size.
+			
+		x(,-1)  y(1,-1) w(,20) h(,20)	- bottom left, fixed width & height to 20px.
+		x(,-1)  y(1,-1) h(.5)			- bottom left, keep height half of the Host's height, keep own width.
+		x(1,-1) y(1)  w(.25) h(.25)		- bottom right, width and height 1/5 of the Host.
+		
+		x()	y(1) w(1) h(,100)			- below the host, use host's width, height = 100.
+		x()	y(,-1,-5) w(1)   			- above the host, use host's width, keep own height, 5px padding.
+		x(.5,-.5) y(,-1) w(,200) h(,30)	- center above the host, width=200, height=30.
+		x(.5,-.5) y(1) w(0.3) h(,30)	- center bellow the host, use 1/3 Host's width, height=30.
+		
+		x(1) y()						- top right, own size.
+		x(1) y() w(,40) h(1)			- top right, use host's height, width = 40.
+        x(1) y(.5,-.5)					- middle right, keep own size.
+ */
+
+/*
+ Group: About 
+    o Ver 1.0 by majkinetor.
+	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
+*/
