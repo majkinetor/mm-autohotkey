@@ -37,14 +37,12 @@
 
  Retunrs:
 				Control's handle.
-
  */
 Property_Add(HParent, X=0, Y=0, W=200, H=100, Style="", Handler="") {
 	hCtrl := SS_Add(HParent, X, Y, W, H, "GRIDMODE CELLEDIT ROWSELECT " style, "Property_handler")
-	Property_initSheet(hCtrl)
+	Property_initSheet(hCtrl), Property_SetColSize(hCtrl)
 	if IsFunc(Handler)
 		Property(hCtrl "handler", Handler)
-	SS_SetLockCol(Hctrl, 1)
 	return hCtrl
 }
 
@@ -52,12 +50,12 @@ Property_Add(HParent, X=0, Y=0, W=200, H=100, Style="", Handler="") {
  Function:		Clear
 				Clear Property control.
  */
-Property_Clear(hCtrl){
-	SS_NewSheet(hCtrl), Property_initSheet(hCtrl), 	SS_Redraw(hCtrl)
+Property_Clear(HCtrl){
+	SS_NewSheet(HCtrl), Property_initSheet(HCtrl), 	SS_Redraw(HCtrl)
 }
 
-Property_Count(hCtrl) {
-	return SS_GetRowCount(hCtrl)
+Property_Count(HCtrl) {
+	return SS_GetRowCount(HCtrl)
 }
 
 /*
@@ -70,13 +68,13 @@ Property_Count(hCtrl) {
 								  Value holds the handle of the ListBox.
 
  */
-Property_Define(hCtrl, ComboEvent=false) {
+Property_Define(HCtrl, ComboEvent=false) {
 	n := SS_GetRowCount(hCtrl)
 	loop, %n%
 	{
-		type := SS_GetCellType(hCtrl, 2, A_Index) 
-		p := SS_GetCellText(hCtrl, 1, A_Index) 
-		v := SS_GetCellText(hCtrl, 2, A_Index) 
+		type := SS_GetCellType(HCtrl, 2, A_Index) 
+		p := SS_GetCellText(HCtrl, 1, A_Index) 
+		v := SS_GetCellText(HCtrl, 2, A_Index) 
 		
 		s = %s%Name=%p%`nType=
 		if type=EXPANDED
@@ -417,11 +415,28 @@ Property_Set( hCtrl, Name, Value, Param="") {
 }
 
 /*
+ Function:	SetColSize
+			Set column size.
+ 
+ Parameters:
+	
+			C	- Size of the first column, by default 120. The other column will be sized automatically according to the control width.
+  
+ */
+Property_SetColSize(HCtrl, C=120) {
+	static b
+	ifEqual, b, ,SysGet, b, 46		;get 3d border dim	
+	ControlGetPos, ,,w,,,ahk_id %hCtrl%
+	ifEqual, w, 0, SetEnv, w, 300
+	SS_SetColWidth(HCtrl, 1, C-b), SS_SetColWidth(HCtrl, 2, w-C-b)
+}
+
+/*
  Function:		SetColors
 				Set colors of property elements.
 
  Parameters:
-				colors	- String containing white space separated colors of property elements.
+				Colors	- String containing white space separated colors of property elements.
 
  Colors:		
 				PB PF - property bg & fg 
@@ -431,8 +446,8 @@ Property_Set( hCtrl, Name, Value, Param="") {
  Example:
 >				Property_SetColors("pbAAEEAA sbBFFFFF")   ;set property and separator background color
  */
-Property_SetColors(hCtrl, colors){
-	Loop, parse, colors, %A_Space%%A_Tab%,%A_Space%%A_Tab%
+Property_SetColors(hCtrl, Colors){
+	Loop, parse, Colors, %A_Space%%A_Tab%,%A_Space%%A_Tab%
 	{
 		ifEqual, A_LoopField,,continue
 		StringLeft c, A_LoopField, 2
@@ -446,22 +461,22 @@ Property_SetColors(hCtrl, colors){
  				Set font of propety element.
 
   Parameters:
-				Element	- One of the four available elements: Property, Value, Separator, Hyperlink
+				Element	- One of the four available elements: Property, Value, Separator, Hyperlink.
 				Font	- Font description in AHK format
 */
 
-Property_SetFont(hCtrl, Element, Font) {
+Property_SetFont(HCtrl, Element, Font) {
 
-	if (element="Property")
+	if (Element="Property")
 		idx := 0
-	if (element="Value")
+	else if (Element="Value")
 		idx := 1
-	if (element="Separator")
+	else if (Element="Separator")
 		idx := 2
-	if (element="HyperLink")
+	else if (Element="HyperLink")
 		idx := 3
 
-	return SS_SetFont(hCtrl, idx, font)
+	return SS_SetFont(HCtrl, idx, Font)
 }
 
 /*
@@ -472,13 +487,13 @@ Property_SetFont(hCtrl, Element, Font) {
 				Name	- Property name for which to get the value, or its index in the list
 				Param	- Property parameter.
  */
-Property_SetParam( hCtrl, Name, Param) {
+Property_SetParam( HCtrl, Name, Param) {
 	ifEqual Name,,return A_ThisFunc "> Name can't be empty"
 
 	if Name is not integer
-		 i := Property_Find( hCtrl, Name)
+		 i := Property_Find( HCtrl, Name)
 	else i := Name
-	return SS_SetCell(hCtrl, 2, i, "data=" Param)
+	return SS_SetCell(HCtrl, 2, i, "data=" Param)
 }
 
 /*
@@ -503,10 +518,25 @@ Property_add2Form(hParent, Txt, Opt){
 }
 
 Property_handler(hCtrl, event, earg, col, row){
-	static last
+	static lastParam, lastSel=1, _hctrl, rowToSet
 
-	if (event = "S") and (col=1) 
-		SetTimer, Property_timer, -1					;if user selects first column, switch to 2nd so he can use shortcuts on combobox, checkbox etc...	
+	if (event = "S") {		
+		ifEqual, lastSel, %row%, return
+
+		bSeparator := SS_GetCellType(hCtrl, 2, row)	= "Expanded"
+		if (col = 1) && !bSeparator {
+			rowToSet := row, _hctrl := hCtrl
+			SetTimer, Property_timer, -1					;if user selects first column, switch to 2nd so he can use shortcuts on combobox, checkbox etc...	
+			return 	"", 
+		} 
+
+		if (bSeparator) {
+			rowToSet := abs(lastSel-row) > 1 ? row+1 : lastSel-row > 0 ? row -1 : row+1,  _hctrl := hCtrl
+			SetTimer, Property_timer, -1
+			return 1				;don't allow selection of separators.
+		} 
+		lastSel := row
+	}
 
 	handler := Property(hctrl "handler")
 	ifEqual, handler, ,return
@@ -524,7 +554,7 @@ Property_handler(hCtrl, event, earg, col, row){
 			return
 
 		if (event="UB")
-			last := param
+			lastParam := param
 
 		StringReplace, event, event, U, E
 	}
@@ -532,23 +562,17 @@ Property_handler(hCtrl, event, earg, col, row){
 	;tooltip %etype% %event%,300, 300, 4
 	r := %handler%(hCtrl, event, name, value, param)
 	if (r && event="EA" && param != "")	; checkbox & combobox don't have EDIT, but only UPDATE notification and in that case you can't prevent change.
-		SS_SetCellData(hCtrl, last, col, row), SS_Redraw(hCtrl)
+		SS_SetCellData(hCtrl, lastParam, col, row), SS_Redraw(hCtrl)
 	return r
 
-Property_timer:
-	SS_SetCurrentCell(hCtrl, 2, SS_GetCurrentRow(hCtrl))
-return
+ Property_timer:
+	SS_SetCurrentCell(_hCtrl, 2, lastSel := rowToSet), SS_Redraw(_hCtrl), Property_handler(_hCtrl, "S", "", 2, rowToSet)
+ return
 }
 
-Property_initSheet(hCtrl, c=120){
-	static b
-	ifEqual, b, ,SysGet, b, 46	;get 3d border dim
-	ControlGetPos, ,,w,h,,ahk_id %hCtrl%
-	SS_SetColWidth(hCtrl, 1, c-b)
-	 , SS_SetColWidth(hCtrl, 2, w-c-b)
-	 , SS_SetColCount(hCtrl, 2)
-	 , SS_SetRowCount(hCtrl, 0)
-	 , SS_SetRowHeight(hCtrl, 0, 0)
+Property_initSheet(hCtrl){
+	 SS_SetColCount(hCtrl, 2),  SS_SetLockCol(Hctrl, 1)
+	 SS_SetRowCount(hCtrl, 0),  SS_SetRowHeight(hCtrl, 0, 0)
 }
 
 /*
@@ -588,7 +612,7 @@ Property(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 }
 
 /* Group: About
-	o Module ver 1.01 by majkinetor
+	o Module ver 1.02 by majkinetor
 	o SpreadSheet control Version: 0.0.2.1 by KetilO <http://www.masm32.com/board/index.php?topic=6913.0>.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
 

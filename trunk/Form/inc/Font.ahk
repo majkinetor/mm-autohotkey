@@ -16,7 +16,7 @@
  */
 Font(HCtrl="", Font="", BRedraw=1) {
 	static WM_SETFONT := 0x30
-
+	
 	if Font is not integer
 	{
 		StringSplit, Font, Font, `,,%A_Space%%A_Tab%

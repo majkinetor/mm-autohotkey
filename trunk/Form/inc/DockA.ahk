@@ -41,9 +41,12 @@
 
 			Notice that x() is not the same as omitting x entirely. First case is equal to x(0,0,0) so it will set Client's X coordinate to be equal as Host's. 
 			In second case, x coordinate of the client will not be affected by the module (client will keep whatever x it has).
+
+	Remarks:
+			You can monitor WM_WINDOWPOSCHANGED=0x47 to detect when user move clients (if they are movable) in order to update dock properties
  */
 DockA(HHost="", HClient="", DockDef="") {
-	DockA_(HHost, HClient, DockDef, "")
+	DockA_(HHost+0, HClient+0, DockDef, "")
 }
 
 DockA_(HHost, HClient, DockDef, Hwnd) {
@@ -100,7 +103,7 @@ DockA_(HHost, HClient, DockDef, Hwnd) {
 		, y := hY + %j%_y1*hH + %j%_y2*(h ? h : cH) + %j%_y3
 		WinMove ahk_id %j%,,x,y, w ? w : "" ,h ? h : ""			;	DllCall(adrSetWindowPos, "uint", hwnd, "uint", 0, "uint", x ? x : cX, "uint", y ? y : cY, "uint", w ? w : cW, "uint", h ? h :cH, "uint", 1044) ;4 | 0x10 | 0x400 
 	}
-
+	SetWinDelay, %oldDelay%
 	critical %oldCritical%
 }
 

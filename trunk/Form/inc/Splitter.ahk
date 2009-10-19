@@ -115,8 +115,8 @@ Splitter_SetPos( HSep, Pos ) {
 ;required by forms framework.
 Splitter_add2Form(HParent, Txt, Opt){
 	static parse = "Form_Parse"
-	%parse%(Opt, "handler", handler)
-	DllCall("SetParent", "uint", hCtrl := Splitter_Add(Opt, Txt, handler), "uint", HParent)
+	%parse%(Opt, "handler", handler, extra)
+	DllCall("SetParent", "uint", hCtrl := Splitter_Add(extra, Txt, handler), "uint", HParent)
 	return hCtrl
 }
 
@@ -283,6 +283,6 @@ Splitter(Var="", Value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="
  */
 
 /* Group: About
-	o Ver 1.1 by majkinetor. 
+	o Ver 1.11 by majkinetor. 
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */
