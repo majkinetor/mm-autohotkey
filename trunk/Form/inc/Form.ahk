@@ -215,7 +215,7 @@ Form_GetNextPos( HForm, Options="",  ByRef x="", ByRef y="") {
 			a#		- Alpha, procentage.
 			c#		- Gui color. Hexadecimal or integer value.
 			e#		- How Escape key works. "e1" will hide the form. "e2" will destroy the form. "e3" will exit the app.
-					  Operation can happen only if form is the active window.
+					  Operation can happen only if form is the active window. This option can not be used together with FormN_Escape routine.
 			m#		- Margin, decimal number in the form X.Y .
 			Font	- Gui font (style, face).
 			Name	- Name of the form, by default FormN where N is the number of the forms created.
@@ -493,9 +493,9 @@ Form_split(opt, s, ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5=
 	return o0
 }
 
+
 Form_setEsc(Hwnd, Type) {
 	static
-
 	if list =
 		Hotkey, ~ESC, %A_ThisFunc%
 	

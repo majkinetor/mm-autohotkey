@@ -1,4 +1,4 @@
-_("mo! w d")
+_("mo! w d e")
 DetectHiddenWindows, on
 	SetWorkingDir, inc
 	hForm1	:=	Form_New("w400 e3 h300 +Resize ")
