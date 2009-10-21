@@ -78,10 +78,6 @@ apiPopulate()  {
   LV_ModifyCol(1), LV_ModifyCol(2, 0), LV_Modify(1, "select")
 }
 
-#Include RichEdit.ahk
-#Include Todo.ahk
-; #Include Structures.ahk
-
 ;//////////////////////////////////////////////////////////////////
 
 
@@ -101,7 +97,7 @@ apiPopulate()  {
 
   ;   MsgBox, Face = %Face% `nstyle = %style%  `ncolor = %color%
   ;
-  ;   CmnDlg_Font(Face, Style, Color, true, hwnd)
+  ;   Dlg_Font(Face, Style, Color, true, hwnd)
   ;   RichEdit_SetCharFormat(hRichEdit, Face, Style, Color)
   ;   MsgBox, Face = %Face% `nstyle = %style%  `ncolor = %color%
   return
@@ -111,7 +107,7 @@ apiPopulate()  {
   ;   RichEdit_SetCharFormat(hRichEdit, "", "strike", Color)
 
     RichEdit_GetCharFormat(hRichEdit, face, style, color)
-    CmnDlg_Font(Face, Style, Color, true, hwnd)
+    Dlg_Font(Face, Style, Color, true, hwnd)
 
   MsgBox, Face = %Face% `nstyle = %style%  `ncolor = %color%
 
@@ -398,7 +394,7 @@ SETBIDIOPTIONS:
 return
 ;---
 SetBkgndColor:  ; Sets the background color for a rich edit control.
-  CmnDlg_Color( color, hRichEdit )
+  Dlg_Color( color, hRichEdit )
   RichEdit_SetBgColor( hRichEdit, color )
 return
 ;---
@@ -552,3 +548,8 @@ Zoom:   ; Sets the zoom ratio anywhere between 1/64 and 64.
 return
 ;---
 
+
+
+#Include RichEdit.ahk
+#Include Todo.ahk
+#include inc\Dlg.ahk
