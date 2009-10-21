@@ -230,7 +230,7 @@ RichEdit_GetSel(hCtrl, ByRef cpMin="", ByRef cpMax="" )  {
  > RichEdit_GetText( hRichEdit, 4, 10 ) ; get range
  */
 RichEdit_GetText(hCtrl, cpMin="-", cpMax="-", codepage="")  {
-static WM_USER=0x400,EM_EXGETSEL=52,EM_GETTEXTEX=94,EM_GETTEXTRANGE=75,GT_SELECTION=2
+  static WM_USER=0x400,EM_EXGETSEL=52,EM_GETTEXTEX=94,EM_GETTEXTRANGE=75,GT_SELECTION=2
   ; GT_ALL=0,CP_ACP=0
   bufferLength := RichEdit_GetTextLength(hCtrl, "CLOSE", "UNICODE" )
   If (cpMin="-" && cpMax="-")
@@ -843,12 +843,6 @@ Richedit_Zoom(hCtrl, zoom=0)  {
 
  ; ///////////////////////////////  UNDER CONSTRUCTION  //////////////////////////////////////////////
 
-______________________:
-return
-
-
-
-
 /*
  Function: GetCharFormat
 			Get or set the current text mode of a rich edit control.
@@ -919,9 +913,6 @@ RichEdit_GetCharFormat(hCtrl, ByRef font="", ByRef style="", ByRef color="", mod
   DllCall("RtlMoveMemory", "str", font, "Uint", &CHARFORMAT + 26, "Uint", 32)
 }
 
-
-
-
 EM_GETCHARFORMAT222(hCtrl, ByRef face="", ByRef style="", ByRef color="")  {
   static EM_GETCHARFORMAT=58,WM_USER=0x400
   static SCF_DEFAULT=0x0,SCF_SELECTION=0x1
@@ -958,9 +949,6 @@ EM_GETCHARFORMAT222(hCtrl, ByRef face="", ByRef style="", ByRef color="")  {
   ;-
    face:=szFaceName, style:=cfeDesc, color:=crTextColor
 }
-
-
-
 
 /*
  Function: SetCharFormat
@@ -1060,7 +1048,6 @@ RichEdit_SetCharFormat(hCtrl, face="", style="", color="-", mode="SELECTION")  {
  ;
  ; }
 
-
 RichEdit_GETWORDWRAPMODE(hCtrl)  {
   static EM_GETWORDWRAPMODE=103,WM_USER=0x400
 
@@ -1069,12 +1056,12 @@ RichEdit_GETWORDWRAPMODE(hCtrl)  {
 }
 
 RichEdit_SETWORDWRAPMODE(hCtrl)  {
-  static EM_SETWORDWRAPMODE=102,WM_USER=0x400
-static WBF_WORDWRAP = 0x10
-      ,EM_SETTARGETDEVICE = 72
-    ,state=0
-a=0
-state:=!state
+	static EM_SETWORDWRAPMODE=102,WM_USER=0x400
+	static WBF_WORDWRAP = 0x10
+		,EM_SETTARGETDEVICE = 72
+		,state=0
+	a=0
+	state:=!state
 
  ; DllCall("SendMessage", "UInt", _ctrlID, "UInt", 0x448, "UInt", "0", "Int", !(opt1)) ; EM_SETTARGETDEVICE
 
@@ -1159,7 +1146,7 @@ RichEdit_wordBreakProc(lpch, ichCurrent, cch, code) {
  ;       Return, RegExMatch(SubStr(str, ichCurrent + 1, 1), exp)
 }
 
- ; EM_GETWORDBREAKPROC
+; EM_GETWORDBREAKPROC
 EM_SETWORDBREAKPROCEX(hCtrl)  {     ; *** no longer used after re2.0.  use  EM_SETWORDBREAKPROC to set EditWordBreakProc instead
  ;   static EM_SETWORDBREAKPROCEX=81,WM_USER=0x400
  ;
