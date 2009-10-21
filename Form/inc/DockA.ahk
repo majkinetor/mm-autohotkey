@@ -14,8 +14,8 @@
 	Function:  DockA
  
  	Parameters: 
- 
-            Hwnd	  - HWND of the Client GUI. Dock is created or updated (if already exists) for that hwnd.                           
+			HHost	  - Hwnd of the host GUI. This window must be AHK window.
+            HClient	  - HWND of the Client GUI. This window can be any window.
             DockDef   - Dock definition, see bellow. To remove dock client pass "-". 
 						If you pass empty string, client will be docked to the host according to its current position relative to the host. 
 

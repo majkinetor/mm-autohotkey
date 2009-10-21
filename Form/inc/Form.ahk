@@ -209,9 +209,9 @@ Form_GetNextPos( HForm, Options="",  ByRef x="", ByRef y="") {
 			Creates new form.
  
  Parameters:
-			Options	- Form options. Any AHK Gui option can be set plus extensions listed bellow:
+			Options	- Form options. Any AHK Gui option can be set plus custom options listed bellow.
 
- Extensions:
+ Custom Options:
 			a#		- Alpha, procentage.
 			c#		- Gui color. Hexadecimal or integer value.
 			e#		- How Escape key works. "e1" will hide the form. "e2" will destroy the form. "e3" will exit the app.
@@ -234,7 +234,7 @@ Form_GetNextPos( HForm, Options="",  ByRef x="", ByRef y="") {
 
 			If you are adding control to the panel, Margin
  */
-Form_New(Options="") {			
+Form_New(Options="", E1="", E2="", E3="", E4="", E5="") {
 	if !(n := Form_getFreeGuiNum())
 		return A_ThisFunc "> Maximum number of windows created."
 
@@ -516,6 +516,6 @@ Form_setEsc(Hwnd, Type) {
 }
 
 /* Group: About
-	o v0.7 by majkinetor.
+	o v0.8 by majkinetor.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
 /*

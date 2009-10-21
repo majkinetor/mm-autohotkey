@@ -588,14 +588,14 @@ Win_SetMenu(Hwnd, hMenu=0){
 			The return value is a handle to the previous large or small icon, depending on the Flag value.
 
  */
-Win_SetIcon( Hwnd, Icon="", Flag=1){
+Win_SetIcon(Hwnd, Icon="", Flag=1){
 	static WM_SETICON = 0x80, LR_LOADFROMFILE=0x10, IMAGE_ICON=1
 
 	if Flag not in 0,1
 		return A_ThisFunc "> Unsupported Flag: " Flag
 
 	if Icon != 
-		hIcon := Icon+0 != "" ? Icon : DllCall("LoadImage", "Uint", 0, "str", Icon, "uint",IMAGE_ICON, "int", 32, "int", 32, "uint", LR_LOADFROMFILE)  
+		hIcon := Icon+0 != "" ? Icon : DllCall("LoadImage", "Uint", 0, "str", Icon, "uint",IMAGE_ICON, "int", 32, "int", 32, "uint", LR_LOADFROMFILE) 	
 
 	SendMessage, WM_SETICON, %Flag%, hIcon, , ahk_id %Hwnd%
 	return ErrorLevel
