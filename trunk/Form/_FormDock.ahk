@@ -5,7 +5,7 @@ DetectHiddenWindows, on
 
 	hForm2 := Form_New("w300 h200 e1 +Resize +ToolWindow -Sysmenu ")
 	SetProperties(hProp := Form_Add(hForm2, "Property", "", "", "Align F", "Attach p"))
-	Property_SetColumnSize(hProp, 150)
+	Property_SetColSize(hProp, 150)
 
 	hForm3 := Form_New("w150 h140 e1 +ToolWindow  -Sysmenu -Caption")
 	Form_Add(hForm3, "SpreadSheet", "", "", "Align F", "Attach h w")
@@ -39,7 +39,7 @@ Form1_Close:
 return
 
 Form2_Size:
-	Property_SetColumnSize(hProp, 150)
+	Property_SetColSize(hProp, 150)
 return
 
 Form2_ContextMenu:
