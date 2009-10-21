@@ -1,5 +1,5 @@
 _()
-	hForm1	:=	Form_New("e3 w200 h500")
+	hForm1	:=	Form_New("e3 w200 h500")	
 	Form_Add(hForm1, "Edit", "ESC to close script. F2 to resize. Drag picture to move.", "-vscroll w200 r3 0x8000","Align T", "Attach w")
 	Form_Add(hForm1, "Picture", "res\test.bmp", "gPictureDrag", "Cursor size")
 
