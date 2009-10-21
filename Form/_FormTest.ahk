@@ -23,6 +23,7 @@ F2::
 	Win_Redraw()
 return
 
+#include inc\_.ahk
 #include inc\Form.ahk
 #include inc\Win.ahk
 #include inc\Attach.ahk
