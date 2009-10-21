@@ -12,7 +12,7 @@
 	Options:
 				m	- Affects how <m> function works: mm makes it use MsgBox (default), mo OutputDebug, m alone disables it.
 					  Anything else will use FileAppend; for instance mout.txt! writes to out.txt file. ! at the end is optional and if present
-					  it will mark the file for deletition on scripts startup. ! can also be used with o mode to clear the DebugView log.
+					  it will mark the file for deletion on scripts startup. ! can also be used with o mode to clear the DebugView log.
 					  DebugView will be started if it doesn't run, make sure its on the system PATH (there will be no error message if Run fails).
 				d	- Detect hidden windows.
 				e	- Escape exits the script. Use ea to exit the script only if its window is active.
@@ -25,7 +25,7 @@
 	Example:	
 		(start code)
 			_("s100 d e")	;set speed to 100ms, detect hiden windows, exit on ESC.
-			_("mo wd tc)	;set m to use OutputDebug, set working directory to A_ScriptDir, set title match mode to c (c=2="contain").
+			_("mo wd tc")	;set m to use OutputDebug, set working directory to A_ScriptDir, set title match mode to c (c=2="contain").
 			_("mout.txt!")	;set m to use File out.txt and to clear it each time script is started.
 	
 		
@@ -262,7 +262,7 @@ S(ByRef S,pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",By
 	Returns:
 			  o	if _value_ is omitted, function returns the current value of _var_
 			  o	if _value_ is set, function sets the _var_ to _value_ and returns previous value of the _var_
-			  o if _var_ is empty, function accepts list of variables in _value_ and returns values of those variables in o1 .. o5
+			  o if _var_ is empty, function accepts list of variables in _value_ and returns values of those variables in o1 .. o6
 
     Remarks:
 			  To use multiple storages, copy *v* function and change its name. 
