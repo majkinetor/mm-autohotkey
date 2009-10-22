@@ -22,7 +22,7 @@
 						otherwise, the repositioning is relative to its parent.
  
   Remarks:
-			Parent window size must be set prior to calling this function. Function is not limitted to top level windows, it can align
+			Parent window size must be set prior to calling this function. Function is not limited to top level windows, it can align
 			controls inside container controls.
 
 			The order in which you register controls to be aligned is important. 
