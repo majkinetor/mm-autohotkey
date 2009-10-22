@@ -11,13 +11,11 @@
   Gui, Add, Text       , x10 y10 w300 HWNDhText
   Gui, Font, s10 Normal, Tahoma
   Gui, Add, Text       , x10 y30 w300 h40 HWNDhDesc
-;   Gui, Font, s2        , system
   Gui, Font, s8        , Tahoma
   Gui, Add, Edit       , x10 y80 w330 h110 HWNDhExample ReadOnly
-
-;   Gui, Font, s8        , system
   Gui, Font, s8        , Tahoma
-  Gui, Add, Listview   , x5 y200 w180 h290 gOnLV AltSubmit, API|Desc
+  Gui, Add, Listview   , x5   y200 w180 h290 gOnLV AltSubmit   , API|Desc
+  Gui, Add, Text       , x195 y205 w150 h290 HWNDhNotifications, -- Notifications --`n`n
   apiPopulate()
 
 ; Window styles:  DISABLENOSCROLL, EX_NOCALLOLEINIT, NOIME, SELFIME, SUNKEN, CLIENTEDGE, VERTICAL
@@ -26,18 +24,20 @@
 	Gui, Show, w805 h500
 
   RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
-  RichEdit_SetEvents(hRichEdit, "Handler", "KEYEVENTS SCROLLEVENTS MOUSEEVENTS PROTECTED")
-
+  RichEdit_SetEvents(hRichEdit, "Handler", "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE")
 return ;//////////////////////////////////////////////////
 
 
 Handler(hCtrl, Event, p1, p2, p3 ) {
-  CoordMode, ToolTip, Screen
-  Tooltip, Event = %Event% `np1 = %p1% `np2 = %p2% `np3 = %p3% `n%L%, 10,10
+  global hNotifications
+  
+  If (Event = "DROPFILES")  {
+    MsgBox, % "Dropped files: " P1 "`n----`n" P2 "`n----`nChar position: " P3
+    return
+  }
 
+  ControlSetText,, -- Notifications --`n`nEvent = %Event% `np1 = %p1% `np2 = %p2% `np3 = %p3% `n%L%, ahk_id %hNotifications%
   IfEqual, Event, PROTECTED, return TRUE
-;     MsgBox, % "Dropped files: " file_count "`n----`n" files "`n----`nChar position: " cp  ;DROPFILES
-;   return TRUE
 }
 
 ^1::reload
@@ -67,7 +67,6 @@ return
 apiPopulate()  {
   global demo
   hImageList := IL_Create(1), LV_SetImageList(hImageList), IL_Add(hImageList, "shell32.dll", 132)
-;   pos = 1200
   pos = 1800
   Loop  {
     If pos := RegExMatch( demo, "Umi)\R(?P<Api>[\w]+):(.*`;.*(?P<Desc>[\w].*))?\R.*", m, pos )
@@ -82,43 +81,6 @@ apiPopulate()  {
 
 
 
-
-
-  Set:
-  ;   RichEdit_SetCharFormat(hRichEdit, "", "strike", Color)
-
-    RichEdit_GetCharFormat(hRichEdit, face, style, color )
-    RichEdit_SetCharFormat(hRichEdit, Face, Style " protected", Color)
-
-  ;   EM_SETEVENTMASK(hRichEdit)
-  ;   WM_NOTIFY:=0x4E
-  ;   old := OnMessage(WM_NOTIFY, "OnProtected")
-
-
-  ;   MsgBox, Face = %Face% `nstyle = %style%  `ncolor = %color%
-  ;
-  ;   Dlg_Font(Face, Style, Color, true, hwnd)
-  ;   RichEdit_SetCharFormat(hRichEdit, Face, Style, Color)
-  ;   MsgBox, Face = %Face% `nstyle = %style%  `ncolor = %color%
-  return
-
-
-  Set2:
-  ;   RichEdit_SetCharFormat(hRichEdit, "", "strike", Color)
-
-    RichEdit_GetCharFormat(hRichEdit, face, style, color)
-    Dlg_Font(Face, Style, Color, true, hwnd)
-
-  MsgBox, Face = %Face% `nstyle = %style%  `ncolor = %color%
-
-    RichEdit_SetCharFormat(hRichEdit, Face, Style " protected", Color, "W")
-
-  return
-
-  Get:
-    RichEdit_GetCharFormat(hRichEdit, face, style, color)
-    MsgBox, Face = %Face% `nstyle = %style%  `ncolor = %color%
-  return
 
 
   Find:
@@ -209,8 +171,9 @@ GETBIDIOPTIONS:
   EM_GETBIDIOPTIONS( hRichEdit )
 return
 ;---
-GETCHARFORMAT:
-;   RichEdit_GETCHARFORMAT( hRichEdit )
+GetCharFormat:  ; Get or set the current text mode of a rich edit control.
+  RichEdit_GetCharFormat(hRichEdit, face, style, color)
+  MsgBox, Face = %Face% `nstyle = %style%  `ncolor = %color%
 return
 ;---
 GETCTFMODEBIAS:
@@ -333,8 +296,7 @@ GETWORDBREAKPROCEX:
 ;   RichEdit_GETWORDBREAKPROCEX( hRichEdit )
 return
 ;---
-
-____HIDESELECTION:
+HIDESELECTION:
 ;   RichEdit_HIDESELECTION( hRichEdit )
 
 EM_HIDESELECTION(hRichEdit, true)
@@ -398,8 +360,15 @@ SetBkgndColor:  ; Sets the background color for a rich edit control.
   RichEdit_SetBgColor( hRichEdit, color )
 return
 ;---
-SETCHARFORMAT:
-;   RichEdit_SETCHARFORMAT( hRichEdit )
+SetCharFormat:  ; Set character formatting in a rich edit control.
+  RichEdit_GetCharFormat(hRichEdit, face, style, color)
+  If Dlg_Font(face, style, color, true, hwnd)
+    RichEdit_SetCharFormat(hRichEdit, face, style, color)
+
+;   Face  = Tahoma
+;   style = bold italic underline s11 protected
+;   color = 0x800000
+;   RichEdit_SetCharFormat(hRichEdit, face, style, color)
 return
 ;---
 SETCTFMODEBIAS:
@@ -415,8 +384,8 @@ SETEDITSTYLE:
 ;   RichEdit_SETEDITSTYLE( hRichEdit )
 return
 ;---
-SETEVENTMASK:
-;   RichEdit_SETEVENTMASK( hRichEdit )
+SetEvents: ; Set notification events.
+  RichEdit_SetEvents(hRichEdit, "Handler", "SelChange")
 return
 ;---
 SETFONTSIZE:
