@@ -3,7 +3,7 @@
  			Options parser.
 
 			O	- String with options.
-			pQ	- Query parameter. It is space a separated list of option names you want to extract from the options string. See bellow for
+			pQ	- Query parameter. It is a space separated list of option names you want to extract from the options string. See bellow for
 				  details of extraction.  
 			o1..o10 - Variables to receive requested options. Their number should match the number of variables you want to extract from the option string plus
 					  1 more if you want to get non-consumed options.
@@ -14,7 +14,7 @@
 
  >			Query :: [Settings)][Name=]Value {Query}
  >			Settings :: sC|aC|qC|eC|c01{Settings}
- >			Value   :: SentenceWithoutSpace | 'SentenceWithSpace'
+ >			Value   :: SentenceWithoutSpace | 'Sentence With Space'
 
 
  Examples:
@@ -42,9 +42,10 @@
 			In above example, | is used as separator, : is used as assignment char and case sensitivity is turned on (style wont be found as it starts with S in options string).
 
 			sC	- Set separator char to C (default is space)
-			aC  - Set assignment char to C (default is =)
-			qE	- Set quote char to C	(default is ')
-			eE	- Set escape char to C  (default is	`)
+			aC	- Set assignment char to C (default is =)
+			qC	- Set quote char to C (default is ')
+			eC	- Set escape char to C  (default is `)
+			cN	- Set case sensitivity to number N (default is 0 = off)
 
  Remarks:
 			Currently you can extract maximum 10 options at a time, but this restriction can be removed for up to 29 options.
