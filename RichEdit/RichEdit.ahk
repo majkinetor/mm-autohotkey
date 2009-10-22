@@ -1001,6 +1001,7 @@ RichEdit_SetCharFormat(hCtrl, face="", style="", color="-", mode="SELECTION")  {
   ; Character effects. This member can be a combination of the following values.
   static CFE_AUTOCOLOR=0x40000000,CFE_BOLD=0x1,CFE_ITALIC=0x2,CFE_STRIKEOUT=0x8,CFE_UNDERLINE=0x4,CFE_PROTECTED=0x10
   dwMask:=dwMask_default  , dwEffects:=0
+  StringUpper, style,style
   If style
   	Loop, parse, style, %A_Tab%%A_Space%
       If A_LoopField in AUTOCOLOR,BOLD,ITALIC,STRIKEOUT,UNDERLINE,PROTECTED
@@ -1010,7 +1011,7 @@ RichEdit_SetCharFormat(hCtrl, face="", style="", color="-", mode="SELECTION")  {
     color:= "0x" _B _G _R
 
   VarSetCapacity(CHARFORMAT, 60, 0), NumPut(60, CHARFORMAT)
-  dwMask |= RegExMatch(style " ","U)s(.*) ", m) ?  (CFM_SIZE , NumPut(m1*20,CHARFORMAT,12,"Int"))   :  0
+  dwMask |= RegExMatch(style " ","U)S([0-9]+) ", m) ?  (CFM_SIZE , NumPut(m1*20,CHARFORMAT,12,"Int"))   :  0
   dwMask |= color!="-"                          ?  (CFM_COLOR, NumPut(color,CHARFORMAT,20,"UInt"))  :  0
   dwMask |= face && StrLen(face)<33             ?  (CFM_FACE , VarSetCapacity(szFaceName,33,0), szFaceName:=face) : 0
 
