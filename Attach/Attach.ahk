@@ -17,11 +17,11 @@
 					- 	"x,y,w,h" letters along with coefficients, decimal numbers which can also be specified in m/n form (see example below).
 					-   "r". Use "r1" (or "r") option to redraw control immediately after repositioning, set "r2" to delay redrawing 100ms for the control
 						(prevents redrawing spam).
-					-	"p" (for "proportional") is the special coeficient. It will make control's dimension always stay in the same proportion to its parent 
+					-	"p" (for "proportional") is the special coefficient. It will make control's dimension always stay in the same proportion to its parent 
 						(so, pin the control to the parent). Although you can mix pinned and non-pinned controls and dimensions that is rarely what you want. 
 						You will generally want to pin every control in the parent.
 					-	"+" or "-" enable or disable function for the control. If control is hidden, you may want to disable the function for 
-						performance reasons, especially if control is container attaching its chilldren. Its perfectly OK to leave invisible controls 
+						performance reasons, especially if control is container attaching its children. Its perfectly OK to leave invisible controls 
 						attached, but if you have lots of them you can use this feature to get faster and more responsive updates. 
 						When you want to show disabled hidden control, make sure you first attach it back so it can take its correct position
 						and size while in hidden state, then show it. "+" must be used alone while "-" can be used either alone or in Attach definition string
@@ -32,7 +32,7 @@
 					and not only top level windows.
 
 					You should reset the function when you programmatically change the position of the controls in the parent control.
-					Depending on how you created your GUI, you might need to put "autosize" when showing it, otherwise reseting the Gui before its 
+					Depending on how you created your GUI, you might need to put "autosize" when showing it, otherwise resetting the Gui before its 
 					placement is changed will not work as intented. Autosize will make sure that WM_SIZE handler fires. Sometimes, however, WM_SIZE
 					message isn't sent to the window. One example is for instance when some control requires Gui size to be set in advance in which case
 					you would first have "Gui, Show, w100 h100 Hide" line prior to adding controls, and only Gui, Show after controls are added. This
@@ -107,7 +107,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		if IsFunc(hCtrl)
 			return Handler := hCtrl
 	
-		ifEqual, adrWindowInfo,, return			;Reseting prior to adding any control just returns.
+		ifEqual, adrWindowInfo,, return			;Resetting prior to adding any control just returns.
 		hParent := hCtrl != "" ? hCtrl+0 : hGui
 		loop, parse, %hParent%a, %A_Space%
 		{
