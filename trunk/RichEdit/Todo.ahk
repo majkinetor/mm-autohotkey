@@ -15,66 +15,63 @@ Return Ansi
 
 
 
+/*
+Function:	SetEvents
+			Set notification events.
 
+Parameters:
+			Handler	- Function that handles events. If empty, any existing handler will be removed.
+			Events	- White space separated list of events to monitor.
 
+Handler:
+ >     	Result := Handler(hCtrl, Event, p1, p2, p3 )
 
-;-------------------------------------------------------------------------------------------------------------------------------------------
-; Function:	SetEvents
-;			Set notification events.
-;
-; Parameters:
-;			Handler	- Function that handles events. If empty, any existing handler will be removed.
-;			Events	- White space separated list of events to monitor.
-;
-; Handler:
-;  >     	Result := Handler(hCtrl, Event, p1, p2, p3 )
-;
-; 		hCtrl	- Handle of richedit control sending the event.
-; 		Event - Specifies event that occurred. Event must be registered to be able to monitor it.
-; 		Col,Row - Cell coordinates.
-; 		Data	- Numeric data of the cell. Pointer to string for textual cells and DWORD value for numeric.
-; 		Result  - Return 1 to prevent action.
-;
-; Events:
-;     CHANGE - Sent when the user has taken an action that may have altered text in an edit control.
-;              Sent after the system updates the screen. (***)
-;     DRAGDROPDONE - Notifies a rich edit control's parent window that the drag-and-drop
-;                    operation has completed.
-;         - p1
-;         - p2
-;
-;         P1 - Number of characters highlighted in drag-drop operation.
-;         P2 - Beginning character position of range.
-;         P3 - Ending character position of range.
-;     DROPFILES - Notifies that the user is attempting to drop files into the control.
-;       P1 - Number of files dropped onto rich edit control.
-;       P2 - Newline delimited (`n) list of files dropped onto control.
-;       P3 - Character position files were dropped onto within rich edit control.
-;     KEYEVENTS - Notification of a keyboard or mouse event in the control. To ignore the
-;                 event, the handler function should return a nonzero value.  (*** needs redone)
-;       P1 - Character position files were dropped onto within rich edit control.
-;            258="KEYPRESS_DWN",513="MOUSE_L_DWN",514="MOUSE_L_UP",516="MOUSE_R_DWN",
-;            517="MOUSE_R_UP",522="SCROLL_BEGIN",277="SCROLL_END" ;,512="MOUSE_HOVER",256="KEYPRESS_UP"
-;     MOUSEEVENTS,SCROLLEVENTS,
-;     LINK - A rich edit control sends these messages when it receives various messages, when the
-;            user clicks the mouse or when the mouse pointer is over text that has the LINK effect.
-;           (*** expand usefulness)
-;     PROTECTED - User is taking an action that would change a protected range of text.  To ignore
-;                 the event, the handler function should return a nonzero value.
-;     REQUESTRESIZE - This message notifies a rich edit control's parent window that the control's
-;                     contents are either smaller or larger than the control's window size.
-;       P1 - Requested new size.
-;     SELCHANGE - The current selection has changed.
-;       P1 - Beginning character position of range.
-;       P2 - Ending character position of range.
-;
-;  Returns:
-;			The previous event mask (number).
-;
+		hCtrl	- Handle of richedit control sending the event.
+		Event - Specifies event that occurred. Event must be registered to be able to monitor it.
+		Col,Row - Cell coordinates.
+		Data	- Numeric data of the cell. Pointer to string for textual cells and DWORD value for numeric.
+		Result  - Return 1 to prevent action.
+
+Events:
+    CHANGE - Sent when the user has taken an action that may have altered text in an edit control.
+             Sent after the system updates the screen. (***)
+    DRAGDROPDONE - Notifies a rich edit control's parent window that the drag-and-drop
+                   operation has completed.
+        - p1
+        - p2
+
+        P1 - Number of characters highlighted in drag-drop operation.
+        P2 - Beginning character position of range.
+        P3 - Ending character position of range.
+    DROPFILES - Notifies that the user is attempting to drop files into the control.
+      P1 - Number of files dropped onto rich edit control.
+      P2 - Newline delimited (`n) list of files dropped onto control.
+      P3 - Character position files were dropped onto within rich edit control.
+    KEYEVENTS - Notification of a keyboard or mouse event in the control. To ignore the
+                event, the handler function should return a nonzero value.  (*** needs redone)
+      P1 - Character position files were dropped onto within rich edit control.
+           258="KEYPRESS_DWN",513="MOUSE_L_DWN",514="MOUSE_L_UP",516="MOUSE_R_DWN",
+           517="MOUSE_R_UP",522="SCROLL_BEGIN",277="SCROLL_END" ;,512="MOUSE_HOVER",256="KEYPRESS_UP"
+    MOUSEEVENTS,SCROLLEVENTS,
+    LINK - A rich edit control sends these messages when it receives various messages, when the
+           user clicks the mouse or when the mouse pointer is over text that has the LINK effect.
+          (*** expand usefulness)
+    PROTECTED - User is taking an action that would change a protected range of text.  To ignore
+                the event, the handler function should return a nonzero value.
+    REQUESTRESIZE - This message notifies a rich edit control's parent window that the control's
+                    contents are either smaller or larger than the control's window size.
+      P1 - Requested new size.
+    SELCHANGE - The current selection has changed.
+      P1 - Beginning character position of range.
+      P2 - Ending character position of range.
+
+ Returns:
+			The previous event mask (number).
+ */
 RichEdit_SetEvents(hCtrl, Handler="", Events="selchange"){
   static ENM_CHANGE=0x1,ENM_DRAGDROPDONE=0x10,ENM_DROPFILES:=0x100000,ENM_KEYEVENTS=0x10000,ENM_LINK=0x4000000,ENM_MOUSEEVENTS=0x20000,ENM_PROTECTED=0x200000,ENM_REQUESTRESIZE=0x40000,ENM_SCROLLEVENTS=0x8,ENM_SELCHANGE=0x80000 ;ENM_OBJECTPOSITIONS=0x2000000,ENM_SCROLL=0x4,ENM_UPDATE=0x2   ***
-       , sEvents="CHANGE,DRAGDROPDONE,DROPFILES,KEYEVENTS,LINK,MOUSEEVENTS,PROTECTED,REQUESTRESIZE,SCROLLEVENTS,SELCHANGE"
-  static WM_NOTIFY=0x4E,EM_SETEVENTMASK=69,WM_USER=0x400, old
+       , sEvents="CHANGE,DRAGDROPDONE,DROPFILES,KEYEVENTS,LINK,MOUSEEVENTS,PROTECTED,REQUESTRESIZE,SCROLLEVENTS,SELCHANGE,SCROLL"
+  static WM_NOTIFY=0x4E,WM_COMMAND=0x111,EM_SETEVENTMASK=69,WM_USER=0x400, oldNotify, oldCOMMAND
 
 	if (Handler = "")
 		return OnMessage(WM_NOTIFY, old != "RichEdit_onNotify" ? old : ""), old := ""
@@ -82,6 +79,7 @@ RichEdit_SetEvents(hCtrl, Handler="", Events="selchange"){
 	if !IsFunc(Handler)
 		return A_ThisFunc "> Invalid handler: " Handler
 
+  StringUpper, Events,Events
 	hMask := 0
 	loop, parse, Events, %A_Tab%%A_Space%
 	{
@@ -89,16 +87,20 @@ RichEdit_SetEvents(hCtrl, Handler="", Events="selchange"){
 		if A_LoopField not in %sEvents%
 			return A_ThisFunc "> Invalid event: " A_LoopField
 		hMask |= ENM_%A_LOOPFIELD%
-		
-		IfEqual, A_LoopField,DROPFILES,  DllCall("shell32.dll\DragAcceptFiles", Int,hCtrl  , Int,TRUE)
-		if A_LoopField in CHANGE,SCROLL
-      WM_COMMAND := true    ;  notification message through a WM_COMMAND message  ;;***** TODO
+    If (A_LoopField = "DROPFILES")
+      DllCall("shell32.dll\DragAcceptFiles", Int,hCtrl  , Int,TRUE)
+; 		if A_LoopField in CHANGE,SCROLL   ; (*** WIP)
+;     	if !oldCOMMAND {
+;     		oldCOMMAND := OnMessage(WM_COMMAND, "RichEdit_onNotify")
+;     		if oldCOMMAND != RichEdit_onNotify
+;     			RichEdit("oldCOMMAND", RegisterCallback(oldCOMMAND))
+;     	}
 	}
 	
-	if !old {
-		old := OnMessage(WM_NOTIFY, "RichEdit_onNotify")
-		if old != RichEdit_onNotify
-			RichEdit("oldNotify", RegisterCallback(old))
+	if !oldNotify {
+		oldNotify := OnMessage(WM_NOTIFY, "RichEdit_onNotify")
+		if oldNotify != RichEdit_onNotify
+			RichEdit("oldNotify", RegisterCallback(oldNotify))
 	}
 
 	RichEdit(hCtrl "Handler", Handler)
@@ -116,20 +118,26 @@ EM_GETEVENTMASK(hCtrl)  {
 ;========================================== PRIVATE ===============================================================
 
 RichEdit_onNotify(wparam, lparam, msg, hwnd) {
-	static MODULEID := 091009, oldNotify="*"
-	
+	static MODULEID := 091009, oldNotify="*", oldCOMMAND="*"
+
+  Critical
 	if (_ := (NumGet(Lparam+4))) != MODULEID
 	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
 	 else {
+	 
 		ifEqual, oldNotify, *, SetEnv, oldNotify, % RichEdit("oldNotify")
 		if oldNotify !=
 			return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
+			
+; 		ifEqual, oldCOMMAND, *, SetEnv, oldCOMMAND, % RichEdit("oldCOMMAND")
+; 		if oldCOMMAND !=
+; 			return DllCall(oldCOMMAND, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
+			
 	 }
 
 	hw :=  NumGet(Lparam+0), code := NumGet(Lparam+8, 0, "UInt"),  handler := RichEdit(hw "Handler")
 	ifEqual, handler,,return (code=1796) ? TRUE : FALSE  ;ENM_PROTECTED- msg returns nonzero value to prevent operation
 
-  Critical
 ;  msgbox, % code
 ; return
 
@@ -187,7 +195,7 @@ RichEdit_onNotify(wparam, lparam, msg, hwnd) {
   }
 }
 
-;Storage
+;Module storage (http://www.autohotkey.net/~majkinetor/_/_.html#v  ,  http://www.autohotkey.com/forum/topic46054.html)
 RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") {
 	static
 	if (var = "" ){
@@ -200,18 +208,6 @@ RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 	ifNotEqual, value, ~`a, SetEnv, %var%, %value%
 	return _
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
