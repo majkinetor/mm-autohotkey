@@ -1,6 +1,6 @@
 /*
 	Function: Run
-			  Retreive and be notified about output from the console programs.
+			  Retrieve and be notified about output from the console programs.
 
 	Parameters:
 			Cmd		 - Command to execute.
@@ -18,9 +18,9 @@
 	Examples:
 		(start code)
 			sOutput := Run("ping.exe localhost")							;just grab the output
-			sOutput := Run("ping.exe localhost", "", "", "OnOutput")		;with stream handler
+			sOutput := Run("ping.exe localhost", "", 0, "", "OnOutput")		;with stream handler
 			sOutput := Run("cmd.exe /c dir /a /o", A_WinDir)				;with working dir
-			sOutput := Run("sort.exe", "", "abc`r`nefg`r`nhijk`r`n0123" )	;with stdin input
+			sOutput := Run("sort.exe", "", 0, "abc`r`nefg`r`nhijk`r`n0123" )	;with stdin input
 			if !ErrorLevel
 				msgbox Program failed with exit code %ErrorLevel%
 			
