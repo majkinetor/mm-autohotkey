@@ -30,10 +30,10 @@
 						   window belonging to its group is activated. By default "Appbar".
 
 	Styles:	
-				OnTop	 -  Sets the Appbar alaways on top.
+				OnTop	 -  Sets the Appbar always on top.
 				Show	 -  Show the Appbar. If not present the Appbar will not be shown or visibility settings of passed window will not be changed.
 						    By default "OnTop Show Reserve".
-				Pin		-   Pin the Appbar to the Desktop (reserve the destop space for the Appbar). 
+				Pin		-   Pin the Appbar to the Desktop (reserve the desktop space for the Appbar). 
 							The system prevents other applications from using the screen area occupied by the appbar. Ignored with AutoHide.
 
   Returns:
@@ -180,7 +180,7 @@ AppBar_animate(Hwnd, Type="", Time=100){
 }
 
 
-;not used atm. Should be used to repositin bar when other bars are created so there is no overalapping.
+;not used atm. Should be used to reposition bar when other bars are created so there is no overlapping.
 ;wparam msg, lparam, msg parameter
 AppBar_onMessage(Wparam, Lparam, Msg, Hwnd){
 	static ABN_POSCHANGED=1, ABN_FULLSCREENAPP=2
