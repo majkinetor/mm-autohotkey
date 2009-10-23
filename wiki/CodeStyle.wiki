@@ -5,6 +5,6 @@
 
  * Subroutines local to the function have the same name as function (unless there are more then 1).
 
- * No single line comment in the function body starts the line.
+ * No comment in the function body starts the line.
 
  * Documentation is in Natural Doc format. Sections with no need for information should be skipped. Trivial examples should not be given after each function. Instead, sample or code snippets should be given at the end of the code in Group:Examples group. Ndoc function comments are set in multiline comment style with the ending token having one space before it.
