@@ -253,7 +253,7 @@ Form_New(Options="", E1="", E2="", E3="", E4="", E5="") {
  			Form options parser.
 
 			O	- String with Form options.
-			pQ	- Query parameter. It is space a separated list of option names you want to extract from the options string. See bellow for
+			pQ	- Query parameter. It is a space separated list of option names you want to extract from the options string. See bellow for
 				  details of extraction.  
 			o1..o10 - Variables to receive requested options. Their number should match the number of variables you want to extract from the option string plus
 					  1 more if you want to get non-consumed options.
@@ -264,7 +264,7 @@ Form_New(Options="", E1="", E2="", E3="", E4="", E5="") {
 
  >			Query :: [Settings)][Name=]Value {Query}
  >			Settings :: sC|aC|qC|eC|c01{Settings}
- >			Value   :: SentenceWithoutSpace | 'SentenceWithSpace'
+ >			Value   :: SentenceWithoutSpace | 'Sentence With Space'
 
 
  Examples:
@@ -293,8 +293,9 @@ Form_New(Options="", E1="", E2="", E3="", E4="", E5="") {
 
 			sC	- Set separator char to C (default is space)
 			aC  - Set assignment char to C (default is =)
-			qE	- Set quote char to C	(default is ')
-			eE	- Set escape char to C  (default is	`)
+			qC	- Set quote char to C	(default is ')
+			eC	- Set escape char to C  (default is	`)
+			cN	- Set case sensitivity to number N (default is 0 = off)
 
  Remarks:
 			Currently you can extract maximum 10 options at a time, but this restriction can be removed for up to 29 options.
