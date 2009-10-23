@@ -49,10 +49,10 @@ AutoUrlDetect:  ; Enable disable or toggle automatic detection of URLs by a rich
   state := RichEdit_AutoUrlDetect( hRichEdit )
   MsgBox,262144,, % "url detect = " state
   
-  state := RichEdit_AutoUrlDetect( hRichEdit, "Toggle" )
+  state := RichEdit_AutoUrlDetect( hRichEdit, "^" )
   MsgBox,262144,, % "url detect = " state
   
-  MsgBox,262144,, % RichEdit_AutoUrlDetect( hRichEdit, false )
+  MsgBox,262144,, % RichEdit_AutoUrlDetect( hRichEdit, "+" )
 return
 
 
