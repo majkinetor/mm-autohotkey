@@ -61,7 +61,7 @@ Panel_wndProc(Hwnd, UMsg, WParam, LParam) {
 			,rootProc, attach, scroller_updatebars, scroller_onscroll, adrGetWindowLong, adrDefWindowProc, hRoot
 			,redirect="78,273"  ;WM_SETCURSOR=32 !!!, WM_COMMAND=78, WM_NOTIFY=273, WM_HSCROLL=276, WM_VSCROLL=277
 
-	critical 100
+	;critical 100
 	if !rootProc {
 		rootProc := DllCall("GetWindowLong", "uint", hRoot := DllCall("GetAncestor", "uint", Hwnd, "uint", GWL_ROOT), "uint", GWL_WNDPROC)
 		adrGetWindowLong := DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), "str", "GetWindowLongA")
