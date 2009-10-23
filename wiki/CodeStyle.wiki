@@ -1,4 +1,3 @@
-#summary Code style
 
  * Public function starts with capitalized word. Private function starts with non-capitalized word. Function name must start the line.
 
