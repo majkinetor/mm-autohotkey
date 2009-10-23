@@ -11,15 +11,23 @@ _("mo!")
 	Gui, Font, s8        , Tahoma
 	Gui, Add, Edit       , x10 y80 w330 h110 HWNDhExample ReadOnly
 	Gui, Font, s8        , Tahoma
-	Gui, Add, Listview   , x5   y200 w180 h290 gOnLV AltSubmit   , API|Desc
+	Gui, Add, Listview   , x5   y200 w180 h290 gOnLV AltSubmit, API|Desc
 	Gui, Add, Text       , x195 y205 w150 h290 HWNDhNotifications, -- Notifications --`n`n
 
 	apiPopulate()
 
-	hRichEdit := RichEdit_Add( hwnd, 355, 5, 445, 490, "", "Some Text`nMeh...")
+	text = 
+	(Ltrim
+		http://www.google.com
+		www.google.com
+
+		meh...
+	)
+	hRichEdit := RichEdit_Add( hwnd, 355, 5, 445, 490, "", text)
+
 	Gui, Show, w805 h500
 
-	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
+	;RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
 	;RichEdit_SetEvents(hRichEdit, "Handler", "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE")
 return
 
@@ -40,11 +48,7 @@ Handler(hCtrl, Event, p1, p2, p3 ) {
   IfEqual, Event, PROTECTED, return TRUE
 }
 
-
-
-
 ^1::reload
-
 
 OnLV:
   LV_GetText( api, LV_GetNext() ), LV_GetText( desc, LV_GetNext(), 2 )
