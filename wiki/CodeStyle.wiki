@@ -6,6 +6,6 @@
 
  * Subroutines local to the function have the same name as function (unless there are more then 1).
 
- * There are no 1 line comments that begin the line in the function bodies.
+ * No single line comment in the function body starts the line.
 
  * Documentation is in Natural Doc format.
