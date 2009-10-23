@@ -1,17 +1,19 @@
 List of some of the methods used in the code.
 
- * Add function arguments should not have initializers other then "". Default values should be handled inside the function. 
+ * <Add> function arguments should not have initializers other then "". Default values should be handled inside the function. This is to solve the problem with add2Form in _Forms framework which always sends all available parameters of the controls Add function. If user didn't set the parameter Parse will set it to "" (thats why "" must specify default value)
 
- * Any constant used is referenced as static on the start of the function. If there is a need to repeat statics in several functions, helper function is created which is the only one to handle statics.
+ * Any constant used is referenced as static on the start of the function. If there is a need to repeat the same statics in several functions, helper function is created which is then the only one to keep static definitions.
 
- * Module must not use globals, unless there is bigger meaning to it. If module needs globals, it will use its own copy of *storage* function.
+ * Module must not use globals for its inner working. If module needs globals, it will use its own copy of *storage* function (big storage, lil' storage or mini storage, depending on what storage options it needs).
 
  * Modules should be independent as much as possible. If there is only few function dependencies to other modules they should be called using dynamic function calls. If this can not be done or is not practical, module states its dependencies as first thing in documentation after specifying Title.
 
+ * If there is already a module implementing some set of functions using the same or similar terminology as module being implemented, their API's should be the same or similar to provide unified experience as much as possible.
+
  * DllCalls that return handles must have "Uint" output type set. Handles are often used as variable names and negative handles will make the script not run. DllCalls that are used in the loop or extensively should be pre-loaded.
 
- * Any message handler for message that is expected to be used in other scenarios must be chained. The chain method must be the same in all modules.
+ * Any message handler for message that is expected to be used in other scenarios must be chained. The chain method must be the same in all modules. Messages that are generally not expected to be used by the user don't need this.
 
- * Each function returns error with A_ThisFunc > " ... ". Function shouldn't use MsgBox for such purpose.
+ * Each function returns error with A_ThisFunc > " ... ". Function shouldn't use MsgBox for such purpose. 
 
- * Controls use MODULEID as ID. ID must be unique among controls (date when the controls is created with 6 numbers - DDMMYY, it must be bigger then 10 000)
+ * Controls use MODULEID as ID. ID must be unique among controls (date when the controls is created with 6 numbers - DDMMYY, it must be bigger then 10 000). MODULEID is generally used in Add function and onNotify function. Each module having those *must* use the same initialization scheme.
