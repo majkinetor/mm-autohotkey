@@ -1,15 +1,15 @@
 List of some of the methods used in the code.
 
-* Add function arguments should not have initializers other then "". Default values should be handled inside the function. 
+ * Add function arguments should not have initializers other then "". Default values should be handled inside the function. 
 
-* Any constant used is referenced as static on the start of the function. If there is a need to repeat statics in several functions, helper function is created which is the only one to handle statics.
+ * Any constant used is referenced as static on the start of the function. If there is a need to repeat statics in several functions, helper function is created which is the only one to handle statics.
 
-* Module must not use globals, unless there is bigger meaning to it. If module needs globals, it will use its own copy of *storage* function.
+ * Module must not use globals, unless there is bigger meaning to it. If module needs globals, it will use its own copy of *storage* function.
 
-* Modules should be independent as much as possible. If there is only few function dependencies to other modules they should be called using dynamic function calls. If this can not be done or is not practical, module states its dependencies as first thing in documentation after specifying Title.
+ * Modules should be independent as much as possible. If there is only few function dependencies to other modules they should be called using dynamic function calls. If this can not be done or is not practical, module states its dependencies as first thing in documentation after specifying Title.
 
-* DllCalls that return handles must have "Uint" output type set. Handles are often used as variable names and negative handles will make the script not run.
+ * DllCalls that return handles must have "Uint" output type set. Handles are often used as variable names and negative handles will make the script not run.
 
-* Any message handler for message that is expected to be used in other scenarios must be chained. The chain method must be the same in all modules.
+ * Any message handler for message that is expected to be used in other scenarios must be chained. The chain method must be the same in all modules.
 
-* Each function returns error with A_ThisFunc > " ... ". Function shouldn't use MsgBox for such purpose.
+ * Each function returns error with A_ThisFunc > " ... ". Function shouldn't use MsgBox for such purpose.
