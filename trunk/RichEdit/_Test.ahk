@@ -10,8 +10,9 @@ _("mo!")
 
 	CreateGui(text)
 	Form_Show("", "Maximize")
-
-	;RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
+	
+	RichEdit_AutoUrlDetect( hRichEdit, "^" )
+	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
 	;RichEdit_SetEvents(hRichEdit, "Handler", "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE")
 return
 
@@ -26,7 +27,7 @@ CreateGui(Text, W=850, H=600) {
 				 Form_Add(hPanel1,"Button", "Execute", "gOnExecute 0x8000", "Align T", "Attach p")
 	hExample  := Form_Add(hPanel1,"Edit", "`n", "T8 hscroll ReadOnly Multi -Wrap", "Align F", "Attach p", "*|)Font s10, Courier New")
 	hSplitter := Form_Add(hForm1, "Splitter", "", "sunken", "Align L, 6", "Attach p")
-	hRichEdit := Form_Add(hForm1, "RichEdit", Text, "", "Align F", "Attach p")
+	hRichEdit := Form_Add(hForm1, "RichEdit", "", "", "Align F", "Attach p")
 
 	Splitter_Set(hSplitter, hPanel1 " | " hRichEdit)
 	PopulateList()
@@ -97,10 +98,14 @@ LineFromChar: ;Determines which line contains the specified character in a rich 
  msgbox, % "Line: " RichEdit_LineFromChar( hRichEdit, RichEdit_GetSel(hRichEdit) )
 return
 
-LimitText: ;Sets an upper limit to the amount of text the user can type or paste into a rich edit control
+LimitText:	;Sets an upper limit to the amount of text the user can type or paste into a rich edit control
 	RichEdit_LimitText( hRichEdit, 20 )  ; limit to 20 characters
 return
 
+TextMode:	;Sets text mode.
+	RichEdit_TextMode(hRichEdit, "RICHTEXT") 
+	msgbox % errorlevel
+return
 
 #include RichEdit.ahk
 

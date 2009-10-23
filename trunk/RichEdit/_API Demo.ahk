@@ -1,4 +1,4 @@
-_("mo!")
+
 #SingleInstance, force
 	Gui, +LastFound
 	hwnd := WinExist()
@@ -23,11 +23,11 @@ _("mo!")
 
 		meh...
 	)
-	hRichEdit := RichEdit_Add( hwnd, 355, 5, 445, 490, "", text)
+	hRichEdit := RichEdit_Add( hwnd, 355, 5, 445, 490, "")
 
 	Gui, Show, w805 h500
 
-	;RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
+	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
 	;RichEdit_SetEvents(hRichEdit, "Handler", "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE")
 return
 
@@ -134,10 +134,8 @@ AutoUrlDetect:  ; Enable disable or toggle automatic detection of URLs by a rich
   state := RichEdit_AutoUrlDetect( hRichEdit )
   MsgBox,262144,, % "url detect = " state
   
-  state := RichEdit_AutoUrlDetect( hRichEdit, "Toggle" )
+  state := RichEdit_AutoUrlDetect( hRichEdit, "^" )
   MsgBox,262144,, % "url detect = " state
-  
-  MsgBox,262144,, % RichEdit_AutoUrlDetect( hRichEdit, false )
 return
 ;---
 CANPASTE:
