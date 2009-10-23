@@ -4,7 +4,7 @@
 
  * Function comments are given in multiline comment style with the ending token having one space before it.
 
- * Subroutines local to the function usualy have the same name as function (unless there are more then 1).
+ * Subroutines local to the function have the same name as function (unless there are more then 1).
 
  * There are no 1 line comments that begin the line in the function bodies.
 
