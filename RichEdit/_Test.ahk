@@ -24,13 +24,12 @@ CreateGui(Text, W=850, H=600) {
 
 	hPanel1   := Form_Add(hForm1, "Panel", "", "", "Align L, 300", "Attach p")
 				 Form_Add(hPanel1,"Button", "Execute", "gOnExecute 0x8000", "Align T", "Attach p")
-	hExample  := Form_Add(hPanel1,"Edit", "`n", "hscroll ReadOnly Multi -Wrap", "Align F", "Attach p", "*|)Font s10, Courier New")
+	hExample  := Form_Add(hPanel1,"Edit", "`n", "T8 hscroll ReadOnly Multi -Wrap", "Align F", "Attach p", "*|)Font s10, Courier New")
 	hSplitter := Form_Add(hForm1, "Splitter", "", "sunken", "Align L, 6", "Attach p")
 	hRichEdit := Form_Add(hForm1, "RichEdit", Text, "", "Align F", "Attach p")
 
 	Splitter_Set(hSplitter, hPanel1 " | " hRichEdit)
 	PopulateList()
-	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
 }
 
 OnExecute:
@@ -70,11 +69,32 @@ return
 
 
 AutoUrlDetect:  ; Enable disable or toggle automatic detection of URLs by a rich edit control.
+
   state := RichEdit_AutoUrlDetect( hRichEdit )
   MsgBox,262144,, % "url detect = " state
   
   state := RichEdit_AutoUrlDetect( hRichEdit, "^" )
   MsgBox,262144,, % "url detect = " state
+return
+
+GetSel: ;Retrieve the starting and ending character positions of the selection.
+
+	RichEdit_GetSel( hRichEdit, min, max  )
+	if !(count := min-max)
+		 MsgBox, Cursor Position: %min%
+	else MsgBox,,%count% char's selected, Selected from: %min%-%max%
+return
+
+GetText: ;Retrieves a specified range of characters from a rich edit control.
+
+ msgbox % RichEdit_GetText( hRichEdit ) ; get current selection
+ msgbox % RichEdit_GetText( hRichEdit, 0, -1 ) ; get all
+ msgbox % RichEdit_GetText( hRichEdit, 4, 10 ) ; get range
+return
+
+LineFromChar: ;Determines which line contains the specified character in a rich edit control.
+
+ msgbox, % "Line: " RichEdit_LineFromChar( hRichEdit, RichEdit_GetSel(hRichEdit) )
 return
 
 
