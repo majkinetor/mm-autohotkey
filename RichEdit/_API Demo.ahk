@@ -1,31 +1,27 @@
+_("mo!")
 #SingleInstance, force
-  FileRead, demo, % A_ScriptFullPath
-  StringReplace, demo, demo, `r,,A
-  StringReplace, demo, demo, MsgBox`,262144`,`,,MsgBox`,,A
-
 	Gui, +LastFound
 	hwnd := WinExist()
 	GroupAdd, RichEditGrp, ahk_id %hwnd%
 
-  Gui, Font, s11 bold  , Tahoma
-  Gui, Add, Text       , x10 y10 w300 HWNDhText
-  Gui, Font, s10 Normal, Tahoma
-  Gui, Add, Text       , x10 y30 w300 h40 HWNDhDesc
-  Gui, Font, s8        , Tahoma
-  Gui, Add, Edit       , x10 y80 w330 h110 HWNDhExample ReadOnly
-  Gui, Font, s8        , Tahoma
-  Gui, Add, Listview   , x5   y200 w180 h290 gOnLV AltSubmit   , API|Desc
-  Gui, Add, Text       , x195 y205 w150 h290 HWNDhNotifications, -- Notifications --`n`n
-  apiPopulate()
+	Gui, Font, s11 bold  , Tahoma
+	Gui, Add, Text       , x10 y10 w300 HWNDhText
+	Gui, Font, s10 Normal, Tahoma
+	Gui, Add, Text       , x10 y30 w300 h40 HWNDhDesc
+	Gui, Font, s8        , Tahoma
+	Gui, Add, Edit       , x10 y80 w330 h110 HWNDhExample ReadOnly
+	Gui, Font, s8        , Tahoma
+	Gui, Add, Listview   , x5   y200 w180 h290 gOnLV AltSubmit   , API|Desc
+	Gui, Add, Text       , x195 y205 w150 h290 HWNDhNotifications, -- Notifications --`n`n
 
-; Window styles:  DISABLENOSCROLL, EX_NOCALLOLEINIT, NOIME, SELFIME, SUNKEN, CLIENTEDGE, VERTICAL
-; Edit styles:  AUTOHSCROLL, AUTOVSCROLL, CENTER, LEFT, MULTILINE, NOHIDESEL, NUMBER, PASSWORD, READONLY, RIGHT, WANTRETURN
-	hRichEdit := RichEdit_Add( hwnd, 355, 5, 445, 490, "VGRIDLINES nosel", "left" )
+	apiPopulate()
+
+	hRichEdit := RichEdit_Add( hwnd, 355, 5, 445, 490, "WANTRETURN SCROLL MULTILINE")
 	Gui, Show, w805 h500
 
-  RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
-  RichEdit_SetEvents(hRichEdit, "Handler", "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE")
-return ;//////////////////////////////////////////////////
+	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
+	;RichEdit_SetEvents(hRichEdit, "Handler", "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE")
+return
 
 
 Handler(hCtrl, Event, p1, p2, p3 ) {
@@ -39,6 +35,9 @@ Handler(hCtrl, Event, p1, p2, p3 ) {
   ControlSetText,, -- Notifications --`n`nEvent = %Event% `np1 = %p1% `np2 = %p2% `np3 = %p3% `n%L%, ahk_id %hNotifications%
   IfEqual, Event, PROTECTED, return TRUE
 }
+
+
+
 
 ^1::reload
 
@@ -66,6 +65,11 @@ return
 
 apiPopulate()  {
   global demo
+
+  FileRead, demo, % A_ScriptFullPath
+  StringReplace, demo, demo, `r,,A
+  StringReplace, demo, demo, MsgBox`,262144`,`,,MsgBox`,,A
+
   hImageList := IL_Create(1), LV_SetImageList(hImageList), IL_Add(hImageList, "shell32.dll", 132)
   pos = 1800
   Loop  {
