@@ -2,7 +2,7 @@ _("mo!")
 #SingleInstance, force
 	Gui, +LastFound
 	hwnd := WinExist()
-	GroupAdd, RichEditGrp, ahk_id %hwnd%
+	GroupAdd, RichEditGrp, ahk_id %hwnd% 
 
 	Gui, Font, s11 bold  , Tahoma
 	Gui, Add, Text       , x10 y10 w300 HWNDhText
