@@ -115,22 +115,22 @@ RichEdit_Add2Form(hParent, Txt, Opt){
  			If auto-URL detection is active, the return value is 1.
  			If auto-URL detection is inactive, the return value is 0.
  */
-RichEdit_AutoUrlDetect( HCtrl, Flag="" )  {	;wParam Specify TRUE to enable automatic URL detection or FALSE to disable it. 
+RichEdit_AutoUrlDetect(HCtrl, Flag="" )  {	;wParam Specify TRUE to enable automatic URL detection or FALSE to disable it. 
 	static EM_AUTOURLDETECT=0x45B, EM_GETAUTOURLDETECT=0x45C
   
 	If (Flag = "") || (Flag ="^") {
-		SendMessage, EM_GETAUTOURLDETECT,,,,ahk_id %hCtrl%
+		SendMessage, EM_GETAUTOURLDETECT,,,,ahk_id %HCtrl%
 		ifEqual, Flag,, return ERRORLEVEL
 		Flag := !ERRORLEVEL
 	}
-	SendMessage, EM_AUTOURLDETECT, Flag,,, ahk_id %hCtrl%
+	SendMessage, EM_AUTOURLDETECT, Flag,,, ahk_id %HCtrl%
 	return Flag
 }
 
 /*
   Function: GetRedo
  			Determine whether there are any actions in the control redo queue, and
-      optionally retrieve the type of the next redo action.
+			optionally retrieve the type of the next redo action.
  
   Parameters:
  			name - This optional parameter is the name of the variable in which to store the
@@ -185,51 +185,38 @@ RichEdit_GetRedo(hCtrl, ByRef name="-")  {
               following the last character in the range.
  
   Returns:
- 			Returns the number of characters selected, not including the terminating null character.
+ 			Returns cpMin. If there is no selection this is cursor position.
  
   Related:
       <GetText>, <GetTextLength>, <SetSel>, <SetText>, <LineFromChar>
- 
-  Example:
- > If !RichEdit_GetSel( hRichEdit ) {
- >   MsgBox, No characters selected.
- >   return
- > }
- > count := RichEdit_GetSel( hRichEdit, min, max )
- > MsgBox,,%count% char's selected, Selected from: %min%-%max%
  */
 RichEdit_GetSel(hCtrl, ByRef cpMin="", ByRef cpMax="" )  {
-  static WM_USER=0x400,EM_EXGETSEL=52
-  VarSetCapacity(CHARRANGE, 8, 0)
-  SendMessage, WM_USER | EM_EXGETSEL, 0,&CHARRANGE,, ahk_id %hCtrl%
+  static EM_EXGETSEL=0x434
+  VarSetCapacity(CHARRANGE, 8)
+  SendMessage, EM_EXGETSEL, 0,&CHARRANGE,, ahk_id %hCtrl%
   cpMin := NumGet(CHARRANGE, 0, "Int"), cpMax := NumGet(CHARRANGE, 4, "Int")
-  return cpMax - cpMin
+  return cpMin
 }
 
 /*
- Function: GetText
+ Function:  GetText
 			Retrieves a specified range of characters from a rich edit control.
 
  Parameters:
 			cpMin -	Beginning of range of characters to retrieve.
-			cpMax -	End of range of characters to retrieve
+			cpMax -	End of range of characters to retrieve.
 			codepage - If *UNICODE* or *U*, this optional parameter will use unicode code page
-                in the translation. Otherwise it will default to using ansi.
+					in the translation. Otherwise it will default to using ansi.
 
  Note:
-     If the *cpMin* and *cpMax* are omitted, the current selection is retrieved.
-     The range includes everything if *cpMin* is 0 and *cpMax* is –1.
+			If the *cpMin* and *cpMax* are omitted, the current selection is retrieved.
+			The range includes everything if *cpMin* is 0 and *cpMax* is –1.
 
  Returns:
 			Returns the retrieved text.
 
  Related:
      <GetSel>, <SetText>, <SetSel>, <GetTextLength>
-
- Example:
- > RichEdit_GetText( hRichEdit ) ; get current selection
- > RichEdit_GetText( hRichEdit, 0, -1 ) ; get all
- > RichEdit_GetText( hRichEdit, 4, 10 ) ; get range
  */
 RichEdit_GetText(hCtrl, cpMin="-", cpMax="-", codepage="")  {
   static WM_USER=0x400,EM_EXGETSEL=52,EM_GETTEXTEX=94,EM_GETTEXTRANGE=75,GT_SELECTION=2
@@ -381,7 +368,7 @@ RichEdit_GetUndo(hCtrl, ByRef name="-")  {
 }
 
 /*
- Function: LineFromChar
+ Function:  LineFromChar
 			Determines which line contains the specified character in a rich edit control.
 
  Parameters:
@@ -392,9 +379,6 @@ RichEdit_GetUndo(hCtrl, ByRef name="-")  {
 
  Related:
      <GetSel>, <SetSel>
-
- Example:
- > msgbox, % RichEdit_LineFromChar( hRichEdit, 5 )
  */
 RichEdit_LineFromChar(hCtrl, idxChar)  {
   static EM_EXLINEFROMCHAR=54,WM_USER=0x400
