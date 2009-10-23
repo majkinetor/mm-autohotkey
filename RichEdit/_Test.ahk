@@ -24,7 +24,7 @@ CreateGui(Text, W=850, H=600) {
 
 	hPanel1   := Form_Add(hForm1, "Panel", "", "", "Align L, 300", "Attach p")
 				 Form_Add(hPanel1,"Button", "Execute", "gOnExecute 0x8000", "Align T", "Attach p")
-	hExample  := Form_Add(hPanel1,"Edit", "`n", "ReadOnly Multi -Wrap", "Align F", "Attach p", "*|)Font s10, Courier New")
+	hExample  := Form_Add(hPanel1,"Edit", "`n", "hscroll ReadOnly Multi -Wrap", "Align F", "Attach p", "*|)Font s10, Courier New")
 	hSplitter := Form_Add(hForm1, "Splitter", "", "sunken", "Align L, 6", "Attach p")
 	hRichEdit := Form_Add(hForm1, "RichEdit", Text, "", "Align F", "Attach p")
 
