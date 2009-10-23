@@ -47,9 +47,11 @@ PopulateList() {
     ;take only sublabels that have description
 	pos := 1
 	Loop
-	If pos := RegExMatch( demo, "`ami)^(?P<Api>[\w]+):\s*;\s*(?P<Desc>.+)$", m, pos )
-	  LV_Add("", mApi, mDesc ),  pos += StrLen(mApi)
-	Else break
+		If pos := RegExMatch( demo, "`ami)^(?P<Api>[\w]+):\s*;\s*(?P<Desc>.+)$", m, pos )
+		  LV_Add("", mApi, mDesc ),  pos += StrLen(mApi), n := A_Index
+		Else break
+
+	SB_SetText("Number of functions: " n)
 
 	LV_ModifyCol(1,180), LV_ModifyCol(2), LV_Modify(1, "select")
 }
@@ -58,7 +60,7 @@ OnLV:
   LV_GetText( api, LV_GetNext() ), LV_GetText( desc, LV_GetNext(), 2 )
 
   If ( A_GuiEvent = "I" ) {
-	RegExMatch(demo, "mi)" api ":\s*(;.+)return", m)
+	RegExMatch(demo, "mi)" api ":\s*(;.+?)\nreturn", m)
 	StringReplace, m1, m1, `n,`r`n,A
 	ControlSetText, ,%m1%, ahk_id %hExample%
   }
@@ -74,7 +76,6 @@ AutoUrlDetect:  ; Enable disable or toggle automatic detection of URLs by a rich
   state := RichEdit_AutoUrlDetect( hRichEdit, "^" )
   MsgBox,262144,, % "url detect = " state
 return
-
 
 
 #include RichEdit.ahk
