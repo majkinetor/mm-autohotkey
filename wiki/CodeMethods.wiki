@@ -1,6 +1,6 @@
 List of some of the methods used in the code.
 
- * <Add> function arguments should not have initializers other then "". Default values should be handled inside the function. This is to solve the problem with add2Form in _Forms framework which always sends all available parameters of the controls Add function. If user didn't set the parameter Parse will set it to "" (thats why "" must specify default value)
+ * "Add" function arguments should not have initializers other then "". Default values should be handled inside the function. This is to solve the problem with add2Form in _Forms framework which always sends all available parameters of the controls Add function. If user didn't set the parameter Parse will set it to "" (thats why "" must specify default value)
 
  * Any constant used is referenced as static on the start of the function. If there is a need to repeat the same statics in several functions, helper function is created which is then the only one to keep static definitions.
 
