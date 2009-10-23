@@ -1036,11 +1036,11 @@ RichEdit_GETWORDWRAPMODE(hCtrl)  {
   MsgBox, % errorlevel
 }
 
-RichEdit_SETWORDWRAPMODE(hCtrl)  {
+RichEdit_SETWORDWRAPMODE(hCtrl, State)  {
 	static EM_SETWORDWRAPMODE=102,WM_USER=0x400
 	static WBF_WORDWRAP = 0x10
 		,EM_SETTARGETDEVICE = 72
-		,state=0
+;		,state=0
 	a=0
 	state:=!state
 

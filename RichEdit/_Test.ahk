@@ -29,7 +29,8 @@ CreateGui(Text, W=850, H=600) {
 	hSplitter := Form_Add(hForm1, "Splitter", "", "", "Align L, 6", "Attach p")
 	hPanel2	  := Form_Add(hForm1, "Panel", "", "", "Align F", "Attach p")
 	hPanel3   := Form_Add(hPanel2, "Panel", "", "", "Align T,35", "Attach w")
-	hToolbar  := Form_Add(hPanel3, "Toolbar", "B`nI`nU`nS`n-`nFont`nFG`nBG", "gOnToolbar style='nodivider menu'", "Attach w")
+	hToolbar  := Form_Add(hPanel3, "Toolbar", "B`nI`nU`nS`n---`nFont`nFG`nBG`n---`nWrap,,checked,CHECK", "gOnToolbar style='nodivider tooltips' il=0", "Attach w")
+	Toolbar_SetBitmapSize(hToolbar, 0)
 	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "", "Align F", "Attach w h")
 
 	Splitter_Set(hSplitter, hPanel1 " | " hPanel2)
@@ -50,6 +51,12 @@ OnToolbar(hCtrl, Event, Txt, Pos, Id){
 
 	if Txt in BG,FG
 		Dlg_Color(color, hForm1)
+
+	if Txt = Wrap 
+	{
+		state := Toolbar_GetButton(hCtrl, Pos, "S")
+		Richedit_SetWordWrapMode(hRichEdit, state="checked")
+	}
 }
 
 
