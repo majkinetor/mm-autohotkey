@@ -4,7 +4,7 @@
 
 /*
  Function:		Color
-				(See color.png)
+				(See Dlg_color.png)
 
  Parameters: 
 				Color	- Initial color and output in RGB format.
@@ -46,8 +46,8 @@ Dlg_Color(ByRef Color, hGui=0){
 /*
 
  Function:     Find / Replace
-				(see find.png)
-				(see replace.png)
+				(See Dlg_find.png)
+				(See Dlg_replace.png)
 
  Parameters: 
                hGui    - Handle to the parent.
@@ -88,12 +88,13 @@ Dlg_Find( hGui, Handler, Flags="d", FindText="") {
 	ifNotEqual, FindText, , SetEnv, buf, %FindText%
 	
 	f := 0
-	 ,InStr(flags, "d")  ? f |= FR_DOWN			 : ""
-	 ,InStr(flags, "c")  ? f |= FR_MATCHCASE	 : ""
-	 ,InStr(flags, "w")  ? f |= FR_WHOLEWORD	 : ""
-	 ,InStr(flags, "-d") ? f |= FR_HIDEUPDOWN	 : ""
-	 ,InStr(flags, "-w") ? f |= FR_HIDEWHOLEWORD : ""
-	 ,InStr(flags, "-c") ? f |= FR_HIDEMATCHCASE : ""
+	 ,InStr(flags, "d")  ? f |= FR_DOWN			 :
+	 ,InStr(flags, "c")  ? f |= FR_MATCHCASE	 :
+	 ,InStr(flags, "w")  ? f |= FR_WHOLEWORD	 :
+	 ,InStr(flags, "-d") ? f |= FR_HIDEUPDOWN	 :
+	 ,InStr(flags, "-w") ? f |= FR_HIDEWHOLEWORD :
+	 ,InStr(flags, "-c") ? f |= FR_HIDEMATCHCASE :
+
 
 	NumPut(40,		FR, 0)	;size
 	 ,NumPut( hGui,	FR, 4)	;hwndOwner
@@ -145,7 +146,7 @@ Dlg_Replace( hGui, Handler, Flags="", FindText="", ReplaceText="") {
 
 /*
  Function:  Font
-			 (see font.png)				
+			 (See Dlg_font.png)				
 
  Parameters:
             Name	- Initial font,  output.
@@ -248,7 +249,7 @@ Dlg_Font(ByRef Name, ByRef Style, ByRef Color, Effects=true, hGui=0) {
 
 /*
  Function:	Icon 
-			(See icon.png)
+			(See Dlg_icon.png)
 
  Parameters:
 			Icon	- Default icon resource, output.
@@ -278,7 +279,7 @@ Dlg_Icon(ByRef Icon, ByRef Index, hGui=0) {
 
 /*
  Function:  Open / Save 
-			 (see open.png)
+			 (See Dlg_open.png)
 
  Parameters: 
             hGui            - Parent's handle, positive number by default 0 (influences dialog position).
@@ -287,14 +288,14 @@ Dlg_Icon(ByRef Icon, ByRef Index, hGui=0) {
             DefaultFilter   - Index of default filter (1 based), by default 1.
             Root			- Specifies startup directory and initial content of "File Name" edit. 
 							  Directory must have trailing "\".
-            DefaulltExt     - Extension to append when none given .
+            DefaultExt      - Extension to append when none given .
             Flags           - White space separated list of flags, by default "FILEMUSTEXIST HIDEREADONLY".
   
   Flags:
 			allowmultiselect	- Specifies that the File Name list box allows multiple selections 
 			createprompt		- If the user specifies a file that does not exist, this flag causes the dialog box to prompt the user for permission to create the file
 			dontaddtorecent		- Prevents the system from adding a link to the selected file in the file system directory that contains the user's most recently used documents. 
-			extensiondifferent	- Specifies that the user typed a file name extension that differs from the extension specified by defaulltExt
+			extensiondifferent	- Specifies that the user typed a file name extension that differs from the extension specified by defaultExt
 			filemustexist		- Specifies that the user can type only names of existing files in the File Name entry field
 			forceshowhidden		- Forces the showing of system and hidden files, thus overriding the user setting to show or not show hidden files. However, a file that is marked both system and hidden is not shown.
 			hidereadonly		- Hides the Read Only check box.
@@ -444,6 +445,6 @@ Dlg_callback(wparam, lparam, msg, hwnd) {
  */
 
 /* Group: About
-		o Ver 5.01 by majkinetor. See http://www.autohotkey.com/forum/topic17230.html
+		o Ver 5.0 by majkinetor. See http://www.autohotkey.com/forum/topic17230.html
 		o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
  */

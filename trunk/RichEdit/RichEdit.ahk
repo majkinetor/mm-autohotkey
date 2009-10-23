@@ -10,7 +10,7 @@
 				HParent	- Handle of the parent of the control.
 				X..H	- Position.
 				Style	- White space separated list of control styles. Any integer style or one of the style keywords (see below).
-						  Invalid styles are skipped. "MULTILINE WANTRETURN" by default.
+						  Invalid styles are skipped. "MULTILINE WANTRETURN VSCROLL" by default.
 				Text	- Control text.
 
  Styles:
@@ -44,7 +44,7 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
 		init := DllCall("LoadLibrary", "Str", "Msftedit.dll", "Uint"), MODULEID := 091009
 
 
-	ifEqual, Style,, SetEnv, Style, MULTILINE WANTRETURN	
+	ifEqual, Style,, SetEnv, Style, MULTILINE WANTRETURN VSCROLL	
 	hStyle := InStr(" " Style " ", " hidden ") ? 0 : WS_VISIBLE,  hExStyle := 0
 	Loop, parse, Style, %A_Tab%%A_Space%
 	{

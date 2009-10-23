@@ -10,26 +10,24 @@
 				opt	- Space separated list of script options.
 	
 	Options:
-				m	- Affects how <m> function works: mm makes it use MsgBox (default), mo OutputDebug, m alone disables it.
-					  Anything else will use FileAppend; for instance mout.txt! writes to out.txt file. ! at the end is optional and if present
-					  it will mark the file for deletition on scripts startup. ! can also be used with o mode to clear the DebugView log.
-					  DebugView will be started if it doesn't run, make sure its on the system PATH (there will be no error message if Run fails).
+				m	- Affects how <m> function works: mm makes it use MsgBox (default), mo OutputDebug, m alone disables it. Anything else will set it to FileAppend mode.
 				d	- Detect hidden windows.
 				e	- Escape exits the script. Use ea to exit the script only if its window is active.
 				wd	- SetWorkingDir %A_ScriptDir%
 				wN	- SetWinDelay. If N is omitted, it defaults to -1.
 				cN	- SetControlDelay. If N is omitted, it defaults to -1.
-				sN	- Speed, always active, defaults to -1
+				sN	- Speed, will always be set in first call to this function (defaults to -1). Subsequent calls will set scripts speed only if s is 
+					  explicitly set up.
 				t?	- Title match mode: t1 (or ts), t2 (or tc), t3 (or te), tr (regular expression).
 
 	Example:	
 		(start code)
 			_("s100 d e")	;set speed to 100ms, detect hiden windows, exit on ESC.
-			_("mo wd tc)	;set m to use OutputDebug, set working directory to A_ScriptDir, set title match mode to c (c=2="contain").
+			_("mo wd tc")	;set m to use OutputDebug, set working directory to A_ScriptDir, set title match mode to c (c=2="contain").
 			_("mout.txt!")	;set m to use File out.txt and to clear it each time script is started.
 	
 		
-			_("m")			;disable m for the script
+			_("m")			;disable m for the script.
 			....
 			m( x, y )	    ;will not trigger
 			...
@@ -42,61 +40,48 @@
 		(end code)
 
 	Remarks:
-				Includes #NoEnv and #SingleInstance force always.
-				Registers global variable _ to contain A_Space.
+				Includes #NoEnv and #SingleInstance force always. Keep in mind that calling this function will set scripts speed to maximum.
  */
 
 _(opt="") {
-	global _
-	_ := A_Space
+	static init=0
 
 	#NoEnv
 	#Singleinstance, force
 
-	s := -1
+	if !init
+		init := s := -1
 	loop, parse, opt, %A_Space%
 		f := SubStr(A_LoopField,1,1), %f% := SubStr(A_LoopField, 2), %f% .= %f% = "" ? 1 : ""
+
+	ifNotEqual, s,, SetBatchLines, %s%
 
 	ifEqual, w, 1, SetEnv, w, -1
 	ifEqual, c, 1, SetEnv, w, -1
 
 	ifEqual, d, 1, DetectHiddenWindows, on
 	ifEqual, w, d, SetWorkingDir %A_ScriptDir%
-	SetBatchLines, %s%
 	ifNotEqual, w,,SetWinDelay, %w%
 	ifNotEqual, c,,SetControlDelay, %c%
 
-	if m != 
-	{
+	if (m != "") {
 		if SubStr(m,0) = "!" {
 			m := SubStr(m, 1, -1)
-			if m = o
-				 bClear := true
-			else FileDelete, %m%
-		}
-
-		if (m="o") {
-			if !WinExist("ahk_class dbgviewClass")
-				 Run, DbgView.exe,, UseErrorLevel, PID
-			else WinRestore, ahk_class dbgviewClass
-			ifNotEqual, PID,, WinWaitActive, ahk_pid %PID%
-			if bClear
-				ControlSend, , ^x, ahk_class dbgviewClass
+			if m not in m,o
+				FileDelete, %m%
+			else m := "o!"
 		} 
-
 		m("~`a" (m = 1 ? "" : m))
 	}
 
-	if e 
-	{
+	if e {
 		Process, Exist
 		ifEqual, e, a, Hotkey, IfWinActive, ahk_pid %ErrorLevel%
 		HotKey, Esc, __HotkeyEsc
 		ifEqual, e, a, Hotkey, IfWinActive
 	}
 
-	if t !=
-	{	
+	if (t != "") {	
 		ts := 1, tc := 2, te := 3, tr := "RegEx"
 		if t not in 1,2,3
 			t := t%t%
@@ -118,31 +103,51 @@ return
 	Parameters:
 			  o1..o8	- Arguments to display.
 	
-	Remarks:
-			  m can use MsgBox (m mode), OutputDebug (o mode) or FileAppend to write messages. See <_> function for details.
-			  In o mode, all arguments will be joined in single line.
+	Modes:	 
+			Function can work in 4 modes:
+
+			m		- MsgBox mode.
+			o[!]	- OutputDebug mode. All arguments will be joined in single line. The function will use DbgView.exe for monitoring.
+					  Program must be copied into the location that is in system PATH (for instance Windows dir).
+			word[!]	- FileAppend mode. Word is the name of the text file (no spaces) that will be used to save messages.
+			""		- Disabled mode. Function will simply return without taking any action.
+
+			You can set mode by using <_> function and its "m" option.
 
 	Returns: 
-			  o1.
+			o1.
 
-	Examples:
-	>		 if (x - m(y) = z)	; Use m inside expressions for debugging.			
+	Remarks:
+			! at the end means that medium used will be erased when script starts.
+
+	Example:
+	>		 if m( (x - m(y) = z) )	; Use m inside expressions for debugging.
 */
 m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a") {
-	static mode="m"
+	static mode="m", init=0, bClear
 	if InStr(o1, "~`a")
-		return mode := SubStr(o1, 3)
+		return mode := SubStr(o1, 3), mode := mode="o!" ? bClear := "o" : mode
 	ifEqual, mode,,return o1
 
 	loop, 8
 		ifEqual, o%A_Index%,~`a,break
 		else s .= "'" o%A_Index% "'"  (mode="o" ? " " : "`n")
 
-	if mode=m
-			MsgBox %s%
-	else if mode=o
-			OutputDebug %s%
-	else	FileAppend, %s%, %mode%
+	if (mode="m")
+		MsgBox %s%
+	else if (mode="o") {
+		if !init {
+			if !WinExist("ahk_class dbgviewClass") {
+				   Run, DbgView.exe,, UseErrorLevel, PID
+	 			   WinWaitActive, ahk_pid %PID%, ,2
+			} else WinActivate, ahk_class dbgviewClass
+
+			ifEqual, bClear, o, WinMenuSelectItem,ahk_class dbgviewClass,,Edit, Clear Display, ;			;ifEqual, bClear, o, Send, ^x		;	ControlSend, , ^x, ahk_class dbgviewClass		(mhm.... it worked...)
+			init++
+		}
+		OutputDebug %s%
+	}
+	else FileAppend, %s%, %mode%
 
 	return o1
 }
@@ -262,7 +267,7 @@ S(ByRef S,pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",By
 	Returns:
 			  o	if _value_ is omitted, function returns the current value of _var_
 			  o	if _value_ is set, function sets the _var_ to _value_ and returns previous value of the _var_
-			  o if _var_ is empty, function accepts list of variables in _value_ and returns values of those variables in o1 .. o5
+			  o if _var_ is empty, function accepts list of variables in _value_ and returns values of those variables in o1 .. o6
 
     Remarks:
 			  To use multiple storages, copy *v* function and change its name. 
@@ -395,6 +400,6 @@ Fatal(Message, E=1, ExitCode="") {
 
 
 /* Group: About
-	o 0.43 by majkinetor
+	o 0.44 by majkinetor
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
  */
