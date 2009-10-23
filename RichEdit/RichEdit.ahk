@@ -108,7 +108,7 @@ RichEdit_Add2Form(hParent, Txt, Opt){
  			 Enable, disable, or toggle automatic detection of URLs.
  
   Parameters:
- 			Flag - Specify "+" to enable automatic URL detection or "-" to disable it. Specify
+ 			Flag - Specify TRUE to enable automatic URL detection or FALSE to disable it. Specify
              "^" to toggle its current state. Omit to only return current state without any change.
  
   Returns:
@@ -116,18 +116,15 @@ RichEdit_Add2Form(hParent, Txt, Opt){
  			If auto-URL detection is inactive, the return value is 0.
  */
 RichEdit_AutoUrlDetect( HCtrl, Flag="" )  {	;wParam Specify TRUE to enable automatic URL detection or FALSE to disable it. 
-  static EM_AUTOURLDETECT=0x45B, EM_GETAUTOURLDETECT=0x45C
+	static EM_AUTOURLDETECT=0x45B, EM_GETAUTOURLDETECT=0x45C
   
-	If (Flag = "") || (Flag ="^")
+	If (Flag = "") || (Flag ="^") {
 		SendMessage, EM_GETAUTOURLDETECT,,,,ahk_id %hCtrl%
-	
-	hFlag := Flag = "+" ? 1 : Flag = "-" ? 0 : Flag = "^" ? !ERRORLEVEL : ERRORLEVEL
-
-	m(hFlag)
-	If Flag in +,-,^
-		SendMessage, EM_AUTOURLDETECT, hFlag,,, ahk_id %hCtrl%
-	
-	return hFlag
+		ifEqual, Flag,, return ERRORLEVEL
+		Flag := !ERRORLEVEL
+	}
+	SendMessage, EM_AUTOURLDETECT, Flag,,, ahk_id %hCtrl%
+	return Flag
 }
 
 /*
