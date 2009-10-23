@@ -29,5 +29,9 @@ F2::
 	Win_Redraw()
 return
 
+Form1_Close:
+	ExitApp
+return
+
 #include inc
 #include _Forms.ahk

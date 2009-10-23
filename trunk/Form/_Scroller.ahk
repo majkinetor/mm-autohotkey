@@ -19,8 +19,9 @@ _("mo!")
 return 
 
 
-GuiClose: 
-ExitApp 
+Form1_Close:
+	ExitApp
+return
 
 Form1_Size:
 	Scroller_UpdateBars(hForm)

@@ -44,6 +44,7 @@ return
 
 OnAttach(Hwnd) {
 	global
+	
 	;if (Hwnd = hButtonPanel) /* Could be used to stretch button image on resizing */
 	;	hbitmap := Ext_Image(hButton, "..\res\test.bmp") ;remove old bitmap....
 
@@ -142,7 +143,7 @@ InitControl(Name, HCtrl) {
 			Type=ComboBox
 			Value=1|2|3
 		)
-		Property_initSheet(hCtrl)	;must be done in panel ... will fix it...
+		;Property_initSheet(hCtrl)	;must be done in panel ... will fix it...
 		Property_SetColors(hCtrl, "pbAAEEAA sbaaeeaa sffff")
 		Property_SetFont(hCtrl, "Separator", "bold s9, verdana")
 		Property_SetRowHeight(hCtrl, 25)
@@ -208,6 +209,11 @@ InitControl(Name, HCtrl) {
 		ControlSetText, ,%html%, ahk_id %HCtrl%
 	}
 }
+
+
+Form1_Close:
+	ExitApp
+return
 
 F2::
 	WinMove, ahk_id %hForm%, , , , 300, 300

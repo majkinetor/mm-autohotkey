@@ -208,6 +208,9 @@ InitControl(Name, HCtrl) {
 	}
 }
 
+Form1_Close:
+	ExitApp
+return
 
 F1::
 	Win_Show(hPanel%gCur%, false), gCur++

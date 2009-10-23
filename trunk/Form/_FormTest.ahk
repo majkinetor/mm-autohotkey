@@ -23,6 +23,10 @@ F2::
 	Win_Redraw()
 return
 
+Form1_Close:
+	ExitApp
+return
+
 #include inc\_.ahk
 #include inc\Form.ahk
 #include inc\Win.ahk

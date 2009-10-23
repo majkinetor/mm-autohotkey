@@ -1,8 +1,5 @@
 _("mo")
-#SingleInstance, force
 #MaxThreads, 255		;Required for this sample with cursor/tooltip extensions.
-#NoEnv
-
 
 	n := 5				;create 10 * 2**n controls
 	;===============
@@ -215,6 +212,10 @@ F1::
 	if (gCur > ctrlNo)
 		gCur := 1
 	Win_Show(hPanel%gCur%)
+return
+
+Form1_Close:
+	ExitApp
 return
 
 #include inc
