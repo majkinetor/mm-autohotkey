@@ -10,10 +10,8 @@
 
  Styles:
      DISABLENOSCROLL - Disables scroll bars instead of hiding them when they are not needed.
-     SUNKEN			- Displays the control with a sunken border style so that the rich edit control appears recessed into its parent window.
+     BORDER			- Displays the control with a sunken border style so that the rich edit control appears recessed into its parent window.
 	 HIDDEN			- Don't show the control.
-     CLIENTEDGE		- Windows 95/98/Me: Applications developed for Microsoft Windows 95/98/Me should use CLIENTEDGE instead of SUNKEN.
-     VERTICAL		- Draws text and objects in a vertical direction. This style is available for Asian-language support only.
 
      AUTOHSCROLL	- Automatically scrolls text to the right by 10 characters when the user types a character at the end of the line. When the user presses the ENTER key, the control scrolls all text back to position zero.
      AUTOVSCROLL	- Automatically scrolls text up one page when the user presses the ENTER key on the last line.
@@ -32,7 +30,7 @@
  */
 RichEdit_Add(HParent, X="", Y="", W="", H="", Style="")  {
   static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
-		,EX_DISABLENOSCROLL=0x2000, EX_SUNKEN=0x4000, EX_CLIENTEDGE=0x200, EX_VERTICAL=0x400000
+		,ES_DISABLENOSCROLL=0x2000, EX_BORDER=0x200, EX_CLIENTEDGE=0x200
 		,ES_LEFT=0, ES_CENTER=1, ES_RIGHT=2, ES_MULTILINE=4, ES_AUTOVSCROLL=0x40, ES_AUTOHSCROLL=0x80, ES_NOHIDESEL=0x100, ES_NUMBER=0x2000, ES_PASSWORD=0x20,ES_READONLY=0x800,ES_WANTRETURN=0x1000
 		,ES_HSCROLL=0x100000, ES_VSCROLL=0x200000, ES_SCROLL=0x300000 
 		,MODULEID

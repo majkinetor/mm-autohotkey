@@ -16,13 +16,17 @@ _("mo!")
 
 	apiPopulate()
 
-	hRichEdit := RichEdit_Add( hwnd, 355, 5, 445, 490, "WANTRETURN SCROLL MULTILINE")
+	hRichEdit := RichEdit_Add( hwnd, 355, 5, 445, 490, "WANTRETURN BORDER DISABLENOSCROLL SCROLL MULTILINE")
 	Gui, Show, w805 h500
 
 	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
 	;RichEdit_SetEvents(hRichEdit, "Handler", "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE")
 return
 
+
+F1::
+	m("hej")
+return
 
 Handler(hCtrl, Event, p1, p2, p3 ) {
   global hNotifications
