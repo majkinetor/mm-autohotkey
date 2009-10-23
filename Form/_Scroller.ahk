@@ -1,5 +1,5 @@
 _("mo!")
-	hForm  := Form_New("Resize w500 h400")
+	hForm  := Form_New("Resize e3 w500 h400")
 
 	hPanel := Form_Add(hForm, "Panel", "", "x250 y20 w150 h300")
 	loop, 2
