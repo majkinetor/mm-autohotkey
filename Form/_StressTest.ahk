@@ -29,5 +29,9 @@ return
 
 F1:: 	Scroller_UpdateBars(hForm1)
 
+Form1_Close:
+	ExitApp
+return
+
 #include inc
 #include _Forms.ahk

@@ -22,8 +22,6 @@ F1::
 	WinMove, ahk_id %hMainForm%, , , ,300, 300
 return
 
-return
-
 F2::
 	if toggled2
 	{
@@ -48,6 +46,9 @@ OnControl:
 	msgbox %  A_GuiCOntrol
 return
 
+Form1_Close:
+	ExitApp
+return
 
 #include inc
 #include _Forms.ahk

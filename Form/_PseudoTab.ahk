@@ -48,7 +48,9 @@ OnControl:
 	msgbox % A_GuiCOntrol
 return
 
-
+Form1_Close:
+	ExitApp
+return
 
 #include inc
 #include _Forms.ahk
