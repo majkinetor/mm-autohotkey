@@ -8,3 +8,5 @@
  * No comment in the function body starts the line.
 
  * Documentation is in Natural Doc format. Sections with no need for information should be skipped. Trivial examples should not be given after each function. Instead, sample or code snippets should be given at the end of the code in Group:Examples group. Ndoc function comments are set in multiline comment style with the ending token having one space before it.
+
+ * Tab spaces used: 4
