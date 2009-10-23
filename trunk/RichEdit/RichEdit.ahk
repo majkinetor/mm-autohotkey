@@ -1,97 +1,93 @@
 /*
- The following window styles are unique to rich edit controls.
+ Function:		Add
+				Create control.
+ 
+ Parameters:
+				HParent	- Handle of the parent of the control.
+				X..H	- Position.
+				Style	- White space separated list of control styles. Any integer style or one of the style keywords (see below).
+						  Invalid styles are skipped.
+
+ Styles:
      DISABLENOSCROLL - Disables scroll bars instead of hiding them when they are not needed.
-     NOCALLOLEINIT - Prevents the control from calling the OleInitialize function when created. This window style is useful only in dialog templates because CreateWindowEx does not accept this style.
-     NOIME - Disables the Input Method Editor (IME) operation. This style is available for Asian language support only.
-     SELFIME - Directs the rich edit control to allow the application to handle all IME operations. This style is available for Asian language support only.
-     SUNKEN - Displays the control with a sunken border style so that the rich edit control appears recessed into its parent window.
-     CLIENTEDGE - Windows 95/98/Me: Applications developed for Microsoft Windows 95/98/Me should use CLIENTEDGE instead of SUNKEN.
-     VERTICAL - Draws text and objects in a vertical direction. This style is available for Asian-language support only.
+     SUNKEN			- Displays the control with a sunken border style so that the rich edit control appears recessed into its parent window.
+	 HIDDEN			- Don't show the control.
+     CLIENTEDGE		- Windows 95/98/Me: Applications developed for Microsoft Windows 95/98/Me should use CLIENTEDGE instead of SUNKEN.
+     VERTICAL		- Draws text and objects in a vertical direction. This style is available for Asian-language support only.
 
- Rich edit controls also support the following edit control styles.
-     AUTOHSCROLL - Automatically scrolls text to the right by 10 characters when the user types a character at the end of the line. When the user presses the ENTER key, the control scrolls all text back to position zero.
-     AUTOVSCROLL - Automatically scrolls text up one page when the user presses the ENTER key on the last line.
-     CENTER - Centers text in a single-line or multiline edit control.
-     LEFT - Left aligns text.
-     MULTILINE - Designates a multiline edit control. The default is single-line edit control.
-     NOHIDESEL - Negates the default behavior for an edit control. The default behavior hides the selection when the control loses the input focus and inverts the selection when the control receives the input focus. If you specify ES_NOHIDESEL, the selected text is inverted, even if the control does not have the focus.
-     NUMBER - Allows only digits to be entered into the edit control.
-     PASSWORD - Displays an asterisk (*) for each character typed into the edit control. This style is valid only for single-line edit controls.
-     READONLY - Prevents the user from typing or editing text in the edit control.
-     RIGHT - Right aligns text in a single-line or multiline edit control.
-     WANTRETURN - Specifies that a carriage return be inserted when the user presses the ENTER key while entering text into a multiline edit control in a dialog box. If you do not specify this style, pressing the ENTER key has the same effect as pressing the dialog box's default push button. This style has no effect on a single-line edit control.
+     AUTOHSCROLL	- Automatically scrolls text to the right by 10 characters when the user types a character at the end of the line. When the user presses the ENTER key, the control scrolls all text back to position zero.
+     AUTOVSCROLL	- Automatically scrolls text up one page when the user presses the ENTER key on the last line.
+     CENTER			- Centers text in a single-line or multiline edit control.
+     LEFT			- Left aligns text.
+     MULTILINE		- Designates a multiline edit control. The default is single-line edit control.
+     NOHIDESEL		- Negates the default behavior for an edit control. The default behavior hides the selection when the control loses the input focus and inverts the selection when the control receives the input focus. If you specify ES_NOHIDESEL, the selected text is inverted, even if the control does not have the focus.
+     NUMBER			- Allows only digits to be entered into the edit control.
+     PASSWORD		- Displays an asterisk (*) for each character typed into the edit control. This style is valid only for single-line edit controls.
+     READONLY		- Prevents the user from typing or editing text in the edit control.
+     RIGHT			- Right aligns text in a single-line or multiline edit control.
+     WANTRETURN		- Specifies that a carriage return be inserted when the user presses the ENTER key while entering text into a multiline edit control in a dialog box. If you do not specify this style, pressing the ENTER key has the same effect as pressing the dialog box's default push button. This style has no effect on a single-line edit control.			
+
+ Returns:
+	Control's handle or 0. Error message on problem.
  */
-RichEdit_Add(hwnd,x=0,y=0,w=200,h=100,winStyle="",editStyle="")  {
- ; 	static	WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
-  static ES_DISABLENOSCROLL = 0x2000
-        ,ES_EX_NOCALLOLEINIT = 0x1000000
-        ,ES_NOIME = 0x80000
-        ,ES_SELFIME = 0x40000
-        ,ES_SUNKEN = 0x4000
-        ,ES_CLIENTEDGE = 0x200  ; WS_EX_CLIENTEDGE
-        ,ES_VERTICAL = 0x400000  
-  static ES_AUTOHSCROLL = 0x80  ;--edit control styles
-        ,ES_AUTOVSCROLL = 0x40
-        ,ES_CENTER = 0x1
-        ,ES_LEFT = 0x0
-        ,ES_MULTILINE = 0x4
-        ,ES_NOHIDESEL = 0x100
-        ,ES_NUMBER = 0x2000
-        ,ES_PASSWORD = 0x20
-        ,ES_READONLY = 0x800
-        ,ES_RIGHT = 0x2
-        ,ES_WANTRETURN = 0x1000
+RichEdit_Add(HParent, X="", Y="", W="", H="", Style="")  {
+  static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
+		,EX_DISABLENOSCROLL=0x2000, EX_SUNKEN=0x4000, EX_CLIENTEDGE=0x200, EX_VERTICAL=0x400000
+		,ES_LEFT=0, ES_CENTER=1, ES_RIGHT=2, ES_MULTILINE=4, ES_AUTOVSCROLL=0x40, ES_AUTOHSCROLL=0x80, ES_NOHIDESEL=0x100, ES_NUMBER=0x2000, ES_PASSWORD=0x20,ES_READONLY=0x800,ES_WANTRETURN=0x1000
+		,ES_HSCROLL=0x100000, ES_VSCROLL=0x200000, ES_SCROLL=0x300000 
+		,MODULEID
 
-	hexWinStyle := 0, hexEditStyle := 0x54B371C4
-	Loop, parse, winStyle, %A_Tab%%A_Space%
-		hexWinStyle |= ES_%A_LOOPFIELD%
+	if !MODULEID
+		init := DllCall("LoadLibrary", "Str", "Msftedit.dll", "Uint"), MODULEID := 091009
 
-	Loop, parse, editStyle, %A_Tab%%A_Space%
-		hexEditStyle |= ES_%A_LOOPFIELD%
+	hStyle := InStr(" " Style " ", " hidden ") ? 0 : WS_VISIBLE,  hExStyle := 0
+	Loop, parse, Style, %A_Tab%%A_Space%
+	{
+		IfEqual, A_LoopField, ,continue
+		else if A_LoopField is integer
+			 hStyle |= A_LoopField
+		else if (v := ES_%A_LOOPFIELD%)
+			 hStyle |= v
+		else if (v := EX_%A_LOOPFIELD%)
+			 hExStyle |= v
+		else continue
+	}
+	/*
+		class   := A_OSVersion = "WIN_95" ? "RICHEDIT" : "RichEdit20A"
+		hModule := DllCall("LoadLibrary", "str",  (class="RichEdit20A" ? "riched20.dll" : "riched32.dll")  )
 
-  class   := "RICHEDIT50W"   ; MSFTEDIT_CLASS
-  MODULEID := 091009, hModule := DllCall("LoadLibrary", "str", "Msftedit.dll" )
+		http://www.soulfree.net/tag/391
+		RE version - DLL (hModule)- class
+		1.0	       - Riched32.dll - RichEdit
+		2.0	       - Riched20.dll - RichEdit20A or RichEdit20W (ANSI or Unicode window classes)
+		3.0	       - Riched20.dll - ?
+		4.1	       - Msftedit.dll - RICHEDIT50W
 
- ;   class   := A_OSVersion = "WIN_95" ? "RICHEDIT" : "RichEdit20A"
- ;   hModule := DllCall("LoadLibrary", "str",  (class="RichEdit20A" ? "riched20.dll" : "riched32.dll")  )
+		2.0 not compatible w/ EM_CONVPOSITION, EM_GETIMECOLOR, EM_GETIMEOPTIONS, EM_GETPUNCTUATION,
+		  EM_GETWORDWRAPMODE, EM_SETIMECOLOR, EM_SETIMEOPTIONS, EM_SETPUNCTUATION, EM_SETWORDWRAPMODE
 
-  If (ErrorLevel)
-    return "ERROR: Error loading dll"
-
- ; http://www.soulfree.net/tag/391
- ; RE version - DLL (hModule)- class
- ; 1.0	       - Riched32.dll - RichEdit
- ; 2.0	       - Riched20.dll - RichEdit20A or RichEdit20W (ANSI or Unicode window classes)
- ; 3.0	       - Riched20.dll - ?
- ; 4.1	       - Msftedit.dll - RICHEDIT50W
-
- ; 2.0 not compatible w/ EM_CONVPOSITION, EM_GETIMECOLOR, EM_GETIMEOPTIONS, EM_GETPUNCTUATION,
- ;   EM_GETWORDWRAPMODE, EM_SETIMECOLOR, EM_SETIMEOPTIONS, EM_SETPUNCTUATION, EM_SETWORDWRAPMODE
-
- ; Windows XP SP1	Includes Rich Edit 4.1, Rich Edit 3.0, and a Rich Edit 1.0 emulator.
- ; Windows XP	Includes Rich Edit 3.0 with a Rich Edit 1.0 emulator.
- ; Windows Me	Includes Rich Edit 1.0 and 3.0.
- ; Windows 2000	Includes Rich Edit 3.0 with a Rich Edit 1.0 emulator.
- ; Windows NT 4.0	Includes Rich Edit 1.0 and 2.0.
- ; Windows 98	Includes Rich Edit 1.0 and 2.0.
- ; Windows 95	Includes only Rich Edit 1.0. However, Riched20.dll is compatible with Windows 95 and may be installed by an application that requires it.
-
+		Windows XP SP1	Includes Rich Edit 4.1, Rich Edit 3.0, and a Rich Edit 1.0 emulator.
+		Windows XP	Includes Rich Edit 3.0 with a Rich Edit 1.0 emulator.
+		Windows Me	Includes Rich Edit 1.0 and 3.0.
+		Windows 2000	Includes Rich Edit 3.0 with a Rich Edit 1.0 emulator.
+		Windows NT 4.0	Includes Rich Edit 1.0 and 2.0.
+		Windows 98	Includes Rich Edit 1.0 and 2.0.
+		Windows 95	Includes only Rich Edit 1.0. However, Riched20.dll is compatible with Windows 95 and may be installed by an application that requires it.
+     */
+	
 	hCtrl := DllCall("CreateWindowEx"
-                  , "Uint", hexWinStyle  ; ExStyle (window style)
-                  , "str" , class        ; ClassName
-                  , "str" , ""           ; WindowName
-                  , "Uint", hexEditStyle ; Edit Style
-                  , "int" , x            ; Left
-                  , "int" , y            ; Top
-                  , "int" , w            ; Width
-                  , "int" , h            ; Height
-                  , "Uint", hwnd         ; hWndParent
-                  , "Uint", MODULEID     ; hMenu
-                  , "Uint", 0            ; hInstance
-                  , "Uint", 0)
-  If (ErrorLevel != 0 || hCtrl = 0)
-  MsgBox, % "ERROR: Error creating control.  " . ErrorLevel . "/" . A_LastError
- ;     return "ERROR: Error creating control.  " . ErrorLevel . "/" . A_LastError
+                  , "Uint", hExStyle			; ExStyle
+                  , "str" , "RICHEDIT50W"		; ClassName
+                  , "str" , ""					; WindowName
+                  , "Uint", WS_CHILD | hStyle	; Edit Style
+                  , "int" , X					; Left
+                  , "int" , Y					; Top
+                  , "int" , W					; Width
+                  , "int" , H					; Height
+                  , "Uint", HParent				; hWndParent
+                  , "Uint", MODULEID			; hMenu 
+                  , "Uint", 0					; hInstance
+                  , "Uint", 0, "Uint")
 	return hCtrl
 }
 
