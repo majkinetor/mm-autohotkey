@@ -61,8 +61,8 @@ Run(Cmd, Dir = "", Skip=0, Input = "", Stream = "")
 		bAlloc := DllCall("AllocConsole") ,hCon:=DllCall("CreateFile","str","CON","Uint",0x40000000,"Uint", bAlloc ? 0 : 3, "Uint",0, "Uint",3, "Uint",0, "Uint",0)
 
 	VarSetCapacity(sTemp, nTemp:=Stream ? 64-nTrim:=1 : 4095)
-	loop
-		If	DllCall("ReadFile", "Uint", hStdOutRd, "Uint", &sTemp, "Uint", nTemp, "UintP", nSize:=0, "Uint", 0) && nSize
+	loop 
+		if DllCall("ReadFile", "Uint", hStdOutRd, "Uint", &sTemp, "Uint", nTemp, "UintP", nSize:=0, "Uint", 0) && nSize
 		{
 			NumPut(0,sTemp,nSize,"Uchar"), VarSetCapacity(sTemp,-1),  sOutput .= sTemp
 			if Stream
@@ -70,14 +70,13 @@ Run(Cmd, Dir = "", Skip=0, Input = "", Stream = "")
 					if RegExMatch(sOutput, "S)[^\n]*\n", sTrim, nTrim)
 						 Stream+0 ? DllCall("WriteFile", "Uint", hCon, "Uint", &sTrim, "Uint", StrLen(sTrim), "UintP", 0, "Uint", 0) : %Stream%(sTrim), nTrim += StrLen(sTrim)
 					else break
-		}
-		else break
+		} else break
 
 	DllCall("CloseHandle", "Uint", hStdOutRd)
 	Stream+0 ? (DllCall("Sleep", "Uint", 1000), hCon+1 ? DllCall("CloseHandle","Uint", hCon) : "", bAlloc ? DllCall("FreeConsole") : "" ) : ""
 	DllCall("GetExitCodeProcess", "uint", hProcess, "intP", ExitCode), DllCall("CloseHandle", "Uint", hProcess)
 
-	if (Skip != ""){
+	if (Skip != "") {
 		StringSplit, s, Skip, ., 
 		StringReplace, sOutput, sOutput, `n, `n, A UseErrorLevel
 		s2 := ErrorLevel - (s2 ? s2 : 0) + 1, 	s1++
