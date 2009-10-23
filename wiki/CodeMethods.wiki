@@ -13,3 +13,5 @@ List of some of the methods used in the code.
  * Any message handler for message that is expected to be used in other scenarios must be chained. The chain method must be the same in all modules.
 
  * Each function returns error with A_ThisFunc > " ... ". Function shouldn't use MsgBox for such purpose.
+
+ * Controls use MODULEID as ID. ID must be unique among controls (date when the controls is created with 6 numbers for example).
