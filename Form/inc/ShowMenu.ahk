@@ -5,9 +5,9 @@
  Parameters: 
 				MDef	- Textual menu definition.
 				Mnu		- Menu to show. Label with the same name as menu will be launched on item selection.
-						  "" means first menu will be shown (default).
-				Sub		- Optional subroutine that will override default label (named by menu).
-				Sep		- Optional separator char used for menu items in menu definition, by default new line.
+						  "" means first menu will be shown (default)
+				Sub		- Optional subroutine that will override default label (named by menu)
+				Sep		- Optional separator char used for menu items in menu definition, by default new line
 				
  Returns:      
 				Message describing error if it occurred or new line separated list of created menus.
@@ -15,19 +15,20 @@
 
 	
  Remarks:
-				You must have in the code label with the same name as that given to the menu, otherwise.
-				ShowMenu returns "No Label" error (unless you used "sub" parameter in which case the same.
+				You must have in the code label with the same name as that given to the menu, otherwise
+				ShowMenu returns "No Label" error (unless you used "sub" parameter in which case the same 
 				applies to that subroutine). There must be no white space between menu name and start of the line.
 				Set each menu item on new line, use "-" to define separator.
 
  Metachars:
-				To create *submenu*, use "item = [submenu]" notation where submenu must exist in the textual.
-				menu definition. Referencing any particular menu as submenu multiple times will work.
+				To create *submenu*, use "item = [submenu]" notation where submenu must exist in the textual 
+				menu definition. Referencing any particular menu as submenu multiple times will work 
 				correctly, but circular references must be avoided.
 				To make item *checked*, use "+" as first character of its name, to make it *disabled* use "*".
-				To associated *user data* use "=data" after the item. If text after = doesn't contain valid.
+				To associated *user data* use "=data" after the item. If text after = doesn't contain valid
 				submenu reference, it will be seen as user data. This also means that submenu items can contain data.
-				To make menu definition more compact use something else then new line as item separator, for instance "|" :
+				To make menu definition more compact use something else then new line as item separator
+				for instance "|" :
  >
  >					[Mnu1]
  >					item1|item2|item3|-|item4=[Mnu2]|item5
@@ -111,25 +112,4 @@ ShowMenu_Data(mDef, item="") {
 	IfEqual, j, 0, return 
 	j += StrLen(item)+1
 	return SubStr(mDef, j, InStr(mDef, "`n", false, j)-j)
-}
-
-ShowTooltip( Msg, X="" ,Y="", TimeIn=500, TimeOut=1500){
-	static 
-	_Msg := Msg, _X:=X, _Y:=Y
-	MouseGetPos, , , , _ctrl
-
-	t1 := -TimeIn, t2 := -TimeOut
-	SetTimer, ShowTooltipOn, %t1%
-	return
-
- ShowTooltipOff:
-	Tooltip, , , , 19
- return
-
- ShowTooltipOn:
-	SetTimer, ShowTooltipOff, %t2%
-	MouseGetPos, , , , ctrl
-	ifNotEqual, ctrl, %_ctrl%, return
-	Tooltip,%_Msg% , _X, _Y, 19
- return
 }
