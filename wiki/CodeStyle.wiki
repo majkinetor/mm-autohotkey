@@ -8,4 +8,4 @@
 
  * No single line comment in the function body starts the line.
 
- * Documentation is in Natural Doc format. Sections with no need for information should be skipped. Trivial examples should not be specified after each function. Instead, sample or code snippets should be given at the end of the code in Group:Examples group.
+ * Documentation is in Natural Doc format. Sections with no need for information should be skipped. Trivial examples should not be given after each function. Instead, sample or code snippets should be given at the end of the code in Group:Examples group.
