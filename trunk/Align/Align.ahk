@@ -1,7 +1,7 @@
 /*
   Function:	Align
  			Aligns controls inside the parent.
- 
+
   Parameter:
  			HCtrl	- Control's handle or Parent handle. If other parameters are omitted, hCtrl represents Parent that
 					  should be re-aligned. Use re-align when you hide/show/resize controls to reposition remaining controls.
@@ -46,13 +46,14 @@
 		o 1.04 by majkinetor.
 		o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
-Align(HCtrl, Type="", Dim="", hMarker=""){
+Align(HCtrl, Type="", Dim="", HGlueCtrl=""){
 	static 
 
 	HCtrl += 0
-	if (Type="") {	;realign
+	if (Type="") or (Type="reset") {	;realign
 		critical 100
 		hParent := HCtrl, %hParent%rect := ""
+		ifEqual, type, reset, return
 		loop, parse, %hParent%, |
 		{
 			StringSplit, s, A_LoopField, %A_Space%
@@ -62,13 +63,13 @@ Align(HCtrl, Type="", Dim="", hMarker=""){
 		return IsFunc(t:="Attach") ? %t%(hParent) : ""
 	} 
 	
-	if (hMarker) {
-		if SubStr(hMarker, 1, 1) = "*"
-			hMarker := SubStr(hMarker, 2), bRoot := 1
+	if (HGlueCtrl) {
+		if SubStr(HGlueCtrl, 1, 1) = "*"
+			HGlueCtrl := SubStr(HGlueCtrl, 2), bRoot := 1
 		
 		if bRoot
-			ControlGetPos, x, y, w, h, , ahk_id %hMarker%
-		else Win_GetRect(hMarker, "*xywh", x,y,w,h)
+			ControlGetPos, x, y, w, h, , ahk_id %HGlueCtrl%
+		else Win_GetRect(HGlueCtrl, "*xywh", x,y,w,h)
 
 		l:=r:=t:=b:=f:=0, %Type% := 1
 		if (Dim = "") {
