@@ -2,10 +2,9 @@
 
  * Function arguments all start with capitalized word and are used as such in function body. Local arguments always start with small letter (the rest is hungarian style). 
 
- * Function comments are given in multiline comment style with the ending token having one space before it.
 
  * Subroutines local to the function have the same name as function (unless there are more then 1).
 
  * No single line comment in the function body starts the line.
 
- * Documentation is in Natural Doc format. Sections with no need for information should be skipped. Trivial examples should not be given after each function. Instead, sample or code snippets should be given at the end of the code in Group:Examples group.
+ * Documentation is in Natural Doc format. Sections with no need for information should be skipped. Trivial examples should not be given after each function. Instead, sample or code snippets should be given at the end of the code in Group:Examples group. Function comments are given in multiline comment style with the ending token having one space before it.
