@@ -65,26 +65,6 @@ Win_FromPoint(X="mouse", Y="") {
 }
 
 /*
- Function:	Align
-			Position window relative to the another window.
-
- 
- Parameters:
-			Hwnd		- Handle of the form.
-			HDockWnd	- Handle of the dock window.
-			Type		- Dock type. Two characters that determine horizontal and vertical position: L, M, R (horizontal)  T, M, B (vertical).
-						  By default RT (Right Top).
- */
-Win_Align( Hwnd, HDockWnd, Type="RT") {
-	WinGetPos, dx, dy, dw, dh, ahk_id %HDockWnd%
-	WinGetPos, , , fw, fh, ahk_id %HForm%
-	StringSplit, Type, Type
-	x := Type1="L" ? dx - dw : Type1="R" ? dx+dw : dx + Abs(dw-fw)//2
-	y := Type2="T" ? dy : Type1="B" ? dy+dh : dy + Abs(dh-fh)//2
-	WinMove, ahk_id %HForm%, , x, y
-}
-
-/*
  Function:	Get
  			Get window information
  
@@ -93,19 +73,19 @@ Win_Align( Hwnd, HDockWnd, Type="RT") {
 			o1 .. o9	- Reference to output variables. R,L,B & N query parameters can return multiple outputs.
  
  Query:
- 			C,I			- Class, pId.
+			C,I			- Class, pId.
 			R,L,B,N		- One of the window rectangles: R (window Rectangle), L (cLient rectangle screen coordinates), B (ver/hor Border), N (captioN rect).
- 						  N gives size of the caption regardless of the window style. These coordinates include all title-bar elements except the window menu.
+ 						  N returns the size of the caption regardless of the window style or theme. These coordinates include all title-bar elements except the window menu.
 						  The function returns x, y, w & h separated by space. 
 						  For all 4 query parameters you can additionaly specify x,y,w,h arguments in any order (except Border which can have only x(hor) and y(ver) arguments) to
-						  extract desired number into ouput variable.
- 			S,E			- Style, Extended style
+						  extract desired number into output variable.
+			S,E			- Style, Extended style.
  		    P,A,O		- Parents handle, Ancestors handle, Owners handle
  			M			- Module full path (owner exe), unlike WinGet,,ProcessName which returns only name without path.
- 			T			- Title for top level windows or Text for child windows
+ 			T			- Title for top level windows or Text for child windows.
  
  Returns:
- 			o1
+			o1
  
  Examples:
  (start code)
@@ -213,7 +193,7 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
  Parameters:
  			hwnd		- Window handle
 			pQ			- Query parameter: ordered list of x, y, w and h characters and optionally type specified as first charachter.
-						  Use *  to get placement ralative to the client area of the parent's window, or ! get placement relative to the root window.
+						  Use *  to get placement relative to the client area of the parent's window, or ! get placement relative to the root window.
 						  Omit x,y,w,h to return all attributes separated by space for given placement type.
 			o1 .. o4	- Reference to output variables. 
 
@@ -232,7 +212,7 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
   			p := Win_GetRect(hwnd, "x") + 5		;for single query parameter you don't need output variable as function returns o1
   			all := Win_GetRect(hwnd)			;return all
   			Win_Get(hwnd, "*hx", h, x)			;return relative h and x
-  			all_rel := WiN_Get(hwnd, "*")		;return all relative coorinates
+  			all_rel := WiN_Get(hwnd, "*")		;return all, relative coordinates
 	(end code)
  */
 Win_GetRect(hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="") {
@@ -328,9 +308,9 @@ Win_Is(Hwnd, pQ="win") {
  Remarks:
 			Does not produce the same effect as ControlMove on child windows. Mentioned AHK function puts child window relative to the ancestor window rectangle 
 			while Win_Move puts it relative to the parent's client rectangle which is usually the wanted behavior.
-			WinMove produces the same effect as Win_Move on child controls, except its X and Y parameters are not optional which makes lot of addtional code for frequent operation: moving the control by some offset of its current position. 
+			WinMove produces the same effect as Win_Move on child controls, except its X and Y parameters are not optional which makes lot of additional code for frequent operation: moving the control by some offset of its current position. 
 			In order to do that you must get the current position of the control. That can be done with ControlGetPos which works in pair with ControlMove hence it is not relative to the client rect or WinGetPos which returns screen coordinates of child control so those can not 
-			be imediatelly used in WinMove as it positions child window relative to the parents client rect. This scenario can be additionaly complicated by the fact that each window may have its own theme which influences the size of its borders, non client area, etc...
+			be immediately used in WinMove as it positions child window relative to the parents client rect. This scenario can be additionally complicated by the fact that each window may have its own theme which influences the size of its borders, non client area, etc...
  */
 Win_Move(Hwnd, X="", Y="", W="", H="", Flags="") {
 ;	static SWP_NOMOVE=2, SWP_NOREDRAW=8, SWP_NOSIZE=1, SWP_NOZORDER=4, SWP_NOACTIVATE = 0x10, SWP_ASYNCWINDOWPOS=0x4000, HWND_BOTTOM=1, HWND_TOPMOST=-1, HWND_NOTOPMOST = -2
@@ -386,7 +366,7 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 					calculate size of controls based on window size and position, when needed. 
 
 		IniFileName	- Ini file to use as storage. Function will save the data under the [Recall] section.
-					If omited, Windows Registry key HKEY_CURRENT_USER\AutoHotKey\Win is used. Each script is uniquely determined by its full path 
+					If omitted, Windows Registry key HKEY_CURRENT_USER\AutoHotKey\Win is used. Each script is uniquely determined by its full path 
 					so same scripts with different name will not share the storage.
 					
   Options:
@@ -432,8 +412,8 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 			Win_Recall(">>")						;Save all Guis. The names will be given by their number.
 			Win_Recall("<<")						;Recall all Guis.
 
-			Win_Recall("-")							;Delete all Registry enteries for the script.
-			Win_Recall("--")						;Delete all Registry enteries for all scripts.
+			Win_Recall("-")							;Delete all Registry entries for the script.
+			Win_Recall("--")						;Delete all Registry entries for all scripts.
 
 			pos := Win_Recall("<MyWin", 0)			;Return position string only for window saved under the "MyWin" name.
 		(end code)
@@ -522,7 +502,7 @@ Win_Recall(Options, Hwnd="", IniFileName=""){
  			Redraws the window.
 
  Parameters:
-			Hwnd	- Handle of the window. If this parameter is omited, Redraw updates the desktop window.
+			Hwnd	- Handle of the window. If this parameter is omitted, Redraw updates the desktop window.
 			Option  - "-" to disable redrawing for the window. "+" to enable it and redraw it. By default empty.
  
  Returns:
@@ -550,7 +530,7 @@ Win_Redraw( Hwnd=0, Option="" ) {
  			Set visibility of the window caption.
 
  Parameters:
-			Flag	- Set + to show the caption or - otherwise. If omited, caption will be toggled.
+			Flag	- Set + to show the caption or - otherwise. If omitted, caption will be toggled.
  */
 Win_SetCaption(Hwnd, Flag="^"){
 	oldDetect := A_DetectHiddenWindows
@@ -581,7 +561,7 @@ Win_SetMenu(Hwnd, hMenu=0){
  			Set the titlebar icon for the window.
  
  Parameters:
-			Icon	- Path to the icon. If omited, icon is removed. If integer, handle to the already loaded icon.
+			Icon	- Path to the icon. If omitted, icon is removed. If integer, handle to the already loaded icon.
 			Flag	- 1 sets the large icon for the window, 0 sets the small icon for the window. 
 
  Returns:
@@ -664,7 +644,7 @@ Win_SetOwner(Hwnd, hOwner){
  			Set the WS_EX_TOOLWINDOW style for the window.
  
  Parameters:
-			Flag	- Set + to show the caption or - otherwise. If omited, caption will be toggled.
+			Flag	- Set + to show the caption or - otherwise. If omitted, caption will be toggled.
  */
 Win_SetToolWindow(Hwnd, Flag="^") {
 	static WS_EX_TOOLWINDOW = 0x80	
@@ -728,10 +708,10 @@ Win_ShowSysMenu(Hwnd, X="mouse", Y="") {
 			Fun		- New window procedure. You can also pass function address here in order to subclass child window
 					  with previously created window procedure.
 			Opt		- Optional callback options for Fun, by default "" 
-		   $WndProc - Optional reference to the ouptut variable that will receive address of the new window procedure.
+		   $WndProc - Optional reference to the output variable that will receive address of the new window procedure.
 
  Returns:
-			The addresss of to the previous window procedure or 0 on error	
+			The address of the previous window procedure or 0 on error.
 
  Remarks:
 			Works only for controls created in the autohotkey process.

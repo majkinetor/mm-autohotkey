@@ -7,7 +7,7 @@
 			OS events will be handled by the module so that the "composite window" behaves like the single window.
 
 			This module is version of Dock module that supports only AHK hosts (hence A in the name).
-			Unlike Dock module, it doesnt'uses system hook to monitor windows changes.
+			Unlike Dock module, it doesn't uses system hook to monitor windows changes.
 */
 
 /*

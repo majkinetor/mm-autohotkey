@@ -1,5 +1,5 @@
 /* Title:	Dlg
-			Common operating system dialogs.
+			*Common Operating System Dialogs*
  */
 
 /*
@@ -288,14 +288,14 @@ Dlg_Icon(ByRef Icon, ByRef Index, hGui=0) {
             DefaultFilter   - Index of default filter (1 based), by default 1.
             Root			- Specifies startup directory and initial content of "File Name" edit. 
 							  Directory must have trailing "\".
-            DefaulltExt     - Extension to append when none given .
+            DefaultExt      - Extension to append when none given .
             Flags           - White space separated list of flags, by default "FILEMUSTEXIST HIDEREADONLY".
   
   Flags:
 			allowmultiselect	- Specifies that the File Name list box allows multiple selections 
 			createprompt		- If the user specifies a file that does not exist, this flag causes the dialog box to prompt the user for permission to create the file
 			dontaddtorecent		- Prevents the system from adding a link to the selected file in the file system directory that contains the user's most recently used documents. 
-			extensiondifferent	- Specifies that the user typed a file name extension that differs from the extension specified by defaulltExt
+			extensiondifferent	- Specifies that the user typed a file name extension that differs from the extension specified by defaultExt
 			filemustexist		- Specifies that the user can type only names of existing files in the File Name entry field
 			forceshowhidden		- Forces the showing of system and hidden files, thus overriding the user setting to show or not show hidden files. However, a file that is marked both system and hidden is not shown.
 			hidereadonly		- Hides the Read Only check box.
