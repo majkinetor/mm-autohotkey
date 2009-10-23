@@ -96,6 +96,13 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
 	return hCtrl
 }
 
+RichEdit_Add2Form(hParent, Txt, Opt){
+	static parse = "Form_Parse"
+	%parse%(Opt, "x# y# w# h# style", x, y, w, h, style)
+	hCtrl := RichEdit_Add(hParent, x, y, w, h, style, Txt)
+	return hCtrl
+}
+
 /*
   Function:  AutoUrlDetect
  			 Enable, disable, or toggle automatic detection of URLs.

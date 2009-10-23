@@ -22,7 +22,7 @@ CreateGui(Text, W=800, H=600) {
 			
 				 Form_Add(hForm1, "StatusBar", "RichEdit Test", "", "Align b")
 	hPanel1   := Form_Add(hForm1, "Panel", "", "", "Align L, 300", "Attach h")
-	;hRichEdit := Form_Add(hForm1, "RichEdit", Text, "", "Align F", "Attach w h")
+	hRichEdit := Form_Add(hForm1, "RichEdit", Text, "", "Align F", "Attach w h")
 
 	hExample := Form_Add(hPanel1, "Edit", "", "ReadOnly ", "Align T, 250", "*|)Font s8, Courier New")
 	hList	 := Form_Add(hPanel1, "ListView", "API", "gOnLV", "Align F", "Attach h",  "*|)Font s10, Courier New")
@@ -61,9 +61,11 @@ return
 
 ;sample includes
 #include inc
+#include _.ahk
 #include Dlg.ahk
 #include Attach.ahk
 #include Align.ahk
 #include Form.ahk
 #include Panel.ahk
 #include Font.ahk
+#include Win.ahk
