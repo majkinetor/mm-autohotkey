@@ -19,7 +19,7 @@ CreateGui(Text, W=850, H=600) {
 	global 
 
 	hForm1 := Form_New("+Resize w" W " h" H)
-	hList	 := Form_Add(hForm1, "ListView", "API|Description", "gOnLV AltSubmit", "Align T", "Attach p",  "*|)Font s10, Courier New")
+	hList	 := Form_Add(hForm1, "ListView", "API|Description", "gOnLV AltSubmit", "Align T", "Attach p")
 				Form_Add(hForm1, "StatusBar", "RichEdit Test", "", "Align B")
 
 	hPanel1   := Form_Add(hForm1, "Panel", "", "", "Align L, 300", "Attach p")
@@ -95,6 +95,10 @@ return
 LineFromChar: ;Determines which line contains the specified character in a rich edit control.
 
  msgbox, % "Line: " RichEdit_LineFromChar( hRichEdit, RichEdit_GetSel(hRichEdit) )
+return
+
+LimitText: ;Sets an upper limit to the amount of text the user can type or paste into a rich edit control
+	RichEdit_LimitText( hRichEdit, 20 )  ; limit to 20 characters
 return
 
 

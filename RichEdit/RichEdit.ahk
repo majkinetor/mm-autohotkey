@@ -387,7 +387,7 @@ RichEdit_LineFromChar(hCtrl, idxChar)  {
 }
 
 /*
- Function: LimitText
+ Function:  LimitText
 			Sets an upper limit to the amount of text the user can type or paste into a rich edit control.
 
  Parameters:
@@ -401,12 +401,6 @@ RichEdit_LineFromChar(hCtrl, idxChar)  {
  Remarks:
      Before LimitText is called, the default limit to the amount of text a user can enter is
      32,767 characters.
-
- Related:
-     <LimitText>
-
- Example:
- > RichEdit_LimitText( hRichEdit, 20 )  ; limit to 20 characters
  */
 RichEdit_LimitText(hCtrl,txtSize=0)  {
   static EM_EXLIMITTEXT=53,WM_USER=0x400
