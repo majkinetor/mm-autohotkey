@@ -113,24 +113,3 @@ ShowMenu_Data(mDef, item="") {
 	j += StrLen(item)+1
 	return SubStr(mDef, j, InStr(mDef, "`n", false, j)-j)
 }
-
-ShowTooltip( Msg, X="" ,Y="", TimeIn=500, TimeOut=1500){
-	static 
-	_Msg := Msg, _X:=X, _Y:=Y
-	MouseGetPos, , , , _ctrl
-
-	t1 := -TimeIn, t2 := -TimeOut
-	SetTimer, ShowTooltipOn, %t1%
-	return
-
- ShowTooltipOff:
-	Tooltip, , , , 19
- return
-
- ShowTooltipOn:
-	SetTimer, ShowTooltipOff, %t2%
-	MouseGetPos, , , , ctrl
-	ifNotEqual, ctrl, %_ctrl%, return
-	Tooltip,%_Msg% , _X, _Y, 19
- return
-}
