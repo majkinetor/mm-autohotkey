@@ -29,16 +29,29 @@ CreateGui(Text, W=850, H=600) {
 	hSplitter := Form_Add(hForm1, "Splitter", "", "sunken", "Align L, 6", "Attach p")
 	hPanel2	  := Form_Add(hForm1, "Panel", "", "", "Align F", "Attach p")
 	hPanel3   := Form_Add(hPanel2, "Panel", "", "", "Align T,35", "Attach w")
-	hToolbar  := Form_Add(hPanel3, "Toolbar", "B`nI`nU`nS`n-`nFont`nFG`nBG", "style='menu'", "Attach w")
+	hToolbar  := Form_Add(hPanel3, "Toolbar", "B`nI`nU`nS`n-`nFont`nFG`nBG", "gOnToolbar style='menu'", "Attach w")
 	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "", "Align F", "Attach w h")
 
 	Splitter_Set(hSplitter, hPanel1 " | " hPanel2)
 	PopulateList()
+		
 }
 
 OnExecute:
 	IfNotEqual, api, API, goto %api%
 return
+
+OnToolbar(hCtrl, Event, Txt, Pos, Id){
+	global 
+
+	ifEqual, Event, hot, return
+
+	if Txt = Font
+		Dlg_Font(font, style, color, 1, hPanel3)
+
+	if Txt in BG,FG
+		Dlg_Color(color, hPanel3)
+}
 
 PopulateList() {
 	global demo
