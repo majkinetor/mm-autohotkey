@@ -27,9 +27,12 @@ CreateGui(Text, W=850, H=600) {
 				 Form_Add(hPanel1,"Button", "Execute", "gOnExecute 0x8000", "Align T", "Attach p")
 	hExample  := Form_Add(hPanel1,"Edit", "`n", "T8 hscroll ReadOnly Multi -Wrap", "Align F", "Attach p", "*|)Font s10, Courier New")
 	hSplitter := Form_Add(hForm1, "Splitter", "", "sunken", "Align L, 6", "Attach p")
-	hRichEdit := Form_Add(hForm1, "RichEdit", "", "", "Align F", "Attach p")
+	hPanel2	  := Form_Add(hForm1, "Panel", "", "", "Align F", "Attach p")
+	hPanel3   := Form_Add(hPanel2, "Panel", "", "", "Align T,35", "Attach w")
+	hToolbar  := Form_Add(hPanel3, "Toolbar", "B`nI`nU`nS`n-`nFont`nFG`nBG", "style='menu'", "Attach w")
+	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "", "Align F", "Attach w h")
 
-	Splitter_Set(hSplitter, hPanel1 " | " hRichEdit)
+	Splitter_Set(hSplitter, hPanel1 " | " hPanel2)
 	PopulateList()
 }
 
@@ -120,3 +123,4 @@ return
 #include Font.ahk
 #include Win.ahk
 #include Splitter.ahk
+#include Toolbar.ahk
