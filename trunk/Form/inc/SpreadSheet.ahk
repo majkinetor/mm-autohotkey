@@ -1697,7 +1697,7 @@ return
 
 /* Group: About
 	o SpreadSheet control version: 0.0.2.1 by KetilO <http://www.masm32.com/board/index.php?topic=6913.0>
-	o AHK module ver 0.0.2.1-2 by majkinetor.
+	o AHK module ver 0.0.2.1-3 by majkinetor.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
 
  */
