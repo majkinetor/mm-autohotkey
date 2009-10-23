@@ -1163,7 +1163,8 @@ __RichEdit_OleInterface(hCtrl)  {
 
 
 /* Group: About
-	o Version 0.1 by freakkk & majkinetor.
+	o Version 0.1 by freakkk.
+	o Additional code by majkinetor.
 	o MSDN Reference : <http://msdn.microsoft.com/en-us/library/bb787605(VS.85).aspx>.
 	o AHK module licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */
