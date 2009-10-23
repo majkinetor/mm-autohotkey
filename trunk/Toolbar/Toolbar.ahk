@@ -1,5 +1,5 @@
 /* Title:    Toolbar
-			*Encapsulation of the system Toolbar API.*
+			Toolbar control.
 			(see toolbar.png)
 			The module is designed with following goals in mind :
 			* To allow programmers to quickly create toolbars in intuitive way.
@@ -16,7 +16,7 @@
 			hGui		- HWND of the GUI. GUI must have defined size.
 			Handler		- User function that handles Toolbar events. See below.
 			Style		- Styles to apply to the toolbar control, see list of styles bellow.
-			ImageList	- Handle of the image list that contains button images. Otherwise it specifies number and icon size of the one of the 3 system catalogs (see catalogs.png).
+			ImageList	- Handle of the image list that contains button images. Otherwise it specifies number and icon size of the one of the 3 system catalogs (see Toolbar_catalogs.png).
 						  Each catalog contains number of common icons in large and small size -- S or L (default). Defaults to "1L" (first catalog, large icons)
 			Pos			- Position of the toolbar specified - any space separated combination of the x y w h keywords followed by the size.
 
@@ -75,7 +75,7 @@
 			Without the Critical command, the function is a lot more forgiving. 
 			The developer should still be careful but the script won't shut down if something unexpected happens.
  */
-Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
+Toolbar_Add(hGui, Handler, Style="", ImageList="", Pos="") {
 	static MODULEID
 	static WS_CHILD := 0x40000000, WS_VISIBLE := 0x10000000, WS_CLIPSIBLINGS = 0x4000000, WS_CLIPCHILDREN = 0x2000000, TBSTYLE_THICKFRAME=0x40000, TBSTYLE_TABSTOP = 0x10000
     static TBSTYLE_WRAPABLE = 0x200, TBSTYLE_FLAT = 0x800, TBSTYLE_LIST=0x1000, TBSTYLE_TOOLTIPS=0x100, TBSTYLE_TRANSPARENT = 0x8000, TBSTYLE_ADJUSTABLE = 0x20, TBSTYLE_VERTICAL=0x80
@@ -88,6 +88,8 @@ Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
 		if old != Toolbar_onNotify
 			Toolbar("oldNotify", RegisterCallback(old))
 	}
+
+	Style .= Style="" ? "WRAPABLE" : "", ImageList .= ImageList="" ? "1L" : ""
 
   	hStyle := 0
 	hExStyle := TBSTYLE_EX_MIXEDBUTTONS ; TBSTYLE_EX_HIDECLIPPEDBUTTONS
@@ -124,7 +126,7 @@ Toolbar_Add(hGui, Handler, Style="WRAPABLE", ImageList="1L", Pos="") {
              , "uint", MODULEID
              , "uint", 0 
              , "uint", 0, "Uint") 
-    ifEqual, hCtrl, 0, return A_ThisFunc "> Can't create toolbar." 
+    ifEqual, hCtrl, 0, return 0
 	
 	SendMessage, TB_BUTTONSTRUCTSIZE, 20, 0, , ahk_id %hCtrl%
 	SendMessage, TB_SETEXTENDEDSTYLE, 0, hExStyle, , ahk_id %hCtrl% 
@@ -195,7 +197,7 @@ Toolbar_Clear(hCtrl){
 /*
  Function:  Customize
  			Launches customization dialog
- 			(see customize.png)
+ 			(see Toolbar_customize.png)
  */
 Toolbar_Customize(hCtrl) {
 	static TB_CUSTOMIZE=0x41B
@@ -1044,6 +1046,18 @@ Toolbar_memcpy(dst, src, cnt) {
 	return DllCall("MSVCRT\memcpy", "UInt", dst, "UInt", src, "uint", cnt)
 }
 
+;Required function by Forms framework.
+Toolbar_add2Form(hParent, Txt, Opt) {
+	static f := "Form_Parse"
+	
+	%f%(Opt, "x# y# w# h# style IL* g*", x,y,w,h,style,il,handler)
+	pos := (x!="" ? " x" x : "") (y!="" ? " y" y : "") (w!="" ? " w" w : "") (h!="" ? " h" h : "")
+	h := Toolbar_Add(hParent, handler, style, il, pos)
+	if Txt != 
+		Toolbar_Insert(h, Txt)
+	return h
+}
+
 ;Storage
 Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
 	static
@@ -1059,7 +1073,7 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 }
 
 /*
- Group: Example
+ Group: Examples
  (start code)
 	   Gui, +LastFound
 	   hGui := WinExist()
@@ -1094,8 +1108,8 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 
 /*
  Group: About
-	o Ver 2.21 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Ver 2.3 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
 	o Parts of code in Toolbar_onNotify by jballi.
 	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
- */ 
+ */

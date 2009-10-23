@@ -30,7 +30,9 @@ SetBatchLines, -1
 	MakeTestGui(w/2, h-430)
 	Gui, Show
 return
-
+F1::
+	Toolbar_SetBitmapSize(hCtrl)
+return
 
 OnToolbar(hwnd, event, txt, pos, id) {
 	if event = hot
