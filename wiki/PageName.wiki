@@ -4,7 +4,7 @@
 
  * Public function starts with capitalized word. Private function starts with non-capitalized word. Function name must start the line.
 
- * Function arguments all start with capitalized word and are used as such in function body. Local arguments always start with small letter (the rest is hungarian style). Statics that must copy function argument have the same name as argument with __ prefix.
+ * Function arguments all start with capitalized word and are used as such in function body. Local arguments always start with small letter (the rest is hungarian style). 
 
  * Function comments are given in multiline comment style (/* ... */) with the ending token having one space before it.
 
