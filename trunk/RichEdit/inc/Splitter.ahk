@@ -124,7 +124,7 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 	static
 	static WM_SETCURSOR := 0x20, WM_MOUSEMOVE := 0x200, WM_LBUTTONDOWN=0x201, WM_LBUTTONUP=0x202, WM_LBUTTONDBLCLK=0x203,  SIZENS := 32645, SIZEWE := 32644
 
-	critical 100
+	;critical 100
 	Hwnd += 0
 	if !Hwnd
 		return 	hwnd := Lparam+0, %hwnd%_bVert := Umsg, %hwnd%_def := WParam, %hwnd%_cursor := DllCall("LoadCursor", "Uint", 0, "Int", UMsg ? SIZEWE : SIZENS, "Uint")

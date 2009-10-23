@@ -26,10 +26,10 @@ CreateGui(Text, W=850, H=600) {
 	hPanel1   := Form_Add(hForm1, "Panel", "", "", "Align L, 300", "Attach p")
 				 Form_Add(hPanel1,"Button", "Execute", "gOnExecute 0x8000", "Align T", "Attach p")
 	hExample  := Form_Add(hPanel1,"Edit", "`n", "T8 hscroll ReadOnly Multi -Wrap", "Align F", "Attach p", "*|)Font s10, Courier New")
-	hSplitter := Form_Add(hForm1, "Splitter", "", "sunken", "Align L, 6", "Attach p")
+	hSplitter := Form_Add(hForm1, "Splitter", "", "", "Align L, 6", "Attach p")
 	hPanel2	  := Form_Add(hForm1, "Panel", "", "", "Align F", "Attach p")
 	hPanel3   := Form_Add(hPanel2, "Panel", "", "", "Align T,35", "Attach w")
-	hToolbar  := Form_Add(hPanel3, "Toolbar", "B`nI`nU`nS`n-`nFont`nFG`nBG", "gOnToolbar style='menu'", "Attach w")
+	hToolbar  := Form_Add(hPanel3, "Toolbar", "B`nI`nU`nS`n-`nFont`nFG`nBG", "gOnToolbar style='nodivider menu'", "Attach w")
 	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "", "Align F", "Attach w h")
 
 	Splitter_Set(hSplitter, hPanel1 " | " hPanel2)
@@ -43,15 +43,16 @@ return
 
 OnToolbar(hCtrl, Event, Txt, Pos, Id){
 	global 
-
 	ifEqual, Event, hot, return
 
 	if Txt = Font
-		Dlg_Font(font, style, color, 1, hPanel3)
+		Dlg_Font(font, style, color, 1, hForm1)
 
 	if Txt in BG,FG
-		Dlg_Color(color, hPanel3)
+		Dlg_Color(color, hForm1)
 }
+
+
 
 PopulateList() {
 	global demo
