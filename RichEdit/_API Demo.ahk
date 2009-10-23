@@ -16,7 +16,7 @@ _("mo!")
 
 	apiPopulate()
 
-	hRichEdit := RichEdit_Add( hwnd, 355, 5, 445, 490, "WANTRETURN BORDER DISABLENOSCROLL SCROLL MULTILINE")
+	hRichEdit := RichEdit_Add( hwnd, 355, 5, 445, 490, "", "Some Text`nMeh...")
 	Gui, Show, w805 h500
 
 	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")

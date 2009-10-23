@@ -6,7 +6,8 @@
 				HParent	- Handle of the parent of the control.
 				X..H	- Position.
 				Style	- White space separated list of control styles. Any integer style or one of the style keywords (see below).
-						  Invalid styles are skipped.
+						  Invalid styles are skipped. "MULTILINE WANTRETURN" by default.
+				Text	- Control text.
 
  Styles:
      DISABLENOSCROLL - Disables scroll bars instead of hiding them when they are not needed.
@@ -28,7 +29,7 @@
  Returns:
 	Control's handle or 0. Error message on problem.
  */
-RichEdit_Add(HParent, X="", Y="", W="", H="", Style="")  {
+RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
   static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
 		,ES_DISABLENOSCROLL=0x2000, EX_BORDER=0x200
 		,ES_LEFT=0, ES_CENTER=1, ES_RIGHT=2, ES_MULTILINE=4, ES_AUTOVSCROLL=0x40, ES_AUTOHSCROLL=0x80, ES_NOHIDESEL=0x100, ES_NUMBER=0x2000, ES_PASSWORD=0x20,ES_READONLY=0x800,ES_WANTRETURN=0x1000
@@ -38,6 +39,8 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="")  {
 	if !MODULEID
 		init := DllCall("LoadLibrary", "Str", "Msftedit.dll", "Uint"), MODULEID := 091009
 
+
+	ifEqual, Style,, SetEnv, Style, MULTILINE WANTRETURN	
 	hStyle := InStr(" " Style " ", " hidden ") ? 0 : WS_VISIBLE,  hExStyle := 0
 	Loop, parse, Style, %A_Tab%%A_Space%
 	{
@@ -76,7 +79,7 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="")  {
 	hCtrl := DllCall("CreateWindowEx"
                   , "Uint", hExStyle			; ExStyle
                   , "str" , "RICHEDIT50W"		; ClassName
-                  , "str" , ""					; WindowName
+                  , "str" , Text				; WindowName
                   , "Uint", WS_CHILD | hStyle	; Edit Style
                   , "int" , X					; Left
                   , "int" , Y					; Top
