@@ -81,10 +81,10 @@ apiPopulate()  {
   hImageList := IL_Create(1), LV_SetImageList(hImageList), IL_Add(hImageList, "shell32.dll", 132)
   pos = 1800
   Loop  {
-    If pos := RegExMatch( demo, "Umi)\R(?P<Api>[\w]+):(.*`;.*(?P<Desc>[\w].*))?\R.*", m, pos )
-      LV_Add("Icon" (mDesc ? 0 : 1)," " mApi, (mDesc ? mDesc : "(not wrapped yet)") ),  pos+=StrLen(mApi)
-    Else
-      break
+    If pos := RegExMatch( demo, "Umi)\R(?P<Api>[\w]+):.*`;.*(?P<Desc>[\w].*)\R.*", m, pos )
+		ifEqual, mDesc,, continue
+		else LV_Add("Icon" (mDesc ? 0 : 1)," " mApi, (mDesc ? mDesc : "(not wrapped yet)") ),  pos+=StrLen(mApi)
+    else break
   }
   LV_ModifyCol(1), LV_ModifyCol(2, 0), LV_Modify(1, "select")
 }
