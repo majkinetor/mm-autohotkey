@@ -1,3 +1,7 @@
+/* Title:		RichEdit
+				RichEdit control.
+ */
+
 /*
  Function:		Add
 				Create control.
@@ -94,32 +98,29 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
 
 /*
   Function:  AutoUrlDetect
- 			Enable, disable, or toggle automatic detection of URLs by a rich edit control.
+ 			 Enable, disable, or toggle automatic detection of URLs.
  
   Parameters:
- 			flag - Specify *TRUE* to enable automatic URL detection or *FALSE* to disable it. Specify
-             *"Toggle"* to toggle its current state. Leave flag parameter blank to not make any
-             changes, but instead only return its current state.
+ 			Flag - Specify "+" to enable automatic URL detection or "-" to disable it. Specify
+             "^" to toggle its current state. Omit to only return current state without any change.
  
   Returns:
  			If auto-URL detection is active, the return value is 1.
  			If auto-URL detection is inactive, the return value is 0.
- 
-  Example:
- > MsgBox, % RichEdit_AutoUrlDetect( hRichEdit, true )
- > MsgBox, % RichEdit_AutoUrlDetect( hRichEdit, "Toggle" )
- > MsgBox, % "Current state: " RichEdit_AutoUrlDetect( hRichEdit )
  */
-RichEdit_AutoUrlDetect( hCtrl, flag="-" )  {
-  static EM_AUTOURLDETECT=91,EM_GETAUTOURLDETECT=92,WM_USER=0x400
-  If flag in -,Toggle
-  {
-    SendMessage, WM_USER | EM_GETAUTOURLDETECT, 0,0,, ahk_id %hCtrl%
-    flag := flag="Toggle" ? !ERRORLEVEL : ERRORLEVEL
-  }
-  If flag in 0,1,Toggle
-    SendMessage, WM_USER | EM_AUTOURLDETECT, %flag%,0,, ahk_id %hCtrl%
-  return flag
+RichEdit_AutoUrlDetect( HCtrl, Flag="" )  {	;wParam Specify TRUE to enable automatic URL detection or FALSE to disable it. 
+  static EM_AUTOURLDETECT=0x45B, EM_GETAUTOURLDETECT=0x45C
+  
+	If (Flag = "") || (Flag ="^")
+		SendMessage, EM_GETAUTOURLDETECT,,,,ahk_id %hCtrl%
+	
+	hFlag := Flag = "+" ? 1 : Flag = "-" ? 0 : Flag = "^" ? !ERRORLEVEL : ERRORLEVEL
+
+	m(hFlag)
+	If Flag in +,-,^
+		SendMessage, EM_AUTOURLDETECT, hFlag,,, ahk_id %hCtrl%
+	
+	return hFlag
 }
 
 /*
@@ -1152,13 +1153,6 @@ EM_SETWORDBREAKPROCEX(hCtrl)  {     ; *** no longer used after re2.0.  use  EM_S
 
 }
 
-
-
-
-
-
-
-
  ; *** WIP-  http://msdn.microsoft.com/en-us/library/bb774252(VS.85).aspx
 __RichEdit_OleInterface(hCtrl)  {
   static EM_GETOLEINTERFACE:=60,EM_SETOLECALLBACK:=70,WM_USER:=0x400
@@ -1180,3 +1174,14 @@ __RichEdit_OleInterface(hCtrl)  {
  ;   msgbox, % COM_Invoke(pipa, "GetClipboardData")
   ;   msgbox, KEEP GOING: "%pointer%"
 }
+
+
+/* Group: Examples
+ */
+
+
+/* Group: About
+	o Version 0.1 by freakkk & majkinetor.
+	o MSDN Reference : <http://msdn.microsoft.com/en-us/library/bb787605(VS.85).aspx>.
+	o AHK module licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+ */
