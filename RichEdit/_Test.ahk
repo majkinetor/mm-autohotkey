@@ -14,9 +14,21 @@ _("mo!")
 	
 	RichEdit_AutoUrlDetect( hRichEdit, "^" )
 	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
-	;RichEdit_SetEvents(hRichEdit, "Handler", "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE")
-	Log("started")
+	RichEdit_SetEvents(hRichEdit, "Handler", "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE")
 return
+
+Handler(hCtrl, Event, p1, p2, p3 ) {
+  global hNotifications
+  
+  If (Event = "DROPFILES")  {
+    MsgBox, % "Dropped files: " P1 "`n----`n" P2 "`n----`nChar position: " P3
+    return
+  }
+
+  msg = %Event% `tp1 = %p1% `tp2 = %p2% `tp3 = %p3% `t%L%
+  Log(msg)
+  IfEqual, Event, PROTECTED, return TRUE
+}
 
 CreateGui(Text, W=850, H=600) {
 	global 
@@ -182,6 +194,7 @@ TextMode:	;Sets text mode.
 	RichEdit_SetText(hRichEdit, txt)
 return
 
+^1::reload
 ^U::
 ^B::
 ^I::
@@ -189,6 +202,7 @@ return
 return
 
 #include RichEdit.ahk
+#include Todo.ahk
 
 ;sample includes
 #include inc
