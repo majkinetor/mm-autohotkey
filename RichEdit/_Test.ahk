@@ -14,6 +14,7 @@ _("mo!")
 	RichEdit_AutoUrlDetect( hRichEdit, "^" )
 	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
 	;RichEdit_SetEvents(hRichEdit, "Handler", "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE")
+	Log("started")
 return
 
 CreateGui(Text, W=850, H=600) {
@@ -25,7 +26,8 @@ CreateGui(Text, W=850, H=600) {
 
 	hPanel1   := Form_Add(hForm1, "Panel", "", "", "Align L, 300", "Attach p")
 				 Form_Add(hPanel1,"Button", "Execute", "gOnExecute 0x8000", "Align T", "Attach p")
-	hExample  := Form_Add(hPanel1,"Edit", "`n", "T8 hscroll ReadOnly Multi -Wrap", "Align F", "Attach p", "*|)Font s10, Courier New")
+	hExample  := Form_Add(hPanel1,"Edit", "`n", "T8 hscroll ReadOnly Multi -Wrap", "Align T,150", "Attach p", "*|)Font s10, Courier New")
+	hLog	  := Form_Add(hPanel1,"ListBox", "", "0x100", "Align F", "Attach p")
 	hSplitter := Form_Add(hForm1, "Splitter", "", "", "Align L, 6", "Attach p")
 	hPanel2	  := Form_Add(hForm1, "Panel", "", "", "Align F", "Attach p")
 	hPanel3   := Form_Add(hPanel2, "Panel", "", "", "Align T,35", "Attach w")
@@ -40,6 +42,13 @@ CreateGui(Text, W=850, H=600) {
 OnExecute:
 	IfNotEqual, api, API, goto %api%
 return
+
+Log(t1="", t2="", t3="", t4="", t5="") {
+	global hLog
+	txt = %t1% %t2% %t3% %t4% %t5%
+	Control,Add,%txt%,, ahk_id %hLog%
+	ControlSend, ,{End},ahk_id %hLog%
+}
 
 OnToolbar(hCtrl, Event, Txt, Pos, Id){
 	global 
