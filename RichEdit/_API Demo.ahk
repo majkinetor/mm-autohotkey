@@ -33,7 +33,7 @@ return
 
 
 F1::
-	m("hej")
+
 return
 
 Handler(hCtrl, Event, p1, p2, p3 ) {
@@ -111,14 +111,6 @@ apiPopulate()  {
   return
   ;---
 
-  GETWORDWRAPMODE:
-    RichEdit_GETWORDWRAPMODE( hRichEdit )
-  return
-  ;---
-  SETWORDWRAPMODE:
-    RichEdit_SETWORDWRAPMODE( hRichEdit )
-  return
-  ;---
 
 
 
