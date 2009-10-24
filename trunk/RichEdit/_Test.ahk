@@ -11,7 +11,7 @@ _("mo!")
 	CreateGui(text)
 
 	Form_Show("", "Maximize")
-	
+	Log("Press F1 or doubleclick to execute selected API"), Log()
 	RichEdit_AutoUrlDetect( hRichEdit, "^" )
 	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
 	RichEdit_SetEvents(hRichEdit, "Handler", "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE")
@@ -48,18 +48,15 @@ CreateGui(Text, W=850, H=600) {
 		BackColor,,,autosize
 	)
 
-	hForm1 := Form_New("+Resize w" W " h" H)
-	hList	 := Form_Add(hForm1, "ListView", "API|Description", "gOnLV AltSubmit", "Align T", "Attach p")
-				Form_Add(hForm1, "StatusBar", "RichEdit Test", "", "Align B")
-
+	hForm1    := Form_New("+Resize w" W " h" H)
+	hList	  := Form_Add(hForm1, "ListView", "API|Description", "gOnLV AltSubmit", "Align T", "Attach p")
 	hPanel1   := Form_Add(hForm1, "Panel", "", "", "Align L, 300", "Attach p")
-				 Form_Add(hPanel1,"Button", "Execute", "gOnExecute 0x8000", "Align T", "Attach p")
 	hExample  := Form_Add(hPanel1,"Edit", "`n", "T8 ReadOnly Multi -vscroll", "Align T,150", "Attach p", "*|)Font s10,Tahoma")
 	hLog	  := Form_Add(hPanel1,"ListBox", "", "0x100", "Align F", "Attach p")
 	hSplitter := Form_Add(hForm1, "Splitter", "", "", "Align L, 6", "Attach p")
 	hPanel2	  := Form_Add(hForm1, "Panel", "", "", "Align F", "Attach p")
 	hPanel3   := Form_Add(hPanel2, "Panel", "", "", "Align T,30", "Attach w")
-	hToolbar  := Form_Add(hPanel3, "Toolbar", btns, "gOnToolbar style='nodivider tooltips' il=0", "Attach w")
+	hToolbar  := Form_Add(hPanel3, "Toolbar", btns, "gOnToolbar style='flat nodivider tooltips' il=0", "Attach w")
 	Toolbar_SetBitmapSize(hToolbar, 0)
 	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "style='MULTILINE SCROLL WANTRETURN'", "Align F", "Attach w h")
 
@@ -69,10 +66,6 @@ CreateGui(Text, W=850, H=600) {
 
 Form1_Close:
 	ExitApp
-return
-
-OnExecute:
-	IfNotEqual, api, API, goto %api%
 return
 
 Log(t1="", t2="", t3="", t4="", t5="") {
@@ -136,7 +129,7 @@ PopulateList() {
 		  LV_Add("", mApi, mDesc ),  pos += StrLen(mApi), n := A_Index
 		Else break
 
-	SB_SetText("Number of functions: " n)
+	Log(n " APIs detected.")
 
 	LV_ModifyCol(1,180), LV_ModifyCol(2), LV_Modify(1, "select")
 }
@@ -200,6 +193,8 @@ return
 ^I::
 	OnToolbar(hToolbar, "click", SubStr(A_ThisHotkey, 2))
 return
+
+F1:: IfNotEqual, api, API, goto %api%
 
 #include RichEdit.ahk
 #include Todo.ahk
