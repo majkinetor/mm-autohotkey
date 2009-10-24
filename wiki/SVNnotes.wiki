@@ -1,7 +1,7 @@
 || *Char* || *Meaning* ||
 || ! || Bugfix ||
 || + || New feature ||
-|| * || Changed feature ||
+||`*`|| Changed feature ||
 || - || Removed feature ||
 || !!! || Serious issue / bug ||
 || ? ||  Question ||
