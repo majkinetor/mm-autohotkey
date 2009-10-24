@@ -877,6 +877,8 @@ RichEdit_GetCharFormat(hCtrl, ByRef font="", ByRef style="", ByRef color="", mod
   static CFE_AUTOCOLOR=0x40000000,CFE_BOLD=0x1,CFE_ITALIC=0x2,CFE_STRIKEOUT=0x8,CFE_UNDERLINE=0x4,CFE_PROTECTED=0x10
   cfe := NumGet(CHARFORMAT, 8, "UInt")
   dwEffects=PROTECTED,UNDERLINE,STRIKEOUT,ITALIC,BOLD,AUTOCOLOR
+
+  style := ""	;-- majkinetor, if entering with same var it accumulates without this.
   Loop, parse, dwEffects,`,
     cfe >= CFE_%a_loopfield%  ?  (style.=(style ? " " a_loopfield : a_loopfield), cfe-=CFE_%a_loopfield%)  :  ""
 
@@ -963,7 +965,7 @@ EM_GETCHARFORMAT222(hCtrl, ByRef face="", ByRef style="", ByRef color="")  {
      <GetCharFormat>, <SetBgColor>
 
  Example:
- > CmnDlg_Font( Face, Style, Color, true, hwnd )
+ > Dlg_Font( Face, Style, Color, true, hwnd )
  > RichEdit_SetCharFormat( hCtrl, Face, Style, Color )
  */
 RichEdit_SetCharFormat(hCtrl, face="", style="", color="-", mode="SELECTION")  {
