@@ -59,8 +59,6 @@ OnToolbar(hCtrl, Event, Txt, Pos, Id){
 
 }
 
-
-
 PopulateList() {
 	global demo
 

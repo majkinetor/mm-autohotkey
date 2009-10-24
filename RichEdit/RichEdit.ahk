@@ -1029,12 +1029,6 @@ RichEdit_SetCharFormat(hCtrl, face="", style="", color="-", mode="SELECTION")  {
  ;
  ; }
 
-RichEdit_GetWrapMode(hCtrl)  {
-  static EM_GETWORDWRAPMODE=0x467
-  SendMessage, EM_GETWORDWRAPMODE,,,, ahk_id %hCtrl%
-  return, ErrorLevel
-}
-
 ;http://msdn.microsoft.com/en-us/library/bb774282(VS.85).aspx
 
 /*
@@ -1053,20 +1047,6 @@ RichEdit_WordWrap(HCtrl, Flag)  {
 	return ErrorLevel
 }
 
-RichEdit_SETWORDWRAPMODE(hCtrl, State)  {
-	static EM_SETWORDWRAPMODE=102,WM_USER=0x400
-	static WBF_WORDWRAP = 0x10
-		,EM_SETTARGETDEVICE = 72
-;		,state=0
-	a=0
-	state:=!state
-
- ; DllCall("SendMessage", "UInt", _ctrlID, "UInt", 0x448, "UInt", "0", "Int", !(opt1)) ; EM_SETTARGETDEVICE
-
- ;   SendMessage, 0x448,0,true,, ahk_id %hCtrl%
- ;   SendMessage, WM_USER | EM_SETWORDWRAPMODE, %WBF_WORDWRAP%,0,, ahk_id %hCtrl%
-  MsgBox, % errorlevel
-}
 
 EM_SETWORDBREAKPROC(hCtrl)  {
   static EM_SETWORDBREAKPROC=0xD0
