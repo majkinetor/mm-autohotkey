@@ -38,8 +38,6 @@ CreateGui(Text, W=850, H=600) {
 		
 }
 
-F1:: m(RichEdit_GetWrapMode(hRichEdit))
-
 OnExecute:
 	IfNotEqual, api, API, goto %api%
 return
