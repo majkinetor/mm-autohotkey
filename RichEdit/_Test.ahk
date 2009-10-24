@@ -85,7 +85,7 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 	{
 		RichEdit_GetCharFormat( hRichEdit, _, _, color)
 		if Dlg_Color(color, hForm1)
-			RichEdit_SetCharFormat(hRichEdit, "", "", color)
+			RichEdit_SetCharFormat(hRichEdit, "", _, color)
 	}
 
 	if Txt = BG
