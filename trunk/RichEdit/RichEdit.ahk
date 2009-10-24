@@ -17,6 +17,9 @@
      DISABLENOSCROLL - Disables scroll bars instead of hiding them when they are not needed.
      BORDER			- Displays the control with a sunken border style so that the rich edit control appears recessed into its parent window.
 	 HIDDEN			- Don't show the control.
+	 VSCROLL		- Enble vertical scroll bar.
+	 HSCROLL		- Enable horizontal scroll bar.
+	 SCROLL			- Enable both scroll bars.
 
      AUTOHSCROLL	- Automatically scrolls text to the right by 10 characters when the user types a character at the end of the line. When the user presses the ENTER key, the control scrolls all text back to position zero.
      AUTOVSCROLL	- Automatically scrolls text up one page when the user presses the ENTER key on the last line.
