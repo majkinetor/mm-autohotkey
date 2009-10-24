@@ -33,7 +33,7 @@ CreateGui(Text, W=850, H=600) {
 	hPanel3   := Form_Add(hPanel2, "Panel", "", "", "Align T,35", "Attach w")
 	hToolbar  := Form_Add(hPanel3, "Toolbar", "B`nI`nU`nS`n---`nFont`nFG`nBG`n---`nWrap,,checked,CHECK", "gOnToolbar style='nodivider tooltips' il=0", "Attach w")
 	Toolbar_SetBitmapSize(hToolbar, 0)
-	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "", "Align F", "Attach w h")
+	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "style='MULTILINE SCROLL'", "Align F", "Attach w h")
 
 	Splitter_Set(hSplitter, hPanel1 " | " hPanel2)
 	PopulateList()		
