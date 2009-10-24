@@ -38,6 +38,8 @@ CreateGui(Text, W=850, H=600) {
 		
 }
 
+F1:: m(RichEdit_GetWrapMode(hRichEdit))
+
 OnExecute:
 	IfNotEqual, api, API, goto %api%
 return
@@ -53,10 +55,8 @@ OnToolbar(hCtrl, Event, Txt, Pos, Id){
 		Dlg_Color(color, hForm1)
 
 	if Txt = Wrap 
-	{
-		state := Toolbar_GetButton(hCtrl, Pos, "S")
-		Richedit_SetWordWrapMode(hRichEdit, state="checked")
-	}
+		RichEdit_WordWrap(hRichEdit, Toolbar_GetButton(hCtrl, Pos, "S")="checked")
+
 }
 
 
