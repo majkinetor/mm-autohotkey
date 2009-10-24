@@ -30,10 +30,10 @@ CreateGui(Text, W=850, H=600) {
 	hLog	  := Form_Add(hPanel1,"ListBox", "", "0x100", "Align F", "Attach p")
 	hSplitter := Form_Add(hForm1, "Splitter", "", "", "Align L, 6", "Attach p")
 	hPanel2	  := Form_Add(hForm1, "Panel", "", "", "Align F", "Attach p")
-	hPanel3   := Form_Add(hPanel2, "Panel", "", "", "Align T,35", "Attach w")
+	hPanel3   := Form_Add(hPanel2, "Panel", "", "", "Align T,30", "Attach w")
 	hToolbar  := Form_Add(hPanel3, "Toolbar", "B`nI`nU`nS`n---`nFont`nFG`nBG`n---`nWrap,,checked,CHECK", "gOnToolbar style='nodivider tooltips' il=0", "Attach w")
 	Toolbar_SetBitmapSize(hToolbar, 0)
-	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "style='MULTILINE SCROLL'", "Align F", "Attach w h")
+	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "style='MULTILINE SCROLL WANTRETURN'", "Align F", "Attach w h")
 
 	Splitter_Set(hSplitter, hPanel1 " | " hPanel2)
 	PopulateList()		
@@ -55,7 +55,11 @@ OnToolbar(hCtrl, Event, Txt, Pos, Id){
 	ifEqual, Event, hot, return
 
 	if Txt = Font
-		Dlg_Font(font, style, color, 1, hForm1)
+	{
+		RichEdit_GetCharFormat( hRichEdit, font, style, color)
+		if Dlg_Font(font, style, color, 1, hForm1)
+			RichEdit_SetCharFormat(hRichEdit, font, style, color)
+	}
 
 	if Txt in BG,FG
 		Dlg_Color(color, hForm1)
@@ -63,6 +67,15 @@ OnToolbar(hCtrl, Event, Txt, Pos, Id){
 	if Txt = Wrap 
 		RichEdit_WordWrap(hRichEdit, Toolbar_GetButton(hCtrl, Pos, "S")="checked")
 
+	if Txt in B,I,U,S
+	{
+		B := "bold", I := "italic", U := "underline", S := "strikeout"
+		RichEdit_GetCharFormat( hRichEdit, font, style)
+		if Instr(style, %Txt%)
+			StringReplace, style, style, %Txt%
+		else style .= " " %Txt%
+		RichEdit_SetCharFormat( hRichEdit, "", style )
+	}
 }
 
 PopulateList() {
