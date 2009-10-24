@@ -1,3 +1,17 @@
+/* 
+	Scroller has a bug that shows
+	when you scroll and resize. This is because p parameter of Attach.
+	
+	It seems that problem is vertical attaching with vertical scroll and vice-versa.
+	When you put w instead of p it doesn't show but its hard to set up this example like that
+	(so that all Panels in Form1 use only w and y dimensions in attach.
+
+	I left it that way cuz its still usefull to see all of the controls in the Form1 and how they
+	get attached. The problem fixes itself when you scroll to top and resize again.
+
+	This is documented in Scroller.ahk
+ */
+
 _("mo! e w")
 #MaxThreads, 255
 
