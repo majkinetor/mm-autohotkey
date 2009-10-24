@@ -7,7 +7,7 @@ _("mo! e w")
 	depthlevel = 5		;makes the difference; tests:  vista(32b, quad)=15, xppro(64b, quad)=5
 
 	;=======================================================
-	hForm1	:=	Form_New("w500 h900")
+	hForm1	:=	Form_New("w500 h600 +Resize")
 	loop, %siblings%
 	{
 		hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "",		"Align T, 300", "Attach p")
