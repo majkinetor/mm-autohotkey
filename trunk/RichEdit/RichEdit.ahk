@@ -1029,11 +1029,28 @@ RichEdit_SetCharFormat(hCtrl, face="", style="", color="-", mode="SELECTION")  {
  ;
  ; }
 
-RichEdit_GETWORDWRAPMODE(hCtrl)  {
-  static EM_GETWORDWRAPMODE=103,WM_USER=0x400
+RichEdit_GetWrapMode(hCtrl)  {
+  static EM_GETWORDWRAPMODE=0x467
+  SendMessage, EM_GETWORDWRAPMODE,,,, ahk_id %hCtrl%
+  return, ErrorLevel
+}
 
-  SendMessage, WM_USER | EM_GETWORDWRAPMODE, 0,0,, ahk_id %hCtrl%
-  MsgBox, % errorlevel
+;http://msdn.microsoft.com/en-us/library/bb774282(VS.85).aspx
+
+/*
+ Function:		WordWrap
+				Set word wrap mode.
+
+ Parameters:
+				Flag	- True / False.
+ 
+ Returns:
+				The return value is zero if the operation fails, or nonzero if it succeeds.
+ */
+RichEdit_WordWrap(HCtrl, Flag)  {
+	static EM_SETTARGETDEVICE=0x448
+	SendMessage, EM_SETTARGETDEVICE,,!Flag,, ahk_id %hCtrl%
+	return ErrorLevel
 }
 
 RichEdit_SETWORDWRAPMODE(hCtrl, State)  {
