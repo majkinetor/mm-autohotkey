@@ -32,7 +32,7 @@ CreateGui(Text, W=850, H=600) {
 		FG,,,autosize
 		BG,,,autosize
 		---
-		Wrap,,checked,check autosize
+		Wrap,,,check autosize
 		BackColor,,,autosize
 	)
 
@@ -70,7 +70,7 @@ Log(t1="", t2="", t3="", t4="", t5="") {
 	ControlSend, ,{End},ahk_id %hLog%
 }
 
-OnToolbar(hCtrl, Event, Txt){
+OnToolbar(hCtrl, Event, Txt, Pos=""){
 	global 
 	ifEqual, Event, hot, return
 
