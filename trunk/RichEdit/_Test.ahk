@@ -9,6 +9,7 @@ _("mo!")
 	 )
 
 	CreateGui(text)
+
 	Form_Show("", "Maximize")
 	
 	RichEdit_AutoUrlDetect( hRichEdit, "^" )
@@ -19,6 +20,21 @@ return
 
 CreateGui(Text, W=850, H=600) {
 	global 
+
+	btns =
+	(LTrim
+		B,,,autosize
+		I,,,autosize
+		U,,,autosize
+		S,,,autosize
+		---
+		Font,,,autosize
+		FG,,,autosize
+		BG,,,autosize
+		---
+		Wrap,,checked,check autosize
+		BackColor,,,autosize
+	)
 
 	hForm1 := Form_New("+Resize w" W " h" H)
 	hList	 := Form_Add(hForm1, "ListView", "API|Description", "gOnLV AltSubmit", "Align T", "Attach p")
@@ -31,13 +47,17 @@ CreateGui(Text, W=850, H=600) {
 	hSplitter := Form_Add(hForm1, "Splitter", "", "", "Align L, 6", "Attach p")
 	hPanel2	  := Form_Add(hForm1, "Panel", "", "", "Align F", "Attach p")
 	hPanel3   := Form_Add(hPanel2, "Panel", "", "", "Align T,30", "Attach w")
-	hToolbar  := Form_Add(hPanel3, "Toolbar", "B`nI`nU`nS`n---`nFont`nFG`nBG`n---`nWrap,,checked,CHECK", "gOnToolbar style='nodivider tooltips' il=0", "Attach w")
+	hToolbar  := Form_Add(hPanel3, "Toolbar", btns, "gOnToolbar style='nodivider tooltips' il=0", "Attach w")
 	Toolbar_SetBitmapSize(hToolbar, 0)
 	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "style='MULTILINE SCROLL WANTRETURN'", "Align F", "Attach w h")
 
 	Splitter_Set(hSplitter, hPanel1 " | " hPanel2)
 	PopulateList()		
 }
+
+Form1_Close:
+	ExitApp
+return
 
 OnExecute:
 	IfNotEqual, api, API, goto %api%
@@ -50,7 +70,7 @@ Log(t1="", t2="", t3="", t4="", t5="") {
 	ControlSend, ,{End},ahk_id %hLog%
 }
 
-OnToolbar(hCtrl, Event, Txt, Pos, Id){
+OnToolbar(hCtrl, Event, Txt){
 	global 
 	ifEqual, Event, hot, return
 
@@ -61,8 +81,15 @@ OnToolbar(hCtrl, Event, Txt, Pos, Id){
 			RichEdit_SetCharFormat(hRichEdit, font, style, color)
 	}
 
-	if Txt in BG,FG
-		Dlg_Color(color, hForm1)
+	if Txt = FG
+	{
+		RichEdit_GetCharFormat( hRichEdit, _, _, color)
+		if Dlg_Color(color, hForm1)
+			RichEdit_SetCharFormat(hRichEdit, "", "", color)
+	}
+
+	if Txt = BG
+		msgbox  not implemented
 
 	if Txt = Wrap 
 		RichEdit_WordWrap(hRichEdit, Toolbar_GetButton(hCtrl, Pos, "S")="checked")
@@ -70,12 +97,17 @@ OnToolbar(hCtrl, Event, Txt, Pos, Id){
 	if Txt in B,I,U,S
 	{
 		B := "bold", I := "italic", U := "underline", S := "strikeout"
-		RichEdit_GetCharFormat( hRichEdit, font, style)
+		RichEdit_GetCharFormat( hRichEdit, _, style)
 		if Instr(style, %Txt%)
 			StringReplace, style, style, %Txt%
 		else style .= " " %Txt%
 		RichEdit_SetCharFormat( hRichEdit, "", style )
 	}
+
+	if Txt = BackColor
+		if Dlg_Color(color, hForm1)
+			RichEdit_SetBgColor(hRichEdit, color)	
+	
 }
 
 PopulateList() {
@@ -148,6 +180,12 @@ TextMode:	;Sets text mode.
 	RichEdit_SetText(hRichEdit)
 	RichEdit_TextMode(hRichEdit, "RICHTEXT") 
 	RichEdit_SetText(hRichEdit, txt)
+return
+
+^U::
+^B::
+^I::
+	OnToolbar(hToolbar, "click", SubStr(A_ThisHotkey, 2))
 return
 
 #include RichEdit.ahk

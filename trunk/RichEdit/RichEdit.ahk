@@ -479,7 +479,7 @@ RichEdit_ScrollPos(hCtrl, posString="" )  {
      <SetCharFormat>, <GetCharFormat>
 
  Example:
- > CmnDlg_Color( color, hRichEdit )
+ > Dlg_Color( color, hRichEdit )
  > RichEdit_SetBgColor( hRichEdit, color )
  >
  > RichEdit_SetBgColor( hRichEdit, 0xa9f874 )
