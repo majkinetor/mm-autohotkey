@@ -47,17 +47,6 @@ _()
 ;	Attach("OnAttach")
 return
 
-;F4::	
-;	Scroller_UpdateBars(hTab)
-;return
-
-OnAttach(Hwnd) {
-	global
-	;if (Hwnd = hButtonPanel) /* Could be used to stretch button image on resizing */
-	;	hbitmap := Ext_Image(hButton, "..\res\test.bmp") ;remove old bitmap....
-}
-
-
 MakeOptions(Name) {
 	if Name in MonthCal,ListBox,TreeView,Hotkey,Slider,UpDown
 		return "gHandler"
