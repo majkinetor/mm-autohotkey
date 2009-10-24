@@ -34,8 +34,7 @@ CreateGui(Text, W=850, H=600) {
 	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "", "Align F", "Attach w h")
 
 	Splitter_Set(hSplitter, hPanel1 " | " hPanel2)
-	PopulateList()
-		
+	PopulateList()		
 }
 
 OnExecute:
@@ -123,8 +122,10 @@ LimitText:	;Sets an upper limit to the amount of text the user can type or paste
 return
 
 TextMode:	;Sets text mode.
+	txt := RichEdit_GetText( hRichEdit, 0, -1 )
+	RichEdit_SetText(hRichEdit)
 	RichEdit_TextMode(hRichEdit, "RICHTEXT") 
-	msgbox % errorlevel
+	RichEdit_SetText(hRichEdit, txt)
 return
 
 #include RichEdit.ahk
