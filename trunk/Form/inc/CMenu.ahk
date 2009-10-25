@@ -1,6 +1,6 @@
 /*
- Function:		Ext_Menu
-				Show menu from the control.
+ Function:		CMenu
+				Sets context menu for the control.
 
  Dependencies:
 				<ShowMenu> 1.2, <Win> 1.2
@@ -23,16 +23,16 @@
 		o Version 1.0 by majkinetor.
 		o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */
-Ext_Menu(HCtrl, MenuName="", Sub="") { 
+CMenu(HCtrl, MenuName="", Sub="") { 
 	oldTrim := A_AutoTrim
 	AutoTrim, on
 	Sub = %Sub%
 	AutoTrim, %oldTrim%
-	Win_SubClass(HCtrl, "Ext_Menu_wndProc")
-	return Ext_Menu_WndProc(0, Sub, MenuName, HCtrl+0)
+	Win_SubClass(HCtrl, "CMenu_wndProc")
+	return CMenu_wndProc(0, Sub, MenuName, HCtrl+0)
 } 
 
-Ext_Menu_wndProc(Hwnd, UMsg, WParam, LParam) {
+CMenu_wndProc(Hwnd, UMsg, WParam, LParam) {
 	static 
 	global Menu_Controls
 	static WM_RBUTTONUP = 0x205
