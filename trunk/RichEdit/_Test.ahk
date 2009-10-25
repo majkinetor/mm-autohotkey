@@ -144,7 +144,7 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 
 	if Txt = Save
 		if fn := Dlg_Save(hForm1, "", "", "", "", "rtf") 
-			RichEdit_Save(hRichEdit, fn), m("saved")
+			RichEdit_Save(hRichEdit, fn)
 
 	if Txt = Events
 	{
