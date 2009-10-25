@@ -47,3 +47,5 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
                   , "Uint", 0, "Uint")			; must return uint.
 	return hCtrl
 }
+
+F1:: Gui, Show
