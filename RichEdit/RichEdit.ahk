@@ -93,7 +93,7 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
                   , "int" , W					; Width
                   , "int" , H					; Height
                   , "Uint", HParent				; hWndParent
-                  , "Uint", MODULEID			; hMenu 
+                  , "Uint", 0			; hMenu 
                   , "Uint", 0					; hInstance
                   , "Uint", 0, "Uint")			; must return uint.
 	return hCtrl
