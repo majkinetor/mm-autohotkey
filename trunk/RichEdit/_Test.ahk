@@ -14,7 +14,6 @@ _("mo!")
 	Log("Press F1 or doubleclick to execute selected API"), Log()
 	RichEdit_AutoUrlDetect( hRichEdit, "^" )
 	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
-	RichEdit_SetEvents(hRichEdit, "Handler", "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE")
 return
 
 Handler(hCtrl, Event, p1, p2, p3 ) {
@@ -57,6 +56,8 @@ CreateGui(Text, W=850, H=600) {
 		-----
 		Wrap,,,check autosize
 		BackColor,,,autosize
+		-----
+		Events,,,check autosize
 	)
 
 	hForm1    := Form_New("+Resize w" W " h" H)
@@ -131,6 +132,13 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 	
 	if Txt = Load
 		RichEdit_SetText(hRichEdit, Dlg_Open(hForm1), "FROMFILE")
+
+	if Txt = Events
+	{
+		b := Toolbar_GetButton(hCtrl, Pos, "S")="checked"
+		events := !b ? "" : "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE"
+		RichEdit_SetEvents(hRichEdit, "Handler", events)
+	}
 }
 
 PopulateList() {
