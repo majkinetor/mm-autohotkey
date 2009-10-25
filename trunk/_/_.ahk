@@ -69,7 +69,8 @@ _(opt="") {
 			m := SubStr(m, 1, -1)
 			if m not in m,o
 				FileDelete, %m%
-			else m := "o!"
+			else if (m="o") 
+				m := "o!"
 		} 
 		m("~`a" (m = 1 ? "" : m))
 	}
