@@ -1,5 +1,5 @@
 _("mm!")
-    Menu_Controls =
+    CMenu =
 	(LTrim
 		[Edit]
 		edit item 1

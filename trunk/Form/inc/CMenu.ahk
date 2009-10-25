@@ -11,13 +11,13 @@
 				Sub		 - Subroutine to be launched, optional.
  
  Globals:
-				Menu_Controls	- Holds the menu definitions.
+				CMenu	- Holds the menu definitions.
  
  Remarks:
 				Parameters and variables of this function are equal to those
 				required by Showmenu. The menu for the control is launched as:
 
- > ShowMenu(Menu_Controls, %Hwnd%_menuName, %Hwnd%_sub)
+ > ShowMenu(CMenu, %Hwnd%_menuName, %Hwnd%_sub)
 
  About:
 		o Version 1.0 by majkinetor.
@@ -42,7 +42,7 @@ CMenu_wndProc(Hwnd, UMsg, WParam, LParam) {
 	}
 
 	If (UMsg = WM_RBUTTONUP) {
-		return ShowMenu(Menu_Controls, %Hwnd%_menuName, %Hwnd%_sub)
+		return ShowMenu(CMenu, %Hwnd%_menuName, %Hwnd%_sub)
 	}
 
 	return DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", hwnd, "UInt", uMsg, "UInt", wParam, "UInt", lParam)
