@@ -520,6 +520,20 @@ RichEdit_SetBgColor(hCtrl, color)  {
 
   return pColor
 }
+/*
+ Function:	SetFontSize
+			Sets the font size for the selected text.
+
+ Parameters:
+			Add - Change in point size of the selected text.The change is applied to 
+					each part of the selection. So, if some of the text is 10pt and some 20pt,
+					after a call with wParam set to 1, the font sizes become 11pt and 22pt, respectively.
+ */
+RichEdit_SetFontSize(hCtrl, Add) { 
+	static EM_SETFONTSIZE=0x4DF
+	SendMessage, EM_SETFONTSIZE,Add,,, ahk_id %hCtrl%
+	return ErrorLEvel
+}
 
 /*
  Function: SetSel

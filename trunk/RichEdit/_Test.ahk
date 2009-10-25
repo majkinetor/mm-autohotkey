@@ -18,13 +18,7 @@ _("mo!")
 return
 
 F2::
-	m(RichEdit_StreamOut(hRichEdit, out))
-  MsgBox, % "DEFAULT  = " RichEdit_GetTextLength(hRichEdit, "DEFAULT" )  "`n"
-          . "USECRLF  = " RichEdit_GetTextLength(hRichEdit, "USECRLF" )  "`n"
-          . "PRECISE  = " RichEdit_GetTextLength(hRichEdit, "PRECISE" )  "`n"
-          . "CLOSE    = " RichEdit_GetTextLength(hRichEdit, "CLOSE" )    "`n"
-          . "NUMCHARS = " RichEdit_GetTextLength(hRichEdit, "NUMCHARS" ) "`n"
-          . "NUMBYTES = " RichEdit_GetTextLength(hRichEdit, "NUMBYTES" ) "`n"
+	RichEdit_SetFontSize(hRichEdit, 2)
 return
 
 Handler(hCtrl, Event, p1, p2, p3 ) {
@@ -62,6 +56,9 @@ CreateGui(Text, W=850, H=600) {
 		Font,,,autosize
 		FG,,,autosize
 		BG,,,autosize
+		-
+		+2,,,autosize
+		-2,,,autosize
 		-----
 		Wrap,,,check autosize
 		BackColor,,,autosize
@@ -152,6 +149,9 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 		events := !b ? "" : "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE"
 		RichEdit_SetEvents(hRichEdit, "Handler", events)
 	}
+
+	If Txt in +2,-2
+		RichEdit_SetFontSize(hRichEdit, Txt)
 }
 
 PopulateList() {
