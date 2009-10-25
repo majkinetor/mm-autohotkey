@@ -119,7 +119,7 @@ EM_GETEVENTMASK(hCtrl)  {
 
 RichEdit_onNotify(wparam, lparam, msg, hwnd) {
 	static MODULEID := 091009, oldNotify="*", oldCOMMAND="*"
-
+ 
   Critical
 	if (_ := (NumGet(Lparam+4))) != MODULEID
 	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
@@ -138,9 +138,7 @@ RichEdit_onNotify(wparam, lparam, msg, hwnd) {
 	hw :=  NumGet(Lparam+0), code := NumGet(Lparam+8, 0, "UInt"),  handler := RichEdit(hw "Handler")
 	ifEqual, handler,,return (code=1796) ? TRUE : FALSE  ;ENM_PROTECTED- msg returns nonzero value to prevent operation
 
-;  msgbox, % code
 ; return
-
   If (code = 1792)       {          ; ENM_MOUSEEVENTS ENM_KEYEVENTS ENM_SCROLLEVENTS
     Umsg := NumGet(lparam+12)  ;Keyboard or mouse message identifier.
     key := ((n:=NumGet(lparam+40))>=32) ? Chr(n) : ""
