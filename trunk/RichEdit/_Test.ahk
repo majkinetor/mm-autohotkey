@@ -74,13 +74,27 @@ CreateGui(Text, W=850, H=600) {
 	hSplitter := Form_Add(hForm1, "Splitter", "", "", "Align L, 6", "Attach p")
 	hPanel2	  := Form_Add(hForm1, "Panel", "", "", "Align F", "Attach p")
 	hPanel3   := Form_Add(hPanel2, "Panel", "", "", "Align T,30", "Attach w")
-	hToolbar  := Form_Add(hPanel3, "Toolbar", btns, "gOnToolbar style='flat nodivider tooltips' il=0", "Attach w")
+				 Form_Add(hPanel3, "Slider", "", "Range1-10 gOnSlider vSlider h30", "Align R, 100", "Attach x")
+	hToolbar  := Form_Add(hPanel3, "Toolbar", btns, "gOnToolbar style='flat nodivider tooltips' il=0 x30", "Align F", "Attach w")
 	Toolbar_SetBitmapSize(hToolbar, 0)
 	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "style='MULTILINE SCROLL WANTRETURN'", "Align F", "Attach w h", "CMenu RichEditMenu")
 
+	cSlider := 0
 	Splitter_Set(hSplitter, hPanel1 " | " hPanel2)
 	PopulateList()		
 }
+
+OnSlider:
+	d := slider - cslider
+	ifEqual, d, 0, return
+	
+	
+	RichEdit_Zoom( hRichEdit, d ) 
+	critical off
+
+
+	cSlider := slider
+return
 
 Form1_Close:
 	ExitApp
