@@ -3,13 +3,11 @@
 			*Forms framework.*
 
  Group: Overview
- :
 		Forms framework is a group of modules used together to create AHK graphical user interfaces. 
 		It contains the list of optional module includes with each module designed to work with or without the framework in place.
 		It includes number of custom controls, extensions and useful libraries. <Form> module is a backbone of the framework.		
 		
  Group: Features
- :
 		All modules are developed so they fulfill specific goals :
 
 		o Standalone. All modules are independent of each other. You can copy any module to your script and use it without other modules.
@@ -25,6 +23,7 @@
 
 
  Group: Modules
+ 		o <_>			- Script initializer and set of helper functions.
 		o <Form>		- Alternative way of creating AHK GUIs.
 		o <Panel>		- Panel custom control, container for other controls.
 		o <Toolbar>		- Toolbar custom control.
@@ -41,16 +40,19 @@
 		o <Win>			- Set of window functions.
 		o <Dlg>			- Common dialogs.
 		o <DockA>		- Docking system for AutoHotKey windows.
-		o <_>			- Script initializer and set of helper functions.
 		o <ShowMenu>	- Show menu from the text.
 
  Group: Extensions
 		o <Align>		- Aligns controls inside the parent.
 		o <Attach>		- Determines how a control is resized with its parent.
-		o <Cursor>		- Set cursor shape for control or window.
+		o <Cursor>		- Sets the cursor shape for a control or a window.
 		o <Tooltip>		- Adds tooltips to GUI controls.
-		o <Image>		- Adds image to the Button control.
+		o <Image>		- Adds an image to a Button control.
 		o <Font>		- Sets font for the control.
+		o <Menu>		- Sets a context menu for a control.
+
+ Group: Known bugs/issues
+		o Menu extension doesn't work on HLink.
  */
 #include *i Form.ahk
 
@@ -61,6 +63,7 @@
 #include *i Cursor.ahk
 #include *i Image.ahk
 #include *i Font.ahk
+#include *i Menu.ahk	
 
 ;controls
 #include *i Panel.ahk
@@ -88,7 +91,7 @@
 
 /* 
  Group: About
-	o v0.4 by majkinetor.
+	o v0.45 by majkinetor.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> .
 
 	(see _Forms.png)

@@ -38,6 +38,9 @@
 
  Remarks:
 	 Setting the same cursor type on several controls uses the same cursor.
+     Some controls may host child windows. In that case you should pass handle of the
+	 topmost child window it contains instead handle of the control itself (for instance RaGrid
+	 SpreedSheat ...)
 
  About:
 	o 1.2 by majkinetor
@@ -78,3 +81,5 @@ Ext_Cursor_wndProc(Hwnd, UMsg, WParam, LParam) {
 
    return DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", hwnd, "UInt", uMsg, "UInt", wParam, "UInt", lParam)
 } 
+
+#include *i Win.ahk

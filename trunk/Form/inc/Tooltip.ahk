@@ -74,3 +74,5 @@ Ext_Tooltip_wndProc(Hwnd, UMsg, WParam, LParam){
 		Tooltip,,,, %num%
  return
 }
+
+#include *i Win.ahk
