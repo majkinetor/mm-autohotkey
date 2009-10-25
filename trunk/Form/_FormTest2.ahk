@@ -15,8 +15,9 @@ _("mm!")
 		pic item1
 		pic item2
 	)
+
 	hForm1	:=	Form_New("e3 w200 h500")	
-	Form_Add(hForm1, "Edit", "ESC to close script. F2 to resize. Drag picture to move.", "-vscroll w200 r3 0x8000","Align T", "Attach w", "CMenu Edit, Menu_Controls")
+	Form_Add(hForm1, "Edit", "ESC to close script. F2 to resize. Drag picture to move. Right click controls for the context menu.", "-vscroll w200 r3 0x8000","Align T", "Attach w", "CMenu Edit, Menu_Controls")
 	Form_Add(hForm1, "Picture", "res\test.bmp", "gPictureDrag", "Cursor size", "CMenu Picture, Menu_Controls")
 
 	hFont := Font("", "s12 italic, Courier New")
