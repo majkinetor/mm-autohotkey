@@ -49,7 +49,7 @@
 		o <Tooltip>		- Adds tooltips to GUI controls.
 		o <Image>		- Adds an image to a Button control.
 		o <Font>		- Sets font for the control.
-		o <Menu>		- Sets a context menu for a control.
+		o <CMenu>		- Sets a context menu for a control.
 
  Group: Known bugs/issues
 		o Menu extension doesn't work on HLink.
@@ -63,7 +63,7 @@
 #include *i Cursor.ahk
 #include *i Image.ahk
 #include *i Font.ahk
-#include *i Menu.ahk	
+#include *i CMenu.ahk	
 
 ;controls
 #include *i Panel.ahk
