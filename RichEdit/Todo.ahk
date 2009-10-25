@@ -963,31 +963,8 @@ EM_STREAMIN(hCtrl)  {
   SendMessage, WM_USER | EM_STREAMIN, SF_TEXT,&EDITSTREAM,, ahk_id %hCtrl%
   MsgBox, % errorlevel
 }
-EM_STREAMOUT(hCtrl, byref out)  {
-  static EM_STREAMOUT=74,WM_USER=0x400
-  static SF_RTF=0x2,SF_RTFNOOBJS=0x3,SF_TEXT=0x1,SF_TEXTIZED=0x4
-  static SFF_PLAINRTF=0x4000,SFF_SELECTION=0x8000,SF_UNICODE=0x10,SF_USECODEPAGE=0x20
-
-  wbProc := RegisterCallback("RichEdit_editStreamCallBack")
-
-  VarSetCapacity(EDITSTREAM, 16, 0)
-  NumPut(&out, EDITSTREAM, 0, "UInt") ; dwCookie
-  NumPut(wbProc, EDITSTREAM, 8, "UInt")
-
-  SendMessage, WM_USER | EM_STREAMOUT, SF_RTF,&EDITSTREAM,, ahk_id %hCtrl%
-  MsgBox, % DllCall("MulDiv", "Int",&out, "Int",1, "Int",1, "str")
-;   MsgBox, % errorlevel
-}
-
-RichEdit_editStreamCallBack(dwCookie, pbBuff, cb, pcb) {
-; ToolTip, % "1- "dwCookie "`n2- " pbBuff "`n3- " cb "`n4- " pcb "`n---`n" buffer
 
 
-;   MsgBox, % buffer := DllCall("MulDiv", "Int",pbBuff, "Int",1, "Int",1, "str")
-
-  DllCall("lstrcpy", "UInt", dwCookie1, "Str", &pbBuff)
-  MsgBox, % dwCookie1
-}
 
 ____Redundant____:
 RETURN
