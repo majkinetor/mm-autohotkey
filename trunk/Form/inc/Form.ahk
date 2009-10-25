@@ -19,7 +19,7 @@
  			Ctrl	- Control name or handle. All AHK controls are supported by default. Custom controls must be included if needed. See below for details.
  			Txt		- Text of the new control (optional).
 			Opt		- Space separated list of control options (optional).
-			E1..E5  - Control extensions (optional). Extension function must exist in the script in order to use it. Option string may preceed 
+			E1..E7  - Control extensions (optional). Extension function must exist in the script in order to use it. Option string may preceed 
 					  extension name in the RegEx manner. See below for details.
  
  Adding Controls:
@@ -84,7 +84,7 @@
  Returns:
  			Control's handle if successful. 0 or error mesage if control can't be created. Error message on invalid usage.
  */
-Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
+Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5="",E6="",E7=""){
 	static integrated = "Text,Edit,UpDown,Picture,Button,Checkbox,Radio,DropDownList,ComboBox,ListBox,ListView,TreeView,Hotkey,DateTime,MonthCal,Slider,Progress,GroupBox,Tab2,StatusBar"
 
   ;make control with options
@@ -101,9 +101,13 @@ Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5=""){
 	loop {
 		o := E%A_Index%
 		ifEqual,o,,break
-		f_Extension := SubStr(o, 1, k:=InStr(o, " ")-1), k := SubStr(o, k+2), iOpt := InStr(f_Extension, ")")
-		opt := iOpt ? (SubStr(f_Extension, 1, iOpt-1), f_Extension := SubStr(f_Extension, iOpt+1)) : ""
-		Form_split(opt, k, p1, p2, p3, p4, p5)
+		k := InStr(o, " ")
+		ifEqual, k, 0, SetEnv, f_Extension, %o%
+		else {
+			f_Extension := SubStr(o, 1, k-1), k := SubStr(o, k+1), iOpt := InStr(f_Extension, ")")
+			opt := iOpt ? (SubStr(f_Extension, 1, iOpt-1), f_Extension := SubStr(f_Extension, iOpt+1)) : ""
+			Form_split(opt, k, p1, p2, p3, p4, p5)
+		}
 		if !(IsFunc(f_Extension) || IsFunc( f_Extension := "Ext_" f_Extension ))
 			return A_ThisFunc "> Unsupported extension: " f_Extension
 		%f_Extension%(hCtrl, p1, p2, p3, p4, p5)
