@@ -16,14 +16,14 @@ Return Ansi
 
 
 /*
-Function:	SetEvents
+	Function:	SetEvents
 			Set notification events.
 
-Parameters:
+	Parameters:
 			Handler	- Function that handles events. If empty, any existing handler will be removed.
 			Events	- White space separated list of events to monitor.
 
-Handler:
+	Handler:
  >     	Result := Handler(hCtrl, Event, p1, p2, p3 )
 
 		hCtrl	- Handle of richedit control sending the event.
@@ -32,7 +32,7 @@ Handler:
 		Data	- Numeric data of the cell. Pointer to string for textual cells and DWORD value for numeric.
 		Result  - Return 1 to prevent action.
 
-Events:
+	Events:
     CHANGE - Sent when the user has taken an action that may have altered text in an edit control.
              Sent after the system updates the screen. (***)
     DRAGDROPDONE - Notifies a rich edit control's parent window that the drag-and-drop
@@ -195,20 +195,13 @@ RichEdit_onNotify(wparam, lparam, msg, hwnd) {
   }
 }
 
-;Module storage (http://www.autohotkey.net/~majkinetor/_/_.html#v  ,  http://www.autohotkey.com/forum/topic46054.html)
+;Storage
 RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") {
 	static
-	if (var = "" ){
-		if ( _ := InStr(value, ")") )
-			__ := SubStr(value, 1, _-1), value := SubStr(value, _+1)
-		loop, parse, value, %A_Space%
-			_ := %__%%A_LoopField%,  o%A_Index% := _ != "" ? _ : %A_LoopField%
-		return
-	} else _ := %var%
+	 _ := %var%
 	ifNotEqual, value, ~`a, SetEnv, %var%, %value%
 	return _
 }
-
 
 
 

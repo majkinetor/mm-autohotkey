@@ -33,17 +33,28 @@ Handler(hCtrl, Event, p1, p2, p3 ) {
 CreateGui(Text, W=850, H=600) {
 	global 
 
+	CMenu=
+	(LTrim
+		[RichEditMenu]
+		Cut
+		Copy
+		Paste
+	)
+
 	btns =
 	(LTrim
+		Load,,,autosize
+		Save,,DISABLED,autosize
+	    -----
 		B,,,autosize
 		I,,,autosize
 		U,,,autosize
 		S,,,autosize
-		---
+		-----
 		Font,,,autosize
 		FG,,,autosize
 		BG,,,autosize
-		---
+		-----
 		Wrap,,,check autosize
 		BackColor,,,autosize
 	)
@@ -58,7 +69,7 @@ CreateGui(Text, W=850, H=600) {
 	hPanel3   := Form_Add(hPanel2, "Panel", "", "", "Align T,30", "Attach w")
 	hToolbar  := Form_Add(hPanel3, "Toolbar", btns, "gOnToolbar style='flat nodivider tooltips' il=0", "Attach w")
 	Toolbar_SetBitmapSize(hToolbar, 0)
-	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "style='MULTILINE SCROLL WANTRETURN'", "Align F", "Attach w h")
+	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "style='MULTILINE SCROLL WANTRETURN'", "Align F", "Attach w h", "CMenu RichEditMenu")
 
 	Splitter_Set(hSplitter, hPanel1 " | " hPanel2)
 	PopulateList()		
@@ -66,6 +77,11 @@ CreateGui(Text, W=850, H=600) {
 
 Form1_Close:
 	ExitApp
+return
+
+RichEditMenu:
+	if A_ThisMenuItem in Cut,Copy,Paste
+		Edit_%A_ThisMenuItem%(hRichEdit)
 return
 
 Log(t1="", t2="", t3="", t4="", t5="") {
@@ -113,6 +129,8 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 		if Dlg_Color(color, hForm1)
 			RichEdit_SetBgColor(hRichEdit, color)	
 	
+	if Txt = Load
+		RichEdit_SetText(hRichEdit, Dlg_Open(hForm1), "FROMFILE")
 }
 
 PopulateList() {
@@ -200,6 +218,7 @@ F1:: IfNotEqual, api, API, goto %api%
 #include Todo.ahk
 
 ;sample includes
+#include Edit.ahk
 #include inc
 #include _.ahk
 #include Dlg.ahk
@@ -208,6 +227,6 @@ F1:: IfNotEqual, api, API, goto %api%
 #include Form.ahk
 #include Panel.ahk
 #include Font.ahk
-#include Win.ahk
 #include Splitter.ahk
 #include Toolbar.ahk
+#include CMenu.ahk
