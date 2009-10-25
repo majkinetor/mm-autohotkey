@@ -28,13 +28,14 @@ CMenu(HCtrl, MenuName="", Sub="") {
 	AutoTrim, on
 	Sub = %Sub%
 	AutoTrim, %oldTrim%
+
 	Win_SubClass(HCtrl, "CMenu_wndProc")
 	return CMenu_wndProc(0, Sub, MenuName, HCtrl+0)
 } 
 
 CMenu_wndProc(Hwnd, UMsg, WParam, LParam) {
 	static 
-	global Menu_Controls
+	global CMenu
 	static WM_RBUTTONUP = 0x205
 
 	if !Hwnd  {
