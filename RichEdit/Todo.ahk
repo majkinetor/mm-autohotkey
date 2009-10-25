@@ -969,13 +969,6 @@ EM_STREAMIN(hCtrl)  {
 ____Redundant____:
 RETURN
 
-EM_SETFONTSIZE(hCtrl)  {
-;   static EM_SETFONTSIZE=223,WM_USER=0x400
-;
-;   SendMessage, WM_USER | EM_SETFONTSIZE, 0,&@??,, ahk_id %hCtrl%
-
-}
-
 
 ____Asian_Only____:
 RETURN
