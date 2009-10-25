@@ -17,8 +17,6 @@ _("mo!")
 return
 
 Handler(hCtrl, Event, p1, p2, p3 ) {
-  global hNotifications
-  
   If (Event = "DROPFILES")  {
     MsgBox, % "Dropped files: " P1 "`n----`n" P2 "`n----`nChar position: " P3
     return
