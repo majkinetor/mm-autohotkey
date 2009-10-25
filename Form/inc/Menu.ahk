@@ -38,7 +38,7 @@ Ext_Menu_wndProc(Hwnd, UMsg, WParam, LParam) {
 	static WM_RBUTTONUP = 0x205
 
 	if !Hwnd  {
-		m(lParam), %LParam%_menuName := WParam, %LParam%_sub := Umsg
+		%LParam%_menuName := WParam, %LParam%_sub := Umsg
 	}
 
 	If (UMsg = WM_RBUTTONUP) {

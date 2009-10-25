@@ -1,4 +1,4 @@
-_("mo!")
+_("mm!")
     Menu_Controls =
 	(LTrim
 		[Edit]
@@ -28,6 +28,10 @@ _("mo!")
 
 	Form_AutoSize( hForm1, 10.5)
 	Form_Show(hForm1, "xCenter yCenter")
+return
+
+Form1_ContextMenu:
+	m("Form1 context menu")
 return
 
 Menu_Controls:
