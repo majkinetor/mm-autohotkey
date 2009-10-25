@@ -7,13 +7,24 @@ _("mo!")
 
 		meh...
 	 )
-
+ 
 	CreateGui(text)
 
 	Form_Show("", "Maximize")
 	Log("Press F1 or doubleclick to execute selected API"), Log()
 	RichEdit_AutoUrlDetect( hRichEdit, "^" )
 	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
+	;	RichEdit_LimitText( hRichEdit, 900000 )  ; to taste save...
+return
+
+F2::
+	m(RichEdit_StreamOut(hRichEdit, out))
+  MsgBox, % "DEFAULT  = " RichEdit_GetTextLength(hRichEdit, "DEFAULT" )  "`n"
+          . "USECRLF  = " RichEdit_GetTextLength(hRichEdit, "USECRLF" )  "`n"
+          . "PRECISE  = " RichEdit_GetTextLength(hRichEdit, "PRECISE" )  "`n"
+          . "CLOSE    = " RichEdit_GetTextLength(hRichEdit, "CLOSE" )    "`n"
+          . "NUMCHARS = " RichEdit_GetTextLength(hRichEdit, "NUMCHARS" ) "`n"
+          . "NUMBYTES = " RichEdit_GetTextLength(hRichEdit, "NUMBYTES" ) "`n"
 return
 
 Handler(hCtrl, Event, p1, p2, p3 ) {
@@ -41,7 +52,7 @@ CreateGui(Text, W=850, H=600) {
 	btns =
 	(LTrim
 		Load,,,autosize
-		Save,,DISABLED,autosize
+		Save,,,autosize
 	    -----
 		B,,,autosize
 		I,,,autosize
@@ -131,6 +142,10 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 	if Txt = Load
 		RichEdit_SetText(hRichEdit, Dlg_Open(hForm1), "FROMFILE")
 
+	if Txt = Save
+		if fn := Dlg_Save(hForm1, "", "", "", "", "rtf") 
+			RichEdit_Save(hRichEdit, fn), m("saved")
+
 	if Txt = Events
 	{
 		b := Toolbar_GetButton(hCtrl, Pos, "S")="checked"
@@ -185,7 +200,7 @@ GetSel: ;Retrieve the starting and ending character positions of the selection.
 	RichEdit_GetSel( hRichEdit, min, max  )
 	if !(count := min-max)
 		 MsgBox, Cursor Position: %min%
-	else MsgBox,,%count% char's selected, Selected from: %min%-%max%
+	else MsgBox,,%count% char's selected, Selected from: %max%-%min%
 return
 
 GetText: ;Retrieves a specified range of characters from a rich edit control.

@@ -301,12 +301,14 @@ RichEdit_GetText(hCtrl, cpMin="-", cpMax="-", codepage="")  {
      <LimitText>, <GetSel>
 
  Example:
- > MsgBox, % "DEFAULT  = " RichEdit_GetTextLength(hRichEdit, "DEFAULT" )  "`n"
- >         . "USECRLF  = " RichEdit_GetTextLength(hRichEdit, "USECRLF" )  "`n"
- >         . "PRECISE  = " RichEdit_GetTextLength(hRichEdit, "PRECISE" )  "`n"
- >         . "CLOSE    = " RichEdit_GetTextLength(hRichEdit, "CLOSE" )    "`n"
- >         . "NUMCHARS = " RichEdit_GetTextLength(hRichEdit, "NUMCHARS" ) "`n"
- >         . "NUMBYTES = " RichEdit_GetTextLength(hRichEdit, "NUMBYTES" ) "`n"
+ (start code)
+  MsgBox, % "DEFAULT  = " RichEdit_GetTextLength(hRichEdit, "DEFAULT" )  "`n"
+          . "USECRLF  = " RichEdit_GetTextLength(hRichEdit, "USECRLF" )  "`n"
+          . "PRECISE  = " RichEdit_GetTextLength(hRichEdit, "PRECISE" )  "`n"
+          . "CLOSE    = " RichEdit_GetTextLength(hRichEdit, "CLOSE" )    "`n"
+          . "NUMCHARS = " RichEdit_GetTextLength(hRichEdit, "NUMCHARS" ) "`n"
+          . "NUMBYTES = " RichEdit_GetTextLength(hRichEdit, "NUMBYTES" ) "`n"
+ (end code)
  */
 RichEdit_GetTextLength(hCtrl, flags=0, codepage="")  {
   static EM_GETTEXTLENGTHEX=95,WM_USER=0x400
@@ -429,6 +431,26 @@ RichEdit_Redo(hCtrl)  {
   SendMessage, WM_USER | EM_REDO, 0,0,, ahk_id %hCtrl%
   return ERRORLEVEL
 }
+
+/*
+ Function:	Save
+			Save the content of the control using RT format.
+			
+ Parameters:
+			FileName	- File name to save RTF file to. If omitted, function will return content.
+ */
+RichEdit_Save(hCtrl, FileName="") {
+	static EM_STREAMOUT=0x44A
+
+	wbProc := RegisterCallback("RichEdit_editStreamCallBack2", "F")
+	VarSetCapacity(EDITSTREAM, 16, 0)
+	NumPut(RichEdit_GetTextLength(hCtrl, "USECRLF")*2, EDITSTREAM)	;aproximate
+	NumPut(wbProc, EDITSTREAM, 8, "UInt")
+
+	SendMessage, EM_STREAMOUT, 2, &EDITSTREAM,, ahk_id %hCtrl%
+	return RichEdit_editStreamCallBack2("!", FileName, "", "")
+}
+
 
 /*
  Function: ScrollPos
@@ -667,6 +689,42 @@ RichEdit_ShowScrollBar(hCtrl, bar, state=true)  {
   }
 }
 
+
+/*
+ Function:	StreamOut
+			Returns control data in various formats.
+
+ Parameters:
+			Out	- Reference to the output variable.
+			Flags - <http://msdn.microsoft.com/en-us/library/bb774304(VS.85).aspx>
+
+ Returns:
+			Number of characters.
+ */
+RichEdit_StreamOut(hCtrl, ByRef Out, Flags="RTF")  {
+	static EM_STREAMOUT=0x44A
+		, SF_RTF=0x2,SF_RTFNOOBJS=0x3,SF_TEXT=0x1,SF_TEXTIZED=0x4
+		, SF_PLAINRTF=0x4000,SF_SELECTION=0x8000,SF_UNICODE=0x10,SF_USECODEPAGE=0x20
+
+	hFlag := 0
+	Loop, parse, Flags, %A_Tab%%A_Space%
+		IfEqual, A_LoopField, ,continue
+		else hFlag |= SF_%A_LoopField%
+	ifEqual, hFlag,, return A_ThisFunc "> Some of the flags are invalid: " Flags
+
+	wbProc := RegisterCallback("RichEdit_editStreamCallBack", "F")
+
+	len := RichEdit_GetTextLength(hCtrl, "NUMBYTES")
+	VarSetCapacity(out, len*10)	;!!! meh....
+	VarSetCapacity(EDITSTREAM, 16, 0)
+	NumPut(&out,   EDITSTREAM, 0, "UInt") ; dwCookie
+	NumPut(wbProc, EDITSTREAM, 8, "UInt")
+
+	SendMessage, EM_STREAMOUT, hFlag, &EDITSTREAM,, ahk_id %hCtrl%
+	VarSetCapacity(out, -1)
+	return ErrorLevel
+}
+
 /*
  Function: TextMode
 			Get or set the current text mode of a rich edit control.
@@ -898,6 +956,8 @@ RichEdit_GetCharFormat(hCtrl, ByRef font="", ByRef style="", ByRef color="", mod
   DllCall("RtlMoveMemory", "str", font, "Uint", &CHARFORMAT + 26, "Uint", 32)
 }
 
+
+
 EM_GETCHARFORMAT222(hCtrl, ByRef face="", ByRef style="", ByRef color="")  {
   static EM_GETCHARFORMAT=58,WM_USER=0x400
   static SCF_DEFAULT=0x0,SCF_SELECTION=0x1
@@ -1067,6 +1127,28 @@ EM_SETWORDBREAKPROC(hCtrl)  {
  ;   msgbox, hold..
  ;       DllCall("GlobalFree", "UInt", wbProc)
 }
+
+RichEdit_editStreamCallBack(dwCookie, pbBuff, cb, pcb) {
+	return !DllCall("lstrcpyn", "UInt", dwCookie, "Uint", pbBuff, "Uint", cb) ? 1 : 0
+}
+
+RichEdit_editStreamCallBack2(dwCookie, pbBuff, cb, pcb) {
+	static s
+
+	if (dwCookie="!") {
+		fn := pbBuff
+		ifEqual, fn,, return l := s, VarSetCapacity(s,0)
+		FileDelete, %fn%
+		FileAppend, %s%, %fn%
+		return VarSetCapacity(s, 0)
+	}
+
+	if s =
+		 VarSetCapacity(s, dwCookie)
+	
+	s .= DllCall("MulDiv", "Int", pbBuff, "Int",1, "Int", 1, "str")
+}
+
 
 RichEdit_wordBreakProc(lpch, ichCurrent, cch, code) {
   ;   LPTSTR lpch    - A pointer to the text of the edit control.

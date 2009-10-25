@@ -17,16 +17,16 @@
 */
 
 body {
-	font-family: Verdana, Arial, Helvetica, sans-serif, "MS sans serif";
-	font-size: 75%;
-	border: 0;
-	background-color: #FFFFFF;
+    font: 10pt Verdana, Arial, sans-serif;
+    color: #000000;
+    margin: 0; padding: 0;
     }
 
 .ContentPage,
 .IndexPage,
-
-.FramedMenuPage { background-color: #E8E8E8; } 			 /* left side bg color */    
+.FramedMenuPage {
+    background-color: #E8E8E8;
+    }
 .FramedContentPage,
 .FramedIndexPage,
 .FramedSearchResultsPage,
@@ -34,14 +34,17 @@ body {
     background-color: #FFFFFF;
     }
 
-a        {text-decoration: none;}
-a:link   {text-decoration: none; color: #0000AA;}
-a:visited{text-decoration: none; color: #AA00AA;}
-a:active {text-decoration: none; color: #0000AA;}
-a:hover  {text-decoration: underline; color: #6666CC;}
 
-td {  vertical-align: top; }
+a:link,
+a:visited { color: #900000; text-decoration: none }
+a:hover { color: #900000; text-decoration: underline }
+a:active { color: #FF0000; text-decoration: underline }
+
+td {
+    vertical-align: top }
+
 img { border: 0;  }
+
 
 /*
     Comment out this line to use web-style paragraphs (blank line between
@@ -58,11 +61,13 @@ p {
 	}
 
 
-/* *** */
+/*  Blockquotes are used as containers for things that may need to scroll.  */
+blockquote {
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+    }
 
-.CFunctions .Prototype {
-    background-color: #111111;
-   }
 
 .Firefox1 blockquote {
     padding-bottom: .5em;
@@ -89,7 +94,7 @@ p {
     position: absolute;
     top: 0;
     left: 0;
-    width: 15ex;		/* menu attributes */
+    width: 31ex;
     overflow: hidden;
     }
 .ContentPage .Firefox #Menu,
@@ -273,9 +278,9 @@ p {
     border-width: 0 0 1px 1px;
     border-style: solid;
     border-color: #000000;
-    background-color: #FFFFFF;				/* main page bg color*/
+    background-color: #FFFFFF;
     font-size: 9pt;  /* To make 31ex match the menu's 31ex. */
-/*    margin-left: 15ex; */
+    
     }
 .ContentPage .Firefox #Content {
     margin-left: 27ex;
@@ -288,6 +293,11 @@ p {
         margin-bottom: 3em;
         }
 
+
+    .CTitle {
+        font-size: 12pt; font-weight: bold;
+        border-width: 0 0 1px 0; border-style: solid; border-color: #A0A0A0;
+        margin: 0 15px .5em 15px }
 
     .CGroup .CTitle {
         font-size: 16pt; font-variant: small-caps;
@@ -355,6 +365,17 @@ p {
         margin: .5em 5ex .5em 5ex;
         }
 
+    .CDescriptionList {
+        margin: .5em 5ex 0 5ex }
+
+        .CDLEntry {
+            font: 10pt "Courier New", Courier, monospace; color: #808080;
+            padding-bottom: .25em;
+            white-space: nowrap }
+
+        .CDLDescription {
+            font-size: 10pt;  /*  For browsers that don't inherit correctly, like Opera 5.  */
+            padding-bottom: .5em; padding-left: 5ex }
 
 
     .CTopic img {
@@ -447,6 +468,18 @@ p {
 
 
 
+.Summary {
+    margin: 1.5em 5ex 0 5ex }
+
+    .STitle {
+        font-size: 12pt; font-weight: bold;
+        margin-bottom: .5em }
+
+
+    .SBorder {
+        background-color: #FFFFF0;
+        padding: 15px;
+        border: 1px solid #C0C060 }
 
     /* In a frame IE 6 will make them too long unless you set the width to 100%.  Without frames it will be correct without a width
         or slightly too long (but not enough to scroll) with a width.  This arbitrary weirdness simply astounds me.  IE 7 has the same
@@ -463,7 +496,7 @@ p {
         font-size: 9pt; width: 100% }
 
     .SEntry {
-        width: 30%;}					/* function list at top..*/
+        width: 30% }
     .SDescription {
         width: 70% }
 
@@ -733,67 +766,6 @@ p {
     #Footer a:hover,
     #Footer a:visited { color: #989898 }
     #Footer a:active { color: #A00000 }
-
-
-
-
-#MainTopic .CTitle {					/* Title: */
-  font-size: 20pt;
-  font-weight: bold; /* Bold looks better against dark background. */
-  font-family: Arial, Helvetica, sans-serif, "MS sans serif"; 
-  background-color: #405871;
-  color: #FFFFFF;
-  margin: 1.0em 0 0.5em 0;
-  padding: 10px 15px 10px 15px;
-}
-
-
-.SBorder,.SEntry, .SDescription {				/* Summary index */
-  background-color: #F2F2F2;
-  padding: 8px;
-  border: 1px solid #E0E0E0 }
-.SBorder{ padding: 1px; }
-
-
-.CTitle {							/* Function */
-  background-color: #FFFFAA;
-  margin: 1 1 1em 1;
-  padding: 12px 0 12px 4px;
-  font-size: 12pt; font-weight: bold;
-  border-width: 3px 0px 0px 0; border-style: solid; border-color: #A0A0A0;
-}
-
-
-h4 {							/* topics.. (parameters, returns, example..) */
-  font-size: 111%;  font-weight: bold;
-  background-color:#E6E6E6;
-  margin: 1.0em 0 0.5em 0;
-  padding: 0.1em 0 0.1em 0.2em;
-}
-
-
-.CDescriptionList, .CDLEntry, .CDLDescription {			/* parameter table */
-  width: 100%;
-  margin: 1em 0ex 0 0ex;
-  border-width: 1px 1px 1px 1px; border-style: solid; border-color: #C0C0C0;
-}
-.CDLEntry, .CDLDescription { margin: 0 0 0em 0;  text-indent: 2px; padding-bottom: .5em; padding-top: .5em; }
-.CDLEntry { width: 15%; font: 10pt "Courier New", Courier, monospace; }
-.CDLDescription {  padding-left: 1ex }
-
-
-/*  Blockquotes are used as containers for things that may need to scroll.  */
-blockquote {
-    padding: 20;
-        padding-left: 9px; border-left-width: 1px;
-    margin: 0;
-    overflow: auto;
-    background-color: #F3F3FF;			/* example bg color..*/
-        border-width: 0px 0px 0px 0px; border-style: solid; border-color: #838B8B;
-    }
-
-/* .ContentPage #Content { margin-left: 0ex; }   */
-
 
 </style><script language=JavaScript src="../javascript/main.js"></script><script language=JavaScript src="../javascript/searchdata.js"></script></head><body class="ContentPage" onLoad="NDOnLoad()"><script language=JavaScript><!--
 if (browserType) {document.write("<div class=" + browserType + ">");if (browserVer) {document.write("<div class=" + browserVer + ">"); }}// --></script>
