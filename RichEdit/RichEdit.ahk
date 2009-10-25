@@ -875,10 +875,10 @@ Richedit_Zoom(hCtrl, zoom=0)  {
   static EM_SETZOOM=225,EM_GETZOOM=224,WM_USER=0x400
 
   ; Get the current zoom ratio
-  VarSetCapacity(numer, 4)  ;, VarSetCapacity(denom, 4)
+  VarSetCapacity(numer, 4)  , VarSetCapacity(denom, 4)
   SendMessage, WM_USER | EM_GETZOOM, &numer,&denom,, ahk_id %hCtrl%
   numerator := NumGet(numer, 0, "UShort") ;, denominator := NumGet(denom, 0, "UShort")
-
+	
   If zoom is not integer
     return false, errorlevel := "ERROR: '" zoom "' is not an integer, stupid"
   If (!zoom)
