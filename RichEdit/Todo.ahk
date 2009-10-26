@@ -1,12 +1,12 @@
 
 
 
-ATOU( ByRef Unicode, Ansi ) { ; Ansi to Unicode
+RichEdit_ATOU( ByRef Unicode, Ansi ) { ; Ansi to Unicode
  VarSetCapacity( Unicode, (Len:=StrLen(Ansi))*2+1, 0 )
  Return DllCall( "MultiByteToWideChar", Int,0,Int,0,Str,Ansi,UInt,Len, Str,Unicode, UInt,Len )
 }
 
-UTOA( pUnicode )  {           ; Unicode to Ansi
+RichEdit_UTOA( pUnicode )  {           ; Unicode to Ansi
   VarSetCapacity( Ansi,(nSz:=DllCall( "lstrlenW", UInt,pUnicode )+1) )
   DllCall( "WideCharToMultiByte", Int,0, Int,0, UInt,pUnicode, UInt,nSz+1
                                 , Str,Ansi, UInt,nSz+1, Int,0, Int,0 )
@@ -14,99 +14,6 @@ Return Ansi
 }
 
 
-
-/*
-	Function:	SetEvents
-			Set notification events.
-
-	Parameters:
-			Handler	- Function that handles events. If empty, any existing handler will be removed.
-			Events	- White space separated list of events to monitor.
-
-	Handler:
- >     	Result := Handler(hCtrl, Event, p1, p2, p3 )
-
-		hCtrl	- Handle of richedit control sending the event.
-		Event - Specifies event that occurred. Event must be registered to be able to monitor it.
-		Col,Row - Cell coordinates.
-		Data	- Numeric data of the cell. Pointer to string for textual cells and DWORD value for numeric.
-		Result  - Return 1 to prevent action.
-
-	Events:
-    CHANGE - Sent when the user has taken an action that may have altered text in an edit control.
-             Sent after the system updates the screen. (***)
-    DRAGDROPDONE - Notifies a rich edit control's parent window that the drag-and-drop
-                   operation has completed.
-        - p1
-        - p2
-
-        P1 - Number of characters highlighted in drag-drop operation.
-        P2 - Beginning character position of range.
-        P3 - Ending character position of range.
-    DROPFILES - Notifies that the user is attempting to drop files into the control.
-      P1 - Number of files dropped onto rich edit control.
-      P2 - Newline delimited (`n) list of files dropped onto control.
-      P3 - Character position files were dropped onto within rich edit control.
-    KEYEVENTS - Notification of a keyboard or mouse event in the control. To ignore the
-                event, the handler function should return a nonzero value.  (*** needs redone)
-      P1 - Character position files were dropped onto within rich edit control.
-           258="KEYPRESS_DWN",513="MOUSE_L_DWN",514="MOUSE_L_UP",516="MOUSE_R_DWN",
-           517="MOUSE_R_UP",522="SCROLL_BEGIN",277="SCROLL_END" ;,512="MOUSE_HOVER",256="KEYPRESS_UP"
-    MOUSEEVENTS,SCROLLEVENTS,
-    LINK - A rich edit control sends these messages when it receives various messages, when the
-           user clicks the mouse or when the mouse pointer is over text that has the LINK effect.
-          (*** expand usefulness)
-    PROTECTED - User is taking an action that would change a protected range of text.  To ignore
-                the event, the handler function should return a nonzero value.
-    REQUESTRESIZE - This message notifies a rich edit control's parent window that the control's
-                    contents are either smaller or larger than the control's window size.
-      P1 - Requested new size.
-    SELCHANGE - The current selection has changed.
-      P1 - Beginning character position of range.
-      P2 - Ending character position of range.
-
- Returns:
-			The previous event mask (number).
- */
-RichEdit_SetEvents(hCtrl, Handler="", Events="selchange"){
-  static ENM_CHANGE=0x1,ENM_DRAGDROPDONE=0x10,ENM_DROPFILES:=0x100000,ENM_KEYEVENTS=0x10000,ENM_LINK=0x4000000,ENM_MOUSEEVENTS=0x20000,ENM_PROTECTED=0x200000,ENM_REQUESTRESIZE=0x40000,ENM_SCROLLEVENTS=0x8,ENM_SELCHANGE=0x80000 ;ENM_OBJECTPOSITIONS=0x2000000,ENM_SCROLL=0x4,ENM_UPDATE=0x2   ***
-       , sEvents="CHANGE,DRAGDROPDONE,DROPFILES,KEYEVENTS,LINK,MOUSEEVENTS,PROTECTED,REQUESTRESIZE,SCROLLEVENTS,SELCHANGE,SCROLL"
-  static WM_NOTIFY=0x4E,WM_COMMAND=0x111,EM_SETEVENTMASK=69,WM_USER=0x400, oldNotify, oldCOMMAND
-
-	if (Handler = "")
-		return OnMessage(WM_NOTIFY, old != "RichEdit_onNotify" ? old : ""), old := ""
-
-	if !IsFunc(Handler)
-		return A_ThisFunc "> Invalid handler: " Handler
-
-  StringUpper, Events,Events
-	hMask := 0
-	loop, parse, Events, %A_Tab%%A_Space%
-	{
-		IfEqual, A_LoopField,,continue
-		if A_LoopField not in %sEvents%
-			return A_ThisFunc "> Invalid event: " A_LoopField
-		hMask |= ENM_%A_LOOPFIELD%
-    If (A_LoopField = "DROPFILES")
-      DllCall("shell32.dll\DragAcceptFiles", Int,hCtrl  , Int,TRUE)
-; 		if A_LoopField in CHANGE,SCROLL   ; (*** WIP)
-;     	if !oldCOMMAND {
-;     		oldCOMMAND := OnMessage(WM_COMMAND, "RichEdit_onNotify")
-;     		if oldCOMMAND != RichEdit_onNotify
-;     			RichEdit("oldCOMMAND", RegisterCallback(oldCOMMAND))
-;     	}
-	}
-	
-	if !oldNotify {
-		oldNotify := OnMessage(WM_NOTIFY, "RichEdit_onNotify")
-		if oldNotify != RichEdit_onNotify
-			RichEdit("oldNotify", RegisterCallback(oldNotify))
-	}
-
-	RichEdit(hCtrl "Handler", Handler)
-  SendMessage, WM_USER | EM_SETEVENTMASK, 0,hMask,, ahk_id %hCtrl%
-  return ERRORLEVEL  ; This message returns the previous event mask
-}
 
 EM_GETEVENTMASK(hCtrl)  {
   static EM_GETEVENTMASK=59,WM_USER=0x400
@@ -117,91 +24,6 @@ EM_GETEVENTMASK(hCtrl)  {
 
 ;========================================== PRIVATE ===============================================================
 
-RichEdit_onNotify(wparam, lparam, msg, hwnd) {
-	static MODULEID := 091009, oldNotify="*", oldCOMMAND="*"
- 
-  Critical
-	if (_ := (NumGet(Lparam+4))) != MODULEID
-	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
-	 else {
-	 
-		ifEqual, oldNotify, *, SetEnv, oldNotify, % RichEdit("oldNotify")
-		if oldNotify !=
-			return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
-			
-; 		ifEqual, oldCOMMAND, *, SetEnv, oldCOMMAND, % RichEdit("oldCOMMAND")
-; 		if oldCOMMAND !=
-; 			return DllCall(oldCOMMAND, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
-			
-	 }
-
-	hw :=  NumGet(Lparam+0), code := NumGet(Lparam+8, 0, "UInt"),  handler := RichEdit(hw "Handler")
-	ifEqual, handler,,return (code=1796) ? TRUE : FALSE  ;ENM_PROTECTED- msg returns nonzero value to prevent operation
-
-; return
-  If (code = 1792)       {          ; ENM_MOUSEEVENTS ENM_KEYEVENTS ENM_SCROLLEVENTS
-    Umsg := NumGet(lparam+12)  ;Keyboard or mouse message identifier.
-    key := ((n:=NumGet(lparam+40))>=32) ? Chr(n) : ""
-    static 258="KEYPRESS_DWN",513="MOUSE_L_DWN",514="MOUSE_L_UP",516="MOUSE_R_DWN",517="MOUSE_R_UP",522="SCROLL_BEGIN",277="SCROLL_END" ;,512="MOUSE_HOVER",256="KEYPRESS_UP"
-    If (%Umsg%)   ;***
-      return %handler%(hw, %Umsg%, key, "", "")
-  }
-
-  Else If (code = 1793)  {          ; ENM_REQUESTRESIZE
-    rc := NumGet(lparam+24) ;Requested new size.
-    return %handler%(hw, "REQUESTRESIZE", rc, "", "")
-  }
-
-  Else If (code = 1794)  {          ; ENM_SELCHANGE
-    cpMin := NumGet(lparam+12), cpMax := NumGet(lparam+16) ;,seltyp := NumGet(lparam+20) (***)
-;     SEL_TEXT = 0x1
-;     SEL_OBJECT = 0x2
-;     SEL_MULTICHAR = 0x4
-;     SEL_MULTIOBJECT = 0x8
-    return %handler%(hw, "SELCHANGE", cpMin, cpMax, "")
-  }
-
-  Else If (code = 1795)  {          ; ENM_DROPFILES
-     hDrop := NumGet(lparam+8, 4 , "UInt"), cp := NumGet(lparam+8, 8 , "Int")
-
-    ; (thanks DerRaphael!)  http://www.autohotkey.com/forum/post-234905.html&highlight=#234905
-    Loop,% file_count := DllCall("shell32.dll\DragQueryFile","uInt",hDrop,"uInt",0xFFFFFFFF,"uInt",0,"uInt",0) {
-       VarSetCapacity(lpSzFile,4096,0)
-       DllCall("shell32.dll\DragQueryFile","uInt",hDrop,"uInt",A_index-1,"uInt",&lpSzFile,"uInt",4096)
-       VarSetCapacity(lpSzFile,-1)
-       files .= ((A_Index>1) ? "`n" : "") lpSzFile
-    }
-    return %handler%(hw, "DROPFILES", file_count, files, cp)
-  }
-
-  Else If (code = 1804)  {          ; ENM_DRAGDROPDONE
-    chars := NumGet(lparam+12), cpMax := NumGet(lparam+16)
-    return %handler%(hw, "DRAGDROPDONE", chars, cpMax-chars, cpMax)
-  }
-
-  Else If (code = 1796)  {          ; ENM_PROTECTED
-    cpMin := NumGet(lparam+24), cpMax := NumGet(lparam+28)
-    return %handler%(hw, "PROTECTED", cpMin, cpMax, "") ; This message returns a nonzero value to prevent the operation.
-  }
-  
-  Else If (code = 1803)  {          ; ENM_LINK
-   Umsg := NumGet(lparam+12)
-   If Umsg Not In 513,516
-    return
-   cpMin := NumGet(lparam+24), cpMax := NumGet(lparam+28)
-   return %handler%(hw, "LINK", (Umsg = 513 ? "LClick" : "RClick"), cpMin, cpMax) ; This message returns a nonzero value to prevent the operation.
-  }
-}
-
-;Storage
-RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") {
-	static
-	 _ := %var%
-	ifNotEqual, value, ~`a, SetEnv, %var%, %value%
-	return _
-}
-
-
 
 ;--------------------------------------------------------------------------------
 ;--------------------------------------------------------------------------------
@@ -211,21 +33,17 @@ RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 /*
 --Messages--
 ; http://msdn.microsoft.com/en-us/library/cc656557(VS.85).aspx
-EM_AUTOURLDETECT
-EM_CANPASTE
-EM_CANREDO
 EM_DISPLAYBAND
 EM_EXGETSEL
 EM_EXLIMITTEXT
 EM_EXLINEFROMCHAR
 EM_EXSETSEL -
-EM_FINDTEXT
 EM_FINDTEXTEX
 EM_FINDTEXTEXW
 EM_FINDTEXTW
 EM_FINDWORDBREAK
 EM_FORMATRANGE
-EM_GETAUTOURLDETECT    ;----------------- RE_Get()
+				   ;----------------- RE_Get()
 EM_GETBIDIOPTIONS
 EM_GETCHARFORMAT
 EM_GETCTFMODEBIAS     *** ??? constant?
@@ -241,7 +59,6 @@ EM_GETIMEOPTIONS
 EM_GETIMEPROPERTY   *** ??? constant?
 EM_GETLANGOPTIONS
 EM_GETOLEINTERFACE
-EM_GETOPTIONS
 EM_GETPAGEROTATE   *** ??? constant?
 EM_GETPARAFORMAT
 EM_GETPUNCTUATION
@@ -262,25 +79,21 @@ EM_HIDESELECTION
 EM_ISIME     
 EM_PASTESPECIAL
 EM_RECONVERSION
-EM_REDO
 EM_REQUESTRESIZE
 
-EM_SELECTIONTYPE    ;----------------- RE_Set()
+				;----------------- RE_Set()
 EM_SETBIDIOPTIONS
 EM_SETBKGNDCOLOR
 EM_SETCHARFORMAT
 EM_SETCTFMODEBIAS     *** ??? constant?
 EM_SETCTFOPENSTATUS   *** ??? constant?
 EM_SETEDITSTYLE
-EM_SETEVENTMASK
-EM_SETFONTSIZE
 EM_SETHYPHENATEINFO   *** ??? constant?
 EM_SETIMECOLOR
 EM_SETIMEMODEBIAS
 EM_SETIMEOPTIONS
 EM_SETLANGOPTIONS
 EM_SETOLECALLBACK
-EM_SETOPTIONS
 EM_SETPAGEROTATE   *** ??? constant?
 EM_SETPALETTE
 EM_SETPARAFORMAT
@@ -293,22 +106,14 @@ EM_SETTYPOGRAPHYOPTIONS
 EM_SETUNDOLIMIT
 EM_SETWORDBREAKPROCEX
 EM_SETWORDWRAPMODE
-EM_SETZOOM
 EM_SHOWSCROLLBAR
 EM_STOPGROUPTYPING    ;----------------- end RE_Set()
 EM_STREAMIN
 EM_STREAMOUT
 
-RE_ReplaceSel ??
-*/
-
-/*
 
 http://msdn.microsoft.com/en-us/library/cc656458(VS.85).aspx
 
-EM_CANUNDO
-EM_CHARFROMPOS
-EM_EMPTYUNDOBUFFER
 EM_FMTLINES
 EM_GETCUEBANNER
 EM_GETFIRSTVISIBLELINE
@@ -316,25 +121,14 @@ EM_GETHANDLE
 EM_GETHILITE
 EM_GETIMESTATUS
 EM_GETLIMITTEXT
-EM_GETLINE
-EM_GETLINECOUNT
 EM_GETMARGINS
-EM_GETMODIFY
 EM_GETPASSWORDCHAR
 EM_GETRECT
-EM_GETSEL
 EM_GETTHUMB
 EM_GETWORDBREAKPROC
 EM_HIDEBALLOONTIP
 EM_LIMITTEXT
-EM_LINEFROMCHAR
-EM_LINEINDEX
-EM_LINELENGTH
-EM_LINESCROLL
-EM_POSFROMCHAR
-EM_REPLACESEL
 EM_SCROLL
-EM_SCROLLCARET
 EM_SETCUEBANNER
 EM_SETHANDLE
 EM_SETHILITE
@@ -346,36 +140,10 @@ EM_SETPASSWORDCHAR
 EM_SETREADONLY
 EM_SETRECT
 EM_SETRECTNP
-EM_SETSEL
 EM_SETTABSTOPS
 EM_SETWORDBREAKPROC
 EM_SHOWBALLOONTIP
-EM_UNDO
-WM_UNDO
 */
-
-
-; The EM_CANPASTE message determines whether a rich edit control can paste a specified clipboard format.
-; http://msdn.microsoft.com/en-us/library/bb787993(VS.85).aspx
-EM_CANPASTE(hCtrl)  {
-
-;   static EM_CANPASTE=50,WM_USER=0x400
-;
-;   SendMessage, WM_USER | EM_CANPASTE, 0,&@??,, ahk_id %hCtrl%
-
-
-;   wParam
-;   Specifies the Clipboard Formats to try. To try any format currently on the clipboard, set this parameter to zero.
-;   lParam
-;   This parameter is not used; it must be zero.
-;   Return Value
-;
-;   Return Value
-;   If the clipboard format can be pasted, the return value is a nonzero value.
-;   If the clipboard format cannot be pasted, the return value is zero.
-
-}
-
 
 
 
@@ -393,40 +161,7 @@ EM_DISPLAYBAND(hCtrl)  {
   MsgBox, % errorlevel  ; If the operation succeeds, the return value is TRUE.
 }
 
-
-
-; EM_FINDTEXT(hCtrl, lpstrText)  {
-EM_FINDTEXT(hCtrl, Flags="D", FindWhat="", ReplaceWith="")  {
-  static EM_FINDTEXT=56,WM_USER=0x400
-	static FR_DOWN=1, FR_MATCHCASE=4, FR_WHOLEWORD=2    ;,FR_HIDEMATCHCASE=0x8000, FR_HIDEWHOLEWORD=0x10000, FR_HIDEUPDOWN=0x4000
-	static buf, FR, len := 256
-	hexFlags := 0
-	hexFlags |= InStr(flags, "d") ? FR_DOWN      : 0
-	hexFlags |= InStr(flags, "c") ? FR_MATCHCASE : 0
-	hexFlags |= InStr(flags, "w") ? FR_WHOLEWORD : 0
-; 	f |= InStr(flags, "-d") ? FR_HIDEUPDOWN : 0
-; 	f |= InStr(flags, "-w") ? FR_HIDEWHOLEWORD :0
-; 	f |= InStr(flags, "-c") ? FR_HIDEMATCHCASE :0
-
-;   FINDTEXT_CHARRANGE := NumGet(FINDTEXT, 0, "UInt")
-;   FINDTEXT_lpstrText := NumGet(FINDTEXT, 8, "UInt")
-;   ;--
-;   NumPut(FINDTEXT_CHARRANGE, FINDTEXT, 0, "UInt")
-; 	VarSetCapacity(CHARRANGE, 8, 0)
-; NumPut(cpMin, CHARRANGE, 0, "Int"), NumPut(cpMax ? cpMax : cpMin, CHARRANGE, 4, "Int")
-  VarSetCapacity(FINDTEXT, 12, 0)
-  NumPut(0, FINDTEXT, 0, "Int")
-  NumPut(100, FINDTEXT, 4, "Int")
-  NumPut(&lpstrText, FINDTEXT, 8, "UInt")
-  SendMessage, WM_USER | EM_FINDTEXT, hexFlags,&FINDTEXT,, ahk_id %hCtrl%
-  MsgBox, % ERRORLEVEL  "`n`n"  
-;   MsgBox, % NumGet(FINDTEXT, 0, "UInt")
-  ;------------------------
-  ; typedef struct _findtext {
-  ;     CHARRANGE chrg;
-  ;     LPCTSTR lpstrText;
-  ; } FINDTEXT;
-}
+;Whats the benefit of this functions from non-ex ones? -- majinetor
 EM_FINDTEXTEX(hCtrl, lpstrText)  {
   static EM_FINDTEXTEX=79,WM_USER=0x400
   VarSetCapacity(FINDTEXTEX, 20, 0)
@@ -452,39 +187,35 @@ EM_FINDTEXTW(hCtrl)  {
 }
 
 
-EM_FINDWORDBREAK(hCtrl)  {
-;   static EM_FINDWORDBREAK=76,WM_USER=0x400
-;
-;   SendMessage, WM_USER | EM_FINDWORDBREAK, 0,&@??,, ahk_id %hCtrl%
+;This message returns the index of the last character that fits in the region, plus 1.
+EM_FORMATRANGE(hCtrl, HDC, W, H, X=0, Y=0)  {
+	static EM_FORMATRANGE=1081
 
-}
+	VarSetCapacity(FORMATRANGE, 48, 0)
 
+	NumPut(HDC, FORMATRANGE, 0, "UInt") ;FORMATRANGE_hdc
+    NumPut(HDC, FORMATRANGE, 4, "UInt") ;FORMATRANGE_hdcTarget (use EM_SETTARGETDEVICE() )
 
-EM_FORMATRANGE(hCtrl)  {
-  static EM_FORMATRANGE=57,WM_USER=0x400
-  VarSetCapacity(FORMATRANGE, 48, 0)
-    NumPut(hDC, FORMATRANGE, 0, "UInt") ;FORMATRANGE_hdc
-    NumPut(hDCTarget, FORMATRANGE, 4, "UInt") ;FORMATRANGE_hdcTarget (use EM_SETTARGETDEVICE() )
-    NumPut(0, FORMATRANGE, 8, "Int") ;FORMATRANGE_rc_left
-    NumPut(0, FORMATRANGE, 12, "Int") ;FORMATRANGE_rc_top
-    NumPut(200, FORMATRANGE, 16, "Int") ; FORMATRANGE_rc_right
-    NumPut(300, FORMATRANGE, 20, "Int") ; FORMATRANGE_rc_bottom
-    NumPut(0, FORMATRANGE, 24, "Int") ; FORMATRANGE_rcPage_left
-    NumPut(0, FORMATRANGE, 28, "Int") ; FORMATRANGE_rcPage_top
-    NumPut(200, FORMATRANGE, 32, "Int") ; FORMATRANGE_rcPage_right
-    NumPut(300, FORMATRANGE, 36, "Int") ; FORMATRANGE_rcPage_bottom
-    NumPut(0, FORMATRANGE, 40, "UInt") ; CHARRANGE-min
-    NumPut(200, FORMATRANGE, 40, "UInt") ; ; CHARRANGE-max
-  SendMessage, WM_USER | EM_FORMATRANGE, 1,&FORMATRANGE,, ahk_id %hCtrl%
-  MsgBox, % "EM_FORMATRANGE: " errorlevel  ;This message returns the index of the last character that fits in the region, plus 1.
-
-;-- CLEANUP
+    NumPut(X, FORMATRANGE, 8, "Int") ;FORMATRANGE_rc_left
+    NumPut(Y, FORMATRANGE, 12, "Int") ;FORMATRANGE_rc_top
+    NumPut(W, FORMATRANGE, 16, "Int") ; FORMATRANGE_rc_right
+    NumPut(H, FORMATRANGE, 20, "Int") ; FORMATRANGE_rc_bottom
+    
+	NumPut(X, FORMATRANGE, 24, "Int") ; FORMATRANGE_rcPage_left
+    NumPut(Y, FORMATRANGE, 28, "Int") ; FORMATRANGE_rcPage_top
+    NumPut(W, FORMATRANGE, 32, "Int") ; FORMATRANGE_rcPage_right
+    NumPut(H, FORMATRANGE, 36, "Int") ; FORMATRANGE_rcPage_bottom
+    
+	NumPut(0, FORMATRANGE, 40, "UInt") ; CHARRANGE-min
+    NumPut(-1, FORMATRANGE, 44, "UInt") ; ; CHARRANGE-max
+	SendMessage, EM_FORMATRANGE 1,&FORMATRANGE,, ahk_id %hCtrl%
+	res := ErrorLevel
 
   ; It is very important to free cached information after the last time you use this message by
   ; specifying NULL in lParam. In addition, after using this message for one device, you must free
   ; cached information before using it again for a different device.
-  SendMessage, WM_USER | EM_FORMATRANGE, 0,0,, ahk_id %hCtrl%
-;   DllCall("DeleteDC","uint",hDC)
+	SendMessage, EM_FORMATRANGE,,,, ahk_id %hCtrl%
+	return res
 }
 
 
@@ -678,38 +409,6 @@ EM_GETLANGOPTIONS(hCtrl)  {
 }
 
 
-EM_GETOPTIONS(hCtrl)  {
-  static EM_GETOPTIONS=78,WM_USER=0x400
-  SendMessage, WM_USER | EM_GETOPTIONS, 0,0,, ahk_id %hCtrl%
-  MsgBox, % errorlevel  ; This message returns a combination of the current option flag values described in the EM_SETOPTIONS message
-}
-EM_SETOPTIONS(hCtrl)  {
-  static EM_SETOPTIONS=77,WM_USER=0x400
-
-  static ECOOP_SET=0x1,ECOOP_OR=0x2,ECOOP_AND=0x3,ECOOP_XOR=0x4
-; ECOOP_SET - Sets the options to those specified by lParam.
-; ECOOP_OR - Combines the specified options with the current options.
-; ECOOP_AND - Retains only those current options that are also specified by lParam.
-; ECOOP_XOR - Logically exclusive OR the current options with those specified by lParam.
-  operation := ECOOP_SET
-
-  static ECO_AUTOWORDSELECTION=0x1,ECO_AUTOVSCROLL=0x40,ECO_AUTOHSCROLL=0x80,ECO_NOHIDESEL=0x100,ECO_READONLY=0x800,ECO_WANTRETURN=0x1000,ECO_SELECTIONBAR=0x1000000,ECO_VERTICAL=0x400000
-; ECO_AUTOWORDSELECTION - Automatic selection of word on double-click.
-; ECO_AUTOVSCROLL - Same as ES_AUTOVSCROLL style.
-; ECO_AUTOHSCROLL - Same as ES_AUTOHSCROLL style.
-; ECO_NOHIDESEL - Same as ES_NOHIDESEL style.
-; ECO_READONLY - Same as ES_READONLY style.
-; ECO_WANTRETURN - Same as ES_WANTRETURN style.
-; ECO_SELECTIONBAR - Same as ES_SELECTIONBAR style.
-; ECO_VERTICAL - Same as ES_VERTICAL style. Available in Asian-language versions only.
-  flags=0
-  flags |= ECO_READONLY
-  flags |= ECO_SELECTIONBAR
-  SendMessage, WM_USER | EM_SETOPTIONS, operation,flags,, ahk_id %hCtrl%
-  MsgBox, % errorlevel  ; This message returns the current options of the edit control.
-}
-
-
 EM_GETPAGEROTATE(hCtrl)  {
 
 ; EPR_0 - Text flows from left to right and from top to bottom.
@@ -756,11 +455,6 @@ EM_SETPUNCTUATION(hCtrl)  {
   SendMessage, WM_USER | EM_SETPUNCTUATION, nType,&PUNCTUATION,, ahk_id %hCtrl%
   MsgBox, % errorlevel  ; If the operation succeeds, the return value is a nonzero value.
 }
-
-
-
-
-
 
 
 
@@ -817,17 +511,6 @@ EM_REQUESTRESIZE(hCtrl)  {
 
   SendMessage, WM_USER | EM_REQUESTRESIZE, 0,0,, ahk_id %hCtrl%
 ;   MsgBox, % errorlevel  ; This message does not return a value.
-}
-
-EM_SELECTIONTYPE(hCtrl)  {
-  static EM_SELECTIONTYPE=66,WM_USER=0x400
-;This message is useful during WM_SIZE processing for the parent of a bottomless rich edit control.
-
-  SendMessage, WM_USER | EM_SELECTIONTYPE, 0,0,, ahk_id %hCtrl%
-  MsgBox, % errorlevel  ; If the selection is empty, the return value is SEL_EMPTY.
-          ; If not empty, the return value isset of flags containing one or more of the following values.
-          
-  static SEL_TEXT=0x1,SEL_OBJECT=0x2,SEL_MULTICHAR=0x4,SEL_MULTIOBJECT=0x8
 }
 
 EM_SETCTFMODEBIAS(hCtrl, mode)  {
@@ -985,3 +668,184 @@ EM_SETIMECOLOR(hCtrl)  {
 ;   SendMessage, WM_USER | EM_SETIMECOLOR, 0,&@??,, ahk_id %hCtrl%
 }
 
+
+RichEdit_wordBreakProc(lpch, ichCurrent, cch, code) {
+  ;   LPTSTR lpch    - A pointer to the text of the edit control.
+  ;   int ichCurrent - An index to a character position in the buffer of text that identifies the point
+  ;                    at which the function should begin checking for a word break.
+  ;   int cch        - An index to a character position in the buffer of text that identifies the point
+  ;                    at which the function should begin checking for a word break.
+  ;   int code       - The action to be taken by the callback function. This parameter can be one of the
+  ;                    following values:
+  ;                   WB_CLASSIFY      - Retrieves the character class and word break flags of the
+  ;                                      character at the specified position. This value is for use with
+  ;                                      rich edit controls.
+  ;                   WB_ISDELIMITER   - Checks whether the character at the specified position is a
+  ;                                      delimiter.
+  ;                   WB_LEFT          - Finds the beginning of a word to the left of the specified
+  ;                                      position.
+  ;                   WB_LEFTBREAK     - Finds the end-of-word delimiter to the left of the specified
+  ;                                      position. This value is for use with rich edit controls.
+  ;                   WB_MOVEWORDLEFT  - Finds the beginning of a word to the left of the specified
+  ;                                      position. This value is used during CTRL+LEFT key processing.
+  ;                                      This value is for use with rich edit controls.
+  ;                   WB_MOVEWORDRIGHT - Finds the beginning of a word to the right of the specified
+  ;                                      position. This value is used during CTRL+RIGHT key processing.
+  ;                                      This value is for use with rich edit controls.
+  ;                   WB_RIGHT         - Finds the beginning of a word to the right of the specified
+  ;                                      position. This is useful in right-aligned edit controls.
+  ;                   WB_RIGHTBREAK    - Finds the end-of-word delimiter to the right of the specified
+  ;                                      position. This is useful in right-aligned edit controls. This
+  ;                                      value is for use with rich edit controls.
+  static WB_CLASSIFY=3,WB_ISDELIMITER=2,WB_LEFT=0,WB_LEFTBREAK=6,WB_MOVEWORDLEFT=4,WB_MOVEWORDRIGHT=5,WB_RIGHT=1,WB_RIGHTBREAK=7
+
+	exp=(s|c| )
+   Loop, % cch * 2 ; build the string:
+      str .= Chr(*(lpch - 1 + A_Index))
+      
+ ;       StringReplace, str,str, %a_space%,_,A
+ ;   str := DllCall("MulDiv", "Int",lpch, "Int",1, "Int",1, "str")
+	tooltip, lpch=%lpch% `nichCurrent=%ichCurrent% `ncch=%cch% `ncode=%code% `nstr=%str%
+ ; If (code = WB_LEFT)
+ ;   return RegExMatch( str, "s[^s]*\Z.*s.*" )
+	If (code = WB_MOVEWORDLEFT)
+      Return, RegExMatch(   SubStr(str, 1, ichCurrent = cch ? cch : ichCurrent - (ichCurrent > 1))
+                          , exp . "[^" . exp . "]*\Z")
+	If (code = WB_MOVEWORDRIGHT)
+     Return, ichCurrent = cch or !(z := RegExMatch(str, exp, "", ichCurrent + 1)+1) ? cch : z - 1
+
+
+ ;   str= especially
+ ; msgbox, %  RegExMatch( str, "s[^s]*\Z.*s.*" )
+ ;    static exp = "\W" ; treat any non alphanumeric character as a delimiter with this regex
+ ;    Loop, % cch * 2 ; build the string:
+ ;       str .= Chr(*(lpch - 1 + A_Index))
+ ;    If code = 0 ; WB_LEFT
+ ;       Return, RegExMatch(SubStr(str, 1, ichCurrent = cch
+ ;          ? cch : ichCurrent - (ichCurrent > 1)), exp . "[^" . exp . "]*\Z")
+ ;    Else If code = 1 ; WB_RIGHT
+ ;     ToolTip, right
+ ; ;       Return, ichCurrent = cch or !(z := RegExMatch(str, exp, "", ichCurrent + 1)) ? cch : z - 1
+ ;    Else If code = 2 ; WB_ISDELIMITER
+ ;       Return, RegExMatch(SubStr(str, ichCurrent + 1, 1), exp)
+}
+
+; EM_GETWORDBREAKPROC
+EM_SETWORDBREAKPROCEX(hCtrl)  {     ; *** no longer used after re2.0.  use  EM_SETWORDBREAKPROC to set EditWordBreakProc instead
+ ;   static EM_SETWORDBREAKPROCEX=81,WM_USER=0x400
+ ;
+ ;   SendMessage, WM_USER | EM_SETWORDBREAKPROCEX, 0,&@??,, ahk_id %hCtrl%
+
+}
+
+ ; *** WIP-  http://msdn.microsoft.com/en-us/library/bb774252(VS.85).aspx
+__RichEdit_OleInterface(hCtrl)  {
+  static EM_GETOLEINTERFACE:=60,EM_SETOLECALLBACK:=70,WM_USER:=0x400
+
+  ; Retrieve an IRichEditOle object to access a rich edit control's COM functionality.
+  VarSetCapacity(pointer, 4)
+  SendMessage, WM_USER | EM_GETOLEINTERFACE, 0,&pointer,, ahk_id %hCtrl%
+  If !pointer := NumGet(pointer, 0)
+    return "ERROR:  Couldn't retrieve an IRichEditOle object for control."
+ ; COM methods: http://msdn.microsoft.com/en-us/library/bb774306(VS.85).aspx
+
+
+  ; gives a rich edit control an IRichEditOleCallback object that the control uses to
+  ; get OLE-related resources and information from the client.
+  SendMessage, WM_USER | EM_SETOLECALLBACK, 0,pointer,, ahk_id %hCtrl%
+
+ ;   com_init()
+ ;   msgbox, % pipa := COM_QueryInterface(pointer)
+ ;   msgbox, % COM_Invoke(pipa, "GetClipboardData")
+  ;   msgbox, KEEP GOING: "%pointer%"
+}
+
+EM_GETCHARFORMAT222(hCtrl, ByRef face="", ByRef style="", ByRef color="")  {
+  static EM_GETCHARFORMAT=58,WM_USER=0x400
+  static SCF_DEFAULT=0x0,SCF_SELECTION=0x1
+
+  VarSetCapacity(CHARFORMAT, 60, 0), NumPut(60, CHARFORMAT)
+  SendMessage, WM_USER | EM_GETCHARFORMAT, SCF_SELECTION,&CHARFORMAT,, ahk_id %hCtrl%
+
+  ; dwMask - Members containing valid information or attributes to set. This member can be zero, one, or more than one of the following values.
+   static CFM_BOLD=0x1,CFM_CHARSET=0x8000000,CFM_COLOR=0x40000000,CFM_FACE=0x20000000,CFM_ITALIC=0x2,CFM_OFFSET=0x10000000,CFM_PROTECTED=0x10,CFM_SIZE=0x80000000,CFM_STRIKEOUT=0x8,CFM_UNDERLINE=0x4
+
+  ; dwEffects - Character effects. This member can be a combination of the following values.
+  static CFE_AUTOCOLOR=0x40000000,CFE_BOLD=0x1,CFE_ITALIC=0x2,CFE_STRIKEOUT=0x8,CFE_UNDERLINE=0x4,CFE_PROTECTED=0x10
+  cfe := NumGet(CHARFORMAT, 8, "UInt")
+  dwEffects=PROTECTED,UNDERLINE,STRIKEOUT,ITALIC,BOLD,AUTOCOLOR
+  Loop, parse, dwEffects,`,
+    cfe >= CFE_%a_loopfield%  ?  (style.=(style ? " " a_loopfield : a_loopfield), cfe-=CFE_%a_loopfield%)  :  ""
+     cfe >= CFE_%a_loopfield%  ?  (cfeDesc.=(cfeDesc ? " " a_loopfield : a_loopfield), cfe-=CFE_%a_loopfield%)  :  ""
+
+  ; color
+  old := A_FormatInteger
+  SetFormat, integer, hex
+  RegExMatch( NumGet(CHARFORMAT,20,"UInt")+0x1000000, "(?P<R>..)(?P<G>..)(?P<B>..)$", _ ) ; BGR2RGB
+  crTextColor := "0x" _B _G _R
+
+  ; font size
+  SetFormat, float, 1.0
+  style .= (style ? " s" : "s") . NumGet(CHARFORMAT,12,"Int")/20
+   cfeDesc .= (cfeDesc ? " s" : "s") . NumGet(CHARFORMAT,12,"Int")/20
+  SetFormat, integer, %old%
+
+  ; face
+  VarSetCapacity(szFaceName, 32)
+  DllCall("RtlMoveMemory", "str", szFaceName, "Uint", &CHARFORMAT + 26, "Uint", 32)
+  ;-
+   face:=szFaceName, style:=cfeDesc, color:=crTextColor
+}
+
+
+EM_SETWORDBREAKPROC(hCtrl)  {
+  static EM_SETWORDBREAKPROC=0xD0
+        ,wbProc
+
+    if !wbProc
+      wbProc := RegisterCallback("RichEdit_wordBreakProc")
+ ;       DllCall("GlobalFree", "UInt", wbProc)
+  SendMessage, 208, 0,wbProc,, ahk_id %hCtrl%
+ ;   SendMessage, EM_SETWORDBREAKPROC, 0,wbProc,, ahk_id %hCtrl%
+  MsgBox, % errorlevel " - " wbProc . " - " . hCtrl
+ ; Return Value - This message does not return a value.
+ ;   msgbox, hold..
+ ;       DllCall("GlobalFree", "UInt", wbProc)
+}
+
+
+/*
+ Function:	StreamOut
+			Returns rich edit control data in various formats.
+
+ Parameters:
+			Out	- Reference to the output variable.
+			Flags - <http://msdn.microsoft.com/en-us/library/bb774304(VS.85).aspx>
+
+ Returns:
+			Number of characters.
+ */
+; problem is the size of RTF data.
+RichEdit_StreamOut(hCtrl, ByRef Out, Flags="RTF")  {
+	static EM_STREAMOUT=0x44A
+		, SF_RTF=0x2,SF_RTFNOOBJS=0x3,SF_TEXT=0x1,SF_TEXTIZED=0x4
+		, SF_PLAINRTF=0x4000,SF_SELECTION=0x8000,SF_UNICODE=0x10,SF_USECODEPAGE=0x20
+
+	hFlag := 0
+	Loop, parse, Flags, %A_Tab%%A_Space%
+		IfEqual, A_LoopField, ,continue
+		else hFlag |= SF_%A_LoopField%
+	ifEqual, hFlag,, return A_ThisFunc "> Some of the flags are invalid: " Flags
+
+	wbProc := RegisterCallback("RichEdit_editStreamCallBack", "F")
+
+	len := RichEdit_GetTextLength(hCtrl, "NUMBYTES")
+	VarSetCapacity(out, len*10)	;!!! meh....
+	VarSetCapacity(EDITSTREAM, 16, 0)
+	NumPut(&out,   EDITSTREAM, 0, "UInt") ; dwCookie
+	NumPut(wbProc, EDITSTREAM, 8, "UInt")
+
+	SendMessage, EM_STREAMOUT, hFlag, &EDITSTREAM,, ahk_id %hCtrl%
+	VarSetCapacity(out, -1)
+	return ErrorLevel
+}
