@@ -50,9 +50,6 @@
 		o <Image>		- Adds an image to a Button control.
 		o <Font>		- Sets font for the control.
 		o <CMenu>		- Sets a context menu for a control.
-
- Group: Known bugs/issues
-		o Menu extension doesn't work on HLink.
  */
 #include *i Form.ahk
 
