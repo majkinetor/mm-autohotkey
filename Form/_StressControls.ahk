@@ -4,7 +4,7 @@ _()
 	n := 5				;create 28 * 2**n controls
 
 	;===============
-	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter ScrollBar Property
+	custom	= HiEdit RichEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter ScrollBar Property
 	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress Tab2 GroupBox		;updown may somehow make problem for other controls. in this setup if you put tab2 after updown it will work ok, otherwise it will initially apear on wrong position. There were other kinds of problems all related to UpDo
 	
 	ctrls := custom " " ahk
@@ -27,7 +27,7 @@ _()
 	Splitter_Set( hSep, hTab " | " hLog)
 
 	hFont := Font("", "s9, Courier New") 	;create font only once, then use it for every control.
-	m := 28*(2**n)
+	m := 29*(2**n)
 	Progress, R0-%m%, creating controls
 	loop, parse, ctrls, %A_Space%
 	{		

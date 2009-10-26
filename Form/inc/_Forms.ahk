@@ -69,6 +69,7 @@
 #include *i Panel.ahk
 #include *i Toolbar.ahk
 #include *i Rebar.ahk
+#include *i RichEdit.ahk
 #include *i HLink.ahk
 #include *i Splitter.ahk
 #include *i Scrollbar.ahk
