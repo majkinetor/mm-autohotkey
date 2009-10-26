@@ -3,8 +3,8 @@ _("mo")
 
 	n := 5				;create 10 * 2**n controls
 	;===============
-	custom	= HiEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter ScrollBar Property
-	m := 20*(2**n)	
+	custom	= HiEdit RichEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter ScrollBar Property
+	m := 22*(2**n)	
 
 	ctrls := custom " " custom
 	loop, %n%
