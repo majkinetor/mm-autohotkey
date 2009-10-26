@@ -151,6 +151,9 @@ InitControl(Name, HCtrl) {
 		Property_SetColSize(Hctrl, 150)
 		pProperty := Win_Get(HCtrl, "P")
 	}
+	if Name = RichEdit
+		RichEdit_SetText(HCtrl, "..\res\test.rtf", "FROMFILE")	
+		, RichEdit_SetEvents(HCtrl, "Handler", "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE")
 
 	if Name = Scrollbar
 		Scrollbar_Set(HCtrl, 20, 0, 100, 10)

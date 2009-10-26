@@ -139,6 +139,9 @@ InitControl(Name, HCtrl) {
 		Property_Insert(HCtrl, p)
 	}
 
+	if Name = RichEdit
+		RichEdit_SetText(HCtrl, "..\res\test.rtf", "FROMFILE")	
+
 	if Name = Scrollbar
 		Scrollbar_Set(HCtrl, 20, 0, 100, 10)
 
