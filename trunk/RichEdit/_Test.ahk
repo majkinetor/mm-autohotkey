@@ -1,4 +1,5 @@
 _("mo!")
+#MaxThreads, 255
 
 	text = 
 	 (Ltrim
@@ -73,10 +74,18 @@ CreateGui(Text, W=850, H=600) {
 	hLog	  := Form_Add(hPanel1,"ListBox", "", "0x100", "Align F", "Attach p")
 	hSplitter := Form_Add(hForm1, "Splitter", "", "", "Align L, 6", "Attach p")
 	hPanel2	  := Form_Add(hForm1, "Panel", "", "", "Align F", "Attach p")
+
+
 	hPanel3   := Form_Add(hPanel2, "Panel", "", "", "Align T,30", "Attach w")
 				 Form_Add(hPanel3, "Slider", "", "Range1-10 gOnSlider vSlider h30", "Align R, 100", "Attach x")
-	hToolbar  := Form_Add(hPanel3, "Toolbar", btns, "gOnToolbar style='flat nodivider tooltips' il=0 x30", "Align F", "Attach w")
-	Toolbar_SetBitmapSize(hToolbar, 0)
+	hToolbar  := Form_Add(hPanel3, "Toolbar", btns, "gOnToolbar style='flat nodivider tooltips' il=0 x0 h30", "Align T", "Attach w")
+	Toolbar_SetBitmapSize(hToolbar, 0)	
+
+	hPanel4   := Form_Add(hPanel2, "Panel", "", "", "Align T,30", "Attach w")
+		hFind := Form_Add(hPanel4, "Edit",   "", "x0 y0 w100")
+ 				 Form_Add(hPanel4, "Button", "Find", "gOnFind h24 x+2 AltSubmit 0x8000")
+		hUp	  := Form_Add(hPanel4, "CheckBox", "up", "x+2 yp+5")
+
 	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "style='MULTILINE SCROLL WANTRETURN'", "Align F", "Attach w h", "CMenu RichEditMenu")
 
 	cSlider := 0
@@ -84,14 +93,27 @@ CreateGui(Text, W=850, H=600) {
 	PopulateList()		
 }
 
+OnFind:
+	pos := RichEdit_GetSel(hRichEdit)
+	ControlGetText, txt, ,ahk_id %hFind%
+	ControlGet, bUp, Checked,  ,,ahk_id %hUp%
+	direction := bUp ? "" : " down"
+
+	pos := RichEdit_FindText(hRichEdit, txt, pos + (bUp ? -1 : 1), -1, "unicode" direction)
+	Log("Found pos: " pos)
+	if pos != -1
+	{
+		RichEdit_SetSel(hRichEdit, pos, pos+StrLen(txt))
+		ControlFocus, , ahk_id %hRichEdit%
+	}
+return
+
 OnSlider:
 	d := slider - cslider
 	ifEqual, d, 0, return
-	
-	
+		
 	RichEdit_Zoom( hRichEdit, d ) 
 	critical off
-
 
 	cSlider := slider
 return
@@ -102,14 +124,15 @@ return
 
 RichEditMenu:
 	if A_ThisMenuItem in Cut,Copy,Paste
-		Edit_%A_ThisMenuItem%(hRichEdit)
+		RichEdit_%A_ThisMenuItem%(hRichEdit)
 return
 
 Log(t1="", t2="", t3="", t4="", t5="") {
-	global hLog
+	global hLog, hRichEdit
 	txt = %t1% %t2% %t3% %t4% %t5%
 	Control,Add,%txt%,, ahk_id %hLog%
 	ControlSend, ,{End},ahk_id %hLog%
+	ControlFocus,, ahk_id %hRichEdit%
 }
 
 OnToolbar(hCtrl, Event, Txt, Pos=""){
@@ -171,9 +194,8 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 PopulateList() {
 	global demo
 
-	FileRead, demo, % A_ScriptFullPath
+	FileRead, demo, _Demo.ahk
 	StringReplace, demo, demo, `r,,A
-	StringReplace, demo, demo, MsgBox`,262144`,`,,MsgBox`,,A
 
     ;take only sublabels that have description
 	pos := 1
@@ -182,7 +204,7 @@ PopulateList() {
 		  LV_Add("", mApi, mDesc ),  pos += StrLen(mApi), n := A_Index
 		Else break
 
-	Log(n " APIs detected.")
+	Log(n " demo APIs detected.")
 
 	LV_ModifyCol(1,180), LV_ModifyCol(2), LV_Modify(1, "select")
 }
@@ -200,46 +222,6 @@ OnLV:
 return
 
 
-AutoUrlDetect:  ; Enable disable or toggle automatic detection of URLs by a rich edit control.
-
-  state := RichEdit_AutoUrlDetect( hRichEdit )
-  MsgBox,262144,, % "url detect = " state
-  
-  state := RichEdit_AutoUrlDetect( hRichEdit, "^" )
-  MsgBox,262144,, % "url detect = " state
-return
-
-GetSel: ;Retrieve the starting and ending character positions of the selection.
-
-	RichEdit_GetSel( hRichEdit, min, max  )
-	if !(count := min-max)
-		 MsgBox, Cursor Position: %min%
-	else MsgBox,,%count% char's selected, Selected from: %max%-%min%
-return
-
-GetText: ;Retrieves a specified range of characters from a rich edit control.
-
- msgbox % RichEdit_GetText( hRichEdit ) ; get current selection
- msgbox % RichEdit_GetText( hRichEdit, 0, -1 ) ; get all
- msgbox % RichEdit_GetText( hRichEdit, 4, 10 ) ; get range
-return
-
-LineFromChar: ;Determines which line contains the specified character in a rich edit control.
-
- msgbox, % "Line: " RichEdit_LineFromChar( hRichEdit, RichEdit_GetSel(hRichEdit) )
-return
-
-LimitText:	;Sets an upper limit to the amount of text the user can type or paste into a rich edit control
-	RichEdit_LimitText( hRichEdit, 20 )  ; limit to 20 characters
-return
-
-TextMode:	;Sets text mode.
-	txt := RichEdit_GetText( hRichEdit, 0, -1 )
-	RichEdit_SetText(hRichEdit)
-	RichEdit_TextMode(hRichEdit, "RICHTEXT") 
-	RichEdit_SetText(hRichEdit, txt)
-return
-
 ^1::reload
 ^U::
 ^B::
@@ -250,10 +232,10 @@ return
 F1:: IfNotEqual, api, API, goto %api%
 
 #include RichEdit.ahk
+#include _Demo.ahk
 #include Todo.ahk
 
 ;sample includes
-#include Edit.ahk
 #include inc
 #include _.ahk
 #include Dlg.ahk
