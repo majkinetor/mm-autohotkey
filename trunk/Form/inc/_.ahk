@@ -40,7 +40,11 @@
 		(end code)
 
 	Remarks:
-				Includes #NoEnv and #SingleInstance force always. Keep in mind that calling this function will set scripts speed to maximum.
+			The following directives are always set:
+			o #NoEnv
+			o #SingleInstance, force
+			o SetBatchLines %s%	(only on first function call)
+			o MaxThreads, 255
  */
 
 _(opt="") {
@@ -48,6 +52,7 @@ _(opt="") {
 
 	#NoEnv
 	#Singleinstance, force
+	#MaxThreads, 255
 
 	if !init
 		init := s := -1

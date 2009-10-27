@@ -50,6 +50,11 @@
 		o <Image>		- Adds an image to a Button control.
 		o <Font>		- Sets font for the control.
 		o <CMenu>		- Sets a context menu for a control.
+
+ Group: Known bugs/issues
+		o Modules use decimal format of integer (default one). Module may not work if integer format is changed to Hex.
+		  as it doesn't set and restore integer format for practical reasons (it would have to be repeated on far too many places).
+		  If you use different integer format restore it back to decimal once you are finished.
  */
 #include *i Form.ahk
 
