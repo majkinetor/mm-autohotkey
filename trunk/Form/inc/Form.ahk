@@ -416,7 +416,6 @@ Form_Set(HForm, Options="", n="") {
 		
 	if (font != "") {
 		StringSplit, font, font, `,
-		m(font1, font2)
 		Gui, %n%:Font, %font1%, %font2%
 	}
 

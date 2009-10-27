@@ -1,14 +1,22 @@
 _("mo! w d e")
 
-	hForm1	:=	Form_New("w400 e3 h300 +Resize Font='bold s12, Courier'")
-	h1 := Form_Add(hForm1, "Edit", "w100 h100")
-	h2 := Form_Add(hForm1, "Edit", "w100 h100")
-	h3 := Form_Add(hForm1, "Text", "w100 h100")
+	ctrls = Edit Text Radio CheckBox ListBox ComboBox DropDownList ListView TreeView
+	FG	  = 
+	BG	  = Red
+	;========================
 
-	CColor(h1, "", "White")
-	CColor(h2, "Lime", "Blue")
-	CColor(h3, "Red", "White")
+	hForm1	:=	Form_New("w400 e3 h800 +Resize Font='s10 bold,Courier'")
+
+	loop, parse, ctrls, %A_Space%
+	{
+			 Form_Add(hForm1, "Text", A_LoopField, "xm w150")
+		h := Form_Add(hForm1, A_LoopField, "Test1|Test2", "x+10 h80 w200 cRed")	
+		CColor(h, BG, FG)
+	}
+	LV_ADD("", "Test1"), TV_Add("Test1")
+	LV_ADD("", "Test2"), TV_Add("Test2")
 	Form_Show()
+	Win_Redraw(hForm1)	
 return
 
 
@@ -19,4 +27,3 @@ return
 
 #include inc
 #include _Forms.ahk
-#include CColor.ahk
