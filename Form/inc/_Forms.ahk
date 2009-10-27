@@ -49,7 +49,7 @@
 		o <Tooltip>		- Adds tooltips to GUI controls.
 		o <CMenu>		- Sets a context menu for a control.
 		o <CColor>		- Sets colors for the control.
-		o <Image>		- Adds an image to a Button control.
+		o <ILButton>	- Adds an image to a Button control.
 		o <Font>		- Sets font for the control.
 
  Group: Known bugs/issues
@@ -66,7 +66,7 @@
 #include *i Cursor.ahk
 #include *i CMenu.ahk	
 #include *i CColor.ahk
-#include *i Image.ahk
+#include *i ILButton.ahk
 #include *i Font.ahk
 
 ;controls
