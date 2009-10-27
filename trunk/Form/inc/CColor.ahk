@@ -67,9 +67,7 @@ CColor_(Wp, Lp, Msg, Hwnd) {
 			IfEqual, CTLCOLORLISTBOX,,SetEnv, CTLCOLORLISTBOX, % OnMessage(WM_CTLCOLORLISTBOX, A_ThisFunc) 
 
 			If NumGet(CBBINFO,44)	;hwndEdit
-				Hwnd :=  Numget(CBBINFO,44)
-
-			class := "Edit" 
+				Hwnd :=  Numget(CBBINFO,44), class := "Edit"
 		} 
 
 		if class in SysListView32,SysTreeView32
