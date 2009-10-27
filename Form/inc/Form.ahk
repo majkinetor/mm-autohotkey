@@ -415,7 +415,8 @@ Form_Set(HForm, Options="", n="") {
 	}
 		
 	if (font != "") {
-		StringSplit, font, font, %A_Space%
+		StringSplit, font, font, `,
+		m(font1, font2)
 		Gui, %n%:Font, %font1%, %font2%
 	}
 
@@ -521,6 +522,6 @@ Form_setEsc(Hwnd, Type) {
 }
 
 /* Group: About
-	o v0.8 by majkinetor.
+	o v0.81 by majkinetor.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
 /*
