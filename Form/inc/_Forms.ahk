@@ -47,9 +47,10 @@
 		o <Attach>		- Determines how a control is resized with its parent.
 		o <Cursor>		- Sets the cursor shape for a control or a window.
 		o <Tooltip>		- Adds tooltips to GUI controls.
+		o <CMenu>		- Sets a context menu for a control.
+		o <CColor>		- Sets colors for the control.
 		o <Image>		- Adds an image to a Button control.
 		o <Font>		- Sets font for the control.
-		o <CMenu>		- Sets a context menu for a control.
 
  Group: Known bugs/issues
 		o Modules use decimal format of integer (default one). Module may not work if integer format is changed to Hex.
@@ -63,9 +64,10 @@
 #include *i Attach.ahk
 #include *i Tooltip.ahk
 #include *i Cursor.ahk
+#include *i CMenu.ahk	
+#include *i CColor.ahk
 #include *i Image.ahk
 #include *i Font.ahk
-#include *i CMenu.ahk	
 
 ;controls
 #include *i Panel.ahk

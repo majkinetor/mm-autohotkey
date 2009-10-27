@@ -950,18 +950,24 @@ RichEdit_SelectionType(hCtrl)  {
  > RichEdit_SetBgColor( hRichEdit, 0xa9f874 )
  */
 RichEdit_SetBgColor(hCtrl, Color)  {
-  static EM_SETBKGNDCOLOR=67,WM_USER=0x400
+	static EM_SETBKGNDCOLOR=1091
 
-  old := A_FormatInteger
-  SetFormat, integer, hex
-  RegExMatch( color, "0x(?P<R>..)(?P<G>..)(?P<B>..)$", _ ) ; RGB2BGR
-  Color := "0x00" _B _G _R        ; 0x00bbggrr
-  SendMessage, WM_USER | EM_SETBKGNDCOLOR, 0, % color,, ahk_id %hCtrl%
-  RegExMatch( ERRORLEVEL + 0x1000000, "(?P<B>..)(?P<G>..)(?P<R>..)$", _ ) ; RGB2BGR
-  pColor := "0x" _R _G _B
-  SetFormat, integer, %old%
+	if SubStr(Color, 1, 1)="-"
+	{
+		SendMessage, EM_SETBKGNDCOLOR,, SubStr(Color, 2),, ahk_id %hCtrl%
+		return
+	}
 
-  return pColor
+	old := A_FormatInteger
+	SetFormat, integer, hex
+	RegExMatch( Color, "0x(?P<R>..)(?P<G>..)(?P<B>..)$", _ ) ; RGB2BGR
+	Color := "0x00" _B _G _R        ; 0x00bbggrr
+	SendMessage, EM_SETBKGNDCOLOR,,Color,, ahk_id %hCtrl%
+	RegExMatch( ERRORLEVEL + 0x1000000, "(?P<B>..)(?P<G>..)(?P<R>..)$", _ ) ; RGB2BGR
+	pColor := "0x" _R _G _B
+	SetFormat, integer, %old%
+
+	return pColor
 }
 
 /*
@@ -1441,7 +1447,7 @@ RichEdit_WordWrap(HCtrl, Flag)  {
 }
 
 /*
- Function:	Zoom
+ Function: Zoom
 			Sets the zoom ratio anywhere between 1/64 and 64.
 
  Parameters:
