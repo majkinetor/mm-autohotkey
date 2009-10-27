@@ -1,4 +1,4 @@
-;_("mo! e d c w")
+_("mo! e d c w")
 #SingleInstance, force
 #MaxThreads, 255		;Required for this sample with cursor/tooltip extensions.
 #NoEnv
@@ -159,7 +159,7 @@ InitControl(Name, HCtrl) {
 		Scrollbar_Set(HCtrl, 20, 0, 100, 10)
 
 	if Name = Button
-		Ext_Image(HCtrl, "..\res\test.bmp")
+		ILButton(HCtrl,"user32.dll", 128, 128, "right"), Font(HCtrl, "s18 bold, Arial")
 
 	if Name = TreeView
 		TV_Add(":>", TV_Add(":)"))

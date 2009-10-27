@@ -1,11 +1,11 @@
 _("mo! w d e")
 
 	ctrls = Edit Text Radio CheckBox ListBox ComboBox DropDownList ListView TreeView
-	FG	  = 
+	FG	  = White
 	BG	  = Red
 	;========================
 
-	hForm1	:=	Form_New("w400 e3 h800 +Resize Font='s10 bold,Courier'")
+	hForm1	:=	Form_New("w400 e3 h700 +Resize Font='s10 bold,Courier'")
 
 	loop, parse, ctrls, %A_Space%
 	{

@@ -145,9 +145,6 @@ InitControl(Name, HCtrl) {
 	if Name = Scrollbar
 		Scrollbar_Set(HCtrl, 20, 0, 100, 10)
 
-	if Name = Button
-		Ext_Image(HCtrl, "..\res\test.bmp")
-
 	if Name = TreeView
 		TV_Add(":>", TV_Add(":)"))
 
