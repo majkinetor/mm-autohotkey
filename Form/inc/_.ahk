@@ -40,11 +40,7 @@
 		(end code)
 
 	Remarks:
-			The following directives are always set:
-			o #NoEnv
-			o #SingleInstance, force
-			o SetBatchLines %s%	(only on first function call)
-			o MaxThreads, 255
+				Includes #NoEnv and #SingleInstance force always. Keep in mind that calling this function will set scripts speed to maximum.
  */
 
 _(opt="") {
@@ -52,7 +48,6 @@ _(opt="") {
 
 	#NoEnv
 	#Singleinstance, force
-	#MaxThreads, 255
 
 	if !init
 		init := s := -1
@@ -74,8 +69,7 @@ _(opt="") {
 			m := SubStr(m, 1, -1)
 			if m not in m,o
 				FileDelete, %m%
-			else if (m="o") 
-				m := "o!"
+			else m := "o!"
 		} 
 		m("~`a" (m = 1 ? "" : m))
 	}
@@ -143,13 +137,14 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 		MsgBox %s%
 	else if (mode="o") {
 		if !init {
+			init := WinExist("A")
 			if !WinExist("ahk_class dbgviewClass") {
-				   Run, DbgView.exe,, UseErrorLevel, PID
-	 			   WinWaitActive, ahk_pid %PID%, ,2
-			} else WinActivate, ahk_class dbgviewClass
-
+				Run, DbgView.exe,, UseErrorLevel, PID
+	 			WinWaitActive, ahk_pid %PID%, ,2
+			} else WinRestore, ahk_class dbgviewClass
+			
 			ifEqual, bClear, o, WinMenuSelectItem,ahk_class dbgviewClass,,Edit, Clear Display, ;			;ifEqual, bClear, o, Send, ^x		;	ControlSend, , ^x, ahk_class dbgviewClass		(mhm.... it worked...)
-			init++
+			WinActivate, ahk_id %init%
 		}
 		OutputDebug %s%
 	}
