@@ -919,9 +919,11 @@ RichEdit_ScrollPos(HCtrl, PosString="" )  {
 RichEdit_SelectionType(hCtrl)  {
 	static EM_SELECTIONTYPE=1090, 1="TEXT", 2="OBJECT", 4="MULTICHAR", 8="MULTIOBJECT", types="1,2,4,8"
 
-	SendMessage, EM_SELECTIONTYPE,,,, ahk_id %hCtrl%
-	if !(o := ErrorLevel)
-		return 
+	if hCtrl > 0
+		SendMessage, EM_SELECTIONTYPE,,,, ahk_id %hCtrl%
+		if !(o := ErrorLevel)
+			return 
+	else o := abs(hCtrl)
 
 	loop, parse, types, `,
 		if (o & A_LoopField)
@@ -1204,10 +1206,10 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
 			*cpMin*'s position.  The range includes everything if *cpMin* is 0 and *cpMax* is –1.
 
  Returns:
-		The selection that is actually set.
+			The selection that is actually set.
 
  Related:
-     <SetText>, <GetSel>, <GetText>, <GetTextLength>
+			<SetText>, <GetSel>, <GetText>, <GetTextLength>
 
  Example:
  > RichEdit_SetSel( hRichEdit, 4, 10 ) ; select range
@@ -1229,13 +1231,15 @@ RichEdit_SetSel(hCtrl, CpMin=0, CpMax=0)  {
  Parameters:
 			Txt		- The text string to set within control.
 			Flag	- Space separated list of options.  See below list.
-			Pos		- When using *SELECTION* flag, this optional parameter allows you to specify a character
-					  position you want text inserted to, rather than replacing current selection. To append to end, use -1.
+			Pos		- This optional parameter allows you to specify a character position you want text inserted to, 
+					  rather than replacing current selection. To append to the end, use -1.
+					  When using *SELECTION* flag, the position is relative to the selection.
 
  Flags:
 			DEFAULT		- Deletes the undo stack, discards rich-text formatting, & replaces all text.
 			KEEPUNDO	- Keeps the undo stack.
-			SELECTION	- Replaces selection and keeps rich-text formatting.
+			SELECTION	- Replaces selection and keeps rich-text formatting. If you don't specify this style entire content of 
+						  the control will be replaced with the new text.
 			FROMFILE	- Load a file into control.  If used, this option expects the *txt* parameter to be
 						  a filename. If there is a problem loading the file, *ErrorLevel* will contain message.
 
@@ -1255,37 +1259,49 @@ RichEdit_SetSel(hCtrl, CpMin=0, CpMax=0)  {
  
   RichEdit_SetText(hRichEdit, "replace all..")
  
-  RichEdit_SetText(hRichEdit, "append to end..", "SELECTION", -1 )
+  RichEdit_SetText(hRichEdit, "append to end of selection..", "SELECTION", -1 )
  (end code)
  */
-RichEdit_SetText(hCtrl, txt="", flag=0, pos="" )  {
-  static EM_SETTEXTEX=97,WM_USER=0x400
-        ,ST_DEFAULT=0,ST_KEEPUNDO=1,ST_SELECTION=2
-  hexFlag=0
-  If flag
-  	Loop, parse, flag, %A_Tab%%A_Space%
-      If (A_LoopField = "FROMFILE") {
-        FileRead, file, %txt%
-        If errorlevel
-          return false, errorlevel := "ERROR: Couldn't open file '" txt "'"
-      }
-      Else If A_LoopField in DEFAULT,KEEPUNDO,SELECTION
-    	 hexFlag |= ST_%A_LoopField%
-  VarSetCapacity(SETTEXTEX, 8, 0), NumPut(hexFlag, SETTEXTEX, 0, "UInt")
+RichEdit_SetText(HCtrl, Txt="", Flag=0, Pos="" )  {
+	static EM_SETTEXTEX=0x461, ST_KEEPUNDO=1, ST_SELECTION=2
 
-  ; The code page is used to translate the text to Unicode. If codepage is 1200 (Unicode code page),
-  ; no translation is done. If codepage is CP_ACP (0), the system code page is used. 
-  NumPut(0, SETTEXTEX, 4, "UInt")
+	hFlag=0
+	If Flag
+  		Loop, parse, Flag, %A_Tab%%A_Space%
+			If (A_LoopField = "FROMFILE") {
+			FileRead, Txt, %Txt%
+			IfNotEqual, Errorlevel, 0, return false, ErrorLevel := A_ThisFunc "> Couldn't open file: '" Txt "'"
+		} else if A_LoopField in KEEPUNDO,SELECTION
+			hFlag |= ST_%A_LoopField%
 
   ; If specifying a pos, calculate new range for restoring original selection
-  If (pos && (hexFlag >= 2) )
-    RichEdit_GetSel(hCtrl,min,max), prevPos:=RichEdit_SetSel(hCtrl,pos)
-    , pos>-1 && pos<=min  ?   (min+=len:=StrLen((file ? file : txt)) , max+=len)   :   ""
-    
-  ; Setting text
-  SendMessage, WM_USER | EM_SETTEXTEX, &SETTEXTEX, (file ? &file : &txt),, ahk_id %hCtrl%
-  err := ERRORLEVEL
-  return err, prevPos ? RichEdit_SetSel(hCtrl,min,max)
+	if (Pos != "")
+		if (hFlag >= ST_SELECTION) {
+			RichEdit_GetSel(HCtrl, min, max)
+			ifLess, Pos, -1, SetEnv, Pos, 0
+			else if (Pos > max-min)
+				Pos := max-min
+
+			ifEqual, Pos, -1, SetEnv, Pos, %max%
+			else Pos += min
+
+			prevPos := RichEdit_SetSel(HCtrl, Pos)
+			max += StrLen(Txt)
+		} else {
+			hFlag |= ST_SELECTION, len := StrLen(Txt)
+			RichEdit_GetSel(HCtrl, min, max)
+			prevPos := RichEdit_SetSel(HCtrl, Pos)
+			if (Pos < min)
+				min += len, max += len
+			else if (Pos >= min) && (Pos < max)
+				max += len
+		}
+
+	VarSetCapacity(SETTEXTEX, 8), NumPut(hFlag, SETTEXTEX)
+	NumPut(0, SETTEXTEX, 4)		  ;The code page is used to translate the text to Unicode. If codepage is 1200 (Unicode code page),
+								  ; no translation is done. If codepage is CP_ACP (0), the system code page is used. 
+	SendMessage, EM_SETTEXTEX, &SETTEXTEX, &Txt,, ahk_id %HCtrl%	
+	return ERRORLEVEL, prevPos != "" ? RichEdit_SetSel(HCtrl, min, max) :
 }
 
 /*
@@ -1528,8 +1544,8 @@ RichEdit_onNotify(Wparam, Lparam, Msg, Hwnd) {
 	 else { 
 		ifEqual, oldNotify, *, SetEnv, oldNotify, % RichEdit("oldNotify")
 		if oldNotify !=
-			return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
-			
+			 return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
+		else return	
 		;ifEqual, oldCOMMAND, *, SetEnv, oldCOMMAND, % RichEdit("oldCOMMAND")
 		;if oldCOMMAND !=
 		;	return DllCall(oldCOMMAND, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)			
@@ -1548,17 +1564,13 @@ RichEdit_onNotify(Wparam, Lparam, Msg, Hwnd) {
 	}
 
 	If (code = ENM_REQUESTRESIZE)  {  
-		rc := NumGet(lparam+24)		;Requested new size.
+		rc := NumGet(lparam+24) ;Requested new size.
 		return %handler%(hw, "REQUESTRESIZE", rc, "", "")
 	}
 
 	if (code = ENM_SELCHANGE)  {          
-		cpMin := NumGet(lparam+12), cpMax := NumGet(lparam+16) ;,seltyp := NumGet(lparam+20) (***)
-		;SEL_TEXT = 0x1
-		;SEL_OBJECT = 0x2
-		;SEL_MULTICHAR = 0x4
-		;SEL_MULTIOBJECT = 0x8
-		return %handler%(hw, "SELCHANGE", cpMin, cpMax, "")
+		cpMin := NumGet(lparam+12), cpMax := NumGet(lparam+16), selType := RichEdit_SelectionType(-NumGet(lparam+20))
+		return %handler%(hw, "SELCHANGE", cpMin, cpMax, seltype)
 	}
 
 	If (code = ENM_DROPFILES)  {          ; 
@@ -1623,8 +1635,7 @@ RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 }
 
 /* Group: About
-	o Version 1.0 by freakkk.
-	o Additional code by majkinetor.
+	o Version 1.0 by freakkk & majkinetor.
 	o MSDN Reference : <http://msdn.microsoft.com/en-us/library/bb787605(VS.85).aspx>.
 	o AHK module licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */
