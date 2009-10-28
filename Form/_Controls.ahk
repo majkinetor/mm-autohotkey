@@ -5,7 +5,7 @@ _("mo! e d c w")
 
 	custom	= HiEdit RichEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter ScrollBar Property
 	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress StatusBar Tab2 GroupBox		;updown may somehow make problem for other controls. in this setup if you put tab2 after updown it will work ok, otherwise it will initially apear on wrong position. There were other kinds of problems all related to UpDo
-	init    = HiEdit
+	init    = Button
 	;===============================================
 	
 	ctrls := custom " " ahk
@@ -159,7 +159,7 @@ InitControl(Name, HCtrl) {
 		Scrollbar_Set(HCtrl, 20, 0, 100, 10)
 
 	if Name = Button
-		ILButton(HCtrl,"user32.dll", 128, 128, "right"), Font(HCtrl, "s18 bold, Arial")
+		ILButton(HCtrl,"..\res\btn1.bmp", 48, 48, "right"), Font(HCtrl, "s18 bold, Arial")
 
 	if Name = TreeView
 		TV_Add(":>", TV_Add(":)"))
