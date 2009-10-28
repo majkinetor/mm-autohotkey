@@ -1232,8 +1232,9 @@ RichEdit_SetSel(hCtrl, CpMin=0, CpMax=0)  {
 			Txt		- The text string to set within control.
 			Flag	- Space separated list of options.  See below list.
 			Pos		- This optional parameter allows you to specify a character position you want text inserted to, 
-					  rather than replacing current selection. To append to the end, use -1.
-					  When using *SELECTION* flag, the position is relative to the selection.
+					  rather than replacing current selection. To append to the end, use -1. 
+					  When using SELECTION flag, the position is relative to the current selection text and current selection is expanded to
+					  contain new text. If used without SELECTION flag existing selection remains unafected.
 
  Flags:
 			DEFAULT		- Deletes the undo stack, discards rich-text formatting, & replaces all text.
