@@ -1,4 +1,3 @@
-#SingleInstance force 
 /*
 	Function:	ILButton
 				Creates an ImageList and associates it with a button.
@@ -68,7 +67,5 @@ ILButton(HBtn, Images, Cx=16, Cy=16, Align="Left", Margin="1 1 1 1") {
 
 	SendMessage, BCM_SETIMAGELIST,,&BIL,, ahk_id %HBtn%
 	ifEqual, ErrorLevel, 0, return 0, DllCall("ImageList_Destroy", "Uint", hIL)
-
-	sleep 1 ; workaround for a redrawing problem on WinXP
 	return hIL
 }
