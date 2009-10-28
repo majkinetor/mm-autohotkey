@@ -137,13 +137,13 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 		MsgBox %s%
 	else if (mode="o") {
 		if !init {
+			init := WinExist("A")
 			if !WinExist("ahk_class dbgviewClass") {
-				   Run, DbgView.exe,, UseErrorLevel, PID
-	 			   WinWaitActive, ahk_pid %PID%, ,2
+				Run, DbgView.exe,, UseErrorLevel
 			} else WinActivate, ahk_class dbgviewClass
-
+ 			WinWaitActive, ahk_class dbgviewClass,,2
 			ifEqual, bClear, o, WinMenuSelectItem,ahk_class dbgviewClass,,Edit, Clear Display, ;			;ifEqual, bClear, o, Send, ^x		;	ControlSend, , ^x, ahk_class dbgviewClass		(mhm.... it worked...)
-			init++
+			WinActivate, ahk_id %init%
 		}
 		OutputDebug %s%
 	}

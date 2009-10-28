@@ -1,8 +1,13 @@
+SetText:			;Set text from string or file in rich edit control using either rich text or plain text.
+	RichEdit_SetText(hRichEdit, "insert..", "", 150)
+	RichEdit_SetText(hRichEdit, "append to end..", "SELECTION", -1 )
+return
+
 LineScroll:			;Line scroll
 	RichEdit_LineScroll(hRichEdit, 100, 1)
 return
 
-PosFromChar:	   ;Pos from char
+PosFromChar:	   ;Gets the client area coordinates of a specified character in an Edit control.
 	RichEdit_PosFromChar(hRichEdit, RichEdit_GetSel(hRichEdit), X, Y)
 	Log("Pos: " X, " " Y)
 return

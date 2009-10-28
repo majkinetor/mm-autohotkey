@@ -183,7 +183,7 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 	if Txt = Events
 	{
 		b := Toolbar_GetButton(hCtrl, Pos, "S")="checked"
-		events := !b ? "" : "DRAGDROPDONE DROPFILES KEYEVENTS MOUSEEVENTS SCROLLEVENTS PROTECTED REQUESTRESIZE"
+		events := !b ? "" : "DRAGDROPDONE DROPFILES KEYEVENTS SELCHANGE SCROLLEVENTS PROTECTED REQUESTRESIZE"
 		RichEdit_SetEvents(hRichEdit, "Handler", events)
 	}
 
