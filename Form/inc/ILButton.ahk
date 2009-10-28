@@ -30,7 +30,8 @@
 	About:
 		- Version 1.0 by majkinetor.
 		- Original code by tkoi. See <http://www.autohotkey.com/forum/viewtopic.php?p=247168>
-		- License: GNU GPLv3 <http://www.opensource.org/licenses/gpl-3.0.html>
+		- Minimum operating systems: Windows XP.
+		- Licenced under GNU GPLv3 <http://www.opensource.org/licenses/gpl-3.0.html>
 */
 
 ILButton(HBtn, Images, Cx=16, Cy=16, Align="Left", Margin="1 1 1 1") {
