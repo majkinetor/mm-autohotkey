@@ -972,75 +972,75 @@ RichEdit_SetBgColor(hCtrl, Color)  {
 }
 
 /*
- Function: SetCharFormat
+ Function:	SetCharFormat
 			Set character formatting in a rich edit control.
 
  Parameters:
-			face - Name of font.
-			style -	Space separated list of optional character effects. See below list.
-			color -	RGB color for font.
-			mode - If *ALL* or *A*, this optional parameter applies the formatting to all text in the
-            control. Otherwise it applies the formatting to the current selection. If the selection
-            is empty, the character formatting is applied to the insertion point, and the new
-            character format is in effect only until the insertion point changes.
+			Face	- Name of font.
+			Style	- Space separated list of optional character effects. See below list.
+			Color	- RGB color for font.
+			Mode	- If *ALL* or *A*, this optional parameter applies the formatting to all text in the
+					control. Otherwise it applies the formatting to the current selection. If the selection
+					is empty, the character formatting is applied to the insertion point, and the new
+					character format is in effect only until the insertion point changes.
 
  Style Options:
-     AUTOCOLOR - The text color is the current color of the text in windows.
-     BOLD - Characters are bold.
-     DISABLED - RichEdit 2.0 and later: Characters are displayed with a shadow that is offset by 3/4 point or one pixel, whichever is larger.
-     ITALIC - Characters are italic.
-     STRIKEOUT - Characters are struck.
-     UNDERLINE - Characters are underlined.
-     PROTECTED - Characters are protected.
+			 AUTOCOLOR	- The text color is the current color of the text in windows.
+			 BOLD		- Characters are bold.
+			 DISABLED	- RichEdit 2.0 and later: Characters are displayed with a shadow that is offset by 3/4 point or one pixel, whichever is larger.
+			 ITALIC		- Characters are italic.
+			 STRIKEOUT	- Characters are struck.
+			 UNDERLINE	- Characters are underlined.
+			 PROTECTED	- Characters are protected.
 
  Returns:
-     If the operation is setting all of the text and succeeds, the return value is 1.
-     If the operation fails, the return value is zero.
+			 If the operation is setting all of the text and succeeds, the return value is 1.
+			 If the operation fails, the return value is zero.
 
  Related:
-     <GetCharFormat>, <SetBgColor>
+			<GetCharFormat>, <SetBgColor>
 
  Example:
- > Dlg_Font( Face, Style, Color, true, hwnd )
- > RichEdit_SetCharFormat( hCtrl, Face, Style, Color )
+	> Dlg_Font( Face, Style, Color )
+	> RichEdit_SetCharFormat( hCtrl, Face, Style, Color )
  */
-RichEdit_SetCharFormat(hCtrl, face="", style="", color="-", mode="SELECTION")  {
-  static EM_SETCHARFORMAT=68,WM_USER=0x400
-  static SCF_ALL=0x4,SCF_SELECTION=0x1  ;,SCF_WORD=0x2
-  If mode in A,ALL
-    mode := SCF_ALL
- ;   Else If mode in W,WORD
- ;     mode := SCF_SELECTION | SCF_WORD
-  Else
-    mode := SCF_SELECTION
+RichEdit_SetCharFormat(hCtrl, Face="", Style="", Color="-", Mode="SELECTION")  {
+	static EM_SETCHARFORMAT=0x444
+		  , CFM_BOLD:=0x1,CFM_CHARSET:=0x8000000,CFM_COLOR:=0x40000000,CFM_FACE:=0x20000000,CFM_ITALIC:=0x2,CFM_OFFSET:=0x10000000,CFM_PROTECTED:=0x10,CFM_SIZE:=0x80000000,CFM_STRIKEOUT:=0x8,CFM_UNDERLINE:=0x4
+		  , CFE_AUTOCOLOR=0x40000000,CFE_BOLD=1,CFE_ITALIC=2,CFE_STRIKEOUT=8,CFE_UNDERLINE=4,CFE_PROTECTED=0x10
+		  , SCF_ALL=0x4,SCF_SELECTION=0x1  ;,SCF_WORD=0x2
+		  , dwMask_default=0
 
-  ;To turn off a formatting attribute, set the appropriate value in dwMask but do not set the corresponding value in dwEffects
-  static CFM_BOLD:=0x1,CFM_CHARSET:=0x8000000,CFM_COLOR:=0x40000000,CFM_FACE:=0x20000000,CFM_ITALIC:=0x2,CFM_OFFSET:=0x10000000,CFM_PROTECTED:=0x10,CFM_SIZE:=0x80000000,CFM_STRIKEOUT:=0x8,CFM_UNDERLINE:=0x4
-  static dwMask_default=0
-  dwMask_default |= !dwMask_default ? CFM_BOLD|CFM_CHARSET|CFM_ITALIC|CFM_OFFSET|CFM_PROTECTED|CFM_STRIKEOUT|CFM_UNDERLINE : 0
+	If mode in A,ALL
+		 mode := SCF_ALL
+	else mode := SCF_SELECTION
+	 ; Else If mode in W,WORD
+	  ;  mode := SCF_SELECTION | SCF_WORD
 
-  ; Character effects. This member can be a combination of the following values.
-  static CFE_AUTOCOLOR=0x40000000,CFE_BOLD=0x1,CFE_ITALIC=0x2,CFE_STRIKEOUT=0x8,CFE_UNDERLINE=0x4,CFE_PROTECTED=0x10
-  dwMask:=dwMask_default  , dwEffects:=0
-  StringUpper, style,style
-  If style
-  	Loop, parse, style, %A_Tab%%A_Space%
-      If A_LoopField in AUTOCOLOR,BOLD,ITALIC,STRIKEOUT,UNDERLINE,PROTECTED
-    	 dwEffects |= CFE_%A_LoopField%
+	;To turn off a formatting attribute, set the appropriate value in dwMask but do not set the corresponding value in dwEffects
+	dwMask_default |= !dwMask_default ? CFM_BOLD|CFM_CHARSET|CFM_ITALIC|CFM_OFFSET|CFM_PROTECTED|CFM_STRIKEOUT|CFM_UNDERLINE : 0
 
-  If RegExMatch( color, "0x(?P<R>..)(?P<G>..)(?P<B>..)", _ ) ; RGB2BGR
-    color:= "0x" _B _G _R
+	; Character effects. This member can be a combination of the following values.	
+	dwMask:=dwMask_default, dwEffects:=0
+	StringUpper, style,style
+	If style
+		Loop, parse, style, %A_Tab%%A_Space%
+		If A_LoopField in AUTOCOLOR,BOLD,ITALIC,STRIKEOUT,UNDERLINE,PROTECTED
+		 dwEffects |= CFE_%A_LoopField%
 
-  VarSetCapacity(CHARFORMAT, 60, 0), NumPut(60, CHARFORMAT)
-  dwMask |= RegExMatch(style " ","U)S([0-9]+) ", m) ?  (CFM_SIZE , NumPut(m1*20,CHARFORMAT,12,"Int"))   :  0
-  dwMask |= color!="-"                          ?  (CFM_COLOR, NumPut(color,CHARFORMAT,20,"UInt"))  :  0
-  dwMask |= face && StrLen(face)<33             ?  (CFM_FACE , VarSetCapacity(szFaceName,33,0), szFaceName:=face) : 0
+	If RegExMatch( color, "S)0x(?P<R>..)(?P<G>..)(?P<B>..)", _ ) ; RGB2BGR
+		color:= "0x" _B _G _R
 
-  NumPut(dwMask, CHARFORMAT, 4, "UInt"), NumPut(dwEffects, CHARFORMAT, 8, "UInt")
-  If szFaceName
-    DllCall("lstrcpy", "UInt", &CHARFORMAT + 26, "Str", szFaceName)
-  SendMessage, WM_USER | EM_SETCHARFORMAT, mode,&CHARFORMAT,, ahk_id %hCtrl%
-  return ERRORLEVEL ; value of the dwMask member of the CHARFORMAT structure
+	VarSetCapacity(CHARFORMAT, 60, 0), NumPut(60, CHARFORMAT)
+	dwMask |= RegExMatch(style " ","US)S([0-9]+) ", m) ?  (CFM_SIZE , NumPut(m1*20,CHARFORMAT,12,"Int"))   :  0
+	dwMask |= color!="-"                          ?  (CFM_COLOR, NumPut(color,CHARFORMAT,20,"UInt"))  :  0
+	dwMask |= face && StrLen(face)<33             ?  (CFM_FACE , VarSetCapacity(szFaceName,33,0), szFaceName:=face) : 0
+
+	NumPut(dwMask, CHARFORMAT, 4), NumPut(dwEffects, CHARFORMAT, 8)
+	If szFaceName
+		DllCall("lstrcpy", "UInt", &CHARFORMAT + 26, "Str", szFaceName)
+	SendMessage, EM_SETCHARFORMAT, mode, &CHARFORMAT,, ahk_id %hCtrl%
+	return ERRORLEVEL	;value of the dwMask member of the CHARFORMAT structure
 }
 
 /*
