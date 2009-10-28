@@ -169,7 +169,7 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 	Define Syntax:
  >			pQ		 :: StructName[=[Size]]: FieldDef1 FieldDef2 ... FieldDefN	
  >			FieldDef :: FieldName[=[Def]
- >			Def		 :: offset.[0][0]Type
+ >			Def		 :: [offset][.Type]
  >			Type	 :: [0]1 | [0]2 | [0]4 | [0]8 | 004 | 008
 
 	Put & Get:
@@ -194,13 +194,13 @@ m(o1="~`a", o2="~`a", o3="~`a", o4="~`a", o5="~`a", o6="~`a", o7="~`a", o8="~`a"
 	Examples:
 	(start code)
 	Define Examples:
-			S("RECT=16: left=0.4 top=4.4 right=8.4 bottom=12.4")		;Define RECT explicitly.
-			S("RECT: left top right bottom")	; Define RECT struct with auto struct size and auto offset increment. Returns 16. The same as above.
-			S("RECT: right=8 bottom")			; Define only 2 fields of RECT struct. Since the fields are last one, ! can be used afterwards. Returns 16.
-			S("RECT: top=4)					    ; Defines only 1 field of the RECT. Returns 8, so ! can't be used.
-			S("RECT=16: top=4)					; Defines only 1 field of the RECT and overrides size. Returns 16, so ! can be used.
-			S("R: x=.1 y=.02 k z=28.004")		; Define R, size don't care. R.x is UChar at 0, R.y is Short at 1, R.k is Uint at 3 and  R.z is Float at 28.
-			S("R=48: x=.1 y=.02 k z=28.004")	; Override struct size. Returns user size (48 in this case).
+			S(_,"RECT=16: left=0.4 top=4.4 right=8.4 bottom=12.4")		;Define RECT explicitly.
+			S(_,"RECT: left top right bottom")	; Define RECT struct with auto struct size and auto offset increment. Returns 16. The same as above.
+			S(_,"RECT: right=8 bottom")			; Define only 2 fields of RECT struct. Since the fields are last one, ! can be used afterwards. Returns 16.
+			S(_,"RECT: top=4)				    ; Defines only 1 field of the RECT. Returns 8, so ! can't be used.
+			S(_,"RECT=16: top=4)				; Defines only 1 field of the RECT and overrides size. Returns 16, so ! can be used.
+			S(_,"R: x=.1 y=.02 k z=28.004")		; Define R, size don't care. R.x is UChar at 0, R.y is Short at 1, R.k is Uint at 3 and  R.z is Float at 28.
+			S(_,"R=48: x=.1 y=.02 k z=28.004")	; Override struct size. Returns user size (48 in this case).
 												;  This is not the same as above as it states that z is not the last field of the R struct and that actual size is 48.
 			
 	Get & Put Examples:
