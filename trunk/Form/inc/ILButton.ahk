@@ -52,13 +52,21 @@ ILButton(HBtn, Images, Cx=16, Cy=16, Align="Left", Margin="1 1 1 1") {
 
 			ifEqual, v1,,SetEnv,v1, %prevFileName%
 			else prevFileName := v1
-
-			DllCall("PrivateExtractIcons", "Str", v1, "UInt", v2, "UInt", Cx, "UInt", Cy, "UIntP", hIcon, "UInt",0, "UInt", 1, "UInt", 0x20) ; LR_LOADTRANSPARENT = 0x20
-			DllCall("ImageList_AddIcon", "UInt",hIL, "UInt",hIcon)
-			ifEqual, A_Index, 1, SetEnv, I, %hIcon%
-			else DllCall("DestroyIcon", "UInt", hIcon)
+			
+			if SubStr(v1, -3) = ".bmp"
+			{
+				hBmp := DllCall("LoadImage", "UInt", 0, "Str", v1, "UInt", 0, "Int", Cx, "Int", Cy, "UInt", 0x30 , "UInt") ; LR_LOADTRANSPARENT = 0x20 , 0x10=LR_LOADFROMFILE
+				DllCall("ImageList_Add", "UInt", hIL, "UInt", hBmp)
+				ifEqual, A_Index, 1, SetEnv, B, %hBmp%
+				else DllCall("DestroyIcon", "UInt", hBmp)
+			} else {	;although privateextract loads bmps too it shows black dot in top left corner ...
+				DllCall("PrivateExtractIcons", "Str", v1, "UInt", v2, "UInt", Cx, "UInt", Cy, "UIntP", hIcon, "UInt",0, "UInt", 1, "UInt", 0x20) ; LR_LOADTRANSPARENT = 0x20
+				DllCall("ImageList_AddIcon", "UInt",hIL, "UInt",hIcon)
+				ifEqual, A_Index, 1, SetEnv, I, %hIcon%
+				else DllCall("DestroyIcon", "UInt", hIcon)
+			}
 		}
-		DllCall("DestroyIcon", "UInt", I)
+		r := I ? DllCall("DestroyIcon", "UInt", I) : DllCall("DeleteObject", "UInt", B)
 	} else hIL := Images
 
 	VarSetCapacity(BIL, 24), NumPut(hIL, BIL), NumPut(a_%Align%, BIL, 20)
@@ -69,3 +77,38 @@ ILButton(HBtn, Images, Cx=16, Cy=16, Align="Left", Margin="1 1 1 1") {
 	ifEqual, ErrorLevel, 0, return 0, DllCall("ImageList_Destroy", "Uint", hIL)
 	return hIL
 }
+
+/*
+ Function:  Image
+			Adds image to the Button control.
+
+ Parameters:
+			HButton	- Handle to the button.
+			Image	- Path to the .BMP file or image handle. First pixel signifies transparency color.
+			Width	- Width of the image, if omitted, current control width will be used.
+			Height	- Height of the image, if omitted, current control height will be used.
+
+ Returns:
+			Bitmap handle. 
+ */
+/*	OUTDATED BUT COULD BE USED IN WIN2K IF NEEDED.
+Image(HButton, Image, Width="", Height=""){ 
+    static BM_SETIMAGE=247, IMAGE_ICON=2, BS_BITMAP=0x80, IMAGE_BITMAP=0, LR_LOADFROMFILE=16, LR_LOADTRANSPARENT=0x20
+
+	if (Width = "" || Height = "") {
+		ControlGetPos, , ,W,H, ,ahk_id %hButton%
+		ifEqual, Width,, SetEnv, Width, % W-8
+		ifEqual, Height,,SetEnv, Height, % H-8
+	}
+
+	if Image is not integer 
+	{
+		if (!hBitmap := DllCall("LoadImage", "UInt", 0, "Str", Image, "UInt", 0, "Int", Width, "Int", Height, "UInt", LR_LOADFROMFILE | LR_LOADTRANSPARENT, "UInt"))
+			return 0
+	} else hBitmap := Image 
+    
+    WinSet, Style, +%BS_BITMAP%, ahk_id %hButton% 
+    SendMessage, BM_SETIMAGE, IMAGE_BITMAP, hBitmap, , ahk_id %hButton%
+	return hBitmap
+}
+*/
