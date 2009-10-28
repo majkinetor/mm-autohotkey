@@ -243,10 +243,11 @@ S(ByRef S,pQ,ByRef o1="~`a ",ByRef o2="",ByRef o3="",ByRef  o4="",ByRef o5="",By
 	j := InStr(pQ, A_Space)-1,  i := SubStr(pQ, j, 1), R := SubStr(pQ, 1, j-1), pQ := SubStr(pQ, j+2)
 	IfEqual, R,, return A_ThisFunc "> Struct name can't be empty"
 	if (i = "!") 
-		 VarSetCapacity(s, _%R%)
+		 VarSetCapacity(s, _%R%, 0)
 	loop, parse, pQ, %A_Space%, %A_Space%
 	{	
 		field := A_LoopField, data := %R%_%field%, offset := floor(data), type := SubStr(data, StrLen(offset)+2), type := %type%
+
 		ifEqual, data, , return A_ThisFunc "> Field or struct isn't recognised :  " R "." field 
 		if i in >,)
 			  o%A_Index% := NumGet(i=")" ? S+0 : &S+0, offset,type)

@@ -269,7 +269,6 @@ EM_SETBIDIOPTIONS(hCtrl)  {
 }
 
 
-
 EM_GETCTFMODEBIAS(hCtrl)  {
   static EM_GETCTFMODEBIAS=237,WM_USER=0x400
   SendMessage, WM_USER | EM_GETCHARFORMAT, 0,0,, ahk_id %hCtrl%
@@ -485,20 +484,6 @@ EM_ISIME(hCtrl)  {  ; richedit 4.1 only (msftedit.dll)
   MsgBox, % errorlevel  ; Returns TRUE if it is an East Asian locale. Otherwise, it returns FALSE.
 }
 
-EM_PASTESPECIAL(hCtrl)  {
-  static EM_PASTESPECIAL=64,WM_USER=0x400
-
-  ;Standard Clipboard Formats
-  static CF_BITMAP=2,CF_DIB=8,CF_DIBV5=17,CF_DIF=5,CF_DSPBITMAP=0x82,CF_DSPENHMETAFILE=0x8E,CF_DSPMETAFILEPICT=0x83
-        ,CF_DSPTEXT=0x81,CF_ENHMETAFILE=14,CF_GDIOBJFIRST=0x300,CF_GDIOBJLAST=0x3FF,CF_HDROP=15,CF_LOCALE=16
-        ,CF_METAFILEPICT=3,CF_OEMTEXT=7,CF_OWNERDISPLAY=0x80,CF_PALETTE=9,CF_PENDATA=10,CF_PRIVATEFIRST=0x200
-        ,CF_PRIVATELAST=0x2FF,CF_RIFF=11,CF_SYLK=4,CF_TEXT=1,CF_WAVE=12,CF_TIFF=6,CF_UNICODETEXT=13
-
-  cbFormat := CF_BITMAP
-  SendMessage, WM_USER | EM_PASTESPECIAL, cbFormat,&REPASTESPECIAL,, ahk_id %hCtrl%
-;   MsgBox, % errorlevel  ; This message does not return a value.
-}
-
 EM_RECONVERSION(hCtrl)  {
   static EM_RECONVERSION=125,WM_USER=0x400
   SendMessage, WM_USER | EM_RECONVERSION, 0,0,, ahk_id %hCtrl%
@@ -548,13 +533,6 @@ EM_SETCTFOPENSTATUS(hCtrl)  {
   MsgBox, % ERRORLEVEL ; If successful, this message returns TRUE.
 }
 
-EM_SETEDITSTYLE(hCtrl)  {
-;   static EM_SETEDITSTYLE=204,WM_USER=0x400
-;
-;   SendMessage, WM_USER | EM_SETEDITSTYLE, 0,&@??,, ahk_id %hCtrl%
-
-}
-
 
 EM_SETIMEMODEBIAS(hCtrl)  {
 ;   static EM_SETIMEMODEBIAS=126,WM_USER=0x400
@@ -588,12 +566,6 @@ EM_SETPALETTE(hCtrl)  {
 ;   static EM_SETPALETTE=93,WM_USER=0x400
 ;
 ;   SendMessage, WM_USER | EM_SETPALETTE, 0,&@??,, ahk_id %hCtrl%
-
-}
-EM_SETPARAFORMAT(hCtrl)  {
-;   static EM_SETPARAFORMAT=71,WM_USER=0x400
-;
-;   SendMessage, WM_USER | EM_SETPARAFORMAT, 0,&@??,, ahk_id %hCtrl%
 
 }
 
@@ -647,14 +619,6 @@ EM_STREAMIN(hCtrl)  {
   MsgBox, % errorlevel
 }
 
-
-
-____Redundant____:
-RETURN
-
-
-____Asian_Only____:
-RETURN
 
 EM_GETIMECOLOR(hCtrl)  {
 ; This message is available only in Asian-language versions of the operating system.

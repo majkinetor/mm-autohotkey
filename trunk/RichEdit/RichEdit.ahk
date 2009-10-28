@@ -795,6 +795,24 @@ RichEdit_Paste(hEdit) {
 } 
 
 /*
+ Function:	Paste
+			Paste clipboard into the Edit control.
+
+ Parameters:
+			Format	- One of the clipboard formats. See <http://msdn.microsoft.com/en-us/library/bb774214(VS.85).aspx>
+ */ 
+RichEdit_PasteSpecial(HCtrl, Format)  {
+  static EM_PASTESPECIAL=0x440
+		,CF_BITMAP=2,CF_DIB=8,CF_DIBV5=17,CF_DIF=5,CF_DSPBITMAP=0x82,CF_DSPENHMETAFILE=0x8E,CF_DSPMETAFILEPICT=0x83
+        ,CF_DSPTEXT=0x81,CF_ENHMETAFILE=14,CF_GDIOBJFIRST=0x300,CF_GDIOBJLAST=0x3FF,CF_HDROP=15,CF_LOCALE=16
+        ,CF_METAFILEPICT=3,CF_OEMTEXT=7,CF_OWNERDISPLAY=0x80,CF_PALETTE=9,CF_PENDATA=10,CF_PRIVATEFIRST=0x200
+        ,CF_PRIVATELAST=0x2FF,CF_RIFF=11,CF_SYLK=4,CF_TEXT=1,CF_WAVE=12,CF_TIFF=6,CF_UNICODETEXT=13
+
+  SendMessage, EM_PASTESPECIAL, CF_%Format%, 0,, ahk_id %hCtrl%
+}
+
+
+/*
  Function: PosFromChar 
            Gets the client area coordinates of a specified character in an Edit control.
  
@@ -1004,6 +1022,7 @@ RichEdit_SetBgColor(hCtrl, Color)  {
 	> Dlg_Font( Face, Style, Color )
 	> RichEdit_SetCharFormat( hCtrl, Face, Style, Color )
  */
+;sz := S(_, "CHARFORMAT2A: cbSize dwMask dwEffects yHeight=.04 yOffset=.04 crTextColor bCharSet=.1 bPitchAndFamily=.1 szFaceName wWeight=60.2 sSpacing=.02 crBackColor lcid dwReserved sStyle=.02 wKerning=.2 bUnderlineType=.1 bAnimation=.1 bRevAuthor=.1 bReserved1=.1")
 RichEdit_SetCharFormat(hCtrl, Face="", Style="", Color="-", Mode="SELECTION")  {
 	static EM_SETCHARFORMAT=0x444
 		  , CFM_BOLD:=0x1,CFM_CHARSET:=0x8000000,CFM_COLOR:=0x40000000,CFM_FACE:=0x20000000,CFM_ITALIC:=0x2,CFM_OFFSET:=0x10000000,CFM_PROTECTED:=0x10,CFM_SIZE:=0x80000000,CFM_STRIKEOUT:=0x8,CFM_UNDERLINE:=0x4
@@ -1191,6 +1210,87 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
 	
 	SendMessage, EM_SETOPTIONS, operation, hOptions,, ahk_id %hCtrl%
 	return RichEdit_GetOptions( "." ErrorLevel)
+}
+/*
+ Function:	SetParaFormat	
+			Sets the paragraph formatting for the current selection in a rich edit control.
+ 
+ Parameters:
+
+
+ Returns:
+			TRUE if succeessiful, FALSE otherwise.
+ */
+RichEdit_SetParaFormat(hCtrl)  {
+	static EM_SETPARAFORMAT=0x447
+		,PFM_ALIGNMENT=0x8, PFM_BORDER=0x800, PFM_BOX=0x4000000, PFM_COLLAPSED=0x1000000, PFM_DONOTHYPHEN=0x400000, PFM_KEEP=0x20000, PFM_KEEPNEXT=0x40000, PFM_LINESPACING=0x100, PFM_NOLINENUMBER=0x100000, PFM_NOWIDOWCONTROL=0x200000, PFM_NUMBERING=0x20
+		,PFM_NUMBERINGSTART=0x8000, PFM_NUMBERINGSTYLE=0x2000, PFM_NUMBERINGTAB=0x4000, PFM_OFFSET=0x4, PFM_OFFSETINDENT=0x80000000, PFM_OUTLINELEVEL=0x2000000, PFM_PAGEBREAKBEFORE=0x80000, PFM_RIGHTINDENT=0x2, PFM_RTLPARA=0x10000, PFM_SHADING=0x1000
+		,PFM_SIDEBYSIDE=0x800000, PFM_SPACEAFTER=0x80, PFM_SPACEBEFORE=0x40, PFM_STARTINDENT=0x1, PFM_STYLE=0x400,PFM_TABLE=0x40000000, PFM_TABSTOPS=0x10, PFN_BULLET=0x1, PFN_LCLETTER=3, PFN_LCROMAN=5, PFN_UCLETTER=4, PFN_UCROMAN=6
+		,PFA_CENTER=3, PFA_LEFT=1, PFA_RIGHT=2, PFA_FULL_INTERWORD=4
+
+	;effects
+		PFE_SIDEBYSIDE = (PFM_SIDEBYSIDE >> 16)
+		PFE_TABLE = 0x4000
+		PFE_PAGEBREAKBEFORE = (PFM_PAGEBREAKBEFORE >> 16)
+		PFE_NOLINENUMBER = (PFM_NOLINENUMBER >> 16)			;??!?! Disables line numbering (in Rich Edit 3.0 only).
+		PFE_KEEPNEXT = (PFM_KEEPNEXT >> 16)
+		PFE_KEEP = (PFM_KEEP >> 16)
+		PFE_RTLPARA = (PFM_RTLPARA >> 16)
+
+;	Rich Edit 1.0 used CR/LF character combinations for paragraph markers. 
+;	Rich Edit 2.0 used only a carriage return character ('\r'). Rich Edit 3.0 uses only a 
+;	carriage return character but can emulate Rich Edit 1.0 in this regard.
+
+
+	sz := S(_, "PARAFORMAT2: cbSize dwMask wNumbering=.2 wEffects=.2 dxStartIndent=.04 dxRightIndent=.04 dxOffset=.04 wAlignment=.02 cTabCount dySpaceBefore=156.04 dySpaceAfter=.04 dyLineSpacing=.04 sStyle=.02 bLineSpacingRule=.1 bOutlineLevel=.1 wShadingWeight=.2 wShadingStyle=.2 wNumberingStart=.2 wNumberingStyle=.2 wNumberingTab=.2 wBorderSpace=.2 wBorderWidth=.2 wBorders=.2")
+;	S(PF, "PARAFORMAT2! cbSize dwMask wBorders wBorderWidth", sz, PFM_BORDER, x:=64, y:=20*5 )	;!!! does not to work, returns 1
+
+	S(PF, "PARAFORMAT2! cbSize dwMask wAlignment", sz, PFM_ALIGNMENT, PFA_RIGHT)
+;	S(PF, "PARAFORMAT2! cbSize dwMask wNumbering", sz, PFM_NUMBERING, x:=6 )
+;	S(PF, "PARAFORMAT2! cbSize dwMask wNumbering wNumberingStart wNumberingStyle wNumberingTab", sz, pm := PFM_NUMBERING | PFM_NUMBERINGSTART | PFM_NUMBERINGSTYLE | PFM_NUMBERINGTAB, p1:=2, p2:=10, p3:=0x200, p4:=20*50)
+;	S(PF, "PARAFORMAT2! cbSize dwMask bLineSpacingRule dyLineSpacing", sz, PFM_LINESPACING, x:=4, y:=20*50)
+;	S(PF, "PARAFORMAT2! cbSize dwMask dxOffset dxStartIndent", sz, p:=PFM_OFFSET | PFM_OFFSETINDENT, x:=-20*50, y:=20*50) ;must turn word wrap on to see effect.
+;	S(PF, "PARAFORMAT2! cbSize dwMask dySpaceAfter dySpaceBefore", sz, p:=PFM_SPACEAFTER | PFM_SPACEBEFORE, x:=20*50, y:=10*50)
+;	S(PF, "PARAFORMAT2! cbSize dwMask dxRightIndent", sz, PFM_RIGHTINDENT, x:=20*50)
+
+;	S(PF, "PARAFORMAT2! cbSize dwMask cTabCount rgxTabs", sz, PFM_TABSTOPS, x:=2)		;put 2 tabstops
+;   NumPut(20*50, PF, 28+0, "Int"), NumPut(20*250, PF, 28+4, "Int")		
+
+;	S(PF, "PARAFORMAT2! cbSize dwMask wEffects", sz, PFM_TABLE, PFE_TABLE)
+
+;	HexView(&PF, sz)
+	SendMessage, EM_SETPARAFORMAT,,&PF,,ahk_id %hCtrl%
+	return ErrorLevel
+}
+
+/*
+ Function:	SetEditStyle
+			Sets the current edit style flags.
+ 
+ Parameters:
+			Style - One of the styles bellow. Prepend "-" to turn the style off.
+
+ Styles:
+			EMULATESYSEDIT	- When this bit is on, rich edit attempts to emulate the system edit control.
+			BEEPONMAXTEXT	- Rich Edit will call the system beeper if the user attempts to enter more than the maximum characters.
+			EXTENDBACKCOLOR	- Extends the background color all the way to the edges of the client rectangle.
+			USEAIMM			- Uses the AIMM input method component that ships with Microsoft Internet Explorer 4.0 or later.
+			UPPERCASE		- Converts all input characters to uppercase.
+			LOWERCASE		- Converts all input characters to lowercase.
+			XLTCRCRLFTOCR	- Turns on translation of CRCRLFs to CRs. When this bit is on and a file is read in, all instances of CRCRLF will be converted to hard CRs internally. This will affect the text wrapping. Note that if such a file is saved as plain text, the CRs will be replaced by CRLFs. This is the .txt standard for plain text.
+			SCROLLONKILLFOCUS - When KillFocus occurs, scroll to the beginning of the text.
+
+ Returns:
+			State of the edit style flags after rich edit has attempted to implement your edit style changes (number).
+ */
+RichEdit_SetEditStyle(hCtrl, Style)  {
+	static EM_SETEDITSTYLE=0x4CC
+		   ,SES_UPPERCASE=512, SES_LOWERCASE=1024, SES_XLTCRCRLFTOCR=16384, SES_EXTENDBACKCOLOR=4, SES_BEEPONMAXTEXT=2, SES_EMULATESYSEDIT=1, SES_USEAIMM=64, SES_SCROLLONKILLFOCUS=8192
+
+	if bOff := (SubStr(Style, 1, 1) = "-")
+		Style := SubStr(Style, 2)
+	SendMessage, EM_SETEDITSTYLE, bOff ? 0 : SES_%Style%, SES_%Style%,, ahk_id %hCtrl%
+	return ErrorLevel
 }
 
 /*
@@ -1638,5 +1738,6 @@ RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 /* Group: About
 	o Version 1.0 by freakkk & majkinetor.
 	o MSDN Reference : <http://msdn.microsoft.com/en-us/library/bb787605(VS.85).aspx>.
+	o RichEdit control shortcut keys: <http://msdn.microsoft.com/en-us/library/bb787873(VS.85).aspx#rich_edit_shortcut_keys>.
 	o AHK module licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */
