@@ -56,7 +56,7 @@ ILButton(HBtn, Images, Cx=16, Cy=16, Align="Left", Margin="1 1 1 1") {
 			
 			if SubStr(v1, -3) = ".bmp"
 			{
-				hBmp := DllCall("LoadImage", "UInt", 0, "Str", v1, "UInt", 0, "Int", Cx, "Int", Cy, "UInt", 0x30 , "UInt") ; LR_LOADTRANSPARENT = 0x20 , 0x10=LR_LOADFROMFILE
+				hBmp := DllCall("LoadImage", "UInt", 0, "Str", v1, "UInt", 0, "Int", Cx, "Int", Cy, "UInt", 0x10 , "UInt") ; 0x10=LR_LOADFROMFILE
 				DllCall("ImageList_Add", "UInt", hIL, "UInt", hBmp)
 				ifEqual, A_Index, 1, SetEnv, B, %hBmp%
 				else DllCall("DestroyIcon", "UInt", hBmp)
