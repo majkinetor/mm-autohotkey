@@ -15,7 +15,30 @@ _("mo!")
 	Form_Show("", "Maximize")
 	Log("Press F1 or doubleclick to execute selected API"), Log()
 	RichEdit_AutoUrlDetect( hRichEdit, "^" )
-	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
+
+	;table
+	t =
+	(LTrim
+		  {\rtf1\ansi\ansicpg1252\deff0\deflang1033
+		  {\fonttbl 
+		  {\f0\fswiss\fcharset0 Arial;} 
+		  {\f1\froman\fprq2\fcharset0 Times New Roman;} 
+		  {\f2\fnil\fprq2\fcharset2 Wingdings;}} 
+		  {\*\generator Msftedit 5.41.15.1507;}\viewkind4\uc1\pard\f0\fs20\par 
+		  \trowd\trgaph108\trleft-108\trbrdrl\brdrs\brdrw10 \trbrdrt\brdrs\brdrw10 \trbrdrr\brdrs\brdrw10  
+		  \trbrdrb\brdrs\brdrw10 \trpaddl108\trpaddr108\trpaddfl3\trpaddfr3 
+		  \clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs  
+		  \cellx2040\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs  
+		  \cellx4320\pard\intbl\lang3081\f1\fs24 Cell 1.1\line Multiline?\line Oh Yeah \f2 J\f1\cell  
+		  Cell 1.2\cell\row\trowd\trgaph108\trleft-108\trbrdrl\brdrs\brdrw10 \trbrdrt\brdrs\brdrw10 \trbrdrr\brdrs\brdrw10  
+		  \trbrdrb\brdrs\brdrw10 \trpaddl108\trpaddr108\trpaddfl3\trpaddfr3 
+		  \clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs  
+		  \cellx2040\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs  
+		  \cellx4320\pard\intbl Cell 2.1\cell Cell 2.2\cell\row\pard\lang1033\f0\fs20\par 
+		  }
+	)
+
+	RichEdit_SetText(hRichEdit, t)
 	;	RichEdit_LimitText( hRichEdit, 900000 )  ; to taste save...
 return
 
