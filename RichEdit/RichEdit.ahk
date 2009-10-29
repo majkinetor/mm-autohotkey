@@ -1125,6 +1125,11 @@ RichEdit_SetCharFormat(hCtrl, Face="", Style="", Color="-", Mode="SELECTION")  {
 		 o P1 - Beginning character position of range.
 		 o P2 - Ending character position of range.
 
+		*LINK*: The hyperlink has been clicked.
+		 o P1 - LClick or RClick.
+		 o P2 - CpMin.
+		 o P3 - CpMax.
+
  Returns:
 		The previous event mask (number).
  */

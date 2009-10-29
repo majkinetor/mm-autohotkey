@@ -37,7 +37,8 @@ Handler(hCtrl, Event, p1, p2, p3 ) {
     MsgBox, % "Dropped files: " P1 "`n----`n" P2 "`n----`nChar position: " P3
     return
   }
-
+	if event = Link
+		Log("Link:", RichEdit_GetText(hCtrl, p2, p3))
   msg = %Event% `tp1 = %p1% `tp2 = %p2% `tp3 = %p3% `t%L%
   Log(msg)
   IfEqual, Event, PROTECTED, return TRUE
@@ -210,7 +211,7 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 	if Txt = Events
 	{
 		b := Toolbar_GetButton(hCtrl, Pos, "S")="checked"
-		events := !b ? "" : "DRAGDROPDONE DROPFILES KEYEVENTS SELCHANGE SCROLLEVENTS PROTECTED REQUESTRESIZE"
+		events := !b ? "" : "DRAGDROPDONE LINK DROPFILES KEYEVENTS SELCHANGE SCROLLEVENTS PROTECTED REQUESTRESIZE"
 		RichEdit_SetEvents(hRichEdit, "Handler", events)
 	}
 
