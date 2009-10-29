@@ -2,7 +2,6 @@
 				Rich Text Format Generator.
  */
 
-
 /*
  Function:	Table
 			Creates table.
@@ -35,3 +34,8 @@ RTF_Table(Rows, Cols, ColWidths) {
 	sTable .= "\par}"
 	return sTable
 }
+
+/* Group: About
+	o Version .1 by majkinetor
+	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+ */
