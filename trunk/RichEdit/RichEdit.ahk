@@ -1,5 +1,9 @@
 /* Title:		RichEdit
-				RichEdit control.
+
+				This module allows you to create and programmatically set text properties in rich edit control.
+				Besides that, it contains functions that work with standard edit controls. Each function contains
+				description for which kind of control it can be used - any control supporting edit control interface
+				(Edit, RichEdit, HiEdit...) or just rich edit control.
  */
 
 /*
@@ -280,7 +284,7 @@ RichEdit_FindText(hEdit, Text, CpMin=0, CpMax=-1, Flags="UNICODE") {
 }
 /*
  Function:	FindWordBreak
-			Finds the next word break before or after the specified character position or retrieves information about the character at that position.
+			Finds the next word break in rich edit conttrol, before or after the specified character position or retrieves information about the character at that position.
  
  Parameters:
 		    CharIndex	- Zero-based character starting position.
@@ -454,7 +458,7 @@ RichEdit_GetCharFormat(hCtrl, ByRef font="", ByRef style="", ByRef color="", mod
 
 /*
   Function: GetRedo
- 			Determine whether there are any actions in the control redo queue, and
+ 			Determine whether there are any actions in the rich edit control redo queue, and
 			optionally retrieve the type of the next redo action.
  
   Parameters:
@@ -597,7 +601,7 @@ RichEdit_GetText(HCtrl, CpMin="-", CpMax="-", CodePage="")  {
 
 /*
  Function:	GetTextLength
-			Calculates text length in various ways.
+			Calculates text length in various ways for a rich edit control.
 
  Parameters:
 			flag     - Space separated list of one or more options.  See below list.
@@ -1230,7 +1234,8 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
 			o1..o6	- Named arguments: Num, Align, Line, Ident, Space, Tabs. Each named arugment has its own set of 
 					  parameters (delimited by comma). The syntax is "Name=a1,a2,a3,a4".
 
- Num:	
+ *Num* :	
+
 			Type	- EMPTY, BULLET, DECIMAL, LOWER, UPPER, ROMAN_LOWER, ROMAN_UPPER, SEQUENCE (Uses a sequence of characters beginning with the character specified by the start argument).
 			Start	- Starting number or starting value used for numbered paragraphs.
 			Style	- One of the following :
@@ -1242,10 +1247,12 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
 					  o NEW  - Starts a new number with value of *Start* parameter.
 			Offset	- Minimum space between a paragraph number and the paragraph text, in twips.
  
- Align:		
+ *Align* :	
+ 
 			Type	- CENTER, LEFT, RIGHT, JUSTIFY.
 
- Line:		
+ *Line* :		
+
 			Rule	- One of the following :
 					  o SINGLE	 - Single spacing.
 					  o 1ANDHALF - One-and-a-half spacing.
@@ -1255,7 +1262,8 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
 					  o S3		 - The value of Spacing/20 is the spacing, in lines, from one line to the next. Thus, setting Spacing to 20 produces single-spaced text, 40 is double spaced, 60 is triple spaced, and so on.
 			Spacing - Spacing between lines. This value is valid only for S1-S3 Rules.
 
- Ident:		
+ *Ident* :		
+
  			First	- Indentation of the paragraph's first line, relative to the paragraph's current indentation, in twips. 
 					  The indentation of subsequent lines depends on the Offset member.  To see all this in effect you must enable word wrap mode.
 					  If starts with ".", it represents absolute indentation from the left margin.
@@ -1263,11 +1271,13 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
 					  The first line is indented if this member is negative or outdented if this member is positive.
 			Right	- Indentation of the right side of the paragraph, relative to the right margin, in twips.
 
- Space:
+ *Space* :
+
 			Before	- Size of the spacing above the paragraph, in twips. 
 			After	- Specifies the size of the spacing below the paragraph, in twips.
 
- Tabs:		
+ *Tabs* :		
+
 			List	- Space separated list of absolute tab stop positions in twips.
 
  Returns:
@@ -1415,7 +1425,7 @@ RichEdit_SetSel(hCtrl, CpMin=0, CpMax=0)  {
  Flags:
 			DEFAULT		- Deletes the undo stack, discards rich-text formatting, & replaces all text.
 			KEEPUNDO	- Keeps the undo stack.
-			SEL			- Replaces selection and keeps rich-text formatting. If you don't specify this style entire content of 
+			SELECTION	- Replaces selection and keeps rich-text formatting. If you don't specify this style entire content of 
 						  the control will be replaced with the new text.
 			FROMFILE	- Load a file into control.  If used, this option expects the *txt* parameter to be
 						  a filename. If there is a problem loading the file, *ErrorLevel* will contain message.
@@ -1519,9 +1529,6 @@ RichEdit_SetUndoLimit(hCtrl, nMax)  {
 				  "*V*", "*H*", or a combination of the two.
 
 			State - *TRUE* or *FALSE*.
-
- Returns:
-     This function does not return a value.
 
  Remarks:
      This method is only valid when the control is in-place active. Calls made while the control is inactive may fail.
