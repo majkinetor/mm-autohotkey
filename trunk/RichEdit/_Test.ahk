@@ -24,12 +24,7 @@ _("mo!")
 
 ;	RichEdit_LimitText( hRichEdit, 900000 )  ; to taste save...
 	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
-	s := RTF( RTF_T("This is bold", "b") 
-			. RTF_Br() 
-			. RTF_T("This is italic", "i") . RTF_T(" ")
-			. RTF_T("centered line", "qc"))
-	RichEdit_SetText(hRichEdit, s, "", -1 )
-	;	RichEdit_SetText(hRichEdit, RTF_Table(3, 2, "100 200") )
+	;	RichEdit_SetText(hRichEdit,  )
 	;	RichEdit_SetText(hRichEdit, RTF_Table(3, 1, "300"), "", -1 )
 
 return
