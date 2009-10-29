@@ -48,6 +48,7 @@
 	o http://www.winasm.net/forum/index.php?showtopic=487
 	o WM_GETDLGCODE Notification (DLGC_WANTALLKEYS, DLGC_WANTTAB): <http://msdn.microsoft.com/en-us/library/ms645425(VS.85).aspx>
 	o http://www.codeguru.com/cpp/controls/editctrl/keyboard/article.php/c513/
+	o Microsoft solution that doesn't work: <http://support.microsoft.com/kb/q143273/>.
  */
 RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
   static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
@@ -541,62 +542,57 @@ RichEdit_GetSel(hCtrl, ByRef cpMin="", ByRef cpMax="" )  {
 			Retrieves a specified range of characters from a rich edit control.
 
  Parameters:
-			cpMin -	Beginning of range of characters to retrieve.
-			cpMax -	End of range of characters to retrieve.
-			codepage - If *UNICODE* or *U*, this optional parameter will use unicode code page
-					in the translation. Otherwise it will default to using ansi.
+			CpMin -	Beginning of range of characters to retrieve.
+			CpMax -	End of range of characters to retrieve.
+			CodePage - If *UNICODE* or *U*, this optional parameter will use unicode code page
+					in the translation. Otherwise it will default to using ansi. (*** needs rework ***)
 
  Note:
-			If the *cpMin* and *cpMax* are omitted, the current selection is retrieved.
-			The range includes everything if *cpMin* is 0 and *cpMax* is –1.
+			If the *CpMin* and *CpMax* are omitted, the current selection is retrieved.
+			The range includes everything if *CpMin* is 0 and *CpMax* is –1.
 
  Returns:
 			Returns the retrieved text.
 
  Related:
-     <GetSel>, <SetText>, <SetSel>, <GetTextLength>
+			<GetSel>, <SetText>, <SetSel>, <GetTextLength>
  */
-RichEdit_GetText(hCtrl, cpMin="-", cpMax="-", codepage="")  {
-  static WM_USER=0x400,EM_EXGETSEL=52,EM_GETTEXTEX=94,EM_GETTEXTRANGE=75,GT_SELECTION=2
-  ; GT_ALL=0,CP_ACP=0
-  bufferLength := RichEdit_GetTextLength(hCtrl, "CLOSE", "UNICODE" )
+RichEdit_GetText(HCtrl, CpMin="-", CpMax="-", CodePage="")  {
+	static EM_EXGETSEL=0x434, EM_GETTEXTEX=0x45E, EM_GETTEXTRANGE=0x44B, GT_SELECTION=2
 
-  If (cpMin="-" && cpMax="-")
-    MODE := GT_SELECTION, cpMin:=cpMax:=""
+	bufferLength := RichEdit_GetTextLength(hCtrl, "CLOSE", "UNICODE" )
 
-  Else If (cpMin=0 && cpMax=-1)
-    MODE := GT_ALL      , cpMin:=cpMax:=""
+	If (CpMin CpMax = "--")
+		MODE := GT_SELECTION, CpMin:=CpMax:=""
+	else if (CpMin=0 && CpMax=-1)
+		MODE := GT_ALL      , CpMin:=CpMax:=""
+	else if (CpMin+0 != "") && (cpMax+0 != "") 
+	{
+		VarSetCapacity(lpwstr, bufferLength), VarSetCapacity(TEXTRANGE, 12)
+		NumPut(CpMin, TEXTRANGE, 0, "UInt")
+		NumPut(CpMax, TEXTRANGE, 4, "UInt"), NumPut(&lpwstr, TEXTRANGE, 8, "UInt")
+		SendMessage, EM_GETTEXTRANGE,, &TEXTRANGE,, ahk_id %hCtrl%
+		; If not unicode, return ansi from string pointer..
+		if !InStr(RichEdit_TextMode(HCtrl), "MULTICODEPAGE")
+			return DllCall("MulDiv", "UInt", &lpwstr, "Int",1, "Int",1, "str")
 
-  Else If cpMin is integer
-  {
-    If cpMax is integer
-    {
-      VarSetCapacity(lpwstr,bufferLength,0), VarSetCapacity(TEXTRANGE, 12, 0)
-      NumPut(cpMin, TEXTRANGE, 0, "UInt")
-      NumPut(cpMax, TEXTRANGE, 4, "UInt"), NumPut(&lpwstr, TEXTRANGE, 8, "UInt")
-      SendMessage, WM_USER | EM_GETTEXTRANGE, 0,&TEXTRANGE,, ahk_id %hCtrl%
+		;..else, convert Unicode to Ansi..
+		nSz := DllCall("lstrlenW","UInt",&lpwstr) + 1, VarSetCapacity( ansi, nSz )
+		DllCall("WideCharToMultiByte" , "Int",0       , "Int",0
+									,"UInt",&LPWSTR ,"UInt",nSz+1
+									, "Str",ansi    ,"UInt",nSz+1
+									, "Int",0       , "Int",0 )
+		VarSetCapacity(ansi, -1)
+		return ansi
+	}
+	else return "", errorlevel := A_ThisFunc "> Invalid use of cpMin or cpMax parameter."
 
-      ; If not unicode, return ansi from string pointer..
-      If !DllCall("IsWindowUnicode", "UInt", hCtrl)
-        return DllCall("MulDiv", "Int",&lpwstr, "Int",1, "Int",1, "str")
-
-      ;..else, convert Unicode to Ansi..
-      nSz:=DllCall("lstrlenW","UInt",&lpwstr) + 1, VarSetCapacity( Ansi,nSz )
-      DllCall("WideCharToMultiByte" , "Int",0       , "Int",0
-                                    ,"UInt",&LPWSTR ,"UInt",nSz+1
-                                    , "Str",ansi    ,"UInt",nSz+1
-                                    , "Int",0       , "Int",0 )
-      return ansi
-    }
-  }
-  Else return "", errorlevel := A_ThisFunc "> Invalid use of cpMin or cpMax parameter."
-
-  VarSetCapacity(GETTEXTEX, 20, 0)          , VarSetCapacity(BUFFER, bufferLength, 0)
-  NumPut(bufferLength, GETTEXTEX, 0, "UInt"), NumPut(MODE, GETTEXTEX, 4, "UInt")
-  NumPut( (codepage="unicode"||codepage="u") ? 1200 : 0  , GETTEXTEX, 8, "UInt")
-  SendMessage, WM_USER | EM_GETTEXTEX, &GETTEXTEX,&BUFFER,, ahk_id %hCtrl%
-  VarSetCapacity(BUFFER, -1)
-  return BUFFER
+	VarSetCapacity(GETTEXTEX, 20, 0)          , VarSetCapacity(BUFFER, bufferLength, 0)
+	NumPut(bufferLength, GETTEXTEX, 0, "UInt"), NumPut(MODE, GETTEXTEX, 4, "UInt")
+	NumPut( (CodePage="unicode" || CodePage="u") ? 1200 : 0  , GETTEXTEX, 8, "UInt")
+	SendMessage, EM_GETTEXTEX, &GETTEXTEX, &BUFFER,, ahk_id %hCtrl%
+	VarSetCapacity(BUFFER, -1)
+	return BUFFER
 }
 
 /*
@@ -645,19 +641,19 @@ RichEdit_GetText(hCtrl, cpMin="-", cpMax="-", codepage="")  {
           . "NUMBYTES = " RichEdit_GetTextLength(hRichEdit, "NUMBYTES" ) "`n"
  (end code)
  */
-RichEdit_GetTextLength(hCtrl, flags=0, codepage="")  {
+RichEdit_GetTextLength(hCtrl, Flags=0, CodePage="")  {
   static EM_GETTEXTLENGTHEX=95,WM_USER=0x400
   static GTL_DEFAULT=0,GTL_USECRLF=1,GTL_PRECISE=2,GTL_CLOSE=4,GTL_NUMCHARS=8,GTL_NUMBYTES=16
 
   hexFlags:=0
-	Loop, parse, flags, %A_Tab%%A_Space%
+	Loop, parse, Flags, %A_Tab%%A_Space%
 		hexFlags |= GTL_%A_LOOPFIELD%
 
-  VarSetCapacity(GETTEXTLENGTHEX, 4, 0)
+  VarSetCapacity(GETTEXTLENGTHEX, 4)
   NumPut(hexFlags, GETTEXTLENGTHEX, 0), NumPut((codepage="unicode"||codepage="u") ? 1200 : 1252, GETTEXTLENGTHEX, 4)
   SendMessage, EM_GETTEXTLENGTHEX | WM_USER, &GETTEXTLENGTHEX,0,, ahk_id %hCtrl%
-  IfEqual, ERRORLEVEL,0x80070057, return "", errorlevel := "ERROR: Invalid combination of parameters."
-  IfEqual, ERRORLEVEL,FAIL      , return "", errorlevel := "ERROR: Invalid control handle."
+  IfEqual, ERRORLEVEL,0x80070057, return "", errorlevel := A_ThisFunc "> Invalid combination of parameters."
+  IfEqual, ERRORLEVEL,FAIL      , return "", errorlevel := A_ThisFunc "> Invalid control handle."
   return ERRORLEVEL
 }
 
@@ -950,9 +946,11 @@ RichEdit_SelectionType(hCtrl)  {
 	static EM_SELECTIONTYPE=1090, 1="TEXT", 2="OBJECT", 4="MULTICHAR", 8="MULTIOBJECT", types="1,2,4,8"
 
 	if hCtrl > 0
+	{
 		SendMessage, EM_SELECTIONTYPE,,,, ahk_id %hCtrl%
 		if !(o := ErrorLevel)
 			return 
+	}
 	else o := abs(hCtrl)
 
 	loop, parse, types, `,

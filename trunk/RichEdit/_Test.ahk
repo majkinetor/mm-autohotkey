@@ -41,7 +41,7 @@ Handler(hCtrl, Event, p1, p2, p3 ) {
   IfEqual, Event, PROTECTED, return TRUE
 }
 
-CreateGui(Text, W=950, H=600) {
+CreateGui(Text, W=980, H=600) {
 	global 
 
 	CMenu=

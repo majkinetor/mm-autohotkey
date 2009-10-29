@@ -1,3 +1,10 @@
+GetText: ;Retrieves a specified range of characters from a rich edit control.
+
+ Log("Selection: " RichEdit_GetText( hRichEdit ))
+ Log("All: " RichEdit_GetText( hRichEdit, 0, -1 ))
+ Log("Range: " RichEdit_GetText( hRichEdit, 4, 10 ))
+return
+
 SetParaFormat:		;ets the paragraph formatting for the current selection in a rich edit control.
 	r := RichEdit_SetParaFormat(hRichEdit, "Align=CENTER", "Num=DECIMAL,10,D,1000", "Line=DOUBLE", "Space=1000,3000" )
 	Log("Set Align, Num, Line & Space: " r)
@@ -10,8 +17,9 @@ return
 TextMode:	;Sets text mode.
 	rtf := RichEdit_Save( hRichEdit )			;get RTF
 	txt := RichEdit_GetText(hRichEdit, 0, -1)	;get PLAINTEXT
-	Log( RichEdit_TextMode(hRichEdit) )
+	Log( "Current mode: " RichEdit_TextMode(hRichEdit) )
 	Log( "Set mode to plaintext: " RichEdit_TextMode(hRichEdit, "PLAINTEXT") )
+	Log( "Current mode: " RichEdit_TextMode(hRichEdit) )
 	RichEdit_SetText(hRichEdit, txt)
 	Msgbox Plain Text
 	Log( "Restore mode to richtext: " RichEdit_TextMode(hRichEdit, "RICHTEXT") )
@@ -41,7 +49,7 @@ GetLineCount:		;Get Line Count
 return
 
 GetModify:			;Get modification status
-	Log("Modificatin status: " RichEdit_GetModify(hRichEdit))
+	Log("Modification status: " RichEdit_GetModify(hRichEdit))
 return
 
 SelectionType:		;Get selection type
@@ -52,7 +60,7 @@ GetOptions: ;Get options
 	Log("Current options: " RichEdit_GetOptions(hRichEdit))
 return
 
-SetOptions:	;Finds the next word break before or after the specified character position or retrieves information about the character at that position.
+SetOptions:	;Set options
 	r := RichEdit_SetOptions(hRichEdit, "XOR", "SELECTIONBAR READONLY")	;switch readonly
 	Log("Current options: " r)
 return
@@ -79,13 +87,6 @@ GetSel: ;Retrieve the starting and ending character positions of the selection.
 	if !(count := max-min)
 		 Log("Cursor Position: " min)
 	else Log("Selected from: " min " - " max " (" count ")")
-return
-
-GetText: ;Retrieves a specified range of characters from a rich edit control.
-
- Log("Selection: " RichEdit_GetText( hRichEdit ))
- Log("All: " RichEdit_GetText( hRichEdit, 0, -1 ))
- Log("Range: " RichEdit_GetText( hRichEdit, 4, 10 ))
 return
 
 LineFromChar: ;Determines which line contains the specified character in a rich edit control.
