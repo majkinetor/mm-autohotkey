@@ -1235,17 +1235,26 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
  Num:	
 			Type	- EMPTY, BULLET, DECIMAL, LOWER, UPPER, ROMAN_LOWER, ROMAN_UPPER, SEQUENCE (Uses a sequence of characters beginning with the character specified by the start argument).
 			Start	- Starting number or starting value used for numbered paragraphs.
-			Style	- RP (right parenthesis), P (enclosed in parentheses), D (dot), N (only number), CONT (Continues a numbered list without applying the next number or bullet), NEW (Starts a new number with *Start*)
+			Style	- One of the following :
+					  o RP   - Follows the number with a right parenthesis.
+					  o P	 - Encloses the number in parentheses.
+					  o D	 - Follows the number with a dot.
+					  o N	 - Displays only the number.
+					  o CONT - Continues a numbered list without applying the next number or bullet.
+					  o NEW  - Starts a new number with value of *Start* parameter.
 			Offset	- Minimum space between a paragraph number and the paragraph text, in twips.
  
  Align:		
 			Type	- CENTER, LEFT, RIGHT, JUSTIFY.
 
  Line:		
-			Rule	- SINGLE (Single spacing), ANDHALF (One-and-a-half spacing), DOUBLE (Double spacing), 
-					  S1 (The Spacing specifies the spacing from one line to the next, in twips. However, if Spacing specifies a value that is less than single spacing, the control displays single-spaced text.)
-					  S2 (The Spacing specifies the spacing from one line to the next, in twips. The control uses the exact spacing specified, even if Spacing specifies a value that is less than single spacing.)
-					  S3 (The value of Spacing/20 is the spacing, in lines, from one line to the next. Thus, setting Spacing to 20 produces single-spaced text, 40 is double spaced, 60 is triple spaced, and so on.)
+			Rule	- One of the following :
+					  o SINGLE	 - Single spacing.
+					  o 1ANDHALF - One-and-a-half spacing.
+					  o DOUBLE	 - Double spacing.
+					  o S1		 - The Spacing specifies the spacing from one line to the next, in twips. However, if Spacing specifies a value that is less than single spacing, the control displays single-spaced text.
+					  o S2		 - The Spacing specifies the spacing from one line to the next, in twips. The control uses the exact spacing specified, even if Spacing specifies a value that is less than single spacing.
+					  o S3		 - The value of Spacing/20 is the spacing, in lines, from one line to the next. Thus, setting Spacing to 20 produces single-spaced text, 40 is double spaced, 60 is triple spaced, and so on.
 			Spacing - Spacing between lines. This value is valid only for S1-S3 Rules.
 
  Ident:		
@@ -1279,7 +1288,7 @@ RichEdit_SetParaFormat(hCtrl, o1="", o2="", o3="", o4="", o5="", o6="")  {
 	static ALIGN_CENTER=3, ALIGN_LEFT=1, ALIGN_RIGHT=2, ALIGN_JUSTIFY=4
 		  ,NUM_TYPE_BULLET=1, NUM_TYPE_DECIMAL=2, NUM_TYPE_LOWER=3, NUM_TYPE_UPPER=4, NUM_TYPE_ROMAN_LOWER=5, NUM_TYPE_ROMAN_UPPER=6, NUM_TYPE_SEQUENCE=7
 		  ,NUM_STYLE_P=0X100, NUM_STYLE_D=0X200, NUM_STYLE_N=0X300, NUM_STYLE_CONT=0X400, NUM_STYLE_NEW=0X800
-		  ,LINE_RULE_SINGLE=0, LINE_RULE_ANDHALF=1, LINE_RULE_DOUBLE=2, LINE_RULE_S1=3, LINE_RULE_S2=4, LINE_RULE_S3=5, 
+		  ,LINE_RULE_SINGLE=0, LINE_RULE_1ANDHALF=1, LINE_RULE_DOUBLE=2, LINE_RULE_S1=3, LINE_RULE_S2=4, LINE_RULE_S3=5, 
 
 	loop {
 		ifEqual, o%A_Index%,,break
