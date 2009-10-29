@@ -12,30 +12,19 @@ _("mo!")
  
 	CreateGui(text)
 
-	Form_Show("", "Maximize")
+	Form_Show() ;"", "Maximize")
 	Log("Press F1 or doubleclick to execute selected API"), Log()
 	RichEdit_AutoUrlDetect( hRichEdit, "^" )
 
 	;table
 	t =
 	(LTrim
-		  {\rtf1\ansi\ansicpg1252\deff0\deflang1033
-		  {\fonttbl 
-		  {\f0\fswiss\fcharset0 Arial;} 
-		  {\f1\froman\fprq2\fcharset0 Times New Roman;} 
-		  {\f2\fnil\fprq2\fcharset2 Wingdings;}} 
-		  {\*\generator Msftedit 5.41.15.1507;}\viewkind4\uc1\pard\f0\fs20\par 
-		  \trowd\trgaph108\trleft-108\trbrdrl\brdrs\brdrw10 \trbrdrt\brdrs\brdrw10 \trbrdrr\brdrs\brdrw10  
-		  \trbrdrb\brdrs\brdrw10 \trpaddl108\trpaddr108\trpaddfl3\trpaddfr3 
-		  \clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs  
-		  \cellx2040\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs  
-		  \cellx4320\pard\intbl\lang3081\f1\fs24 Cell 1.1\line Multiline?\line Oh Yeah \f2 J\f1\cell  
-		  Cell 1.2\cell\row\trowd\trgaph108\trleft-108\trbrdrl\brdrs\brdrw10 \trbrdrt\brdrs\brdrw10 \trbrdrr\brdrs\brdrw10  
-		  \trbrdrb\brdrs\brdrw10 \trpaddl108\trpaddr108\trpaddfl3\trpaddfr3 
-		  \clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs  
-		  \cellx2040\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs  
-		  \cellx4320\pard\intbl Cell 2.1\cell Cell 2.2\cell\row\pard\lang1033\f0\fs20\par 
-		  }
+{\rtf1
+\trowd\trgaph108\trleft8\trbrdrl\brdrs\brdrw10 \trbrdrt\brdrs\brdrw10 \trbrdrr\brdrs\brdrw10 \trbrdrb\brdrs\brdrw10 \trpaddl108\trpaddr108\trpaddfl3\trpaddfr3
+\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs \cellx2374\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs \cellx4748\pard\intbl Row: 0 Column: 0\cell Row: 0 Column: 1\cell\row\trowd\trgaph108\trleft8\trbrdrl\brdrs\brdrw10 \trbrdrt\brdrs\brdrw10 \trbrdrr\brdrs\brdrw10 \trbrdrb\brdrs\brdrw10 \trpaddl108\trpaddr108\trpaddfl3\trpaddfr3
+\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs \cellx2374\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs \cellx4748\pard\intbl Row: 1 Column: 0\cell Row: 1 Column: 1\cell\row\pard\b\f1\fs20\par
+}
+
 	)
 
 	RichEdit_SetText(hRichEdit, t)
@@ -43,7 +32,7 @@ _("mo!")
 return
 
 F2::
-	RichEdit_SetFontSize(hRichEdit, 2)
+	RichEdit_InsertTable(hRichEdit)
 return
 
 Handler(hCtrl, Event, p1, p2, p3 ) {
@@ -101,7 +90,7 @@ CreateGui(Text, W=850, H=600) {
 
 
 	hPanel3   := Form_Add(hPanel2, "Panel", "", "", "Align T,30", "Attach w")
-				 Form_Add(hPanel3, "Slider", "", "Range1-10 gOnSlider vSlider h30", "Align R, 100", "Attach x")
+				 Form_Add(hPanel3, "Slider", "", "Range1-10 gOnSlider AltSubmit vSlider h30", "Align R, 100", "Attach x")
 	hToolbar  := Form_Add(hPanel3, "Toolbar", btns, "gOnToolbar style='flat nodivider tooltips' il=0 x0 h30", "Align T", "Attach w")
 	Toolbar_SetBitmapSize(hToolbar, 0)	
 
@@ -133,6 +122,7 @@ OnFind:
 return
 
 OnSlider:
+	Log(RichEdit_Zoom( hRichEdit ))
 	d := slider - cslider
 	ifEqual, d, 0, return
 		
