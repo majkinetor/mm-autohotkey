@@ -201,10 +201,10 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 			RichEdit_SetBgColor(hRichEdit, color)	
 	
 	if Txt = Load
-		RichEdit_SetText(hRichEdit, Dlg_Open(hForm1), "FROMFILE")
+		RichEdit_SetText(hRichEdit, Dlg_Open(hForm1, "", "RTF files (*.rtf)|Text files (*.txt)"), "FROMFILE")
 
 	if Txt = Save
-		if fn := Dlg_Save(hForm1, "", "", "", "", "rtf") 
+		if fn := Dlg_Save(hForm1, "", "RTF files (*.rtf)|Text files (*.txt)", "", "", "rtf") 
 			RichEdit_Save(hRichEdit, fn)
 
 	if Txt = Events
