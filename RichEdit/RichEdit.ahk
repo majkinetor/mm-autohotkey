@@ -694,6 +694,13 @@ RichEdit_GetUndo(hCtrl, ByRef Name="-")  {
   return nUndo
 }
 
+
+RichEdit_InsertTable(HCtrl, rows=4, cols=3) {
+	
+
+    RichEdit_SetText(hCtrl, sTable, "SELECTION KEEPUNDO")
+}
+
 /*
  Function:  LineFromChar
 			Determines which line contains the specified character in a rich edit control.
