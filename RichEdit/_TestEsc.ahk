@@ -1,3 +1,6 @@
+;http://www.winasm.net/forum/index.php?showtopic=487
+;http://www.williamwilling.com/blog/?p=28
+
 #SingleInstance, force
 	Gui, +LastFound
 	hwnd := WinExist()
