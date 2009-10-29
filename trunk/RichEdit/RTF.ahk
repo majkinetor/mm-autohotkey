@@ -35,7 +35,31 @@ RTF_Table(Rows, Cols, ColWidths) {
 	return sTable
 }
 
+RTF_T(Text, Type="") {
+	if Type in i,b
+	    return "`n\" Type "`n" Text "`n\" Type "0"
+	
+	if Type in qc,ql
+		return "`n\" Type " " Text
+
+	return "`n" Text
+}
+
+RTF_Br() {
+	return "`n\par"
+}
+
+RTF(Text) {
+	return "{\rtf1" Text "`n}"
+}
+
+
 /* Group: About
-	o Version .1 by majkinetor
+	o Version .1 by majkinetor.
+	o RTF specification v1.7: <http://www.snake.net/software/RTF/RTF-Spec-1.7.pdf>.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */
+
+; http://www.powerbasic.com/support/pbforums/showthread.php?t=39489&highlight=RTF+Rich+Edit
+
+

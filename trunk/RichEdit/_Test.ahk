@@ -22,15 +22,18 @@ _("mo!")
 
 	)
 
-	;RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
-	;	RichEdit_LimitText( hRichEdit, 900000 )  ; to taste save...
-	RichEdit_SetText(hRichEdit, RTF_Table(3, 2, "100 200") )
-	RichEdit_SetText(hRichEdit, RTF_Table(3, 1, "300"), "", -1 )
+;	RichEdit_LimitText( hRichEdit, 900000 )  ; to taste save...
+	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
+	s := RTF( RTF_T("This is bold", "b") 
+			. RTF_Br() 
+			. RTF_T("This is italic", "i") . RTF_T(" ")
+			. RTF_T("centered line", "qc"))
+	RichEdit_SetText(hRichEdit, s, "", -1 )
+	;	RichEdit_SetText(hRichEdit, RTF_Table(3, 2, "100 200") )
+	;	RichEdit_SetText(hRichEdit, RTF_Table(3, 1, "300"), "", -1 )
+
 return
 
-F2::
-	RichEdit_SetText(hRichEdit, RTF_Table(3, 2, 100) )
-return
 
 Handler(hCtrl, Event, p1, p2, p3 ) {
   If (Event = "DROPFILES")  {
