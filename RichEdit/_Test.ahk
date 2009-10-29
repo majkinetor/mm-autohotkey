@@ -19,20 +19,17 @@ _("mo!")
 	;table
 	t =
 	(LTrim
-{\rtf1
-\trowd\trgaph108\trleft8\trbrdrl\brdrs\brdrw10 \trbrdrt\brdrs\brdrw10 \trbrdrr\brdrs\brdrw10 \trbrdrb\brdrs\brdrw10 \trpaddl108\trpaddr108\trpaddfl3\trpaddfr3
-\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs \cellx2374\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs \cellx4748\pard\intbl Row: 0 Column: 0\cell Row: 0 Column: 1\cell\row\trowd\trgaph108\trleft8\trbrdrl\brdrs\brdrw10 \trbrdrt\brdrs\brdrw10 \trbrdrr\brdrs\brdrw10 \trbrdrb\brdrs\brdrw10 \trpaddl108\trpaddr108\trpaddfl3\trpaddfr3
-\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs \cellx2374\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs \cellx4748\pard\intbl Row: 1 Column: 0\cell Row: 1 Column: 1\cell\row\pard\b\f1\fs20\par
-}
 
 	)
 
-	RichEdit_SetText(hRichEdit, t)
+	;RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
 	;	RichEdit_LimitText( hRichEdit, 900000 )  ; to taste save...
+	RichEdit_SetText(hRichEdit, RTF_Table(3, 2, "100 200") )
+	RichEdit_SetText(hRichEdit, RTF_Table(3, 1, "300"), "", -1 )
 return
 
 F2::
-	RichEdit_InsertTable(hRichEdit)
+	RichEdit_SetText(hRichEdit, RTF_Table(3, 2, 100) )
 return
 
 Handler(hCtrl, Event, p1, p2, p3 ) {
@@ -246,8 +243,9 @@ return
 F1:: IfNotEqual, api, API, goto %api%
 
 #include RichEdit.ahk
+#include RTF.ahk
+
 #include _Demo.ahk
-#include Todo.ahk
 
 ;sample includes
 #include inc
