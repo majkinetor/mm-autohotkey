@@ -696,7 +696,8 @@ RichEdit_GetUndo(hCtrl, ByRef Name="-")  {
 
 
 RichEdit_InsertTable(HCtrl, rows=4, cols=3) {
-    RichEdit_SetText(hCtrl, s, "SELECTION KEEPUNDO")
+	;http://www.devx.com/asp/Article/17964/0/page/3
+	RichEdit_SetText(hCtrl, s, "SELECTION KEEPUNDO")
 }
 
 /*
