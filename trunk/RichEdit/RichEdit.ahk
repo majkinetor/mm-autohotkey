@@ -40,8 +40,8 @@
  Remarks:
 	Whenever you press Escape in a multiline edit control it sends a WM_CLOSE message to its parent. Both the regular edit control and the rich edit control have this problem.
 	This is by Microsoft design. There is also similar undesired behavior for {Tab} key which is used by the system to navigate over controls with "tabstop" flag. RichEdit is designed
-	in such way that it doesn't prevent this, but to use ^{Tab} instead. For both cases, you can either subclass control and handle keys yourself or instantiate appropriate Hotkeys and
-	which are handled when RichEdit has focus.
+	in such way that it doesn't prevent this, but to use ^{Tab} instead. For both cases, you can either subclass control and handle keys yourself or instantiate appropriate Hotkeys
+	which should be handled when rich edit control has focus.
 
 	For more information see links bellow :
 	o http://www.williamwilling.com/blog/?p=28http://www.biblioscape.com/rtf15_spec.htm
