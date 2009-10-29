@@ -694,6 +694,11 @@ RichEdit_GetUndo(hCtrl, ByRef Name="-")  {
   return nUndo
 }
 
+
+RichEdit_InsertTable(HCtrl, rows=4, cols=3) {
+    RichEdit_SetText(hCtrl, s, "SELECTION KEEPUNDO")
+}
+
 /*
  Function:  LineFromChar
 			Determines which line contains the specified character in a rich edit control.
@@ -1563,7 +1568,7 @@ RichEdit_WordWrap(HCtrl, Flag)  {
 }
 
 /*
- Function: Zoom
+ Function:	Zoom
 			Sets the zoom ratio anywhere between 1/64 and 64.
 
  Parameters:
@@ -1739,5 +1744,6 @@ RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 	o Version 1.0 by freakkk & majkinetor.
 	o MSDN Reference : <http://msdn.microsoft.com/en-us/library/bb787605(VS.85).aspx>.
 	o RichEdit control shortcut keys: <http://msdn.microsoft.com/en-us/library/bb787873(VS.85).aspx#rich_edit_shortcut_keys>.
+	o RTF specification: <http://www.biblioscape.com/rtf15_spec.htm>
 	o AHK module licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */
