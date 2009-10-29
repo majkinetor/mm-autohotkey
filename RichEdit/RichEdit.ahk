@@ -43,7 +43,7 @@
 	in such way that it doesn't prevent this, but to use ^{Tab} instead. For both cases, you can either subclass control and handle keys yourself or instantiate appropriate Hotkeys and
 	which are handled when RichEdit has focus.
 
-	For more information see links bellow:
+	For more information see links bellow :
 	o http://www.williamwilling.com/blog/?p=28http://www.biblioscape.com/rtf15_spec.htm
 	o http://www.winasm.net/forum/index.php?showtopic=487
 	o WM_GETDLGCODE Notification (DLGC_WANTALLKEYS, DLGC_WANTTAB): <http://msdn.microsoft.com/en-us/library/ms645425(VS.85).aspx>
@@ -1487,77 +1487,82 @@ RichEdit_ShowScrollBar(hCtrl, Bar, State=true)  {
 			Get or set the current text mode of a rich edit control.
 
  Parameters:
-			textMode - Space separated list of options (see below list). If omitted, current text mode is returned.
+			TextMode - Space separated list of options (see below). If omitted, current text mode is returned.
 
- textMode Options:
-     PLAINTEXT		 - Indicates plain-text mode, in which the control is similar to a standard edit control. 
-					   For more information about plain-text mode see  <http://msdn.microsoft.com/en-us/library/bb774286(VS.85).aspx>
-     RICHTEXT		 - Indicates rich-text mode (default text mode)
-     SINGLELEVELUNDO - The control allows the user to undo only the last action in the undo queue.
-     MULTILEVELUNDO	 - The control supports multiple undo actions (default undo mode).
-                       Use <SetUndoLimit> to set the maximum number of undo actions.
-     SINGLECODEPAGE	 - The control only allows the English keyboard and a keyboard corresponding
-                       to the default character set. For example, you could have Greek and
-                       English. Note that this prevents Unicode text from entering the control.
-                       For example, use this value if a rich edit control must berestricted to ANSI text.
-     MULTICODEPAGE	 - The control allows multiple code pages and Unicode text into the control(default code page mode)
+ Options:
+		Specify one of the following values to set the text mode parameter. 
+		If you don't specify a text mode value, the text mode remains at its current setting.
+
+		PLAINTEXT		 - Indicates plain-text mode, in which the control is similar to a standard edit control. 
+		RICHTEXT		 - Indicates rich-text mode (default text mode).
+
+		Specify one of the following values to set the undo level parameter. If you don't specify an undo level value, the undo level remains at its current setting.
+
+		SINGLELEVELUNDO  - The control allows the user to undo only the last action in the undo queue.
+		MULTILEVELUNDO	 - The control supports multiple undo actions (default undo mode).
+						   Use <SetUndoLimit> to set the maximum number of undo actions.
+
+		Specify one of the following values to set the code page parameter. If you don't specify an code page value, the code page remains at its current setting.
+
+		SINGLECODEPAGE	 - The control only allows the English keyboard and a keyboard corresponding
+						   to the default character set. For example, you could have Greek and
+						   English. Note that this prevents Unicode text from entering the control.
+						   For example, use this value if a rich edit control must be restricted to ANSI text.
+		MULTICODEPAGE	 - The control allows multiple code pages and Unicode text into the control (default code page mode).
 
  Returns:
-	If *textMode* is omitted, the return value is the current text mode settings.
-	When *textMode* is given, function will return *TRUE* or *FALSE*.
+		If *TextMode* is omitted, the return value is the current text mode settings.
+		When *TextMode* is given, function will return *TRUE* or *FALSE*.
 
  Remarks:
-	The control must not contain text when calling this function, or it will return *FALSE*.
-	To ensure there is no text, use <SetText> with an empty string.
-		> RichEdit_SetText(hRichEdit, "")
+		The control text will be deleted when calling this function.
 
-	If you simply want to determine whether a rich edit control is Unicode, use *IsWindowUnicode* dllcall as demonstrated below:
-		> If DllCall("IsWindowUnicode", "UInt", hCtrl)
-		>   	MsgBox, Control is unicode.
-		> Else  MsgBox, Control is ansi.
+		In rich text mode, a rich edit control has standard rich edit functionality. 
+		However, in plain text mode, the control is similar to a standard edit control :
+
+		- The text in a plain text control can have only one format (such as Bold, 10pt Arial). 
+		- The user cannot paste rich text formats, such as Rich Text Format (RTF) or embedded objects into a plain text control. 
+		- Rich text mode controls always have a default end-of-document marker or carriage return, to format paragraphs. 
+		- Plain text controls, on the other hand, do not need the default, end-of-document marker, so it is omitted.
 
  Related:
-     <SetUndoLimit>
+		<SetUndoLimit>
 
  Example:
- > MsgBox, % "mode= " RichEdit_TextMode(hRichEdit)
- >
- > If RichEdit_TextMode( hRichEdit, "PLAINTEXT SINGLELEVELUNDO" )
- >   MsgBox, % "new mode= " RichEdit_TextMode(hRichEdit)
- > Else
- >   MsgBox, % errorlevel
+	(start code)
+	  MsgBox, % "mode= " RichEdit_TextMode(hRichEdit)
+	 
+	  If RichEdit_TextMode( hRichEdit, "PLAINTEXT SINGLELEVELUNDO" )
+			MsgBox, % "new mode= " RichEdit_TextMode(hRichEdit)
+	  Else	MsgBox, % errorlevel
+	(end code)
  */
-RichEdit_TextMode(hCtrl, textMode="")  {
-  static EM_SETTEXTMODE=89,EM_GETTEXTMODE=90,WM_USER=0x400
-  static TM_PLAINTEXT=1,TM_RICHTEXT=2,TM_SINGLELEVELUNDO=4,TM_MULTILEVELUNDO=8,TM_SINGLECODEPAGE=16,TM_MULTICODEPAGE=32
+RichEdit_TextMode(HCtrl, TextMode="")  {
+  static EM_SETTEXTMODE=0x459, EM_GETTEXTMODE=0x45A
+		,TM_PLAINTEXT=1, TM_RICHTEXT=2, TM_SINGLELEVELUNDO=4, TM_MULTILEVELUNDO=8, TM_SINGLECODEPAGE=16, TM_MULTICODEPAGE=32
+		,TEXTMODES="MULTICODEPAGE,SINGLECODEPAGE,MULTILEVELUNDO,SINGLELEVELUNDO,RICHTEXT,PLAINTEXT"
 
-  If (textMode)  {    ; Setting text mode
-    txtMode := undoMode := codepgMode := 0
-    Loop, parse, textMode, %A_Tab%%A_Space%
-    {
-      If A_LoopField in RICHTEXT,PLAINTEXT
-    	 txtMode    := TM_%A_LoopField%
-      Else If A_LoopField in MULTILEVELUNDO,SINGLELEVELUNDO
-    	 undoMode   := TM_%A_LoopField%
-      Else If A_LoopField in MULTICODEPAGE,SINGLECODEPAGE
-    	 codepgMode := TM_%A_LoopField%
-      Else
-        return false, errorlevel := "ERROR: '" A_LoopField "' isn't a valid textmode."
-    }
-    SendMessage, WM_USER | EM_SETTEXTMODE, % txtMode | undoMode | codepgMode,0,, ahk_id %hCtrl%
-    return !errorlevel ? true : false, errorlevel := "ERROR: Unable to change text mode. Make sure control is empty first."
-  }
-  Else  {     ; Getting current text mode
-    SendMessage, WM_USER | EM_GETTEXTMODE, 0,0,, ahk_id %hCtrl%
-    If errorlevel is not integer
-      return false, errorlevel := "ERROR: Failed to retrieve controls text mode. Check to make sure you are specifying correct hwnd to control."
-    tm := errorlevel
-    TEXTMODES=MULTICODEPAGE,SINGLECODEPAGE,MULTILEVELUNDO,SINGLELEVELUNDO,RICHTEXT,PLAINTEXT
-    Loop, parse, TEXTMODES,`,
-      tm >= TM_%a_loopfield%  ?  (tmDesc.=(tmDesc ? " " a_loopfield : a_loopfield), tm-=TM_%a_loopfield%)  :  ""
-    return tmDesc
-  }
+	If (TextMode)  {    ; Setting text mode
+		hTextMode := 0
+		Loop, parse, TextMode, %A_Tab%%A_Space%
+			ifEqual, A_LoopField,,continue
+			else hTextMode |= TM_%A_LOOPFIELD%
+	    IfEqual, hTextMode,, return false, ErrorLevel := A_ThisFunc "> Some of the options are invalid: " TextMode
+
+		RichEdit_SetText(HCtrl)
+		SendMessage, EM_SETTEXTMODE, hTextMode,,, ahk_id %HCtrl%
+		return Errorlevel ? True : False
+	}
+	else  {				; Getting current text mode
+		SendMessage, EM_GETTEXTMODE,,,, ahk_id %HCtrl%
+		tm := ErrorLevel
+		loop, parse, TEXTMODES,`,
+			if (TM_%A_LoopField% & tm)
+				res .= A_LoopField " "
+		return SubStr(res, 1, -1)
+	}
 }
+
 /*
  Function:		WordWrap
 				Set word wrap mode in rich edit control.

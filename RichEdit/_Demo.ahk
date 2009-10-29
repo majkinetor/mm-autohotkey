@@ -1,3 +1,10 @@
+TextMode:	;Sets text mode.
+;	txt := RichEdit_GetText( hRichEdit, 0, -1 )
+	Log( RichEdit_TextMode(hRichEdit) )
+	Log( RichEdit_TextMode(hRichEdit, "RICHTEXT") )
+;	RichEdit_SetText(hRichEdit, txt)
+return
+
 SetParaFormat:		;
 	Log(RichEdit_SetParaFormat(hRichEdit))
 return
@@ -78,11 +85,4 @@ return
 
 LimitText:	;Sets an upper limit to the amount of text the user can type or paste into a rich edit control
 	RichEdit_LimitText( hRichEdit, 20 )  ; limit to 20 characters
-return
-
-TextMode:	;Sets text mode.
-	txt := RichEdit_GetText( hRichEdit, 0, -1 )
-	RichEdit_SetText(hRichEdit)
-	RichEdit_TextMode(hRichEdit, "RICHTEXT") 
-	RichEdit_SetText(hRichEdit, txt)
 return
