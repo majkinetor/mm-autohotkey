@@ -1223,54 +1223,111 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
 	SendMessage, EM_SETOPTIONS, operation, hOptions,, ahk_id %hCtrl%
 	return RichEdit_GetOptions( "." ErrorLevel)
 }
+
 /*
  Function:	SetParaFormat	
 			Sets the paragraph formatting for the current selection in a rich edit control.
  
  Parameters:
+			o1..o6	- Named arguments: Num, Align, Line, Ident, Space, Tabs. Each named arugment has its own set of 
+					  parameters (delimited by comma). The syntax is "Name=a1,a2,a3,a4".
 
+ Num:	
+			Type	- EMPTY, BULLET, DECIMAL, LOWER, UPPER, ROMAN_LOWER, ROMAN_UPPER, SEQUENCE (Uses a sequence of characters beginning with the character specified by the start argument).
+			Start	- Starting number or starting value used for numbered paragraphs.
+			Style	- RP (right parenthesis), P (enclosed in parentheses), D (dot), N (only number), CONT (Continues a numbered list without applying the next number or bullet), NEW (Starts a new number with *Start*)
+			Offset	- Minimum space between a paragraph number and the paragraph text, in twips.
+ 
+ Align:		
+			Type	- CENTER, LEFT, RIGHT, JUSTIFY.
+
+ Line:		
+			Rule	- SINGLE (Single spacing), ANDHALF (One-and-a-half spacing), DOUBLE (Double spacing), 
+					  S1 (The Spacing specifies the spacing from one line to the next, in twips. However, if Spacing specifies a value that is less than single spacing, the control displays single-spaced text.)
+					  S2 (The Spacing specifies the spacing from one line to the next, in twips. The control uses the exact spacing specified, even if Spacing specifies a value that is less than single spacing.)
+					  S3 (The value of Spacing/20 is the spacing, in lines, from one line to the next. Thus, setting Spacing to 20 produces single-spaced text, 40 is double spaced, 60 is triple spaced, and so on.)
+			Spacing - Spacing between lines. This value is valid only for S1-S3 Rules.
+
+ Ident:		
+ 			First	- Indentation of the paragraph's first line, relative to the paragraph's current indentation, in twips. 
+					  The indentation of subsequent lines depends on the Offset member.  To see all this in effect you must enable word wrap mode.
+					  If negative, it represents absolute indentation from the left margin.
+			Offset	- Indentation of the second and subsequent lines, relative to the indentation of the first line, in twips. 
+					  The first line is indented if this member is negative or outdented if this member is positive.
+			Right	- Indentation of the right side of the paragraph, relative to the right margin, in twips.
+
+ Space:
+			Before	- Size of the spacing above the paragraph, in twips. 
+			After	- Specifies the size of the spacing below the paragraph, in twips.
+
+ Tabs:		
+			List	- Space separated list of absolute tab stop positions in twips.
 
  Returns:
 			TRUE if succeessiful, FALSE otherwise.
+
+ Remarks: 
+			Control uses carriage return character (`r) for paragraph markers by default.
  */
-RichEdit_SetParaFormat(hCtrl)  {
+RichEdit_SetParaFormat(hCtrl, o1="", o2="", o3="", o4="", o5="", o6="")  {
+	;S(_, "PARAFORMAT2: cbSize dwMask wNumbering=.2 wEffects=.2 dxStartIndent=.04 dxRightIndent=.04 dxOffset=.04 wAlignment=.02 cTabCount dySpaceBefore=156.04 dySpaceAfter=.04 dyLineSpacing=.04 sStyle=.02 bLineSpacingRule=.1 bOutlineLevel=.1 wShadingWeight=.2 wShadingStyle=.2 wNumberingStart=.2 wNumberingStyle=.2 wNumberingTab=.2 wBorderSpace=.2 wBorderWidth=.2 wBorders=.2")
 	static EM_SETPARAFORMAT=0x447
 		,PFM_ALIGNMENT=0x8, PFM_BORDER=0x800, PFM_BOX=0x4000000, PFM_COLLAPSED=0x1000000, PFM_DONOTHYPHEN=0x400000, PFM_KEEP=0x20000, PFM_KEEPNEXT=0x40000, PFM_LINESPACING=0x100, PFM_NOLINENUMBER=0x100000, PFM_NOWIDOWCONTROL=0x200000, PFM_NUMBERING=0x20
 		,PFM_NUMBERINGSTART=0x8000, PFM_NUMBERINGSTYLE=0x2000, PFM_NUMBERINGTAB=0x4000, PFM_OFFSET=0x4, PFM_OFFSETINDENT=0x80000000, PFM_OUTLINELEVEL=0x2000000, PFM_PAGEBREAKBEFORE=0x80000, PFM_RIGHTINDENT=0x2, PFM_RTLPARA=0x10000, PFM_SHADING=0x1000
 		,PFM_SIDEBYSIDE=0x800000, PFM_SPACEAFTER=0x80, PFM_SPACEBEFORE=0x40, PFM_STARTINDENT=0x1, PFM_STYLE=0x400,PFM_TABLE=0x40000000, PFM_TABSTOPS=0x10, PFN_BULLET=0x1, PFN_LCLETTER=3, PFN_LCROMAN=5, PFN_UCLETTER=4, PFN_UCROMAN=6
-		,PFA_CENTER=3, PFA_LEFT=1, PFA_RIGHT=2, PFA_FULL_INTERWORD=4
+		
+	static ALIGN_CENTER=3, ALIGN_LEFT=1, ALIGN_RIGHT=2, ALIGN_JUSTIFY=4
+		  ,NUM_TYPE_BULLET=1, NUM_TYPE_DECIMAL=2, NUM_TYPE_LOWER=3, NUM_TYPE_UPPER=4, NUM_TYPE_ROMAN_LOWER=5, NUM_TYPE_ROMAN_UPPER=6, NUM_TYPE_SEQUENCE=7
+		  ,NUM_STYLE_P=0X100, NUM_STYLE_D=0X200, NUM_STYLE_N=0X300, NUM_STYLE_CONT=0X400, NUM_STYLE_NEW=0X800
+		  ,LINE_RULE_SINGLE=0, LINE_RULE_ANDHALF=1, LINE_RULE_DOUBLE=2, LINE_RULE_S1=3, LINE_RULE_S2=4, LINE_RULE_S3=5, 
 
-	;effects
-		PFE_SIDEBYSIDE = (PFM_SIDEBYSIDE >> 16)
-		PFE_TABLE = 0x4000
-		PFE_PAGEBREAKBEFORE = (PFM_PAGEBREAKBEFORE >> 16)
-		PFE_NOLINENUMBER = (PFM_NOLINENUMBER >> 16)			;??!?! Disables line numbering (in Rich Edit 3.0 only).
-		PFE_KEEPNEXT = (PFM_KEEPNEXT >> 16)
-		PFE_KEEP = (PFM_KEEP >> 16)
-		PFE_RTLPARA = (PFM_RTLPARA >> 16)
+	loop {
+		ifEqual, o%A_Index%,,break
+		else j := InStr( o%A_index%, "=" ), p := SubStr(o%A_index%, 1, j-1 ), v := SubStr( o%A_index%, j+1)
+		StringSplit, %p%, v, `,
+	}		
 
-;	Rich Edit 1.0 used CR/LF character combinations for paragraph markers. 
-;	Rich Edit 2.0 used only a carriage return character ('\r'). Rich Edit 3.0 uses only a 
-;	carriage return character but can emulate Rich Edit 1.0 in this regard.
+	;S(PF, "PARAFORMAT2! cbSize dwMask wAlignment", sz, PFM_ALIGNMENT, PFA_RIGHT)
+	VarSetCapacity(PF, 188, 0), NumPut(188, PF),  hMask := 0
+	if Align0 
+		hMask |= PFM_ALIGNMENT, NumPut(ALIGN_%Align1%, PF, 24, "UShort")
 
+	;S(PF, "PARAFORMAT2! cbSize dwMask wNumbering wNumberingStart wNumberingStyle wNumberingTab", sz, pm := PFM_NUMBERING | PFM_NUMBERINGSTART | PFM_NUMBERINGSTYLE | PFM_NUMBERINGTAB, p1:=2, p2:=10, p3:=0x200, p4:=20*50)
+	if Num0
+		hMask |= PFM_NUMBERING, NumPut(NUM_TYPE_%Num1%, PF, 8, "UShort")
+		, (Num2 = "") ? "" : (hMask |= PFM_NUMBERINGSTART,  NumPut(Num2, PF, 176, "UShort"))
+		, (Num3 = "") ? "" : (hMask |= PFM_NUMBERINGSTYLE,  NumPut(NUM_STYLE_%Num3%, PF, 178, "UShort"))
+		, (Num4 = "") ? "" : (hMask |= PFM_NUMBERINGTAB,    NumPut(Num4, PF, 180, "UShort"))
 
-	sz := S(_, "PARAFORMAT2: cbSize dwMask wNumbering=.2 wEffects=.2 dxStartIndent=.04 dxRightIndent=.04 dxOffset=.04 wAlignment=.02 cTabCount dySpaceBefore=156.04 dySpaceAfter=.04 dyLineSpacing=.04 sStyle=.02 bLineSpacingRule=.1 bOutlineLevel=.1 wShadingWeight=.2 wShadingStyle=.2 wNumberingStart=.2 wNumberingStyle=.2 wNumberingTab=.2 wBorderSpace=.2 wBorderWidth=.2 wBorders=.2")
-;	S(PF, "PARAFORMAT2! cbSize dwMask wBorders wBorderWidth", sz, PFM_BORDER, x:=64, y:=20*5 )	;!!! does not to work, returns 1
+	;S(PF, "PARAFORMAT2! cbSize dwMask bLineSpacingRule dyLineSpacing", sz, PFM_LINESPACING, x:=4, y:=20*50)
+	if Line0
+		hMask |= PFM_LINESPACING,  NumPut(LINE_RULE_%Line1%, PF, 170, "UChar"),  NumPut(Line2, PF, 164, "Int")
 
-	S(PF, "PARAFORMAT2! cbSize dwMask wAlignment", sz, PFM_ALIGNMENT, PFA_RIGHT)
-;	S(PF, "PARAFORMAT2! cbSize dwMask wNumbering", sz, PFM_NUMBERING, x:=6 )
-;	S(PF, "PARAFORMAT2! cbSize dwMask wNumbering wNumberingStart wNumberingStyle wNumberingTab", sz, pm := PFM_NUMBERING | PFM_NUMBERINGSTART | PFM_NUMBERINGSTYLE | PFM_NUMBERINGTAB, p1:=2, p2:=10, p3:=0x200, p4:=20*50)
-;	S(PF, "PARAFORMAT2! cbSize dwMask bLineSpacingRule dyLineSpacing", sz, PFM_LINESPACING, x:=4, y:=20*50)
-;	S(PF, "PARAFORMAT2! cbSize dwMask dxOffset dxStartIndent", sz, p:=PFM_OFFSET | PFM_OFFSETINDENT, x:=-20*50, y:=20*50) ;must turn word wrap on to see effect.
-;	S(PF, "PARAFORMAT2! cbSize dwMask dySpaceAfter dySpaceBefore", sz, p:=PFM_SPACEAFTER | PFM_SPACEBEFORE, x:=20*50, y:=10*50)
-;	S(PF, "PARAFORMAT2! cbSize dwMask dxRightIndent", sz, PFM_RIGHTINDENT, x:=20*50)
+	;S(PF, "PARAFORMAT2! cbSize dwMask dxOffset dxStartIndent dxRightIndent", sz, p:=PFM_OFFSET | PFM_OFFSETINDENT | PFM_RIGHTINDENT, x:=-20*50, y:=20*50, z=x:=20*50)
+	if Ident0
+		hMask |= 0	;dummy, expression so that bellow works....
+		,(Ident1 = "") ? "" : (hMask |= (Ident1>0 ? PFM_OFFSETINDENT : PFM_STARTINDENT),  NumPut(abs(Ident1), PF, 12, "Int"))
+		,(Ident2 = "") ? "" : (hMask |= PFM_OFFSET,  NumPut(Ident2, PF, 20, "Int"))
+		,(Ident3 = "") ? "" : (hMask |= PFM_RIGHTINDENT,  NumPut(Ident3, PF, 16, "Int"))
 
-;	S(PF, "PARAFORMAT2! cbSize dwMask cTabCount rgxTabs", sz, PFM_TABSTOPS, x:=2)		;put 2 tabstops
-;   NumPut(20*50, PF, 28+0, "Int"), NumPut(20*250, PF, 28+4, "Int")		
+	;S(PF, "PARAFORMAT2! cbSize dwMask dySpaceAfter dySpaceBefore", sz, p:=PFM_SPACEAFTER | PFM_SPACEBEFORE, x:=20*50, y:=10*50)
+	if Space0
+		hMask |= 0	
+		,(Space1 = "") ? "" : (hMask |= PFM_SPACEBEFORE,  NumPut(Space1, PF, 156, "Int"))
+		,(Space2 = "") ? "" : (hMask |= PFM_SPACEAFTER,   NumPut(Space2, PF, 160, "Int"))
 
-;	S(PF, "PARAFORMAT2! cbSize dwMask wEffects", sz, PFM_TABLE, PFE_TABLE)
+	;S(PF, "PARAFORMAT2! cbSize dwMask cTabCount rgxTabs", sz, PFM_TABSTOPS, x:=2)		;put 2 tabstops
+	;NumPut(20*50, PF, 28+0, "Int"), NumPut(20*250, PF, 28+4, "Int")
+	if Tabs0
+	{
+		loop, parse, Tabs1, %A_Space%%A_Tab%
+			NumPut(A_LoopField, PF, 24+(A_Index*4), "Int"), tabCount := A_Index
+		NumPut(tabCount, PF, 26, "Short"),  hMask |= PFM_TABSTOPS
+	}
 
-;	HexView(&PF, sz)
+	;S(PF, "PARAFORMAT2! cbSize dwMask wBorders wBorderWidth", sz, PFM_BORDER, x:=64, y:=20*5 )	;!!! does not work
+
+    NumPut(hMask, PF, 4)   ; HexView(&PF, sz)
 	SendMessage, EM_SETPARAFORMAT,,&PF,,ahk_id %hCtrl%
 	return ErrorLevel
 }
@@ -1551,7 +1608,7 @@ RichEdit_TextMode(HCtrl, TextMode="")  {
 
 		RichEdit_SetText(HCtrl)
 		SendMessage, EM_SETTEXTMODE, hTextMode,,, ahk_id %HCtrl%
-		return Errorlevel ? True : False
+		return Errorlevel ? False : True
 	}
 	else  {				; Getting current text mode
 		SendMessage, EM_GETTEXTMODE,,,, ahk_id %HCtrl%

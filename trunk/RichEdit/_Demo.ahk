@@ -1,12 +1,21 @@
-TextMode:	;Sets text mode.
-;	txt := RichEdit_GetText( hRichEdit, 0, -1 )
-	Log( RichEdit_TextMode(hRichEdit) )
-	Log( RichEdit_TextMode(hRichEdit, "RICHTEXT") )
-;	RichEdit_SetText(hRichEdit, txt)
+SetParaFormat:		;ets the paragraph formatting for the current selection in a rich edit control.
+	r := RichEdit_SetParaFormat(hRichEdit, "Align=CENTER", "Num=DECIMAL,10,D,1000", "Line=DOUBLE", "Space=1000,3000" )
+	Log("Set Align, Num, Line & Space: " r)
+;	r := RichEdit_SetParaFormat(hRichEdit, "Ident=-1000") ;,-1000, 1000" )
+	r := RichEdit_SetParaFormat(hRichEdit, "Tabs=100 1000 2000 5000")
+	Log("Set Tabs: " r)
 return
 
-SetParaFormat:		;
-	Log(RichEdit_SetParaFormat(hRichEdit))
+
+TextMode:	;Sets text mode.
+	rtf := RichEdit_Save( hRichEdit )			;get RTF
+	txt := RichEdit_GetText(hRichEdit, 0, -1)	;get PLAINTEXT
+	Log( RichEdit_TextMode(hRichEdit) )
+	Log( "Set mode to plaintext: " RichEdit_TextMode(hRichEdit, "PLAINTEXT") )
+	RichEdit_SetText(hRichEdit, txt)
+	Msgbox Plain Text
+	Log( "Restore mode to richtext: " RichEdit_TextMode(hRichEdit, "RICHTEXT") )
+	RichEdit_SetText(hRichEdit, rtf)
 return
 
 SetText:			;Set text from string or file in rich edit control using either rich text or plain text.
