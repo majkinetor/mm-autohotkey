@@ -13,7 +13,9 @@ _("mo!")
 	CreateGui(text)
 
 	Form_Show() ;"", "Maximize")
-	Log("Press F1 or doubleclick to execute selected API"), Log()
+	Log("Press F1 or doubleclick to execute selected API")
+	Log("Sort API by clicking ListView header.")
+	Log()
 	RichEdit_AutoUrlDetect( hRichEdit, "^" )
 
 	;table
@@ -75,6 +77,20 @@ CreateGui(Text, W=980, H=600) {
 		Events,,,check autosize
 	)
 
+	btns2 =
+	(LTrim
+		Num
+		Bullet
+		-----
+		Left
+		Center
+		Right
+		Justify
+		-----
+		->
+		<-
+	)
+
 	hForm1    := Form_New("+Resize w" W " h" H)
 	hList	  := Form_Add(hForm1, "ListView", "API|Description", "gOnLV AltSubmit", "Align T", "Attach p")
 	hPanel1   := Form_Add(hForm1, "Panel", "", "", "Align L, 300", "Attach p")
@@ -90,9 +106,11 @@ CreateGui(Text, W=980, H=600) {
 	Toolbar_SetBitmapSize(hToolbar, 0)	
 
 	hPanel4   := Form_Add(hPanel2, "Panel", "", "", "Align T,30", "Attach w")
-		hFind := Form_Add(hPanel4, "Edit",   "", "x0 y0 w100")
+		hFind := Form_Add(hPanel4, "Edit",   "", "x0 y2 w100")
  				 Form_Add(hPanel4, "Button", "Find", "gOnFind h24 x+2 AltSubmit 0x8000")
 		hUp	  := Form_Add(hPanel4, "CheckBox", "up", "x+2 yp+5")
+	hToolbar  := Form_Add(hPanel4, "Toolbar", btns2, "gOnToolbar style='flat nodivider tooltips' il=0 x200 h30")
+	Toolbar_SetBitmapSize(hToolbar, 0), Toolbar_AutoSize(hToolbar)
 
 	hRichEdit := Form_Add(hPanel2, "RichEdit", "", "style='MULTILINE SCROLL WANTRETURN'", "Align F", "Attach w h", "CMenu RichEditMenu")
 
@@ -198,6 +216,15 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 
 	If Txt in +2,-2
 		RichEdit_SetFontSize(hRichEdit, Txt)
+
+	if Txt in left,right,center,justify
+		RichEdit_SetParaFormat(hRichEdit, "Align=" Txt)
+
+	if Txt in <-,->
+		RichEdit_SetParaFormat(hRichEdit, "Ident=" (Txt="<-" ? -1:1)*1000)
+	
+	if Txt in Num,Bullet
+		RichEdit_SetParaFormat(hRichEdit, "Num=" (Txt="Num" ? "DECIMAL" : "BULLET") ",1,D")
 }
 
 PopulateList() {
@@ -213,7 +240,7 @@ PopulateList() {
 		  LV_Add("", mApi, mDesc ),  pos += StrLen(mApi), n := A_Index
 		Else break
 
-	Log(n " demo APIs detected.")
+	Log(n " demo routines detected.")
 
 	LV_ModifyCol(1,180), LV_ModifyCol(2), LV_Modify(1, "select")
 }

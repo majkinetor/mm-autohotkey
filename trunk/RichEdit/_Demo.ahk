@@ -5,10 +5,9 @@ GetText: ;Retrieves a specified range of characters from a rich edit control.
  Log("Range: " RichEdit_GetText( hRichEdit, 4, 10 ))
 return
 
-SetParaFormat:		;ets the paragraph formatting for the current selection in a rich edit control.
+SetParaFormat:		;Sets the paragraph formatting for the current selection in a rich edit control.
 	r := RichEdit_SetParaFormat(hRichEdit, "Align=CENTER", "Num=DECIMAL,10,D,1000", "Line=DOUBLE", "Space=1000,3000" )
 	Log("Set Align, Num, Line & Space: " r)
-;	r := RichEdit_SetParaFormat(hRichEdit, "Ident=-1000") ;,-1000, 1000" )
 	r := RichEdit_SetParaFormat(hRichEdit, "Tabs=100 1000 2000 5000")
 	Log("Set Tabs: " r)
 return
