@@ -1258,7 +1258,7 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
  Ident:		
  			First	- Indentation of the paragraph's first line, relative to the paragraph's current indentation, in twips. 
 					  The indentation of subsequent lines depends on the Offset member.  To see all this in effect you must enable word wrap mode.
-					  If negative, it represents absolute indentation from the left margin.
+					  If starts with ".", it represents absolute indentation from the left margin.
 			Offset	- Indentation of the second and subsequent lines, relative to the indentation of the first line, in twips. 
 					  The first line is indented if this member is negative or outdented if this member is positive.
 			Right	- Indentation of the right side of the paragraph, relative to the right margin, in twips.
@@ -1313,7 +1313,7 @@ RichEdit_SetParaFormat(hCtrl, o1="", o2="", o3="", o4="", o5="", o6="")  {
 	;S(PF, "PARAFORMAT2! cbSize dwMask dxOffset dxStartIndent dxRightIndent", sz, p:=PFM_OFFSET | PFM_OFFSETINDENT | PFM_RIGHTINDENT, x:=-20*50, y:=20*50, z=x:=20*50)
 	if Ident0
 		hMask |= 0	;dummy, expression so that bellow works....
-		,(Ident1 = "") ? "" : (hMask |= (Ident1>0 ? PFM_OFFSETINDENT : PFM_STARTINDENT),  NumPut(abs(Ident1), PF, 12, "Int"))
+		,(Ident1 = "") ? "" : (hMask |= SubStr(Ident1,1,1)!="." ? PFM_OFFSETINDENT : (PFM_STARTINDENT, Ident1 := SubStr(Ident1,2)),  NumPut(Ident1, PF, 12, "Int"))
 		,(Ident2 = "") ? "" : (hMask |= PFM_OFFSET,  NumPut(Ident2, PF, 20, "Int"))
 		,(Ident3 = "") ? "" : (hMask |= PFM_RIGHTINDENT,  NumPut(Ident3, PF, 16, "Int"))
 
