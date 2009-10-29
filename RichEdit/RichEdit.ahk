@@ -1351,7 +1351,7 @@ RichEdit_SetSel(hCtrl, CpMin=0, CpMax=0)  {
  Flags:
 			DEFAULT		- Deletes the undo stack, discards rich-text formatting, & replaces all text.
 			KEEPUNDO	- Keeps the undo stack.
-			SELECTION	- Replaces selection and keeps rich-text formatting. If you don't specify this style entire content of 
+			SEL			- Replaces selection and keeps rich-text formatting. If you don't specify this style entire content of 
 						  the control will be replaced with the new text.
 			FROMFILE	- Load a file into control.  If used, this option expects the *txt* parameter to be
 						  a filename. If there is a problem loading the file, *ErrorLevel* will contain message.
@@ -1751,6 +1751,5 @@ RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 	o Version 1.0 by freakkk & majkinetor.
 	o MSDN Reference : <http://msdn.microsoft.com/en-us/library/bb787605(VS.85).aspx>.
 	o RichEdit control shortcut keys: <http://msdn.microsoft.com/en-us/library/bb787873(VS.85).aspx#rich_edit_shortcut_keys>.
-	o RTF specification: <http://www.biblioscape.com/rtf15_spec.htm>
 	o AHK module licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */
