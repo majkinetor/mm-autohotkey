@@ -1,6 +1,7 @@
 SetCharFormat:	;
-	r := RichEdit_SetCharFormat(hRichEdit, "", "-UNDERLINE")
-	Log("Char Format: ", r)
+	r := RichEdit_SetCharFormat(hRichEdit, "Courier New", "BOLD S19", "", "WORD")
+	SLEEP 1000
+	r := RichEdit_SetCharFormat(hRichEdit, "aRIAL", "-BOLD S12", "", "WORD")
 return
 
 GetCharFormat:	;

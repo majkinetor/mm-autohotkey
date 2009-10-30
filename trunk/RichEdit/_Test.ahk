@@ -25,10 +25,9 @@ _("mo!")
 	)
 
 ;	RichEdit_LimitText( hRichEdit, 900000 )  ; to taste save...
-	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
-	;	RichEdit_SetText(hRichEdit,  )
-	;	RichEdit_SetText(hRichEdit, RTF_Table(3, 1, "300"), "", -1 )
-
+	RichEdit_SetText(hRichEdit, "1.rtf", "FROMFILE")
+	;RichEdit_SetText(hRichEdit,  )
+	;RichEdit_SetText(hRichEdit, RTF_Table(3, 1, "300"), "", -1 )
 return
 
 

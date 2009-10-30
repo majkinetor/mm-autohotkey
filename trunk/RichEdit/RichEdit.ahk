@@ -4,7 +4,6 @@
 				Besides that, it contains functions that work with standard edit controls. Each function contains
 				description for which kind of control it can be used - any control supporting edit control interface
 				(Edit, RichEdit, HiEdit...) or just rich edit control. 
-				Control usualy uses twips as a measure (1/1440 of an inch, or 1/20 of a printer's point).
  */
 
 /*
@@ -223,6 +222,29 @@ RichEdit_Clear(hEdit) {
 } 
 
 /*
+ Function:		Convert
+				Convert twips to pixels or vice-versa.
+
+ Parameters:
+				Input		- Twips (Input>0) or pixels (Input<0).
+				Direction	- 0 (default) or 1. Pixels are not always square (the height and width are not the same). 
+							  Therefore, it is necessary to pass in the desired "direction" to use, horizontal (0) or vertical (1). 
+ Returns:
+				Rounded value.
+ */
+RichEdit_Convert(Input, Direction=0) {
+	static twipsPerInch = 1440, WU_LOGPIXELSX=88, WU_LOGPIXELSY=90, tpi0, tpi1
+
+	if !tpi0
+		dc := DllCall("GetDC", "uint", 0, "Uint")
+		, tpi0 := DllCall("gdi32.dll\GetDeviceCaps", "uint", dc, "int", WU_LOGPIXELSX)
+		, tpi1 := DllCall("gdi32.dll\GetDeviceCaps", "uint", dc, "int", WU_LOGPIXELSY)
+		, DllCall("ReleaseDC", "uint", 0, "uint", dc)
+   
+   return (Input>0) ? (Input * tpi%Direction%) // twipsPerInch  : (-Input*twipsPerInch) // tpi%Direction%
+}
+
+/*
  Function: Copy
 		   Copy selection of the Edit control.
  */ 
@@ -230,6 +252,7 @@ RichEdit_Copy(hEdit) {
     Static WM_COPY:=0x301 
     SendMessage WM_COPY,0,0,,ahk_id %hEdit% 
 } 
+
 
 /*
  Function: Cut
@@ -1009,33 +1032,13 @@ RichEdit_SetBgColor(hCtrl, Color)  {
 
  Parameters:
 			Face	- Font name.
-			Style	- Space separated list of optional character effects. See below list.
+			Style	- Space separated list of styles. See below list.
 			Colors	- Comma separated string of 2 RGB colors for text and background. Each is optional.
-			Mode	- Mode.
+			Mode	- Character formatting that applies to the control. If this parameter is omitted, the default character format is set. Otherwise, it can be on of the values given bellow.
 
-
- Style Options:
-			 AUTOCOLOR	- The text color is the current color of the text in windows.
-			 BOLD		- Characters are bold.
-			 DISABLED	- RichEdit 2.0 and later: Characters are displayed with a shadow that is offset by 3/4 point or one pixel, whichever is larger.
-			 ITALIC		- Characters are italic.
-			 STRIKEOUT	- Characters are struck.
-			 UNDERLINE	- Characters are underlined.
-			 PROTECTED	- Characters are protected.
-
- Returns:
-			 TRUE / FALSE.
-
- Related:
-			<GetCharFormat>, <SetBgColor>
-
- Remarks:
-			If this message is sent more than once with the same parameters, the effect on the text is toggled. 
-			That is, sending the message once produces the effect, sending the message twice cancels the effect, and so forth.
- 
-
- Effects:
-			sNN			- Character size.
+ Styles:
+			s<Num>		- Character size, usual AHK represntation (i.e. s12)
+			o<Num>		- Character offset from the baseline, in twips,. If the value of this member is positive, the character is a superscript; if the value is negative, the character is a subscript.
 			AUTOBACKCOLOR - The background color is the return value of GetSysColor(COLOR_WINDOW). If this flag is set, BackColor member is ignored.
 			AUTOCOLOR	- The text color is the return value of GetSysColor(COLOR_WINDOWTEXT). If this flag is set, the TextColor member is ignored.
 			BOLD		- Characters are bold.
@@ -1055,18 +1058,18 @@ RichEdit_SetBgColor(hCtrl, Color)  {
 						  to the insertion point, and the new character format is in effect only until the insertion point changes.
 			WORD		- Applies the formatting to the selected word or words. If the selection is empty but the insertion point is inside a word
 						  ,the formatting is applied to the word.
-			ASSOCIATEFONT - Associates a font to a given script, thus changing the default font for that script. 
-						   To specify the font, use the following styles: s, CharSet & Face.
 
-			
+ Returns:
+			TRUE or FALSE.			
  */
-;sz := S(_, "CHARFORMAT2A: cbSize dwMask dwEffects yHeight=.04 yOffset=.04 crTextColor bCharSet=.1 bPitchAndFamily=.1 szFaceName wWeight=60.2 sSpacing=.02 crBackColor lcid dwReserved sStyle=.02 wKerning=.2 bUnderlineType=.1 bAnimation=.1 bRevAuthor=.1 bReserved1=.1")
-RichEdit_SetCharFormat(HCtrl, Face="", Style="", Colors="", Mode="SELECTION")  {
+RichEdit_SetCharFormat(HCtrl, Face="", Style="", Colors="", Mode="")  {
 	static EM_SETCHARFORMAT=0x444
 		  , CFM_CHARSET:=0x8000000,CFM_COLOR:=0x40000000, CFM_FACE:=0x20000000, CFM_OFFSET:=0x10000000, CFM_SIZE:=0x80000000, CFM_WEIGHT=0x400000, CFM_UNDERLINETYPE=0x800000
 		  , CFM_HIDDEN=0x100, CFM_BOLD=1, CFM_ITALIC=2, CFM_DISABLED=0x2000, CFM_LINK=0x20, CFM_PROTECTED=0x10, CFM_STRIKEOUT=8, CFM_UNDERLINE=4, CFM_SUPERSCRIPT=0x30000, CFM_SUBSCRIPT=0x30000, CFM_BACKCOLOR=0x4000000, CFE_AUTOBACKCOLOR=0x4000000, CFE_AUTOCOLOR = 0x40000000
 		  , CFE_HIDDEN=0x100, CFE_BOLD=1, CFE_ITALIC=2, CFE_DISABLED=0x2000, CFE_LINK=0x20, CFE_PROTECTED=0x10, CFE_STRIKEOUT=8, CFE_UNDERLINE=4, CFE_SUBSCRIPT=0x10000, CFE_SUPERSCRIPT=0x20000, CFM_COLOR=0x40000000, CFM_AUTOBACKCOLOR=0x4000000, CFM_AUTOCOLOR=0x40000000
-		  , SCF_ALL=4, SCF_SELECTION=1, SCF_WORD=3, SCF_ASSOCIATEFONT=0x10
+		  , SCF_ALL=4, SCF_SELECTION=1, SCF_WORD=3	;, SCF_ASSOCIATEFONT=0x10
+
+	;sz := S(_, "CHARFORMAT2A: cbSize dwMask dwEffects yHeight=.04 yOffset=.04 crTextColor bCharSet=.1 bPitchAndFamily=.1 szFaceName wWeight=60.2 sSpacing=.02 crBackColor lcid dwReserved sStyle=.02 wKerning=.2 bUnderlineType=.1 bAnimation=.1 bRevAuthor=.1 bReserved1=.1")
 
 	VarSetCapacity(CF, 84, 0),  NumPut(84, CF)
 	hMask := 0
@@ -1085,19 +1088,21 @@ RichEdit_SetCharFormat(HCtrl, Face="", Style="", Colors="", Mode="SELECTION")  {
 		hEffects := 0
 		loop, parse, Style, %A_Space%
 		{
-			lf := A_LoopField
-			if (h := SubStr(lf, 2)+0 != "") && (s := h)
+			lf := A_LoopField, c := SubStr(lf, 1, 1) 
+			if InStr("so", c) && ((j := SubStr(lf, 2)+0) != "") && (%c% := j)
 				 continue
 			
-			if bOff := SubStr(lf, 1, 1) = "-"
+			if bOff := c = "-"
 				lf := SubStr(lf, 2)
 			
 			hMask |= CFM_%lf%, hEffects |= bOff ? 0 : CFE_%lf%
 		}
 	    NumPut(hEffects, CF, 8)
 		if (s != "")
-			hMask |= CFM_SIZE ;size here.
-	}	
+			hMask |= CFM_SIZE, NumPut(s*20, CF, 12, "Int")
+		if (o != "")
+			hMask |= CFM_OFFSET, NumPut(o, CF, 16, "Int")
+	}
 
 	NumPut(hMask, CF, 4)
 	SendMessage, EM_SETCHARFORMAT, SCF_%Mode%, &CF,, ahk_id %hCtrl%
@@ -1666,28 +1671,6 @@ RichEdit_TextMode(HCtrl, TextMode="")  {
 		return SubStr(res, 1, -1)
 	}
 }
-
-/*
- Function:		TwipsToPixels
-				Convert Twips to Pixels.
-
- Parameters:
-				Twips		- Twips to convert.
-				Direction	- 0 (default) or 1. Pixels are not always square (the height and width are not the same). 
-							  Therefore, it is necessary to pass in the desired "direction" to use, horizontal (0) or vertical (1). 
- */
-RichEdit_TwipsToPixels(Twips, Direction=0) {
-	static twipsPerInch = 1440, WU_LOGPIXELSX=88, WU_LOGPIXELSY=90, tpi0, tpi1
-
-	if !tpi0
-		dc := DllCall("GetDC", "uint", 0, "Uint")
-		, tpi0 := DllCall("gdi32.dll\GetDeviceCaps", "uint", dc, "int", WU_LOGPIXELSX)
-		, tpi1 := DllCall("gdi32.dll\GetDeviceCaps", "uint", dc, "int", WU_LOGPIXELSY)
-		, DllCall("ReleaseDC", "uint", 0, "uint", dc)
-   
-   return (Twips / twipsPerInch) * tpi%Direction%
-}
-		
 
 /*
  Function:		WordWrap
