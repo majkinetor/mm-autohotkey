@@ -88,13 +88,12 @@ Dlg_Find( hGui, Handler, Flags="d", FindText="") {
 	ifNotEqual, FindText, , SetEnv, buf, %FindText%
 	
 	f := 0
-	 ,InStr(flags, "d")  ? f |= FR_DOWN			 :
-	 ,InStr(flags, "c")  ? f |= FR_MATCHCASE	 :
-	 ,InStr(flags, "w")  ? f |= FR_WHOLEWORD	 :
-	 ,InStr(flags, "-d") ? f |= FR_HIDEUPDOWN	 :
-	 ,InStr(flags, "-w") ? f |= FR_HIDEWHOLEWORD :
-	 ,InStr(flags, "-c") ? f |= FR_HIDEMATCHCASE :
-
+	 ,InStr(flags, "d")  ? f |= FR_DOWN			 : ""
+	 ,InStr(flags, "c")  ? f |= FR_MATCHCASE	 : ""
+	 ,InStr(flags, "w")  ? f |= FR_WHOLEWORD	 : ""
+	 ,InStr(flags, "-d") ? f |= FR_HIDEUPDOWN	 : ""
+	 ,InStr(flags, "-w") ? f |= FR_HIDEWHOLEWORD : ""
+	 ,InStr(flags, "-c") ? f |= FR_HIDEMATCHCASE : ""
 
 	NumPut(40,		FR, 0)	;size
 	 ,NumPut( hGui,	FR, 4)	;hwndOwner
@@ -160,7 +159,7 @@ Dlg_Replace( hGui, Handler, Flags="", FindText="", ReplaceText="") {
  */
 Dlg_Font(ByRef Name, ByRef Style, ByRef Color, Effects=true, hGui=0) {
 
-   RegRead, LogPixels, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontDPI, LogPixels
+   LogPixels := DllCall("GetDeviceCaps", "uint", DllCall("GetDC", "uint", hGui), "uint", 90)	;LOGPIXELSY
    VarSetCapacity(LOGFONT, 128, 0)
 
    Effects := 0x041 + (Effects ? 0x100 : 0)  ;CF_EFFECTS = 0x100, CF_SCREENFONTS=1, CF_INITTOLOGFONTSTRUCT = 0x40
@@ -187,7 +186,7 @@ Dlg_Font(ByRef Name, ByRef Style, ByRef Color, Effects=true, hGui=0) {
    if RegExMatch(Style, "s[1-9][0-9]*", s){
       StringTrimLeft, s, s, 1      
       s := -DllCall("MulDiv", "int", s, "int", LogPixels, "int", 72)
-      NumPut(s, LOGFONT, 0)				; set size
+      NumPut(s, LOGFONT, 0, "Int")			; set size
    }
    else  NumPut(16, LOGFONT, 0)         ; set default size
 
@@ -230,7 +229,7 @@ Dlg_Font(ByRef Name, ByRef Style, ByRef Color, Effects=true, hGui=0) {
 	if NumGet(LOGFONT, 22, "UChar")
       Style .= "strikeout "
 
-	s := NumGet(LOGFONT, 0)
+	s := NumGet(LOGFONT, 0, "Int")
 	Style .= "s" Abs(DllCall("MulDiv", "int", abs(s), "int", 72, "int", LogPixels))
 
  ;convert to rgb 
@@ -445,6 +444,6 @@ Dlg_callback(wparam, lparam, msg, hwnd) {
  */
 
 /* Group: About
-		o Ver 5.0 by majkinetor. See http://www.autohotkey.com/forum/topic17230.html
-		o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
+		o Ver 5.02 by majkinetor. See http://www.autohotkey.com/forum/topic17230.html
+		o Licenced under BSD <http://creativecommons.org/licenses/BSD/>
  */
