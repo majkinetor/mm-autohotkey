@@ -1031,10 +1031,10 @@ RichEdit_SetBgColor(hCtrl, Color)  {
 			Set character formatting in a rich edit control.
 
  Parameters:
-			Face	- Font name.
-			Style	- Space separated list of styles. See below list.
+			Face	- Font name. Optional.
+			Style	- Space separated list of styles. See below list. Optional.
 			Colors	- Comma separated string of 2 RGB colors for text and background. Each is optional.
-			Mode	- Character formatting that applies to the control. If this parameter is omitted, the default character format is set. Otherwise, it can be on of the values given bellow.
+			Mode	- Character formatting that applies to the control. It can be one of the values given bellow. Optional.
 
  Styles:
 			s<Num>		- Character size, usual AHK represntation (i.e. s12)
@@ -1058,9 +1058,8 @@ RichEdit_SetBgColor(hCtrl, Color)  {
 						  to the insertion point, and the new character format is in effect only until the insertion point changes.
 			WORD		- Applies the formatting to the selected word or words. If the selection is empty but the insertion point is inside a word
 						  ,the formatting is applied to the word.
-
  Returns:
-			TRUE or FALSE.			
+			TRUE or FALSE.
  */
 RichEdit_SetCharFormat(HCtrl, Face="", Style="", Colors="", Mode="")  {
 	static EM_SETCHARFORMAT=0x444
