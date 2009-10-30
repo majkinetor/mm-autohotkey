@@ -445,5 +445,5 @@ Dlg_callback(wparam, lparam, msg, hwnd) {
 
 /* Group: About
 		o Ver 5.02 by majkinetor. See http://www.autohotkey.com/forum/topic17230.html
-		o Licenced under BSD <http://creativecommons.org/licenses/BSD/>
+		o Licensed under BSD <http://creativecommons.org/licenses/BSD/>
  */
