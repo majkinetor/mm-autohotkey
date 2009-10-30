@@ -408,19 +408,6 @@ GuiEscape:
 GuiClose: 
     ExitApp 
 
-GuiSize: 
-;     Anchor("InputText" ,  "w h0.5") 
-;     , Anchor("ParseButton", "y0.5"), Anchor("GenGetters", "y0.5") 
-;     , Anchor("GenGetters", "y0.5"), Anchor("GenSetters", "y0.5") 
-;     , Anchor("GenCtor", "y0.5"), Anchor("StructName", "y0.5 w1") 
-;     , Anchor("OutputText",  "w h0.5 y0.5") 
-    ; InputText is rarely used for more than a paste target, 
-    ; so resize only OutputText vertically. 
-    Anchor("InputText", "w") 
-    , Anchor("StructName", "w") 
-    , Anchor("OutputText", "h w") 
-    return 
-
 
 ; Case-sensitive by default because we're parsing C++ code. 
 EndsWith(A, B, CaseSensitive=true) 
