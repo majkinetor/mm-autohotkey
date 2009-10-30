@@ -437,7 +437,7 @@ RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef Colors="", Mo
   		  , CFM_CHARSET:=0x8000000,CFM_COLOR:=0x40000000, CFM_FACE:=0x20000000, CFM_OFFSET:=0x10000000, CFM_SIZE:=0x80000000, CFM_WEIGHT=0x400000, CFM_UNDERLINETYPE=0x800000
 		  , CFE_HIDDEN=0x100, CFE_BOLD=1, CFE_ITALIC=2, CFE_LINK=0x20, CFE_PROTECTED=0x10, CFE_STRIKEOUT=8, CFE_UNDERLINE=4, CFE_SUPERSCRIPT=0x30000, CFE_SUBSCRIPT=0x30000
 		  , CFM_ALL2=0xFEFFFFFF
-		  , styles="HIDDEN BOLD ITALIC DISABLED LINK PROTECTED STRIKEOUT UNDERLINE SUPERSCRIPT SUBSCRIPT"
+		  , styles="HIDDEN BOLD ITALIC LINK PROTECTED STRIKEOUT UNDERLINE SUPERSCRIPT SUBSCRIPT"
 
 	VarSetCapacity(CF, 84, 0), NumPut(84, CF), NumPut(CFM_ALL2, CF, 4)
 	SendMessage, EM_GETCHARFORMAT, SCF_%Mode%, &CF,, ahk_id %hCtrl%
@@ -454,10 +454,9 @@ RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef Colors="", Mo
 	ifEqual, Colors, bg, SetEnv, clr, %bg%
 
 	oldFormat := A_FormatInteger 
-    SetFormat, integer, hex  ; Show RGB color extracted below in hex format. 
+    SetFormat, integer, hex 
 
  ;convert to rgb 
-	 
     Color := (clr & 0xff00) + ((clr & 0xff0000) >> 16) + ((clr & 0xff) << 16) 
     StringTrimLeft, Color, Color, 2 
     loop, % 6-strlen(Color) 
@@ -1852,7 +1851,7 @@ RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 }
 
 /* Group: About
-	o Version 1.0 by freakkk & majkinetor.
+	o Version 1.0a by freakkk & majkinetor.
 	o MSDN Reference : <http://msdn.microsoft.com/en-us/library/bb787605(VS.85).aspx>.
 	o RichEdit control shortcut keys: <http://msdn.microsoft.com/en-us/library/bb787873(VS.85).aspx#rich_edit_shortcut_keys>.
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
