@@ -1,3 +1,8 @@
+SetCharFormat:	;
+	r := RichEdit_SetCharFormat(hRichEdit, "", "-UNDERLINE")
+	Log("Char Format: ", r)
+return
+
 GetCharFormat:	;
 	RichEdit_GetCharFormat(hRichEdit, font, style, color)
 	Log("Char Format: ", font, style, color)

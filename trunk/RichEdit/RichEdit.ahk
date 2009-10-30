@@ -3,7 +3,8 @@
 				This module allows you to create and programmatically set text properties in rich edit control.
 				Besides that, it contains functions that work with standard edit controls. Each function contains
 				description for which kind of control it can be used - any control supporting edit control interface
-				(Edit, RichEdit, HiEdit...) or just rich edit control.
+				(Edit, RichEdit, HiEdit...) or just rich edit control. 
+				Control usualy uses twips as a measure (1/1440 of an inch, or 1/20 of a printer's point).
  */
 
 /*
@@ -487,20 +488,19 @@ RichEdit_GetCharFormat(hCtrl, ByRef font="", ByRef style="", ByRef color="", mod
  >   MsgBox, Nothing left to redo.
  */
 RichEdit_GetRedo(hCtrl, ByRef name="-")  {
-  static EM_CANREDO=85,EM_GETREDONAME=87,WM_USER=0x400
-        ,UIDs="UNKNOWN,TYPING,DELETE,DRAGDROP,CUT,PASTE"
-  SendMessage, WM_USER | EM_CANREDO, 0,0,, ahk_id %hCtrl%
-  nRedo := ERRORLEVEL
-  
-  If ( nRedo && name != "-" )  {
-    SendMessage, WM_USER | EM_GETREDONAME, 0,0,, ahk_id %hCtrl%
-    Loop, Parse, UIDs, `,
-      If (A_Index - 1 = errorlevel)  {
-        name := A_LoopField
-        break
-      }
-  }
-  return nRedo
+	static EM_CANREDO=1109, EM_GETREDONAME=1111,UIDs="UNKNOWN,TYPING,DELETE,DRAGDROP,CUT,PASTE"
+	SendMessage, WM_USER | EM_CANREDO,,,, ahk_id %hCtrl%
+	nRedo := ErrorLevel
+
+	If ( nRedo && name != "-" )  {
+		SendMessage, EM_GETREDONAME,,,, ahk_id %hCtrl%
+		Loop, Parse, UIDs, `,
+			If (A_Index - 1 = ErrorLevel)  {
+				name := A_LoopField
+				break
+			}
+	}
+	return nRedo
 }
 
 /*
@@ -1008,13 +1008,11 @@ RichEdit_SetBgColor(hCtrl, Color)  {
 			Set character formatting in a rich edit control.
 
  Parameters:
-			Face	- Name of font.
+			Face	- Font name.
 			Style	- Space separated list of optional character effects. See below list.
-			Color	- RGB color for font.
-			Mode	- If *ALL* or *A*, this optional parameter applies the formatting to all text in the
-					control. Otherwise it applies the formatting to the current selection. If the selection
-					is empty, the character formatting is applied to the insertion point, and the new
-					character format is in effect only until the insertion point changes.
+			Colors	- Comma separated string of 2 RGB colors for text and background. Each is optional.
+			Mode	- Mode.
+
 
  Style Options:
 			 AUTOCOLOR	- The text color is the current color of the text in windows.
@@ -1026,54 +1024,84 @@ RichEdit_SetBgColor(hCtrl, Color)  {
 			 PROTECTED	- Characters are protected.
 
  Returns:
-			 If the operation is setting all of the text and succeeds, the return value is 1.
-			 If the operation fails, the return value is zero.
+			 TRUE / FALSE.
 
  Related:
 			<GetCharFormat>, <SetBgColor>
 
- Example:
-	> Dlg_Font( Face, Style, Color )
-	> RichEdit_SetCharFormat( hCtrl, Face, Style, Color )
+ Remarks:
+			If this message is sent more than once with the same parameters, the effect on the text is toggled. 
+			That is, sending the message once produces the effect, sending the message twice cancels the effect, and so forth.
+ 
+
+ Effects:
+			sNN			- Character size.
+			AUTOBACKCOLOR - The background color is the return value of GetSysColor(COLOR_WINDOW). If this flag is set, BackColor member is ignored.
+			AUTOCOLOR	- The text color is the return value of GetSysColor(COLOR_WINDOWTEXT). If this flag is set, the TextColor member is ignored.
+			BOLD		- Characters are bold.
+			HIDDEN		- Characters are not displayed.
+			ITALIC		- Characters are italic.
+			LINK		- A rich edit control sends LINK notification messages when it receives mouse messages while the mouse pointer is over text with the LINK effect.
+			PROTECTED	- Characters are protected; an attempt to modify them will cause an PROTECTED notification message.
+			STRIKEOUT	- Characters are struck out.
+			SUBSCRIPT	- Characters are subscript. The SUPERSCRIPT and SUBSCRIPT values are mutually exclusive. 
+						  For both values, the control automatically calculates an offset and a smaller font size. 
+			SUPERSCRIPT	- Characters are superscript. 
+			UNDERLINE	- Characters are underlined.	
+
+ Modes:
+			ALL			- Applies the formatting to all text in the control.
+			SELECTION	- Applies the formatting to the current selection. If the selection is empty, the character formatting is applied 
+						  to the insertion point, and the new character format is in effect only until the insertion point changes.
+			WORD		- Applies the formatting to the selected word or words. If the selection is empty but the insertion point is inside a word
+						  ,the formatting is applied to the word.
+			ASSOCIATEFONT - Associates a font to a given script, thus changing the default font for that script. 
+						   To specify the font, use the following styles: s, CharSet & Face.
+
+			
  */
 ;sz := S(_, "CHARFORMAT2A: cbSize dwMask dwEffects yHeight=.04 yOffset=.04 crTextColor bCharSet=.1 bPitchAndFamily=.1 szFaceName wWeight=60.2 sSpacing=.02 crBackColor lcid dwReserved sStyle=.02 wKerning=.2 bUnderlineType=.1 bAnimation=.1 bRevAuthor=.1 bReserved1=.1")
-RichEdit_SetCharFormat(hCtrl, Face="", Style="", Color="-", Mode="SELECTION")  {
+RichEdit_SetCharFormat(HCtrl, Face="", Style="", Colors="", Mode="SELECTION")  {
 	static EM_SETCHARFORMAT=0x444
-		  , CFM_BOLD:=0x1,CFM_CHARSET:=0x8000000,CFM_COLOR:=0x40000000,CFM_FACE:=0x20000000,CFM_ITALIC:=0x2,CFM_OFFSET:=0x10000000,CFM_PROTECTED:=0x10,CFM_SIZE:=0x80000000,CFM_STRIKEOUT:=0x8,CFM_UNDERLINE:=0x4
-		  , CFE_AUTOCOLOR=0x40000000,CFE_BOLD=1,CFE_ITALIC=2,CFE_STRIKEOUT=8,CFE_UNDERLINE=4,CFE_PROTECTED=0x10
-		  , SCF_ALL=0x4,SCF_SELECTION=0x1  ;,SCF_WORD=0x2
-		  , dwMask_default=0
+		  , CFM_CHARSET:=0x8000000,CFM_COLOR:=0x40000000, CFM_FACE:=0x20000000, CFM_OFFSET:=0x10000000, CFM_SIZE:=0x80000000, CFM_WEIGHT=0x400000, CFM_UNDERLINETYPE=0x800000
+		  , CFM_OUTLINE=0x200, CFM_ALLCAPS=0x80, CFM_HIDDEN=0x100, CFM_BOLD=1, CFM_ITALIC=2, CFM_DISABLED=0x2000, CFM_EMBOSS=0x800, CFM_IMPRINT=0x1000, CFM_LINK=0x20, CFM_PROTECTED=0x10, CFM_SHADOW=0x400, CFM_SMALLCAPS=0x40, CFM_STRIKEOUT=8, CFM_UNDERLINE=4, CFM_SUPERSCRIPT=0x30000, CFM_SUBSCRIPT=0x30000, CFM_BACKCOLOR=0x4000000, CFE_AUTOBACKCOLOR=0x4000000, CFE_AUTOCOLOR = 0x40000000
+		  , CFE_OUTLINE=0x200, CFE_ALLCAPS=0x80, CFE_HIDDEN=0x100, CFE_BOLD=1, CFE_ITALIC=2, CFE_DISABLED=0x2000, CFE_EMBOSS=0x800, CFE_IMPRINT=0x1000, CFE_LINK=0x20, CFE_PROTECTED=0x10, CFE_SHADOW=0x400, CFE_SMALLCAPS=0x40, CFE_STRIKEOUT=8, CFE_UNDERLINE=4, CFE_SUBSCRIPT=0x10000, CFE_SUPERSCRIPT=0x20000, CFM_COLOR=0x40000000, CFM_AUTOBACKCOLOR=0x4000000, CFM_AUTOCOLOR=0x40000000
+		  , SCF_ALL=4, SCF_SELECTION=1, SCF_WORD=3, SCF_ASSOCIATEFONT=0x10
 
-	If mode in A,ALL
-		 mode := SCF_ALL
-	else mode := SCF_SELECTION
-	 ; Else If mode in W,WORD
-	  ;  mode := SCF_SELECTION | SCF_WORD
+	VarSetCapacity(CF, 84, 0),  NumPut(84, CF)
+	hMask := 0
+	if (Face != "") && (StrLen(Face) <= 32)
+		hMask |= CFM_FACE, DllCall("lstrcpy", "UInt", &CF+26, "Str", Face)
 
-	;To turn off a formatting attribute, set the appropriate value in dwMask but do not set the corresponding value in dwEffects
-	dwMask_default |= !dwMask_default ? CFM_BOLD|CFM_CHARSET|CFM_ITALIC|CFM_OFFSET|CFM_PROTECTED|CFM_STRIKEOUT|CFM_UNDERLINE : 0
+	if (Colors != "") {
+		StringSplit, Color, Colors, `,
+		Color1 := Color1 = "" ? "" : ((Color1 & 0xFF) << 16) + (Color1 & 0xFF00) + ((Color1 >> 16) & 0xFF) 
+		Color2 := Color2 = "" ? "" : ((Color2 & 0xFF) << 16) + (Color2 & 0xFF00) + ((Color2 >> 16) & 0xFF) 
+	    NumPut(Color1, CF, 20),  NumPut(Color2, CF, 64)
+		hMask |= (Color1 = "" ? 0 : CFM_COLOR) | (Color2 = "" ? 0 : CFM_BACKCOLOR)
+	}
 
-	; Character effects. This member can be a combination of the following values.	
-	dwMask:=dwMask_default, dwEffects:=0
-	StringUpper, style,style
-	If style
-		Loop, parse, style, %A_Tab%%A_Space%
-		If A_LoopField in AUTOCOLOR,BOLD,ITALIC,STRIKEOUT,UNDERLINE,PROTECTED
-		 dwEffects |= CFE_%A_LoopField%
+	if (Style != "") {
+		hEffects := 0
+		loop, parse, Style, %A_Space%
+		{
+			lf := A_LoopField
+			if (h := SubStr(lf, 2)+0 != "") && (s := h)
+				 continue
+			
+			if bOff := SubStr(lf, 1, 1) = "-"
+				lf := SubStr(lf, 2)
+			
+			hMask |= CFM_%lf%, hEffects |= bOff ? 0 : CFE_%lf%
+		}
+	    NumPut(hEffects, CF, 8)
+		if (s != "")
+			hMask |= CFM_SIZE ;size here.
+	}	
 
-	If RegExMatch( color, "S)0x(?P<R>..)(?P<G>..)(?P<B>..)", _ ) ; RGB2BGR
-		color:= "0x" _B _G _R
-
-	VarSetCapacity(CHARFORMAT, 60, 0), NumPut(60, CHARFORMAT)
-	dwMask |= RegExMatch(style " ","US)S([0-9]+) ", m) ?  (CFM_SIZE , NumPut(m1*20,CHARFORMAT,12,"Int"))   :  0
-	dwMask |= color!="-"                          ?  (CFM_COLOR, NumPut(color,CHARFORMAT,20,"UInt"))  :  0
-	dwMask |= face && StrLen(face)<33             ?  (CFM_FACE , VarSetCapacity(szFaceName,33,0), szFaceName:=face) : 0
-
-	NumPut(dwMask, CHARFORMAT, 4), NumPut(dwEffects, CHARFORMAT, 8)
-	If szFaceName
-		DllCall("lstrcpy", "UInt", &CHARFORMAT + 26, "Str", szFaceName)
-	SendMessage, EM_SETCHARFORMAT, mode, &CHARFORMAT,, ahk_id %hCtrl%
-	return ERRORLEVEL	;value of the dwMask member of the CHARFORMAT structure
+	NumPut(hMask, CF, 4)
+	SendMessage, EM_SETCHARFORMAT, SCF_%Mode%, &CF,, ahk_id %hCtrl%
+	return ErrorLevel
 }
 
 /*
@@ -1638,6 +1666,28 @@ RichEdit_TextMode(HCtrl, TextMode="")  {
 		return SubStr(res, 1, -1)
 	}
 }
+
+/*
+ Function:		TwipsToPixels
+				Convert Twips to Pixels.
+
+ Parameters:
+				Twips		- Twips to convert.
+				Direction	- 0 (default) or 1. Pixels are not always square (the height and width are not the same). 
+							  Therefore, it is necessary to pass in the desired "direction" to use, horizontal (0) or vertical (1). 
+ */
+RichEdit_TwipsToPixels(Twips, Direction=0) {
+	static twipsPerInch = 1440, WU_LOGPIXELSX=88, WU_LOGPIXELSY=90, tpi0, tpi1
+
+	if !tpi0
+		dc := DllCall("GetDC", "uint", 0, "Uint")
+		, tpi0 := DllCall("gdi32.dll\GetDeviceCaps", "uint", dc, "int", WU_LOGPIXELSX)
+		, tpi1 := DllCall("gdi32.dll\GetDeviceCaps", "uint", dc, "int", WU_LOGPIXELSY)
+		, DllCall("ReleaseDC", "uint", 0, "uint", dc)
+   
+   return (Twips / twipsPerInch) * tpi%Direction%
+}
+		
 
 /*
  Function:		WordWrap
