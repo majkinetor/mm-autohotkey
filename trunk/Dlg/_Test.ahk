@@ -1,3 +1,4 @@
+;_("mo!")
 #Singleinstance, force
 #NoEnv
 	Gui, +LastFound
@@ -12,7 +13,7 @@
 	Gui, Add, Edit, ym+5 w300 h220,Input / Output
 	Gui, Show, autosize
 return
-
+	
 Set(txt){
 	ControlSetText, Edit1, %txt%
 }
@@ -41,7 +42,7 @@ OnBtn:
 		Set(Dlg_Save(hGui, "Select several files", "All Files (*.*)|Audio (*.wav; *.mp2; *.mp3)|Documents (*.txt)", "", "c:\", ""))
 
 	if A_GuiControl = Find
-		Dlg_Find(hGui, "OnFindReplace", "d") 
+		Dlg_Find(hGui, "OnFindReplace", "-w") 
 
 	if A_GuiControl = Replace
 		Dlg_Replace(hGui, "OnFindReplace", "d", "Find me", "Replace me")
