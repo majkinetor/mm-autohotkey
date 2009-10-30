@@ -1088,9 +1088,9 @@ RichEdit_SetCharFormat(HCtrl, Face="", Style="", Colors="", Mode="")  {
 		loop, parse, Style, %A_Space%
 		{
 			lf := A_LoopField, c := SubStr(lf, 1, 1) 
-			if InStr("so", c) && ((j := SubStr(lf, 2)+0) != "") && (%c% := j)
+			if InStr("so", c) && ((j := SubStr(lf, 2)+0) != "", (%c% := j))
 				 continue
-			
+		
 			if bOff := c = "-"
 				lf := SubStr(lf, 2)
 			
@@ -1101,6 +1101,7 @@ RichEdit_SetCharFormat(HCtrl, Face="", Style="", Colors="", Mode="")  {
 			hMask |= CFM_SIZE, NumPut(s*20, CF, 12, "Int")
 		if (o != "")
 			hMask |= CFM_OFFSET, NumPut(o, CF, 16, "Int")
+		
 	}
 
 	NumPut(hMask, CF, 4)

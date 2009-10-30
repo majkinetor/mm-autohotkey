@@ -1,7 +1,7 @@
 SetCharFormat:	;
-	r := RichEdit_SetCharFormat(hRichEdit, "Courier New", "BOLD S19", "", "WORD")
+	r := RichEdit_SetCharFormat(hRichEdit, "Courier New", "BOLD S19 o200", "", "WORD")
 	SLEEP 1000
-	r := RichEdit_SetCharFormat(hRichEdit, "aRIAL", "-BOLD S12", "", "WORD")
+	r := RichEdit_SetCharFormat(hRichEdit, "aRIAL", "-BOLD S12 o0", "", "WORD")
 return
 
 GetCharFormat:	;
