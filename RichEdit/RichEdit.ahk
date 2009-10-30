@@ -233,12 +233,12 @@ RichEdit_Clear(hEdit) {
 				Rounded value.
  */
 RichEdit_Convert(Input, Direction=0) {
-	static twipsPerInch = 1440, WU_LOGPIXELSX=88, WU_LOGPIXELSY=90, tpi0, tpi1
+	static twipsPerInch = 1440, LOGPIXELSX=88, LOGPIXELSY=90, tpi0, tpi1
 
 	if !tpi0
 		dc := DllCall("GetDC", "uint", 0, "Uint")
-		, tpi0 := DllCall("gdi32.dll\GetDeviceCaps", "uint", dc, "int", WU_LOGPIXELSX)
-		, tpi1 := DllCall("gdi32.dll\GetDeviceCaps", "uint", dc, "int", WU_LOGPIXELSY)
+		, tpi0 := DllCall("gdi32.dll\GetDeviceCaps", "uint", dc, "int", LOGPIXELSX)
+		, tpi1 := DllCall("gdi32.dll\GetDeviceCaps", "uint", dc, "int", LOGPIXELSY)
 		, DllCall("ReleaseDC", "uint", 0, "uint", dc)
    
    return (Input>0) ? (Input * tpi%Direction%) // twipsPerInch  : (-Input*twipsPerInch) // tpi%Direction%
@@ -413,71 +413,58 @@ RichEdit_GetOptions(hCtrl)  {
 			Get or set the current text mode of a rich edit control.
 
  Parameters:
-			font - Optional byref parameter will contain the name of the font.
-			style - Optional byref parameter will contain a space separated list
-             of styles. See below list.
-			colors - Optional byref parameter will contain the RGB color for font.
-			mode - If *DEFAULT* or *D*, this optional parameter retrieves the formatting to all text in the
-            control. Otherwise it applies the formatting to the current selection. If the selection
-            is empty, the character formatting is applied to the insertion point, and the new
-            character format is in effect only until the insertion point changes.
-
- Style Options:
-     AUTOCOLOR - The text color is the current color of the text in windows.
-     BOLD - Characters are bold.
-     DISABLED - RichEdit 2.0 and later: Characters are displayed with a shadow that is offset by 3/4 point or one pixel, whichever is larger.
-     ITALIC - Characters are italic.
-     STRIKEOUT - Characters are struck.
-     UNDERLINE - Characters are underlined.
-     PROTECTED - Characters are protected. an attempt to modify them will cause an EN_PROTECTED notification message.
-
- Returns:
-			This function does not return a value.
+			Face	- Optional byref parameter will contain the name of the font.
+			Style	- Optional byref parameter will contain a space separated list
+					  of styles. See <SetCharFormat> for list of styles.
+			Colors	- Optional byref parameter will contain the RGB text and background color of the char.
+					  Ppass "FG" or "BG" to select color to be returned.
+			Mode	- If empty, this optional parameter retrieves the formatting to all text in the
+					  control. Otherwise, pass "SELECTION" (default) to get formatting of the current selection. If the selection
+					  is empty, the function will get the character of the insertion point.
 
  Remarks:
-     The control must not contain text when calling this function, or it will return *FALSE*.
-     To ensure there is no text, use <SetText> with an empty string.
-
- >     RichEdit_SetText(hRichEdit, "")
+		Function will get the attributes of the first character. 
 
  Related:
-     <SetCharFormat>, <SetBgColor>
+		<SetCharFormat>, <SetBgColor>
 
  Example:
- > RichEdit_GetCharFormat(hRichEdit, face, style, color)
+ > RichEdit_GetCharFormat(hRichEdit, face, style, color := "fg")
  > MsgBox, Face = %Face% `nstyle = %style%  `ncolor = %color%
  */
-RichEdit_GetCharFormat(hCtrl, ByRef font="", ByRef style="", ByRef color="", mode="SELECTION")  {
-  static EM_GETCHARFORMAT=58,WM_USER=0x400
-  static SCF_SELECTION=0x1,SCF_DEFAULT=0x0
+RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef Colors="", Mode="SELECTION")  {
+	static EM_GETCHARFORMAT=1082, SCF_SELECTION=1
+  		  , CFM_CHARSET:=0x8000000,CFM_COLOR:=0x40000000, CFM_FACE:=0x20000000, CFM_OFFSET:=0x10000000, CFM_SIZE:=0x80000000, CFM_WEIGHT=0x400000, CFM_UNDERLINETYPE=0x800000
+		  , CFE_HIDDEN=0x100, CFE_BOLD=1, CFE_ITALIC=2, CFE_LINK=0x20, CFE_PROTECTED=0x10, CFE_STRIKEOUT=8, CFE_UNDERLINE=4, CFE_SUPERSCRIPT=0x30000, CFE_SUBSCRIPT=0x30000
+		  , CFM_ALL2=0xFEFFFFFF
+		  , styles="HIDDEN BOLD ITALIC DISABLED LINK PROTECTED STRIKEOUT UNDERLINE SUPERSCRIPT SUBSCRIPT"
 
-  mode := (mode="default"||mode="d")  ?   SCF_DEFAULT : SCF_SELECTION
-  VarSetCapacity(CHARFORMAT, 60, 0), NumPut(60, CHARFORMAT)
-  SendMessage, WM_USER | EM_GETCHARFORMAT, mode,&CHARFORMAT,, ahk_id %hCtrl%
+	VarSetCapacity(CF, 84, 0), NumPut(84, CF), NumPut(CFM_ALL2, CF, 4)
+	SendMessage, EM_GETCHARFORMAT, SCF_%Mode%, &CF,, ahk_id %hCtrl%
+	Face := DllCall("MulDiv", "UInt", &CF+26, "Int",1, "Int",1, "str")
 
-  ; dwEffects - Character effects. This member can be a combination of the following values.
-  static CFE_AUTOCOLOR=0x40000000,CFE_BOLD=0x1,CFE_ITALIC=0x2,CFE_STRIKEOUT=0x8,CFE_UNDERLINE=0x4,CFE_PROTECTED=0x10
-  cfe := NumGet(CHARFORMAT, 8, "UInt")
-  dwEffects=PROTECTED,UNDERLINE,STRIKEOUT,ITALIC,BOLD,AUTOCOLOR
+	Style := "", dwEffects := NumGet(CF, 8, "UInt")
+	Loop, parse, styles, %A_SPACE%
+		if (CFE_%A_LoopField% & dwEffects) 
+			Style .= A_LoopField " "
+    s := NumGet(CF, 12, "Int") // 20,  o := NumGet(CF, 16, "Int")
+	Style .= "s" s (o ? " o" o : "")
+	
+	clr := NumGet(CF, 20, "UInt"), bg := NumGet(CF, 62, "UInt")
+	ifEqual, Colors, bg, SetEnv, clr, %bg%
 
-  style := ""	;-- majkinetor, if entering with same var it accumulates without this.
-  Loop, parse, dwEffects,`,
-    cfe >= CFE_%a_loopfield%  ?  (style.=(style ? " " a_loopfield : a_loopfield), cfe-=CFE_%a_loopfield%)  :  ""
+	oldFormat := A_FormatInteger 
+    SetFormat, integer, hex  ; Show RGB color extracted below in hex format. 
 
-  ; color (crTextColor)
-  old := A_FormatInteger
-  SetFormat, integer, hex
-  RegExMatch( NumGet(CHARFORMAT,20,"UInt")+0x1000000, "(?P<R>..)(?P<G>..)(?P<B>..)$", _ ) ; RGB2BGR
-  color := "0x" _B _G _R
-
-  ; font size (cfeDesc)
-  SetFormat, float, 1.0
-  style .= (style ? " s" : "s") . NumGet(CHARFORMAT,12,"Int")/20
-  SetFormat, integer, %old%
-
-  ; face (szFaceName)
-  VarSetCapacity(font, 32)
-  DllCall("RtlMoveMemory", "str", font, "Uint", &CHARFORMAT + 26, "Uint", 32)
+ ;convert to rgb 
+	 
+    Color := (clr & 0xff00) + ((clr & 0xff0000) >> 16) + ((clr & 0xff) << 16) 
+    StringTrimLeft, Color, Color, 2 
+    loop, % 6-strlen(Color) 
+		Color=0%Color% 
+    Color=0x%Color% 
+    SetFormat, integer, %oldFormat% 
+	Colors := Color
 }
 
 /*
@@ -1063,7 +1050,7 @@ RichEdit_SetBgColor(hCtrl, Color)  {
  Returns:
 			TRUE or FALSE.
  */
-RichEdit_SetCharFormat(HCtrl, Face="", Style="", Colors="", Mode="")  {
+RichEdit_SetCharFormat(HCtrl, Face="", Style="", Colors="", Mode="SELECTION")  {
 	static EM_SETCHARFORMAT=0x444
 		  , CFM_CHARSET:=0x8000000,CFM_COLOR:=0x40000000, CFM_FACE:=0x20000000, CFM_OFFSET:=0x10000000, CFM_SIZE:=0x80000000, CFM_WEIGHT=0x400000, CFM_UNDERLINETYPE=0x800000
 		  , CFM_HIDDEN=0x100, CFM_BOLD=1, CFM_ITALIC=2, CFM_DISABLED=0x2000, CFM_LINK=0x20, CFM_PROTECTED=0x10, CFM_STRIKEOUT=8, CFM_UNDERLINE=4, CFM_SUPERSCRIPT=0x30000, CFM_SUBSCRIPT=0x30000, CFM_BACKCOLOR=0x4000000, CFE_AUTOBACKCOLOR=0x4000000, CFE_AUTOCOLOR = 0x40000000
@@ -1868,5 +1855,5 @@ RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 	o Version 1.0 by freakkk & majkinetor.
 	o MSDN Reference : <http://msdn.microsoft.com/en-us/library/bb787605(VS.85).aspx>.
 	o RichEdit control shortcut keys: <http://msdn.microsoft.com/en-us/library/bb787873(VS.85).aspx#rich_edit_shortcut_keys>.
-	o AHK module licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */

@@ -25,7 +25,7 @@ _("mo!")
 	)
 
 ;	RichEdit_LimitText( hRichEdit, 900000 )  ; to taste save...
-	RichEdit_SetText(hRichEdit, "1.rtf", "FROMFILE")
+	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
 	;RichEdit_SetText(hRichEdit,  )
 	;RichEdit_SetText(hRichEdit, RTF_Table(3, 1, "300"), "", -1 )
 return
@@ -168,20 +168,17 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 
 	if Txt = Font
 	{
-		RichEdit_GetCharFormat( hRichEdit, font, style, color)
+		;RichEdit_GetCharFormat( hRichEdit, font, style, color)
 		if Dlg_Font(font, style, color, 1, hForm1)
 			RichEdit_SetCharFormat(hRichEdit, font, style, color)
 	}
 
-	if Txt = FG
+	if Txt in FG,BG
 	{
-		RichEdit_GetCharFormat( hRichEdit, _, _, color)
+		RichEdit_GetCharFormat( hRichEdit, _, _, color := Txt)
 		if Dlg_Color(color, hForm1)
-			RichEdit_SetCharFormat(hRichEdit, "", _, color)
+			RichEdit_SetCharFormat(hRichEdit, "", _, (Txt="FG" ? "" : ",") color)
 	}
-
-	if Txt = BG
-		msgbox  not implemented
 
 	if Txt = Wrap 
 		RichEdit_WordWrap(hRichEdit, Toolbar_GetButton(hCtrl, Pos, "S")="checked")

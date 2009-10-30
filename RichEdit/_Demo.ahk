@@ -1,12 +1,11 @@
-SetCharFormat:	;
-	r := RichEdit_SetCharFormat(hRichEdit, "Courier New", "BOLD S19 o200", "", "WORD")
-	SLEEP 1000
-	r := RichEdit_SetCharFormat(hRichEdit, "aRIAL", "-BOLD S12 o0", "", "WORD")
-return
-
 GetCharFormat:	;
 	RichEdit_GetCharFormat(hRichEdit, font, style, color)
 	Log("Char Format: ", font, style, color)
+return
+
+SetCharFormat:	;
+	r := RichEdit_SetCharFormat(hRichEdit, "Courier New", "BOLD S19 O100", ",0xff00", "word")
+
 return
 
 GetText: ;Retrieves a specified range of characters from a rich edit control.
