@@ -409,7 +409,7 @@ RichEdit_GetOptions(hCtrl)  {
 }
 
 /*
- Function: GetCharFormat
+ Function:	GetCharFormat
 			Get or set the current text mode of a rich edit control.
 
  Parameters:
@@ -1034,7 +1034,9 @@ RichEdit_SetBgColor(hCtrl, Color)  {
 			Face	- Font name. Optional.
 			Style	- Space separated list of styles. See below list. Optional.
 			Colors	- Comma separated string of 2 RGB colors for text and background. Each is optional.
-			Mode	- Character formatting that applies to the control. It can be one of the values given bellow. Optional.
+			Mode	- Character formatting that applies to the control.
+					  If omitted, the function changes the default character formatting.
+					  It can be one of the values given bellow. Optional.
 
  Styles:
 			s<Num>		- Character size, usual AHK represntation (i.e. s12)
@@ -1105,6 +1107,7 @@ RichEdit_SetCharFormat(HCtrl, Face="", Style="", Colors="", Mode="")  {
 	}
 
 	NumPut(hMask, CF, 4)
+	SendMessage, EM_SETCHARFORMAT, SCF_%Mode%, &CF,, ahk_id %hCtrl%
 	SendMessage, EM_SETCHARFORMAT, SCF_%Mode%, &CF,, ahk_id %hCtrl%
 	return ErrorLevel
 }
