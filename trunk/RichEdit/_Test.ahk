@@ -177,7 +177,7 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 	{
 		RichEdit_GetCharFormat( hRichEdit, _, _, color := Txt)
 		if Dlg_Color(color, hForm1)
-			RichEdit_SetCharFormat(hRichEdit, "", _, (Txt="FG" ? "" : ",") color)
+			RichEdit_SetCharFormat(hRichEdit, "", "", (Txt="FG" ? "" : ",") color)
 	}
 
 	if Txt = Wrap 
@@ -188,7 +188,7 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 		B := "bold", I := "italic", U := "underline", S := "strikeout"
 		RichEdit_GetCharFormat( hRichEdit, _, style)
 		if Instr(style, %Txt%)
-			StringReplace, style, style, %Txt%
+			StringReplace, style, style, %Txt%, -%Txt%
 		else style .= " " %Txt%
 		RichEdit_SetCharFormat( hRichEdit, "", style )
 	}
