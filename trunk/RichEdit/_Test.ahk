@@ -1,32 +1,16 @@
 _("mo!")
 
-#MaxThreads, 255
-
-	text = 
-	 (Ltrim
-		http://www.google.com
-		www.google.com
-
-		meh...
-	 )
- 
 	CreateGui(text)
+	
+	RichEdit_SetText(hRichEdit, "colors.rtf", "FROMFILE")
+	RichEdit_AutoUrlDetect( hRichEdit, "^" )
+	
+	Form_Show("", "Maximize")
 
-	Form_Show() ;"", "Maximize")
 	Log("Press F1 or doubleclick to execute selected API")
 	Log("Sort API by clicking ListView header.")
 	Log()
-	RichEdit_AutoUrlDetect( hRichEdit, "^" )
 
-	;table
-	t =
-	(LTrim
-
-	)
-
-;	RichEdit_LimitText( hRichEdit, 900000 )  ; to taste save...
-	RichEdit_SetText(hRichEdit, "Document.rtf", "FROMFILE")
-	;RichEdit_SetText(hRichEdit,  )
 	;RichEdit_SetText(hRichEdit, RTF_Table(3, 1, "300"), "", -1 )
 return
 
@@ -168,20 +152,26 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 
 	if Txt = Font
 	{
-		;RichEdit_GetCharFormat( hRichEdit, font, style, color)
+		RichEdit_GetCharFormat( hRichEdit, font, style, color)
 		if Dlg_Font(font, style, color, 1, hForm1)
-			RichEdit_SetCharFormat(hRichEdit, font, style, color)
+			 return RichEdit_SetCharFormat(hRichEdit, font, style, color)
+		else return 
 	}
 
 	if Txt in FG,BG
 	{
-		RichEdit_GetCharFormat( hRichEdit, _, _, color := Txt)
-		if Dlg_Color(color, hForm1)
-			RichEdit_SetCharFormat(hRichEdit, "", "", (Txt="FG" ? "" : ",") color)
+		RichEdit_GetCharFormat( hRichEdit, _, _, fg, bg)
+		if Txt = FG
+			 bg := ""
+		else fg := ""
+
+		if Dlg_Color(%txt%, hForm1)
+			return RichEdit_SetCharFormat(hRichEdit, "", "", fg, bg)
+		else return 
 	}
 
 	if Txt = Wrap 
-		RichEdit_WordWrap(hRichEdit, Toolbar_GetButton(hCtrl, Pos, "S")="checked")
+		return RichEdit_WordWrap(hRichEdit, Toolbar_GetButton(hCtrl, Pos, "S")="checked")
 
 	if Txt in B,I,U,S
 	{
@@ -190,38 +180,40 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 		if Instr(style, %Txt%)
 			StringReplace, style, style, %Txt%, -%Txt%
 		else style .= " " %Txt%
-		RichEdit_SetCharFormat( hRichEdit, "", style )
+		return RichEdit_SetCharFormat( hRichEdit, "", style )
 	}
 
 	if Txt = BackColor
 		if Dlg_Color(color, hForm1)
-			RichEdit_SetBgColor(hRichEdit, color)	
+			 return RichEdit_SetBgColor(hRichEdit, color)
+		else return
 	
 	if Txt = Load
-		RichEdit_SetText(hRichEdit, Dlg_Open(hForm1, "", "RTF files (*.rtf)|Text files (*.txt)"), "FROMFILE")
+		return RichEdit_SetText(hRichEdit, Dlg_Open(hForm1, "", "RTF files (*.rtf)|Text files (*.txt)"), "FROMFILE")
 
 	if Txt = Save
 		if fn := Dlg_Save(hForm1, "", "RTF files (*.rtf)|Text files (*.txt)", "", "", "rtf") 
-			RichEdit_Save(hRichEdit, fn)
+			 return RichEdit_Save(hRichEdit, fn)
+		else return
 
 	if Txt = Events
 	{
 		b := Toolbar_GetButton(hCtrl, Pos, "S")="checked"
 		events := !b ? "" : "DRAGDROPDONE LINK DROPFILES KEYEVENTS SELCHANGE SCROLLEVENTS PROTECTED REQUESTRESIZE"
-		RichEdit_SetEvents(hRichEdit, "Handler", events)
+		return RichEdit_SetEvents(hRichEdit, "Handler", events)
 	}
 
 	If Txt in +2,-2
-		RichEdit_SetFontSize(hRichEdit, Txt)
+		return RichEdit_SetFontSize(hRichEdit, Txt)
 
 	if Txt in left,right,center,justify
-		RichEdit_SetParaFormat(hRichEdit, "Align=" Txt)
+		return RichEdit_SetParaFormat(hRichEdit, "Align=" Txt)
 
 	if Txt in <-,->
-		RichEdit_SetParaFormat(hRichEdit, "Ident=" (Txt="<-" ? -1:1)*1000)
+		return RichEdit_SetParaFormat(hRichEdit, "Ident=" (Txt="<-" ? -1:1)*1000)
 	
 	if Txt in Num,Bullet
-		RichEdit_SetParaFormat(hRichEdit, "Num=" (Txt="Num" ? "DECIMAL" : "BULLET") ",1,D")
+		return RichEdit_SetParaFormat(hRichEdit, "Num=" (Txt="Num" ? "DECIMAL" : "BULLET") ",1,D")
 }
 
 PopulateList() {

@@ -51,4 +51,6 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
 	return hCtrl
 }
 
-F1:: Gui, Show
+
+
+#include 

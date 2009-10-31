@@ -416,8 +416,8 @@ RichEdit_GetOptions(hCtrl)  {
 			Face	- Optional byref parameter will contain the name of the font.
 			Style	- Optional byref parameter will contain a space separated list
 					  of styles. See <SetCharFormat> for list of styles.
-			Colors	- Optional byref parameter will contain the RGB text and background color of the char.
-					  Ppass "FG" or "BG" to select color to be returned.
+			TextColor		- Text forground color.
+			BackColor		- Text background color.
 			Mode	- If empty, this optional parameter retrieves the formatting to all text in the
 					  control. Otherwise, pass "SELECTION" (default) to get formatting of the current selection. If the selection
 					  is empty, the function will get the character of the insertion point.
@@ -429,10 +429,10 @@ RichEdit_GetOptions(hCtrl)  {
 		<SetCharFormat>, <SetBgColor>
 
  Example:
- > RichEdit_GetCharFormat(hRichEdit, face, style, color := "fg")
+ > RichEdit_GetCharFormat(hRichEdit, face, style, color)
  > MsgBox, Face = %Face% `nstyle = %style%  `ncolor = %color%
  */
-RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef Colors="", Mode="SELECTION")  {
+RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef TextColor="", ByRef BackColor="", Mode="SELECTION")  {
 	static EM_GETCHARFORMAT=1082, SCF_SELECTION=1
   		  , CFM_CHARSET:=0x8000000,CFM_COLOR:=0x40000000, CFM_FACE:=0x20000000, CFM_OFFSET:=0x10000000, CFM_SIZE:=0x80000000, CFM_WEIGHT=0x400000, CFM_UNDERLINETYPE=0x800000
 		  , CFE_HIDDEN=0x100, CFE_BOLD=1, CFE_ITALIC=2, CFE_LINK=0x20, CFE_PROTECTED=0x10, CFE_STRIKEOUT=8, CFE_UNDERLINE=4, CFE_SUPERSCRIPT=0x30000, CFE_SUBSCRIPT=0x30000
@@ -450,20 +450,13 @@ RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef Colors="", Mo
     s := NumGet(CF, 12, "Int") // 20,  o := NumGet(CF, 16, "Int")
 	Style .= "s" s (o ? " o" o : "")
 	
-	clr := NumGet(CF, 20, "UInt"), bg := NumGet(CF, 62, "UInt")
-	ifEqual, Colors, bg, SetEnv, clr, %bg%
+	TextColor := NumGet(CF, 20), BackColor := NumGet(CF, 64)
 
 	oldFormat := A_FormatInteger 
     SetFormat, integer, hex 
-
- ;convert to rgb 
-    Color := (clr & 0xff00) + ((clr & 0xff0000) >> 16) + ((clr & 0xff) << 16) 
-    StringTrimLeft, Color, Color, 2 
-    loop, % 6-strlen(Color) 
-		Color=0%Color% 
-    Color=0x%Color% 
-    SetFormat, integer, %oldFormat% 
-	Colors := Color
+    TextColor := (TextColor & 0xff00) + ((TextColor & 0xff0000) >> 16) + ((TextColor & 0xff) << 16) 
+    BackColor := (BackColor & 0xff00) + ((BackColor & 0xff0000) >> 16) + ((BackColor & 0xff) << 16)	
+    SetFormat, integer, %oldFormat%
 }
 
 /*
@@ -1019,7 +1012,8 @@ RichEdit_SetBgColor(hCtrl, Color)  {
  Parameters:
 			Face	- Font name. Optional.
 			Style	- Space separated list of styles. See below list. Optional.
-			Colors	- Comma separated string of 2 RGB colors for text and background. Each is optional.
+			TextColor	- Text foreground color. Optional.
+			BackColor	- Text backgrond color. Optional.
 			Mode	- Character formatting that applies to the control.
 					  If omitted, the function changes the default character formatting.
 					  It can be one of the values given bellow. Optional.
@@ -1049,7 +1043,7 @@ RichEdit_SetBgColor(hCtrl, Color)  {
  Returns:
 			TRUE or FALSE.
  */
-RichEdit_SetCharFormat(HCtrl, Face="", Style="", Colors="", Mode="SELECTION")  {
+RichEdit_SetCharFormat(HCtrl, Face="", Style="", TextColor="", BackColor="", Mode="SELECTION")  {
 	static EM_SETCHARFORMAT=0x444
 		  , CFM_CHARSET:=0x8000000,CFM_COLOR:=0x40000000, CFM_FACE:=0x20000000, CFM_OFFSET:=0x10000000, CFM_SIZE:=0x80000000, CFM_WEIGHT=0x400000, CFM_UNDERLINETYPE=0x800000
 		  , CFM_HIDDEN=0x100, CFM_BOLD=1, CFM_ITALIC=2, CFM_DISABLED=0x2000, CFM_LINK=0x20, CFM_PROTECTED=0x10, CFM_STRIKEOUT=8, CFM_UNDERLINE=4, CFM_SUPERSCRIPT=0x30000, CFM_SUBSCRIPT=0x30000, CFM_BACKCOLOR=0x4000000, CFE_AUTOBACKCOLOR=0x4000000, CFE_AUTOCOLOR = 0x40000000
@@ -1063,13 +1057,13 @@ RichEdit_SetCharFormat(HCtrl, Face="", Style="", Colors="", Mode="SELECTION")  {
 	if (Face != "") && (StrLen(Face) <= 32)
 		hMask |= CFM_FACE, DllCall("lstrcpy", "UInt", &CF+26, "Str", Face)
 
-	if (Colors != "") {
-		StringSplit, Color, Colors, `,
-		Color1 := Color1 = "" ? "" : ((Color1 & 0xFF) << 16) + (Color1 & 0xFF00) + ((Color1 >> 16) & 0xFF) 
-		Color2 := Color2 = "" ? "" : ((Color2 & 0xFF) << 16) + (Color2 & 0xFF00) + ((Color2 >> 16) & 0xFF) 
-	    NumPut(Color1, CF, 20),  NumPut(Color2, CF, 64)
-		hMask |= (Color1 = "" ? 0 : CFM_COLOR) | (Color2 = "" ? 0 : CFM_BACKCOLOR)
-	}
+	if (TextColor != "") 
+		TextColor := ((TextColor & 0xFF) << 16) + (TextColor & 0xFF00) + ((TextColor >> 16) & 0xFF)
+		, hMask |= CFM_COLOR, NumPut(TextColor, CF, 20)
+
+	if (BackColor != "") 
+		BackColor := ((BackColor & 0xFF) << 16) + (BackColor & 0xFF00) + ((BackColor >> 16) & 0xFF)
+		, hMask |= CFM_BACKCOLOR,  NumPut(BackColor, CF, 64)
 
 	if (Style != "") {
 		hEffects := 0
@@ -1088,12 +1082,10 @@ RichEdit_SetCharFormat(HCtrl, Face="", Style="", Colors="", Mode="SELECTION")  {
 		if (s != "")
 			hMask |= CFM_SIZE, NumPut(s*20, CF, 12, "Int")
 		if (o != "")
-			hMask |= CFM_OFFSET, NumPut(o, CF, 16, "Int")
-		
+			hMask |= CFM_OFFSET, NumPut(o, CF, 16, "Int")		
 	}
 
 	NumPut(hMask, CF, 4)
-	SendMessage, EM_SETCHARFORMAT, SCF_%Mode%, &CF,, ahk_id %hCtrl%
 	SendMessage, EM_SETCHARFORMAT, SCF_%Mode%, &CF,, ahk_id %hCtrl%
 	return ErrorLevel
 }

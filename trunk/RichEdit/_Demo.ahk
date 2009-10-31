@@ -1,6 +1,6 @@
 GetCharFormat:	;
-	RichEdit_GetCharFormat(hRichEdit, font, style, color)
-	Log("Char Format: ", font, style, color)
+	RichEdit_GetCharFormat(hRichEdit, font, style, textclr, backclr)
+	Log("Char Format: ", font, style, textclr, backclr)
 return
 
 SetCharFormat:	;
