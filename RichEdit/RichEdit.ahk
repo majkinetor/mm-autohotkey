@@ -1863,7 +1863,7 @@ RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 */
 
 /* Group: About
-	o Version 1.0a by freakkk & majkinetor.
+	o Version 1.0a2 by freakkk & majkinetor.
 	o MSDN Reference : <http://msdn.microsoft.com/en-us/library/bb787605(VS.85).aspx>.
 	o RichEdit control shortcut keys: <http://msdn.microsoft.com/en-us/library/bb787873(VS.85).aspx#rich_edit_shortcut_keys>.
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
