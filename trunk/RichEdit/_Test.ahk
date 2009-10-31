@@ -177,10 +177,7 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 	{
 		B := "bold", I := "italic", U := "underline", S := "strikeout"
 		RichEdit_GetCharFormat( hRichEdit, _, style)
-		if Instr(style, %Txt%)
-			StringReplace, style, style, %Txt%, -%Txt%
-		else style .= " " %Txt%
-		return RichEdit_SetCharFormat( hRichEdit, "", style )
+		return RichEdit_SetCharFormat( hRichEdit, "", Instr(style, %Txt%) ? "-" %Txt% : %Txt% )
 	}
 
 	if Txt = BackColor
