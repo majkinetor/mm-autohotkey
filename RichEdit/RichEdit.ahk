@@ -41,18 +41,6 @@
  Returns:
 	Control's handle or 0. Error message on problem.
 
- Remarks:
-	Whenever you press Escape in a multiline edit control it sends a WM_CLOSE message to its parent. Both the regular edit control and the rich edit control have this problem.
-	This is by Microsoft design. There is also similar undesired behavior for {Tab} key which is used by the system to navigate over controls with "tabstop" flag. RichEdit is designed
-	in such way that it doesn't prevent this, but to use ^{Tab} instead. For both cases, you can either subclass control and handle keys yourself or instantiate appropriate Hotkeys
-	which should be handled when rich edit control has focus.
-
-	For more information see links bellow :
-	o http://www.williamwilling.com/blog/?p=28http://www.biblioscape.com/rtf15_spec.htm
-	o http://www.winasm.net/forum/index.php?showtopic=487
-	o WM_GETDLGCODE Notification (DLGC_WANTALLKEYS, DLGC_WANTTAB): <http://msdn.microsoft.com/en-us/library/ms645425(VS.85).aspx>
-	o http://www.codeguru.com/cpp/controls/editctrl/keyboard/article.php/c513/
-	o Microsoft solution that doesn't work: <http://support.microsoft.com/kb/q143273/>.
  */
 RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
   static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
@@ -1841,6 +1829,38 @@ RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 	ifNotEqual, value, ~`a, SetEnv, %var%, %value%
 	return _
 }
+
+/* Group: Known Issues
+
+	Tab and Esc keys: 
+	Whenever you press Escape in a multiline edit control it sends a WM_CLOSE message to its parent. Both the regular edit control and the rich edit control have this problem.
+	This is by Microsoft design. There is also similar undesired behavior for {Tab} key which is used by the system to navigate over controls with "tabstop" flag. RichEdit is designed
+	to use ^{Tab} instead. 
+	
+	To prevent this behavior, you can either subclass control and handle keys yourself or instantiate appropriate Hotkeys
+	which should be handled when rich edit control has focus:
+
+	(start code)
+	Win_SubClass(hRichEdit, "MyWindowProc")
+	...
+
+	MyWindowProc(hwnd, uMsg, wParam, lParam){ 
+
+	   if (uMsg = 0x87)  ;WM_GETDLGCODE
+			return 4	 ;DLGC_WANTALLKEYS
+
+	   return DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", hwnd, "UInt", uMsg, "UInt", wParam, "UInt", lParam) 
+	}
+	(end code)
+
+	The subclassing routine presented above might be included by default 
+	in future versions of the module. For more information see links bellow :
+	o WM_GETDLGCODE @ MSDN: <http://msdn.microsoft.com/en-us/library/ms645425(VS.85).aspx>
+	o William Willing blog: <http://www.williamwilling.com/blog/?p=28>.
+	o WinAsm Forum: <http://www.winasm.net/forum/index.php?showtopic=487>.
+	o CodeGuru: <http://www.codeguru.com/cpp/controls/editctrl/keyboard/article.php/c513/>.
+	o Strange Microsoft solution for VB (that doesn't work): <http://support.microsoft.com/kb/q143273/>.
+*/
 
 /* Group: About
 	o Version 1.0a by freakkk & majkinetor.
