@@ -7,12 +7,21 @@
 
 	hRichEdit := RichEdit_Add( hwnd, 0, 0, 445, 490)
 	Gui, Show, w805 h500
+
+	Win_SubClass(hRichEdit, "MyWindowProc")
 return
 
+MyWindowProc(hwnd, uMsg, wParam, lParam){ 
+	
+   if (uMsg = 0x87)  ;WM_GETDLGCODE
+		return 4	 ;DLGC_WANTALLKEYS
+
+   return DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", hwnd, "UInt", uMsg, "UInt", wParam, "UInt", lParam) 
+}
 
 RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
   static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
-		,ES_DISABLENOSCROLL=0x2000, EX_BORDER=0x200   ; ES_MULTILINE=4  ;<-- escape issue (?)
+		,ES_DISABLENOSCROLL=0x2000, EX_BORDER=0x200, ES_MULTILINE=4  ;<-- escape issue (?)
 		,ES_LEFT=0, ES_CENTER=1, ES_RIGHT=2, ES_AUTOVSCROLL=0x40, ES_AUTOHSCROLL=0x80, ES_NOHIDESEL=0x100, ES_NUMBER=0x2000, ES_PASSWORD=0x20,ES_READONLY=0x800,ES_WANTRETURN=0x1000
 		,ES_HSCROLL=0x100000, ES_VSCROLL=0x200000, ES_SCROLL=0x300000 
 		,MODULEID
@@ -51,6 +60,4 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
 	return hCtrl
 }
 
-
-
-#include 
+#include inc\Win.ahk
