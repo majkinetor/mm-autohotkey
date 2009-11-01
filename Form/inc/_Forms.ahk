@@ -10,8 +10,8 @@
  Group: Features
 		All modules are developed so they fulfill specific goals :
 
-		o Standalone. All modules are independent of each other. You can copy any module to your script and use it without other modules.
-		  They generally don't depend on your script settings. 
+		o Standalone. All modules are independent of each other unless stated differently. You can copy any module to your script and use it without other modules.
+		  They generally don't depend on your script settings.
 		o Standardized. Generally, modules use the same or similar APIs whenever possible. Functions with big number of parameters use
 		  named arguments to avoid long list of empty parameters. Functions doing similar things are declared the same and arguments
 		  having similar purpose are named equaly cross-module.
@@ -53,10 +53,12 @@
 		o <Font>		- Sets font for the control.
 
  Group: Known bugs/issues
-		o Modules use decimal format of integer (default one). Module may not work if integer format is changed to Hex.
-		  as it doesn't set and restore integer format for practical reasons (it would have to be repeated on far too many places).
-		  If you use different integer format restore it back to decimal once you are finished.
+		o Modules use decimal format of integer (default one). Module may not work as expected if 
+		integer format is changed to Hex as it doesn't set and restore integer 
+		format for practical reasons (it would have to be repeated on far too many places).
+		If you set different integer format restore it back to default one once you are finished.
  */
+
 #include *i Form.ahk
 
 ;extensions
@@ -96,7 +98,7 @@
 
 /* 
  Group: About
-	o v0.45 by majkinetor.
+	o v0.5 by majkinetor.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> .
 
 	(see _Forms.png)
