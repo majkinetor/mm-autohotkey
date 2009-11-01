@@ -20,11 +20,10 @@
  Styles:
      DISABLENOSCROLL - Disables scroll bars instead of hiding them when they are not needed.
      BORDER			- Displays the control with a sunken border style so that the rich edit control appears recessed into its parent window.
-	 HIDDEN			- Don't show the control.
-	 VSCROLL		- Enble vertical scroll bar.
-	 HSCROLL		- Enable horizontal scroll bar.
-	 SCROLL			- Enable both scroll bars.
-
+     HIDDEN			- Don't show the control.
+     VSCROLL		- Enble vertical scroll bar.
+     HSCROLL		- Enable horizontal scroll bar.
+     SCROLL			- Enable both scroll bars.
      AUTOHSCROLL	- Automatically scrolls text to the right by 10 characters when the user types a character at the end of the line. When the user presses the ENTER key, the control scrolls all text back to position zero.
      AUTOVSCROLL	- Automatically scrolls text up one page when the user presses the ENTER key on the last line.
      CENTER			- Centers text in a single-line or multiline edit control.
@@ -35,7 +34,7 @@
      PASSWORD		- Displays an asterisk (*) for each character typed into the edit control. This style is valid only for single-line edit controls.
      READONLY		- Prevents the user from typing or editing text in the edit control.
      RIGHT			- Right aligns text in a single-line or multiline edit control.
-	 SELECTIONBAR   - When set, there is small left margin (wider than default) where cursor changes to right-up arrow allowing full line(s) selection.
+     SELECTIONBAR - When set, there is small left margin (wider than default) where cursor changes to right-up arrow allowing full line(s) selection. This style also requires use of *MULTILINE* style.
      WANTRETURN		- Specifies that a carriage return be inserted when the user presses the ENTER key while entering text into a multiline edit control in a dialog box. If you do not specify this style, pressing the ENTER key has the same effect as pressing the dialog box's default push button. This style has no effect on a single-line edit control.			
 
  Returns:
@@ -45,7 +44,7 @@
 RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
   static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
 		,ES_DISABLENOSCROLL=0x2000, EX_BORDER=0x200
-		,ES_LEFT=0, ES_CENTER=1, ES_RIGHT=2, ES_MULTILINE=4, ES_AUTOVSCROLL=0x40, ES_AUTOHSCROLL=0x80, ES_NOHIDESEL=0x100, ES_NUMBER=0x2000, ES_PASSWORD=0x20,ES_READONLY=0x800,ES_WANTRETURN=0x1000, ES_SELECTIONBAR = 0x1000000
+		,ES_LEFT=0, ES_CENTER=1, ES_RIGHT=2, ES_MULTILINE=4, ES_AUTOVSCROLL=0x40, ES_AUTOHSCROLL=0x80, ES_NOHIDESEL=0x100, ES_NUMBER=0x2000, ES_PASSWORD=0x20,ES_READONLY=0x800,ES_WANTRETURN=0x1000  ;, ES_SELECTIONBAR = 0x1000000
 		,ES_HSCROLL=0x100000, ES_VSCROLL=0x200000, ES_SCROLL=0x300000 
 		,MODULEID
 
@@ -64,6 +63,8 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
 			 hStyle |= v
 		else if (v := EX_%A_LOOPFIELD%)
 			 hExStyle |= v
+		else if (A_LoopField = "SELECTIONBAR")
+       selectionbar := true
 		else continue
 	}
 	/*
@@ -102,7 +103,7 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
                   , "Uint", MODULEID			; hMenu 
                   , "Uint", 0					; hInstance
                   , "Uint", 0, "Uint")			; must return uint.
-	return hCtrl
+	return hCtrl,  selectionbar ? RichEdit_SetOptions( hCtrl, "OR", "SELECTIONBAR" ) 
 }
 
 /*
