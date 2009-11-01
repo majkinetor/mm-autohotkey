@@ -240,7 +240,7 @@ OnLV:
 	ControlSetText, ,%m1%, ahk_id %hExample%
   }
   If ( A_GuiEvent = "DoubleClick" )
-	IfNotEqual, api, API, goto %api%
+	IfNotEqual, api, API, goto _%api%
 return
 
 
@@ -251,7 +251,7 @@ return
 	OnToolbar(hToolbar, "click", SubStr(A_ThisHotkey, 2))
 return
 
-F1:: IfNotEqual, api, API, goto %api%
+F1:: IfNotEqual, api, API, goto _%api%
 
 #include RichEdit.ahk
 
