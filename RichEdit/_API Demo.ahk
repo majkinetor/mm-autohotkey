@@ -96,7 +96,7 @@ apiPopulate()  {
 
 
   Find:
-    EM_FINDTEXT(hRichEdit, "waldo")
+
   return
 
 

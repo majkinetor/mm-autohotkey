@@ -327,6 +327,37 @@ RichEdit_FindWordBreak(hCtrl, CharIndex, Flag="")  {
 }
 
 /*
+ Function: FixKeys
+	  	   Fix Tab and Esc key handling in rich edit control.
+	
+ Returns:
+		  True or False.
+
+ Remarks:
+	Whenever you press Escape in a multiline edit control it sends a WM_CLOSE message to its parent. Both the regular edit control and the rich edit control have this problem.
+	This is by Microsoft design. There is also similar undesired behavior for {Tab} key which is used by the system to navigate over controls with "tabstop" flag. RichEdit is designed
+	to use ^{Tab} instead. This function subclasses the control to prevent such behavior.
+
+	However, before using this function be sure to know what subclassing is and what kind of effects
+	it may introduce to your particular script. There is also other method to solve this problem via 
+	hotkey handling while rich edit control has focus.
+	
+ Reference:
+	o WM_GETDLGCODE @ MSDN: <http://msdn.microsoft.com/en-us/library/ms645425(VS.85).aspx>
+	o William Willing blog: <http://www.williamwilling.com/blog/?p=28>.
+	o WinAsm Forum: <http://www.winasm.net/forum/index.php?showtopic=487>.
+	o CodeGuru: <http://www.codeguru.com/cpp/controls/editctrl/keyboard/article.php/c513/>.
+	o Strange Microsoft solution for VB (that doesn't work): <http://support.microsoft.com/kb/q143273/>.
+ */
+RichEdit_FixKeys(hCtrl) {
+	oldProc := DllCall("GetWindowLong", "uint", hCtrl, "uint", -4) 
+	ifEqual, oldProc, 0, return 0 
+	wndProc := RegisterCallback("RichEdit_wndProc", "", 4, oldProc) 
+	ifEqual, wndProc, , return 0
+	return DllCall("SetWindowLong", "UInt", hCtrl, "Int", -4, "Int", wndProc, "UInt") 
+}
+
+/*
  Function:	GetLine
 			Get the text of the desired line from the control.
  
@@ -870,13 +901,13 @@ RichEdit_ReplaceSel(hEdit, Text=""){
 RichEdit_Save(hCtrl, FileName="") {
 	static EM_STREAMOUT=0x44A
 
-	wbProc := RegisterCallback("RichEdit_editStreamCallBack2", "F")
+	wbProc := RegisterCallback("RichEdit_editStreamCallBack", "F")
 	VarSetCapacity(EDITSTREAM, 16, 0)
 	NumPut(RichEdit_GetTextLength(hCtrl, "USECRLF")*2, EDITSTREAM)	;aproximate
 	NumPut(wbProc, EDITSTREAM, 8, "UInt")
 
 	SendMessage, EM_STREAMOUT, 2, &EDITSTREAM,, ahk_id %hCtrl%
-	return RichEdit_editStreamCallBack2("!", FileName, "", "")
+	return RichEdit_editStreamCallBack("!", FileName, "", "")
 }
 
 /*
@@ -1801,11 +1832,15 @@ RichEdit_onNotify(Wparam, Lparam, Msg, Hwnd) {
 	}
 }
 
-RichEdit_editStreamCallBack(dwCookie, pbBuff, cb, pcb) {
-	return !DllCall("lstrcpyn", "UInt", dwCookie, "Uint", pbBuff, "Uint", cb) ? 1 : 0
+RichEdit_wndProc(hwnd, uMsg, wParam, lParam){ 
+	
+   if (uMsg = 0x87)  ;WM_GETDLGCODE
+		return 4	 ;DLGC_WANTALLKEYS
+
+   return DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", hwnd, "UInt", uMsg, "UInt", wParam, "UInt", lParam) 
 }
 
-RichEdit_editStreamCallBack2(dwCookie, pbBuff, cb, pcb) {
+RichEdit_editStreamCallBack(dwCookie, pbBuff, cb, pcb) {
 	static s
 
 	if (dwCookie="!") {
@@ -1830,40 +1865,8 @@ RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 	return _
 }
 
-/* Group: Known Issues
-
-	Tab and Esc keys: 
-	Whenever you press Escape in a multiline edit control it sends a WM_CLOSE message to its parent. Both the regular edit control and the rich edit control have this problem.
-	This is by Microsoft design. There is also similar undesired behavior for {Tab} key which is used by the system to navigate over controls with "tabstop" flag. RichEdit is designed
-	to use ^{Tab} instead. 
-	
-	To prevent this behavior, you can either subclass control and handle keys yourself or instantiate appropriate Hotkeys
-	which should be handled when rich edit control has focus:
-
-	(start code)
-	Win_SubClass(hRichEdit, "MyWindowProc")
-	...
-
-	MyWindowProc(hwnd, uMsg, wParam, lParam){ 
-
-	   if (uMsg = 0x87)  ;WM_GETDLGCODE
-			return 4	 ;DLGC_WANTALLKEYS
-
-	   return DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", hwnd, "UInt", uMsg, "UInt", wParam, "UInt", lParam) 
-	}
-	(end code)
-
-	The subclassing routine presented above might be included by default 
-	in future versions of the module. For more information see links bellow :
-	o WM_GETDLGCODE @ MSDN: <http://msdn.microsoft.com/en-us/library/ms645425(VS.85).aspx>
-	o William Willing blog: <http://www.williamwilling.com/blog/?p=28>.
-	o WinAsm Forum: <http://www.winasm.net/forum/index.php?showtopic=487>.
-	o CodeGuru: <http://www.codeguru.com/cpp/controls/editctrl/keyboard/article.php/c513/>.
-	o Strange Microsoft solution for VB (that doesn't work): <http://support.microsoft.com/kb/q143273/>.
-*/
-
 /* Group: About
-	o Version 1.0a2 by freakkk & majkinetor.
+	o Version 1.0b1 by freakkk & majkinetor.
 	o MSDN Reference : <http://msdn.microsoft.com/en-us/library/bb787605(VS.85).aspx>.
 	o RichEdit control shortcut keys: <http://msdn.microsoft.com/en-us/library/bb787873(VS.85).aspx#rich_edit_shortcut_keys>.
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
