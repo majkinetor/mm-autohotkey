@@ -11,7 +11,7 @@ _("mo!")
 	Log("Sort API by clicking ListView header.")
 	Log()
 
-	;RichEdit_SetText(hRichEdit, RTF_Table(3, 1, "300"), "", -1 )
+	RichEdit_FixKeys(hRichEdit)
 return
 
 
@@ -75,7 +75,7 @@ CreateGui(Text, W=980, H=600) {
 		<-
 	)
 
-	hForm1    := Form_New("+Resize w" W " h" H)
+	hForm1    := Form_New("+Resize e1 w" W " h" H)
 	hList	  := Form_Add(hForm1, "ListView", "API|Description", "gOnLV AltSubmit", "Align T", "Attach p")
 	hPanel1   := Form_Add(hForm1, "Panel", "", "", "Align L, 300", "Attach p")
 	hExample  := Form_Add(hPanel1,"Edit", "`n", "T8 ReadOnly Multi -vscroll", "Align T,150", "Attach p", "*|)Font s10,Tahoma")
@@ -216,13 +216,13 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 PopulateList() {
 	global demo
 
-	FileRead, demo, _Demo.ahk
+	FileRead, demo, %A_ScriptName%
 	StringReplace, demo, demo, `r,,A
 
-    ;take only sublabels that have description
+    ;take only sublabels that start with _ and have description
 	pos := 1
 	Loop
-		If pos := RegExMatch( demo, "`ami)^(?P<Api>[\w]+):\s*;\s*(?P<Desc>.+)$", m, pos )
+		If pos := RegExMatch( demo, "`ami)^_(?P<Api>[\w]+):\s*;\s*(?P<Desc>.+)$", m, pos )
 		  LV_Add("", mApi, mDesc ),  pos += StrLen(mApi), n := A_Index
 		Else break
 
@@ -254,19 +254,118 @@ return
 F1:: IfNotEqual, api, API, goto %api%
 
 #include RichEdit.ahk
-#include RTF.ahk
-
-#include _Demo.ahk
 
 ;sample includes
 #include inc
-#include _.ahk
-#include Dlg.ahk
-#include Attach.ahk
-#include Align.ahk
-#include Form.ahk
-#include Panel.ahk
-#include Font.ahk
-#include Splitter.ahk
-#include Toolbar.ahk
-#include CMenu.ahk
+#include _Forms.ahk
+
+
+;================================ DEMO ==============================
+
+_GetCharFormat:	;
+	RichEdit_GetCharFormat(hRichEdit, font, style, textclr, backclr)
+	Log("Char Format: ", font, style, textclr, backclr)
+return
+
+_SetCharFormat:	;
+	r := RichEdit_SetCharFormat(hRichEdit, "Courier New", "BOLD S19 O100", ",0xff00", "word")
+
+return
+
+_GetText: ;Retrieves a specified range of characters from a rich edit control.
+
+ Log("Selection: " RichEdit_GetText( hRichEdit ))
+ Log("All: " RichEdit_GetText( hRichEdit, 0, -1 ))
+ Log("Range: " RichEdit_GetText( hRichEdit, 4, 10 ))
+return
+
+_SetParaFormat:		;Sets the paragraph formatting for the current selection in a rich edit control.
+	r := RichEdit_SetParaFormat(hRichEdit, "Align=CENTER", "Num=DECIMAL,10,D,1000", "Line=DOUBLE", "Space=1000,3000" )
+	Log("Set Align, Num, Line & Space: " r)
+	r := RichEdit_SetParaFormat(hRichEdit, "Tabs=100 1000 2000 5000")
+	Log("Set Tabs:", r)
+return
+
+
+_TextMode:	;Sets text mode.
+	rtf := RichEdit_Save( hRichEdit )			;get RTF
+	txt := RichEdit_GetText(hRichEdit, 0, -1)	;get PLAINTEXT
+	Log( "Current mode: " RichEdit_TextMode(hRichEdit) )
+	Log( "Set mode to plaintext: " RichEdit_TextMode(hRichEdit, "PLAINTEXT") )
+	Log( "Current mode: " RichEdit_TextMode(hRichEdit) )
+	RichEdit_SetText(hRichEdit, txt)
+	Msgbox Plain Text
+	Log( "Restore mode to richtext: " RichEdit_TextMode(hRichEdit, "RICHTEXT") )
+	RichEdit_SetText(hRichEdit, rtf)
+return
+
+_SetText:			;Set text from string or file in rich edit control using either rich text or plain text.
+	RichEdit_SetText(hRichEdit, "insert..", "", 150)
+	RichEdit_SetText(hRichEdit, "append to end..", "SELECTION", -1 )
+return
+
+_LineScroll:			;Line scroll
+	RichEdit_LineScroll(hRichEdit, 100, 1)
+return
+
+_PosFromChar:	   ;Gets the client area coordinates of a specified character in an Edit control.
+	RichEdit_PosFromChar(hRichEdit, RichEdit_GetSel(hRichEdit), X, Y)
+	Log("Pos: " X, " " Y)
+return
+
+_GetLine:			;Get Line
+	Log("Current Line: '" RichEdit_GetLine(hRichEdit) "'")
+return
+
+_GetLineCount:		;Get Line Count
+	Log("Line count: " RichEdit_GetLineCount(hRichEdit) )
+return
+
+_GetModify:			;Get modification status
+	Log("Modification status: " RichEdit_GetModify(hRichEdit))
+return
+
+_SelectionType:		;Get selection type
+	Log("Selection type: " RichEdit_SelectionType(hRichEdit))
+return
+
+_GetOptions: ;Get options
+	Log("Current options: " RichEdit_GetOptions(hRichEdit))
+return
+
+_SetOptions:	;Set options
+	r := RichEdit_SetOptions(hRichEdit, "XOR", "SELECTIONBAR READONLY")	;switch readonly
+	Log("Current options: " r)
+return
+
+_FindWordBreak:	;Finds the next word break before or after the specified character position or retrieves information about the character at that position.
+	pos := RichEdit_FindWordBreak(hRichEdit, RichEdit_GetSel(hRichEdit), "MOVEWORDRIGHT")
+	RichEdit_SetSel(hRichEdit, pos)
+	Log("Next word found at: " pos)
+return
+
+_Clear:	;Clear selection
+	RichEdit_Clear(hRichEdit)
+return
+
+
+_AutoUrlDetect:  ; Enable disable or toggle automatic detection of URLs by a rich edit control.
+
+  Log("Url detect: " RichEdit_AutoUrlDetect( hRichEdit, "^" ))
+return
+
+_GetSel: ;Retrieve the starting and ending character positions of the selection.
+
+	RichEdit_GetSel( hRichEdit, min, max  )
+	if !(count := max-min)
+		 Log("Cursor Position: " min)
+	else Log("Selected from: " min " - " max " (" count ")")
+return
+
+_LineFromChar: ;Determines which line contains the specified character in a rich edit control.
+	Log( "Current Line: " RichEdit_LineFromChar( hRichEdit, RichEdit_GetSel(hRichEdit)))
+return
+
+_LimitText:	;Sets an upper limit to the amount of text the user can type or paste into a rich edit control
+	RichEdit_LimitText( hRichEdit, 20 )  ; limit to 20 characters
+return
