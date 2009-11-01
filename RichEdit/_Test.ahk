@@ -5,7 +5,7 @@ _("mo!")
 	RichEdit_SetText(hRichEdit, "colors.rtf", "FROMFILE")
 	RichEdit_AutoUrlDetect( hRichEdit, "^" )
 	
-	Form_Show("", "Maximize")
+	Form_Show("", "Maximize", "Rich Edit Test Script")
 
 	Log("Press F1 or doubleclick to execute selected API")
 	Log("Sort API by clicking ListView header.")
@@ -63,16 +63,16 @@ CreateGui(Text, W=980, H=600) {
 
 	btns2 =
 	(LTrim
-		Num
-		Bullet
+		Num,,,autosize
+		Bullet,,,autosize
 		-----
-		Left
-		Center
-		Right
-		Justify
+		Left,,,autosize
+		Center,,,autosize
+		Right,,,autosize
+		Justify,,,autosize
 		-----
-		->
-		<-
+		->,,,autosize
+		<-,,,autosize
 	)
 
 	hForm1    := Form_New("+Resize e1 w" W " h" H)
@@ -262,14 +262,14 @@ F1:: IfNotEqual, api, API, goto _%api%
 
 ;================================ DEMO ==============================
 
-_GetCharFormat:	;
+_GetCharFormat:	;Determines the character formatting in a rich edit control.
 	RichEdit_GetCharFormat(hRichEdit, font, style, textclr, backclr)
 	Log("Char Format: ", font, style, textclr, backclr)
 return
 
-_SetCharFormat:	;
+_SetCharFormat:	;Set character formatting in a rich edit control.
 	r := RichEdit_SetCharFormat(hRichEdit, "Courier New", "BOLD S19 O100", ",0xff00", "word")
-
+	Log("Set Char Format: " r)
 return
 
 _GetText: ;Retrieves a specified range of characters from a rich edit control.
@@ -333,7 +333,7 @@ _GetOptions: ;Get options
 	Log("Current options: " RichEdit_GetOptions(hRichEdit))
 return
 
-_SetOptions:	;Set options
+_SetOptions:	;Set rich edit options
 	r := RichEdit_SetOptions(hRichEdit, "XOR", "SELECTIONBAR READONLY")	;switch readonly
 	Log("Current options: " r)
 return

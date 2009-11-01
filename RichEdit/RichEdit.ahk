@@ -429,7 +429,7 @@ RichEdit_GetOptions(hCtrl)  {
 
 /*
  Function:	GetCharFormat
-			Get or set the current text mode of a rich edit control.
+			Determines the character formatting in a rich edit control.
 
  Parameters:
 			Face	- Optional byref parameter will contain the name of the font.
