@@ -103,7 +103,7 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
                   , "Uint", MODULEID			; hMenu 
                   , "Uint", 0					; hInstance
                   , "Uint", 0, "Uint")			; must return uint.
-	return hCtrl,  selectionbar ? RichEdit_SetOptions( hCtrl, "OR", "SELECTIONBAR" ) 
+	return hCtrl,  selectionbar ? RichEdit_SetOptions( hCtrl, "OR", "SELECTIONBAR" ) : ""
 }
 
 /*
