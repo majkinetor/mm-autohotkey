@@ -177,26 +177,6 @@ RichEdit_CanPaste(hEdit, ClipboardFormat=0x1) {
 }
 
 /*
- Function: CanRedo
-           Returns TRUE if the Edit control can do Redo operation.
- */
-RichEdit_CanRedo(hEdit) {
-    Static EM_CANREDO=1109
-    SendMessage EM_CANREDO,,,,ahk_id %hEdit%
-	return ErrorLevel ? True : False
-}
-
-/*
- Function: CanUndo
-           Returns TRUE if the Edit control can correctly do Undo operation.
- */
-RichEdit_CanUndo(hEdit) {
-    Static EM_CANUNDO=0xC6
-    SendMessage EM_CANUNDO,,,,ahk_id %hEdit%
-    return ErrorLevel
-}
-
-/*
  Function: CharFromPos
            Gets information about the character closest to a specified point in the client area of the Edit control.
 
