@@ -614,7 +614,7 @@ Property(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 /* Group: About
 	o Module ver 1.02 by majkinetor
 	o SpreadSheet control Version: 0.0.2.1 by KetilO <http://www.masm32.com/board/index.php?topic=6913.0>.
-	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
 
  */
 
