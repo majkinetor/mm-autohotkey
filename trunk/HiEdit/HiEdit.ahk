@@ -1233,7 +1233,8 @@ HiEdit_add2Form(hParent, Txt, Opt) {
 	o HiEdit control is copyright of Antonis Kyprianou (aka akyprian). See <http://www.winasm.net>.
 	o Available for *NON commercial purposes* provided you have previous line in your about box. 
 	  You need author's written permission to use HiEdit in commercial applications.
-	o AHK wrapper version 4.0.0.4-3 by majkinetor.
-	o AHK module licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+	o AHK wrapper version 4.0.0.4-4 by majkinetor.
     o Additonal functions by jballi.
+	o AHK module licensed under BSD <http://creativecommons.org/licenses/BSD/>.
+
  */
