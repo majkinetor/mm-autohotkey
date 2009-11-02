@@ -3,57 +3,63 @@
 				This module allows you to create and programmatically set text properties in rich edit control.
 				Besides that, it contains functions that work with standard edit controls. Each function contains
 				description for which kind of control it can be used - any control supporting edit control interface
-				(Edit, RichEdit, HiEdit...) or just rich edit control. 
+				(Edit, RichEdit, HiEdit...) or just rich edit control.
  */
 
 /*
  Function:		Add
-				Create rich edit control.
- 
+				Create rich edit version 4.1 control. (requires at least Windows XP SP1)
+
  Parameters:
 				HParent	- Handle of the parent of the control.
 				X..H	- Position.
 				Style	- White space separated list of control styles. Any integer style or one of the style keywords (see below).
-						  Invalid styles are skipped. "MULTILINE WANTRETURN VSCROLL" by default.
+						  Invalid styles are skipped. "*MULTILINE WANTRETURN VSCROLL*" by default.
 				Text	- Control text.
 
  Styles:
      DISABLENOSCROLL - Disables scroll bars instead of hiding them when they are not needed.
      BORDER			- Displays the control with a sunken border style so that the rich edit control appears recessed into its parent window.
-	 HIDDEN			- Don't show the control.
-	 VSCROLL		- Enble vertical scroll bar.
-	 HSCROLL		- Enable horizontal scroll bar.
-	 SCROLL			- Enable both scroll bars.
-
+     HIDDEN			- Don't show the control.
+     VSCROLL		- Enble vertical scroll bar.
+     HSCROLL		- Enable horizontal scroll bar.
+     SCROLL			- Enable both scroll bars.
      AUTOHSCROLL	- Automatically scrolls text to the right by 10 characters when the user types a character at the end of the line. When the user presses the ENTER key, the control scrolls all text back to position zero.
      AUTOVSCROLL	- Automatically scrolls text up one page when the user presses the ENTER key on the last line.
      CENTER			- Centers text in a single-line or multiline edit control.
      LEFT			- Left aligns text.
      MULTILINE		- Designates a multiline edit control. The default is single-line edit control.
-     NOHIDESEL		- Negates the default behavior for an edit control. The default behavior hides the selection when the control loses the input focus and inverts the selection when the control receives the input focus. If you specify ES_NOHIDESEL, the selected text is inverted, even if the control does not have the focus.
+     NOHIDESEL		- Negates the default behavior for an edit control. The default behavior hides the selection when the control loses the input focus and inverts the selection when the control receives the input focus. If you specify *NOHIDESEL*, the selected text is inverted, even if the control does not have the focus.
      NUMBER			- Allows only digits to be entered into the edit control.
      PASSWORD		- Displays an asterisk (*) for each character typed into the edit control. This style is valid only for single-line edit controls.
      READONLY		- Prevents the user from typing or editing text in the edit control.
      RIGHT			- Right aligns text in a single-line or multiline edit control.
-	 SELECTIONBAR   - When set, there is small left margin (wider than default) where cursor changes to right-up arrow allowing full line(s) selection.
-     WANTRETURN		- Specifies that a carriage return be inserted when the user presses the ENTER key while entering text into a multiline edit control in a dialog box. If you do not specify this style, pressing the ENTER key has the same effect as pressing the dialog box's default push button. This style has no effect on a single-line edit control.			
+     SELECTIONBAR - When set, there is small left margin (wider than default) where cursor changes to right-up arrow allowing full line(s) selection. This style also requires use of *MULTILINE* style.
+     WANTRETURN		- Specifies that a carriage return be inserted when the user presses the ENTER key while entering text into a multiline edit control in a dialog box. If you do not specify this style, pressing the ENTER key has the same effect as pressing the dialog box's default push button. This style has no effect on a single-line edit control.
 
  Returns:
 	Control's handle or 0. Error message on problem.
 
+ Example:
+ (start code)
+  Gui, +LastFound
+  hwnd := WinExist()
+  hRichEdit := RichEdit_Add(hwnd, 5, 5, 200, 300)
+  Gui, Show, w210 h310
+ (end code)
  */
 RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
   static WS_CLIPCHILDREN=0x2000000, WS_VISIBLE=0x10000000, WS_CHILD=0x40000000
 		,ES_DISABLENOSCROLL=0x2000, EX_BORDER=0x200
-		,ES_LEFT=0, ES_CENTER=1, ES_RIGHT=2, ES_MULTILINE=4, ES_AUTOVSCROLL=0x40, ES_AUTOHSCROLL=0x80, ES_NOHIDESEL=0x100, ES_NUMBER=0x2000, ES_PASSWORD=0x20,ES_READONLY=0x800,ES_WANTRETURN=0x1000, ES_SELECTIONBAR = 0x1000000
-		,ES_HSCROLL=0x100000, ES_VSCROLL=0x200000, ES_SCROLL=0x300000 
+		,ES_LEFT=0, ES_CENTER=1, ES_RIGHT=2, ES_MULTILINE=4, ES_AUTOVSCROLL=0x40, ES_AUTOHSCROLL=0x80, ES_NOHIDESEL=0x100, ES_NUMBER=0x2000, ES_PASSWORD=0x20,ES_READONLY=0x800,ES_WANTRETURN=0x1000  ;, ES_SELECTIONBAR = 0x1000000
+		,ES_HSCROLL=0x100000, ES_VSCROLL=0x200000, ES_SCROLL=0x300000
 		,MODULEID
 
 	if !MODULEID
 		init := DllCall("LoadLibrary", "Str", "Msftedit.dll", "Uint"), MODULEID := 091009
 
 
-	ifEqual, Style,, SetEnv, Style, MULTILINE WANTRETURN VSCROLL	
+	ifEqual, Style,, SetEnv, Style, MULTILINE WANTRETURN VSCROLL
 	hStyle := InStr(" " Style " ", " hidden ") ? 0 : WS_VISIBLE,  hExStyle := 0
 	Loop, parse, Style, %A_Tab%%A_Space%
 	{
@@ -64,6 +70,8 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
 			 hStyle |= v
 		else if (v := EX_%A_LOOPFIELD%)
 			 hExStyle |= v
+		else if (A_LoopField = "SELECTIONBAR")
+       selectionbar := true
 		else continue
 	}
 	/*
@@ -88,7 +96,7 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
 		Windows 98	Includes Rich Edit 1.0 and 2.0.
 		Windows 95	Includes only Rich Edit 1.0. However, Riched20.dll is compatible with Windows 95 and may be installed by an application that requires it.
      */
-	
+
 	hCtrl := DllCall("CreateWindowEx"
                   , "Uint", hExStyle			; ExStyle
                   , "str" , "RICHEDIT50W"		; ClassName
@@ -99,27 +107,34 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
                   , "int" , W					; Width
                   , "int" , H					; Height
                   , "Uint", HParent				; hWndParent
-                  , "Uint", MODULEID			; hMenu 
+                  , "Uint", MODULEID			; hMenu
                   , "Uint", 0					; hInstance
                   , "Uint", 0, "Uint")			; must return uint.
-	return hCtrl
+	return hCtrl,  selectionbar ? RichEdit_SetOptions( hCtrl, "OR", "SELECTIONBAR" ) : ""
 }
 
 /*
   Function:  AutoUrlDetect
  			 Enable, disable, or toggle automatic detection of URLs in the RichEdit control.
- 
+
   Parameters:
- 			Flag - Specify TRUE to enable automatic URL detection or FALSE to disable it. Specify
-             "^" to toggle its current state. Omit to only return current state without any change.
- 
+ 			Flag - Specify *TRUE* to enable automatic URL detection or *FALSE* to disable it. Specify
+             *"^"* to toggle its current state. Omit to only return current state without any change.
+
   Returns:
  			If auto-URL detection is active, the return value is 1.
  			If auto-URL detection is inactive, the return value is 0.
+
+ Example:
+ (start code)
+  MsgBox, % RichEdit_AutoUrlDetect( hRichEdit, true )
+  MsgBox, % RichEdit_AutoUrlDetect( hRichEdit, "^" )
+  MsgBox, % "Current state: " RichEdit_AutoUrlDetect( hRichEdit )
+ (end code)
  */
-RichEdit_AutoUrlDetect(HCtrl, Flag="" )  {	;wParam Specify TRUE to enable automatic URL detection or FALSE to disable it. 
+RichEdit_AutoUrlDetect(HCtrl, Flag="" )  {	;wParam Specify TRUE to enable automatic URL detection or FALSE to disable it.
 	static EM_AUTOURLDETECT=0x45B, EM_GETAUTOURLDETECT=0x45C
-  
+
 	If (Flag = "") || (Flag ="^") {
 		SendMessage, EM_GETAUTOURLDETECT,,,,ahk_id %HCtrl%
 		ifEqual, Flag,, return ERRORLEVEL
@@ -130,72 +145,79 @@ RichEdit_AutoUrlDetect(HCtrl, Flag="" )  {	;wParam Specify TRUE to enable automa
 }
 
 /*
- Function: CanPaste  
+ Function: CanPaste
            Determines whether an Edit control can paste a specified clipboard format.
-  
- Parameters: 
+
+ Parameters:
            ClipboardFormat - Specifies the Clipboard Formats to try. To try any format currently on the clipboard, set this parameter to zero.
 							 The default is 0x1 (CF_TEXT).
-  
- Returns: 
-           TRUE if the clipboard format can be pasted otherwise FALSE.
-  
- Remarks: 
-           For additional information on clipboard formats, see the following: 
+
+ Returns:
+           *TRUE* if the clipboard format can be pasted otherwise *FALSE*.
+
+ Remarks:
+           For additional information on clipboard formats, see the following:
            <http://msdn.microsoft.com/en-us/library/ms649013(VS.85).aspx>
 
- Bugs:
-           If the clipboard format can be pasted, the return value is a nonzero value.
-           If the clipboard format cannot be pasted, the return value is zero.
+ Related:
+		<Paste>, <PasteSpecial>
+
+ Example:
+ (start code)
+  If RichEdit_CanPaste( hRichEdit, 0 )
+    RichEdit_Paste( hRichEdit )
+  Else
+    MsgBox,262144,, Cannot paste your clipboard into control..
+ (end code)
  */
-RichEdit_CanPaste(hEdit, ClipboardFormat=0x1) { 
-    Static EM_CANPASTE := 1074 
-    SendMessage EM_CANPASTE,ClipboardFormat,0,,ahk_id %hEdit% 
+RichEdit_CanPaste(hEdit, ClipboardFormat=0x1) {
+    Static EM_CANPASTE := 1074
+    SendMessage EM_CANPASTE,ClipboardFormat,0,,ahk_id %hEdit%
     return ErrorLevel
 }
 
 /*
  Function: CanRedo
-           Returns TRUE if the Edit control can do Redo operation. 
+           Returns TRUE if the Edit control can do Redo operation.
  */
-RichEdit_CanRedo(hEdit) { 
+RichEdit_CanRedo(hEdit) {
     Static EM_CANREDO=1109
-    SendMessage EM_CANREDO,,,,ahk_id %hEdit% 
-    return ErrorLevel 
+    SendMessage EM_CANREDO,,,,ahk_id %hEdit%
+	return ErrorLevel ? True : False
 }
 
 /*
- Function: CanUndo 
+ Function: CanUndo
            Returns TRUE if the Edit control can correctly do Undo operation.
- */ 
-RichEdit_CanUndo(hEdit) { 
-    Static EM_CANUNDO=0xC6 
-    SendMessage EM_CANUNDO,,,,ahk_id %hEdit% 
-    return ErrorLevel 
-} 
-
-/* 
- Function: CharFromPos 
-           Gets information about the character closest to a specified point in the client area of the Edit control. 
- 
- Parameters: 
-           X, Y - The coordinates of a point in the Edit control's client area relative to the upper-left corner of the client area. 
- 
- Returns: 
-           The character index of the specified point or the character index to 
-           the last character if the given point is beyond the last character in the control.  
  */
-RichEdit_CharFromPos(hEdit,X,Y) { 
-    Static EM_CHARFROMPOS:=0xD7 
+RichEdit_CanUndo(hEdit) {
+    Static EM_CANUNDO=0xC6
+    SendMessage EM_CANUNDO,,,,ahk_id %hEdit%
+    return ErrorLevel
+}
+
+/*
+ Function: CharFromPos
+           Gets information about the character closest to a specified point in the client area of the Edit control.
+
+ Parameters:
+           X, Y - The coordinates of a point in the Edit control's client area relative to the upper-left corner of the client area.
+
+ Returns:
+           The character index of the specified point or the character index to
+           the last character if the given point is beyond the last character in the control.
+ */
+RichEdit_CharFromPos(hEdit,X,Y) {
+    Static EM_CHARFROMPOS:=0xD7
 
 	WinGetClass, cls, ahk_id %hEdit%
 	if cls in RICHEDIT50W
 		 VarSetCapacity(POINTL, 8), lParam := &POINTL, NumPut(X, POINTL), NumPut(Y,POINTL)
 	else lParam := (Y<<16)|X
 
-    SendMessage EM_CHARFROMPOS,,lParam,,ahk_id %hEdit% 
-    return ErrorLevel 
-} 
+    SendMessage EM_CHARFROMPOS,,lParam,,ahk_id %hEdit%
+    return ErrorLevel
+}
 
 /*
  Function:	Clear
@@ -203,11 +225,11 @@ RichEdit_CharFromPos(hEdit,X,Y) {
 
  Remarks:
 			To delete the current selection and place the deleted content on the clipboard, use the Cut operation.
- */ 
+ */
 RichEdit_Clear(hEdit) {
-    static WM_CLEAR=0x303 
-    SendMessage WM_CLEAR,,,,ahk_id %hEdit% 
-} 
+    static WM_CLEAR=0x303
+    SendMessage WM_CLEAR,,,,ahk_id %hEdit%
+}
 
 /*
  Function:		Convert
@@ -215,8 +237,8 @@ RichEdit_Clear(hEdit) {
 
  Parameters:
 				Input		- Twips (Input>0) or pixels (Input<0).
-				Direction	- 0 (default) or 1. Pixels are not always square (the height and width are not the same). 
-							  Therefore, it is necessary to pass in the desired "direction" to use, horizontal (0) or vertical (1). 
+				Direction	- 0 (default) or 1. Pixels are not always square (the height and width are not the same).
+							  Therefore, it is necessary to pass in the desired "direction" to use, horizontal (0) or vertical (1).
  Returns:
 				Rounded value.
  */
@@ -228,33 +250,33 @@ RichEdit_Convert(Input, Direction=0) {
 		, tpi0 := DllCall("gdi32.dll\GetDeviceCaps", "uint", dc, "int", LOGPIXELSX)
 		, tpi1 := DllCall("gdi32.dll\GetDeviceCaps", "uint", dc, "int", LOGPIXELSY)
 		, DllCall("ReleaseDC", "uint", 0, "uint", dc)
-   
+
    return (Input>0) ? (Input * tpi%Direction%) // twipsPerInch  : (-Input*twipsPerInch) // tpi%Direction%
 }
 
 /*
  Function: Copy
 		   Copy selection of the Edit control.
- */ 
-RichEdit_Copy(hEdit) { 
-    Static WM_COPY:=0x301 
-    SendMessage WM_COPY,0,0,,ahk_id %hEdit% 
-} 
+ */
+RichEdit_Copy(hEdit) {
+    Static WM_COPY:=0x301
+    SendMessage WM_COPY,0,0,,ahk_id %hEdit%
+}
 
 
 /*
  Function: Cut
 		   Cut selection from the Edit control.
- */ 
-RichEdit_Cut(hEdit) { 
-    Static WM_CUT:=0x300 
-    SendMessage WM_CUT,,,,ahk_id %hEdit% 
-} 
+ */
+RichEdit_Cut(hEdit) {
+    Static WM_CUT:=0x300
+    SendMessage WM_CUT,,,,ahk_id %hEdit%
+}
 
 /*
  Function:	FindText
 			Find desired text in the Edit control.
- 
+
  Parameters:
 			Text	- Text to be searched for.
 			CpMin	- Start searching at this character position. By default 0.
@@ -264,17 +286,17 @@ RichEdit_Cut(hEdit) {
  Flags:
 			WHOLEWORD	- If set, the operation searches only for whole words that match the search string. If not set, the operation also searches for word fragments that match the search string.
 			MATCHCASE	- If set, the search operation is case-sensitive. If not set, the search operation is case-insensitive.
-			DOWN		- Rich Edit only: If set, the search is from the end of the current selection to the end of the document. 
+			DOWN		- Rich Edit only: If set, the search is from the end of the current selection to the end of the document.
 						  If not set, the search is from the end of the current selection to the beginning of the document.
 			UNICODE		- Transforms Text into the Unicode charset before searching for it.
- Returns:	
+ Returns:
 			The zero-based character position of the next match, or -1 if there are no more matches.
 
  Remarks
-			The CpMin member always specifies the starting-point of the search, and CpMax specifies the end point. 
-			When searching backward, CpMin must be equal to or greater than CpMax. 
+			The CpMin member always specifies the starting-point of the search, and CpMax specifies the end point.
+			When searching backward, CpMin must be equal to or greater than CpMax.
  */
-RichEdit_FindText(hEdit, Text, CpMin=0, CpMax=-1, Flags="UNICODE") { 
+RichEdit_FindText(hEdit, Text, CpMin=0, CpMax=-1, Flags="UNICODE") {
 	static EM_FINDTEXT=1080, FR_DOWN=1, FR_WHOLEWORD=2, FR_MATCHCASE=4, FR_UNICODE=0
 	hFlags := 0
 	loop, parse, Flags, %A_Tab%%A_Space%,
@@ -291,13 +313,13 @@ RichEdit_FindText(hEdit, Text, CpMin=0, CpMax=-1, Flags="UNICODE") {
 	NumPut(CpMax,   FT, 4)
 	NumPut(txtAdr,  FT, 8)
 
-	SendMessage, EM_FINDTEXT, hFlags, &FT,, ahk_id %hEdit% 
+	SendMessage, EM_FINDTEXT, hFlags, &FT,, ahk_id %hEdit%
 	Return ErrorLevel=4294967295 ? -1 : ErrorLevel
 }
 /*
  Function:	FindWordBreak
 			Finds the next word break in rich edit conttrol, before or after the specified character position or retrieves information about the character at that position.
- 
+
  Parameters:
 		    CharIndex	- Zero-based character starting position.
 			Flag		- One of the flags list below.
@@ -321,7 +343,7 @@ RichEdit_FindText(hEdit, Text, CpMin=0, CpMax=-1, Flags="UNICODE") {
 RichEdit_FindWordBreak(hCtrl, CharIndex, Flag="")  {
 	static  EM_FINDWORDBREAK=1100
 			, WB_CLASSIFY=3, WB_ISDELIMITER=2, WB_LEFT=0, WB_LEFTBREAK=6, WB_MOVEWORDLEFT=4, WB_MOVEWORDNEXT=5, WB_MOVEWORDPREV=4, WB_MOVEWORDRIGHT=5, WB_NEXTBREAK=7, WB_PREVBREAK=6, WB_RIGHT=1, WB_RIGHTBREAK=7
-	
+
 	SendMessage, EM_FINDWORDBREAK, WB_%Flag%, CharIndex,, ahk_id %hCtrl%
 	return ErrorLevel
 }
@@ -329,7 +351,7 @@ RichEdit_FindWordBreak(hCtrl, CharIndex, Flag="")  {
 /*
  Function: FixKeys
 	  	   Fix Tab and Esc key handling in rich edit control.
-	
+
  Returns:
 		  True or False.
 
@@ -339,9 +361,9 @@ RichEdit_FindWordBreak(hCtrl, CharIndex, Flag="")  {
 	to use ^{Tab} instead. This function subclasses the control to prevent such behavior.
 
 	However, before using this function be sure to know what subclassing is and what kind of effects
-	it may introduce to your particular script. There is also other method to solve this problem via 
+	it may introduce to your particular script. There is also other method to solve this problem via
 	hotkey handling while rich edit control has focus.
-	
+
  Reference:
 	o WM_GETDLGCODE @ MSDN: <http://msdn.microsoft.com/en-us/library/ms645425(VS.85).aspx>
 	o William Willing blog: <http://www.williamwilling.com/blog/?p=28>.
@@ -350,34 +372,34 @@ RichEdit_FindWordBreak(hCtrl, CharIndex, Flag="")  {
 	o Strange Microsoft solution for VB (that doesn't work): <http://support.microsoft.com/kb/q143273/>.
  */
 RichEdit_FixKeys(hCtrl) {
-	oldProc := DllCall("GetWindowLong", "uint", hCtrl, "uint", -4) 
-	ifEqual, oldProc, 0, return 0 
-	wndProc := RegisterCallback("RichEdit_wndProc", "", 4, oldProc) 
+	oldProc := DllCall("GetWindowLong", "uint", hCtrl, "uint", -4)
+	ifEqual, oldProc, 0, return 0
+	wndProc := RegisterCallback("RichEdit_wndProc", "", 4, oldProc)
 	ifEqual, wndProc, , return 0
-	return DllCall("SetWindowLong", "UInt", hCtrl, "Int", -4, "Int", wndProc, "UInt") 
+	return DllCall("SetWindowLong", "UInt", hCtrl, "Int", -4, "Int", wndProc, "UInt")
 }
 
 /*
  Function:	GetLine
 			Get the text of the desired line from the control.
- 
+
  Parameters:
 			LineNumber	- Zero-based index of the line. -1 means current line.
 
- Returns:	
+ Returns:
 			The return value is the text.
 			The return value is empty string if the line number specified by the line parameter is greater than the number of lines in the HiEdit control
  */
 RichEdit_GetLine(hEdit, LineNumber=-1){
 	static EM_GETLINE=196	  ;The return value is the number of characters copied. The return value is zero if the line number specified by the line parameter is greater than the number of lines in the HiEdit control
 
-	if (LineNumber = -1) 
+	if (LineNumber = -1)
 		LineNumber := RichEdit_LineFromChar(hEdit, RichEdit_LineIndex(hEdit))
 	len := RichEdit_LineLength(hEdit, LineNumber)
 	ifEqual, len, 0, return
 
 	VarSetCapacity(txt, len, 0), NumPut(len = 1 ? 2 : len, txt)		; HiEdit bug! if line contains only 1 word SendMessage returns FAIL.
-	SendMessage, EM_GETLINE, LineNumber, &txt,, ahk_id %hEdit% 
+	SendMessage, EM_GETLINE, LineNumber, &txt,, ahk_id %hEdit%
 	if ErrorLevel = FAIL
 		return "", ErrorLevel := A_ThisFunc "> Failed to get line with code: " A_LastError
 
@@ -388,25 +410,25 @@ RichEdit_GetLine(hEdit, LineNumber=-1){
 /*
  Function:	GetLineCount
 			Gets the number of lines in a multiline Edit control.
- 
+
  Returns:
-			The return value is an integer specifying the total number of text lines in the multiline edit control or rich edit control. 
+			The return value is an integer specifying the total number of text lines in the multiline edit control or rich edit control.
 			If the control has no text, the return value is 1. The return value will never be less than 1.
 
  Remarks:
-			The function etrieves the total number of text lines, not just the number of lines that are currently visible. 
+			The function etrieves the total number of text lines, not just the number of lines that are currently visible.
 			If the Wordwrap feature is enabled, the number of lines can change when the dimensions of the editing window change.
  */
 RichEdit_GetLineCount(hEdit){
 	static EM_GETLINECOUNT=0xBA
- 	SendMessage, EM_GETLINECOUNT,,,, ahk_id %hEdit% 
+ 	SendMessage, EM_GETLINECOUNT,,,, ahk_id %hEdit%
 	Return ErrorLevel
 }
 
 /*
  Function:	GetOptions
 			Get the options for a rich edit control.
- 
+
  Remarks:
 			See <SetOptions> for details.
  */
@@ -414,7 +436,7 @@ RichEdit_GetOptions(hCtrl)  {
 	static  EM_GETOPTIONS=1102
 			,1="AUTOWORDSELECTION", 64="AUTOVSCROLL", 128="AUTOHSCROLL",  256="NOHIDESEL", 2048="READONLY", 4096="WANTRETURN", 16777216="SELECTIONBAR"
 			,options="1,64,128,256,2048,4096,16777216"
-		
+
 	if (hCtrl > 1) {
 		SendMessage, EM_GETOPTIONS,,,, ahk_id %hCtrl%
 		o := ErrorLevel
@@ -423,13 +445,13 @@ RichEdit_GetOptions(hCtrl)  {
 	loop, parse, options, `,
 		if (o & A_LoopField)
 			res .= %A_LoopField% " "
-	
+
 	return SubStr(res, 1, -1)
 }
 
 /*
  Function:	GetCharFormat
-			Get or set the current text mode of a rich edit control.
+			Determines the character formatting in a rich edit control.
 
  Parameters:
 			Face	- Optional byref parameter will contain the name of the font.
@@ -442,7 +464,7 @@ RichEdit_GetOptions(hCtrl)  {
 					  is empty, the function will get the character of the insertion point.
 
  Remarks:
-		Function will get the attributes of the first character. 
+		Function will get the attributes of the first character.
 
  Related:
 		<SetCharFormat>, <SetBgColor>
@@ -464,17 +486,17 @@ RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef TextColor="",
 
 	Style := "", dwEffects := NumGet(CF, 8, "UInt")
 	Loop, parse, styles, %A_SPACE%
-		if (CFE_%A_LoopField% & dwEffects) 
+		if (CFE_%A_LoopField% & dwEffects)
 			Style .= A_LoopField " "
     s := NumGet(CF, 12, "Int") // 20,  o := NumGet(CF, 16, "Int")
 	Style .= "s" s (o ? " o" o : "")
-	
+
 	TextColor := NumGet(CF, 20), BackColor := NumGet(CF, 64)
 
-	oldFormat := A_FormatInteger 
-    SetFormat, integer, hex 
-    TextColor := (TextColor & 0xff00) + ((TextColor & 0xff0000) >> 16) + ((TextColor & 0xff) << 16) 
-    BackColor := (BackColor & 0xff00) + ((BackColor & 0xff0000) >> 16) + ((BackColor & 0xff) << 16)	
+	oldFormat := A_FormatInteger
+    SetFormat, integer, hex
+    TextColor := (TextColor & 0xff00) + ((TextColor & 0xff0000) >> 16) + ((TextColor & 0xff) << 16)
+    BackColor := (BackColor & 0xff00) + ((BackColor & 0xff0000) >> 16) + ((BackColor & 0xff) << 16)
     SetFormat, integer, %oldFormat%
 }
 
@@ -482,11 +504,11 @@ RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef TextColor="",
   Function: GetRedo
  			Determine whether there are any actions in the rich edit control redo queue, and
 			optionally retrieve the type of the next redo action.
- 
+
   Parameters:
  			name - This optional parameter is the name of the variable in which to store the
              type of redo action, if any.
- 
+
   Name Types:
       UNKNOWN - The type of undo action is unknown.
       TYPING - Typing operation.
@@ -494,23 +516,25 @@ RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef TextColor="",
       DRAGDROP - Drag-and-drop operation.
       CUT - Cut operation.
       PASTE - Paste operation.
- 
+
   Returns:
  			If there are actions in the control redo queue, the return value is a nonzero value.
  			If the redo queue is empty, the return value is zero.
- 
+
   Related:
-      <Redo>, <GetUndo>, <Undo>, <SetUndoLimit>
- 
-  Example:
- > If RichEdit_GetRedo( hRichEdit, name )
- >   MsgBox, The next redo is a %name% type
- > Else
- >   MsgBox, Nothing left to redo.
+		<Redo>, <GetUndo>, <Undo>, <SetUndoLimit>
+
+ Example:
+ (start code)
+  If RichEdit_GetRedo( hRichEdit, name )
+    MsgBox, The next redo is a %name% type
+  Else
+    MsgBox, Nothing left to redo.
+ (end code)
  */
 RichEdit_GetRedo(hCtrl, ByRef name="-")  {
 	static EM_CANREDO=1109, EM_GETREDONAME=1111,UIDs="UNKNOWN,TYPING,DELETE,DRAGDROP,CUT,PASTE"
-	SendMessage, WM_USER | EM_CANREDO,,,, ahk_id %hCtrl%
+	SendMessage, EM_CANREDO,,,, ahk_id %hCtrl%
 	nRedo := ErrorLevel
 
 	If ( nRedo && name != "-" )  {
@@ -526,7 +550,7 @@ RichEdit_GetRedo(hCtrl, ByRef name="-")  {
 
 /*
  Function: GetModify
-           Gets the state of the modification flag for the Edit control. 
+           Gets the state of the modification flag for the Edit control.
 		   The flag indicates whether the contents of the control has been modified.
 
  Returns:
@@ -539,18 +563,40 @@ RichEdit_GetModify(hEdit){
 }
 
 /*
+ Function:  GetRect 
+            Gets the formatting rectangle of the Edit control.  
+
+ Parameters:
+			Left..Bottom	- Output variables, can be omitted.
+
+ Returns:
+		   Space separated rectangle.
+ */ 
+RichEdit_GetRect(hEdit,ByRef Left="",ByRef Top="",ByRef Right="",ByRef Bottom="") { 
+    static EM_GETRECT:=0xB2
+
+	VarSetCapacity(RECT,16) 
+    SendMessage EM_GETRECT,0,&RECT,,ahk_id %hEdit% 
+      Left  :=NumGet(RECT, 0,"Int")
+    , Top   :=NumGet(RECT, 4,"Int") 
+    , Right :=NumGet(RECT, 8,"Int") 
+    , Bottom:=NumGet(RECT,12,"Int") 
+    return  Left " " Top " " Right " " Bottom
+} 
+
+/*
   Function: GetSel
  			Retrieve the starting and ending character positions of the selection in a rich edit control.
- 
+
   Parameters:
  			cpMin -	The optional name of the variable in which to store the character position index immediately
               preceding the first character in the range.
  			cpMin -	The optional name of the variable in which to store the character position index immediately
               following the last character in the range.
- 
+
   Returns:
  			Returns cpMin. If there is no selection this is cursor position.
- 
+
   Related:
       <GetText>, <GetTextLength>, <SetSel>, <SetText>, <LineFromChar>
  */
@@ -591,7 +637,7 @@ RichEdit_GetText(HCtrl, CpMin="-", CpMax="-", CodePage="")  {
 		MODE := GT_SELECTION, CpMin:=CpMax:=""
 	else if (CpMin=0 && CpMax=-1)
 		MODE := GT_ALL      , CpMin:=CpMax:=""
-	else if (CpMin+0 != "") && (cpMax+0 != "") 
+	else if (CpMin+0 != "") && (cpMax+0 != "")
 	{
 		VarSetCapacity(lpwstr, bufferLength), VarSetCapacity(TEXTRANGE, 12)
 		NumPut(CpMin, TEXTRANGE, 0, "UInt")
@@ -752,13 +798,13 @@ RichEdit_LineFromChar(hCtrl, CharIndex)  {
 
  Parameters:
 			LineNumber	- Line number for which to retreive character index. -1 (default) means current line.
-	
+
  Returns:
 			The character index of the line specified, or -1 if the specified line number is greater than the number of lines.
  */
 RichEdit_LineIndex(hEdit, LineNumber=-1) {
 	static EM_LINEINDEX=187
- 	SendMessage, EM_LINEINDEX, LineNumber,,, ahk_id %hEdit% 
+ 	SendMessage, EM_LINEINDEX, LineNumber,,, ahk_id %hEdit%
 	Return ErrorLevel
 }
 
@@ -768,13 +814,13 @@ RichEdit_LineIndex(hEdit, LineNumber=-1) {
 
  Parameters:
 			LineNumber	- Line number for which to retreive line length. -1 (default) means current line.
-	
+
  Returns:
 			The length (in characters) of the line.
  */
 RichEdit_LineLength(hEdit, LineNumber=-1) {
 	static EM_LINELENGTH=193
-	SendMessage, EM_LINELENGTH, RichEdit_LineIndex(hEdit, LineNumber),,, ahk_id %hEdit% 
+	SendMessage, EM_LINELENGTH, RichEdit_LineIndex(hEdit, LineNumber),,, ahk_id %hEdit%
 	Return ErrorLevel
 }
 
@@ -821,19 +867,25 @@ RichEdit_LimitText(hCtrl,txtSize=0)  {
 /*
  Function: Paste
 		   Paste clipboard into the Edit control.
- */ 
-RichEdit_Paste(hEdit) { 
-    Static WM_PASTE:=0x302 
-    SendMessage WM_PASTE,0,0,,ahk_id %hEdit% 
-} 
+
+ Related:
+		<CanPaste>, <PasteSpecial>
+ */
+RichEdit_Paste(hEdit) {
+    Static WM_PASTE:=0x302
+    SendMessage WM_PASTE,0,0,,ahk_id %hEdit%
+}
 
 /*
- Function:	Paste
-			Paste clipboard into the Edit control.
+ Function:	PasteSpecial
+      Pastes a specific clipboard format in a rich edit control.
 
  Parameters:
 			Format	- One of the clipboard formats. See <http://msdn.microsoft.com/en-us/library/bb774214(VS.85).aspx>
- */ 
+
+ Related:
+		<CanPaste>, <Paste>
+ */
 RichEdit_PasteSpecial(HCtrl, Format)  {
   static EM_PASTESPECIAL=0x440
 		,CF_BITMAP=2,CF_DIB=8,CF_DIBV5=17,CF_DIF=5,CF_DSPBITMAP=0x82,CF_DSPENHMETAFILE=0x8E,CF_DSPMETAFILEPICT=0x83
@@ -846,24 +898,24 @@ RichEdit_PasteSpecial(HCtrl, Format)  {
 
 
 /*
- Function: PosFromChar 
+ Function: PosFromChar
            Gets the client area coordinates of a specified character in an Edit control.
- 
- Parameters: 
-           CharIndex - The zero-based index of the character. 
- 
-           X, Y - These parameters, which must contain valid variable names, 
-           are used to return the x/y-coordinates of a point in the control's client relative to the upper-left corner of the client area. 
- 
- Remarks: 
-           If CharIndex is greater than the index of the last character in the control, the returned coordinates are of the position just past 
-           the last character of the control. 
- */ 
-RichEdit_PosFromChar(hEdit, CharIndex, ByRef X, ByRef Y) { 
-    Static EM_POSFROMCHAR=0xD6 
-    VarSetCapacity(POINTL,8,0) 
-    SendMessage EM_POSFROMCHAR,&POINTL,CharIndex,,ahk_id %hEdit% 
-    X:=NumGet(POINTL,0,"Int"), Y:=NumGet(POINTL,4,"Int")     
+
+ Parameters:
+           CharIndex - The zero-based index of the character.
+
+           X, Y - These parameters, which must contain valid variable names,
+           are used to return the x/y-coordinates of a point in the control's client relative to the upper-left corner of the client area.
+
+ Remarks:
+           If CharIndex is greater than the index of the last character in the control, the returned coordinates are of the position just past
+           the last character of the control.
+ */
+RichEdit_PosFromChar(hEdit, CharIndex, ByRef X, ByRef Y) {
+    Static EM_POSFROMCHAR=0xD6
+    VarSetCapacity(POINTL,8,0)
+    SendMessage EM_POSFROMCHAR,&POINTL,CharIndex,,ahk_id %hEdit%
+    X:=NumGet(POINTL,0,"Int"), Y:=NumGet(POINTL,4,"Int")
 }
 
 /*
@@ -873,9 +925,9 @@ RichEdit_PosFromChar(hEdit, CharIndex, ByRef X, ByRef Y) {
  Returns:
 			TRUE if the Redo operation succeeds, FALSE otherwise.
  */
-RichEdit_Redo(hEdit) { 
-	static EM_REDO := 1108 
-	SendMessage, EM_REDO,,,, ahk_id %hEdit%    
+RichEdit_Redo(hEdit) {
+	static EM_REDO := 1108
+	SendMessage, EM_REDO,,,, ahk_id %hEdit%
 	return ErrorLevel
 }
 
@@ -887,14 +939,14 @@ RichEdit_Redo(hEdit) {
 			Text - Text to replace selection with.
  */
 RichEdit_ReplaceSel(hEdit, Text=""){
-	static  EM_REPLACESEL=194	
+	static  EM_REPLACESEL=194
 	SendMessage, EM_REPLACESEL,, &text,, ahk_id %hEdit%
 }
 
 /*
  Function:	Save
 			Save the content of the rich edit control using RT format.
-			
+
  Parameters:
 			FileName	- File name to save RTF file to. If omitted, function will return content.
  */
@@ -916,7 +968,7 @@ RichEdit_Save(hCtrl, FileName="") {
  */
 RichEdit_ScrollCaret(hEdit){
 	static EM_SCROLLCARET=183
-	SendMessage, EM_SCROLLCARET,,,, ahk_id %hEdit% 
+	SendMessage, EM_SCROLLCARET,,,, ahk_id %hEdit%
 }
 
 /*
@@ -956,14 +1008,14 @@ RichEdit_ScrollPos(HCtrl, PosString="" )  {
 /*
  Function:	SelectionType
 			Determines the selection type for a rich edit control.
- 
+
  Returns:
 			If the selection is not empty, the return value is a set of flags containing one or more of the following values:
 			TEXT		-	Text.
 			OBJECT		-	At least one Component Object Model (COM) object.
 			MULTICHAR	-	More than one character of text.
 			MULTIOBJECT	-	More than one COM object.
-	 
+
  Remarks:
 	This message is useful during WM_SIZE processing for the parent of a bottomless rich edit control.
  */
@@ -974,14 +1026,14 @@ RichEdit_SelectionType(hCtrl)  {
 	{
 		SendMessage, EM_SELECTIONTYPE,,,, ahk_id %hCtrl%
 		if !(o := ErrorLevel)
-			return 
+			return
 	}
 	else o := abs(hCtrl)
 
 	loop, parse, types, `,
 		if (o & A_LoopField)
 			res .= %A_LoopField% " "
-	
+
 	return SubStr(res, 1, -1)
 }
 
@@ -1048,14 +1100,14 @@ RichEdit_SetBgColor(hCtrl, Color)  {
 			LINK		- A rich edit control sends LINK notification messages when it receives mouse messages while the mouse pointer is over text with the LINK effect.
 			PROTECTED	- Characters are protected; an attempt to modify them will cause an PROTECTED notification message.
 			STRIKEOUT	- Characters are struck out.
-			SUBSCRIPT	- Characters are subscript. The SUPERSCRIPT and SUBSCRIPT values are mutually exclusive. 
-						  For both values, the control automatically calculates an offset and a smaller font size. 
-			SUPERSCRIPT	- Characters are superscript. 
-			UNDERLINE	- Characters are underlined.	
+			SUBSCRIPT	- Characters are subscript. The SUPERSCRIPT and SUBSCRIPT values are mutually exclusive.
+						  For both values, the control automatically calculates an offset and a smaller font size.
+			SUPERSCRIPT	- Characters are superscript.
+			UNDERLINE	- Characters are underlined.
 
  Modes:
 			ALL			- Applies the formatting to all text in the control.
-			SELECTION	- Applies the formatting to the current selection. If the selection is empty, the character formatting is applied 
+			SELECTION	- Applies the formatting to the current selection. If the selection is empty, the character formatting is applied
 						  to the insertion point, and the new character format is in effect only until the insertion point changes.
 			WORD		- Applies the formatting to the selected word or words. If the selection is empty but the insertion point is inside a word
 						  ,the formatting is applied to the word.
@@ -1076,11 +1128,11 @@ RichEdit_SetCharFormat(HCtrl, Face="", Style="", TextColor="", BackColor="", Mod
 	if (Face != "") && (StrLen(Face) <= 32)
 		hMask |= CFM_FACE, DllCall("lstrcpy", "UInt", &CF+26, "Str", Face)
 
-	if (TextColor != "") 
+	if (TextColor != "")
 		TextColor := ((TextColor & 0xFF) << 16) + (TextColor & 0xFF00) + ((TextColor >> 16) & 0xFF)
 		, hMask |= CFM_COLOR, NumPut(TextColor, CF, 20)
 
-	if (BackColor != "") 
+	if (BackColor != "")
 		BackColor := ((BackColor & 0xFF) << 16) + (BackColor & 0xFF00) + ((BackColor >> 16) & 0xFF)
 		, hMask |= CFM_BACKCOLOR,  NumPut(BackColor, CF, 64)
 
@@ -1088,20 +1140,20 @@ RichEdit_SetCharFormat(HCtrl, Face="", Style="", TextColor="", BackColor="", Mod
 		hEffects := 0
 		loop, parse, Style, %A_Space%
 		{
-			lf := A_LoopField, c := SubStr(lf, 1, 1) 
+			lf := A_LoopField, c := SubStr(lf, 1, 1)
 			if InStr("so", c) && ((j := SubStr(lf, 2)+0) != "", (%c% := j))
 				 continue
-		
+
 			if bOff := c = "-"
 				lf := SubStr(lf, 2)
-			
+
 			hMask |= CFM_%lf%, hEffects |= bOff ? 0 : CFE_%lf%
 		}
 	    NumPut(hEffects, CF, 8)
 		if (s != "")
 			hMask |= CFM_SIZE, NumPut(s*20, CF, 12, "Int")
 		if (o != "")
-			hMask |= CFM_OFFSET, NumPut(o, CF, 16, "Int")		
+			hMask |= CFM_OFFSET, NumPut(o, CF, 16, "Int")
 	}
 
 	NumPut(hMask, CF, 4)
@@ -1133,7 +1185,7 @@ RichEdit_SetCharFormat(HCtrl, Face="", Style="", TextColor="", BackColor="", Mod
 		 o P1 - Number of characters highlighted in drag-drop operation.
          o P2 - Beginning character position of range.
          o P3 - Ending character position of range.
-		
+
 		*DROPFILES*: Notifies that the user is attempting to drop files into the control.
 		 o P1 - Number of files dropped onto rich edit control.
 		 o P2 - Newline delimited (`n) list of files dropped onto control.
@@ -1142,7 +1194,7 @@ RichEdit_SetCharFormat(HCtrl, Face="", Style="", TextColor="", BackColor="", Mod
 		*KEYEVENTS*: Notification of a keyboard or mouse event in the control. To ignore the
 					 event, the handler function should return a nonzero value.  (*** needs redone)
 		 o P1 - Character position files were dropped onto within rich edit control.
-        
+
 		*MOUSEEVENTS,SCROLLEVENTS,LINK*: A rich edit control sends these messages when it receives various messages, when the
 				user clicks the mouse or when the mouse pointer is over text that has the LINK effect.
 				(*** expand usefulness)
@@ -1153,7 +1205,7 @@ RichEdit_SetCharFormat(HCtrl, Face="", Style="", TextColor="", BackColor="", Mod
 		*REQUESTRESIZE*: This message notifies a rich edit control's parent window that the control's
 						 contents are either smaller or larger than the control's window size.
 		 o P1 - Requested new size.
-    
+
 		*SELCHANGE*: The current selection has changed.
 		 o P1 - Beginning character position of range.
 		 o P2 - Ending character position of range.
@@ -1194,7 +1246,7 @@ RichEdit_SetEvents(hCtrl, Handler="", Events="selchange"){
 		 ;     			RichEdit("oldCOMMAND", RegisterCallback(oldCOMMAND))
 		 ;     	}
 	}
-	
+
 	if !oldNotify {
 		oldNotify := OnMessage(WM_NOTIFY, "RichEdit_onNotify")
 		if oldNotify != RichEdit_onNotify
@@ -1211,11 +1263,11 @@ RichEdit_SetEvents(hCtrl, Handler="", Events="selchange"){
 			Sets the font size for the selected text in the rich edit control.
 
  Parameters:
-			Add - Change in point size of the selected text.The change is applied to 
+			Add - Change in point size of the selected text.The change is applied to
 					each part of the selection. So, if some of the text is 10pt and some 20pt,
 					after a call with wParam set to 1, the font sizes become 11pt and 22pt, respectively.
  */
-RichEdit_SetFontSize(hCtrl, Add) { 
+RichEdit_SetFontSize(hCtrl, Add) {
 	static EM_SETFONTSIZE=0x4DF
 	SendMessage, EM_SETFONTSIZE,Add,,, ahk_id %hCtrl%
 	return ErrorLEvel
@@ -1225,16 +1277,16 @@ RichEdit_SetFontSize(hCtrl, Add) {
  Function:	SetOptions
 			Sets the options for a rich edit control.
 
- 
+
  Parameters:
 			Operation	- Specifies the operation.
-			Options		- White separted list of option values. 
+			Options		- White separted list of option values.
 
  Operation:
 			SET - Sets the options to those specified by Options.
 			OR  - Combines the specified options with the current options.
 			AND - Retains only those current options that are also specified by Options.
-			XOR - Logically exclusive OR the current options with those specified by Options.	
+			XOR - Logically exclusive OR the current options with those specified by Options.
 
  Options:
 			AUTOWORDSELECTION - Automatic selection of word on double-click.
@@ -1251,7 +1303,7 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
   static EM_SETOPTIONS=1101
 		, ECOOP_SET=0x1,ECOOP_OR=0x2,ECOOP_AND=0x3,ECOOP_XOR=0x4
 		, ECO_AUTOWORDSELECTION=0x1,ECO_AUTOVSCROLL=0x40,ECO_AUTOHSCROLL=0x80,ECO_NOHIDESEL=0x100,ECO_READONLY=0x800,ECO_WANTRETURN=0x1000,ECO_SELECTIONBAR=0x1000000
-	
+
 	operation := ECOOP_%Operation%
 	ifEqual, operation,,return A_ThisFunc "> Invalid operation: " Operation
 
@@ -1259,20 +1311,20 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
 	loop, parse, Options, %A_Tab%%A_Space%,
 		ifEqual, A_LoopField,,continue
 		else hOptions |= ECO_%A_LOOPFIELD%
-	
+
 	SendMessage, EM_SETOPTIONS, operation, hOptions,, ahk_id %hCtrl%
 	return RichEdit_GetOptions( "." ErrorLevel)
 }
 
 /*
- Function:	SetParaFormat	
+ Function:	SetParaFormat
 			Sets the paragraph formatting for the current selection in a rich edit control.
- 
+
  Parameters:
-			o1..o6	- Named arguments: Num, Align, Line, Ident, Space, Tabs. Each named arugment has its own set of 
+			o1..o6	- Named arguments: Num, Align, Line, Ident, Space, Tabs. Each named arugment has its own set of
 					  parameters (delimited by comma). The syntax is "Name=a1,a2,a3,a4".
 
- *Num* :	
+ *Num* :
 
 			Type	- EMPTY, BULLET, DECIMAL, LOWER, UPPER, ROMAN_LOWER, ROMAN_UPPER, SEQUENCE (Uses a sequence of characters beginning with the character specified by the start argument).
 			Start	- Starting number or starting value used for numbered paragraphs.
@@ -1284,12 +1336,12 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
 					  o CONT - Continues a numbered list without applying the next number or bullet.
 					  o NEW  - Starts a new number with value of *Start* parameter.
 			Offset	- Minimum space between a paragraph number and the paragraph text, in twips.
- 
- *Align* :	
- 
+
+ *Align* :
+
 			Type	- CENTER, LEFT, RIGHT, JUSTIFY.
 
- *Line* :		
+ *Line* :
 
 			Rule	- One of the following :
 					  o SINGLE	 - Single spacing.
@@ -1300,28 +1352,28 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
 					  o S3		 - The value of Spacing/20 is the spacing, in lines, from one line to the next. Thus, setting Spacing to 20 produces single-spaced text, 40 is double spaced, 60 is triple spaced, and so on.
 			Spacing - Spacing between lines. This value is valid only for S1-S3 Rules.
 
- *Ident* :		
+ *Ident* :
 
- 			First	- Indentation of the paragraph's first line, relative to the paragraph's current indentation, in twips. 
+ 			First	- Indentation of the paragraph's first line, relative to the paragraph's current indentation, in twips.
 					  The indentation of subsequent lines depends on the Offset member.  To see all this in effect you must enable word wrap mode.
 					  If starts with ".", it represents absolute indentation from the left margin.
-			Offset	- Indentation of the second and subsequent lines, relative to the indentation of the first line, in twips. 
+			Offset	- Indentation of the second and subsequent lines, relative to the indentation of the first line, in twips.
 					  The first line is indented if this member is negative or outdented if this member is positive.
 			Right	- Indentation of the right side of the paragraph, relative to the right margin, in twips.
 
  *Space* :
 
-			Before	- Size of the spacing above the paragraph, in twips. 
+			Before	- Size of the spacing above the paragraph, in twips.
 			After	- Specifies the size of the spacing below the paragraph, in twips.
 
- *Tabs* :		
+ *Tabs* :
 
 			List	- Space separated list of absolute tab stop positions in twips.
 
  Returns:
 			TRUE if succeessiful, FALSE otherwise.
 
- Remarks: 
+ Remarks:
 			Control uses carriage return character (`r) for paragraph markers by default.
  */
 RichEdit_SetParaFormat(hCtrl, o1="", o2="", o3="", o4="", o5="", o6="")  {
@@ -1330,21 +1382,21 @@ RichEdit_SetParaFormat(hCtrl, o1="", o2="", o3="", o4="", o5="", o6="")  {
 		,PFM_ALIGNMENT=0x8, PFM_BORDER=0x800, PFM_BOX=0x4000000, PFM_COLLAPSED=0x1000000, PFM_DONOTHYPHEN=0x400000, PFM_KEEP=0x20000, PFM_KEEPNEXT=0x40000, PFM_LINESPACING=0x100, PFM_NOLINENUMBER=0x100000, PFM_NOWIDOWCONTROL=0x200000, PFM_NUMBERING=0x20
 		,PFM_NUMBERINGSTART=0x8000, PFM_NUMBERINGSTYLE=0x2000, PFM_NUMBERINGTAB=0x4000, PFM_OFFSET=0x4, PFM_OFFSETINDENT=0x80000000, PFM_OUTLINELEVEL=0x2000000, PFM_PAGEBREAKBEFORE=0x80000, PFM_RIGHTINDENT=0x2, PFM_RTLPARA=0x10000, PFM_SHADING=0x1000
 		,PFM_SIDEBYSIDE=0x800000, PFM_SPACEAFTER=0x80, PFM_SPACEBEFORE=0x40, PFM_STARTINDENT=0x1, PFM_STYLE=0x400,PFM_TABLE=0x40000000, PFM_TABSTOPS=0x10, PFN_BULLET=0x1, PFN_LCLETTER=3, PFN_LCROMAN=5, PFN_UCLETTER=4, PFN_UCROMAN=6
-		
+
 	static ALIGN_CENTER=3, ALIGN_LEFT=1, ALIGN_RIGHT=2, ALIGN_JUSTIFY=4
 		  ,NUM_TYPE_BULLET=1, NUM_TYPE_DECIMAL=2, NUM_TYPE_LOWER=3, NUM_TYPE_UPPER=4, NUM_TYPE_ROMAN_LOWER=5, NUM_TYPE_ROMAN_UPPER=6, NUM_TYPE_SEQUENCE=7
 		  ,NUM_STYLE_P=0X100, NUM_STYLE_D=0X200, NUM_STYLE_N=0X300, NUM_STYLE_CONT=0X400, NUM_STYLE_NEW=0X800
-		  ,LINE_RULE_SINGLE=0, LINE_RULE_1ANDHALF=1, LINE_RULE_DOUBLE=2, LINE_RULE_S1=3, LINE_RULE_S2=4, LINE_RULE_S3=5, 
+		  ,LINE_RULE_SINGLE=0, LINE_RULE_1ANDHALF=1, LINE_RULE_DOUBLE=2, LINE_RULE_S1=3, LINE_RULE_S2=4, LINE_RULE_S3=5,
 
 	loop {
 		ifEqual, o%A_Index%,,break
 		else j := InStr( o%A_index%, "=" ), p := SubStr(o%A_index%, 1, j-1 ), v := SubStr( o%A_index%, j+1)
 		StringSplit, %p%, v, `,
-	}		
+	}
 
 	;S(PF, "PARAFORMAT2! cbSize dwMask wAlignment", sz, PFM_ALIGNMENT, PFA_RIGHT)
 	VarSetCapacity(PF, 188, 0), NumPut(188, PF),  hMask := 0
-	if Align0 
+	if Align0
 		hMask |= PFM_ALIGNMENT, NumPut(ALIGN_%Align1%, PF, 24, "UShort")
 
 	;S(PF, "PARAFORMAT2! cbSize dwMask wNumbering wNumberingStart wNumberingStyle wNumberingTab", sz, pm := PFM_NUMBERING | PFM_NUMBERINGSTART | PFM_NUMBERINGSTYLE | PFM_NUMBERINGTAB, p1:=2, p2:=10, p3:=0x200, p4:=20*50)
@@ -1367,7 +1419,7 @@ RichEdit_SetParaFormat(hCtrl, o1="", o2="", o3="", o4="", o5="", o6="")  {
 
 	;S(PF, "PARAFORMAT2! cbSize dwMask dySpaceAfter dySpaceBefore", sz, p:=PFM_SPACEAFTER | PFM_SPACEBEFORE, x:=20*50, y:=10*50)
 	if Space0
-		hMask |= 0	
+		hMask |= 0
 		,(Space1 = "") ? "" : (hMask |= PFM_SPACEBEFORE,  NumPut(Space1, PF, 156, "Int"))
 		,(Space2 = "") ? "" : (hMask |= PFM_SPACEAFTER,   NumPut(Space2, PF, 160, "Int"))
 
@@ -1390,7 +1442,7 @@ RichEdit_SetParaFormat(hCtrl, o1="", o2="", o3="", o4="", o5="", o6="")  {
 /*
  Function:	SetEditStyle
 			Sets the current edit style flags.
- 
+
  Parameters:
 			Style - One of the styles bellow. Prepend "-" to turn the style off.
 
@@ -1442,7 +1494,7 @@ RichEdit_SetEditStyle(hCtrl, Style)  {
  */
 RichEdit_SetSel(hCtrl, CpMin=0, CpMax=0)  {
 	static EM_EXSETSEL=1079
-  
+
 	VarSetCapacity(CHARRANGE, 8), NumPut(cpMin, CHARRANGE, 0, "Int"), NumPut(cpMax ? cpMax : cpMin, CHARRANGE, 4, "Int")
 	SendMessage, EM_EXSETSEL, , &CHARRANGE,, ahk_id %hCtrl%
 	return ErrorLevel
@@ -1455,15 +1507,15 @@ RichEdit_SetSel(hCtrl, CpMin=0, CpMax=0)  {
  Parameters:
 			Txt		- The text string to set within control.
 			Flag	- Space separated list of options.  See below list.
-			Pos		- This optional parameter allows you to specify a character position you want text inserted to, 
-					  rather than replacing current selection. To append to the end, use -1. 
+			Pos		- This optional parameter allows you to specify a character position you want text inserted to,
+					  rather than replacing current selection. To append to the end, use -1.
 					  When using SELECTION flag, the position is relative to the current selection text and current selection is expanded to
 					  contain new text. If used without SELECTION flag existing selection remains unafected.
 
  Flags:
 			DEFAULT		- Deletes the undo stack, discards rich-text formatting, & replaces all text.
 			KEEPUNDO	- Keeps the undo stack.
-			SELECTION	- Replaces selection and keeps rich-text formatting. If you don't specify this style entire content of 
+			SELECTION	- Replaces selection and keeps rich-text formatting. If you don't specify this style entire content of
 						  the control will be replaced with the new text.
 			FROMFILE	- Load a file into control.  If used, this option expects the *txt* parameter to be
 						  a filename. If there is a problem loading the file, *ErrorLevel* will contain message.
@@ -1479,11 +1531,11 @@ RichEdit_SetSel(hCtrl, CpMin=0, CpMax=0)  {
  (start code)
   FileSelectFile, file,,, Select file, RTF(*.rtf; *.txt)
   RichEdit_SetText(hRichEdit, file, "FROMFILE KEEPUNDO")
- 
+
   RichEdit_SetText(hRichEdit, "insert..", "SELECTION")
- 
+
   RichEdit_SetText(hRichEdit, "replace all..")
- 
+
   RichEdit_SetText(hRichEdit, "append to end of selection..", "SELECTION", -1 )
  (end code)
  */
@@ -1524,8 +1576,8 @@ RichEdit_SetText(HCtrl, Txt="", Flag=0, Pos="" )  {
 
 	VarSetCapacity(SETTEXTEX, 8), NumPut(hFlag, SETTEXTEX)
 	NumPut(0, SETTEXTEX, 4)		  ;The code page is used to translate the text to Unicode. If codepage is 1200 (Unicode code page),
-								  ; no translation is done. If codepage is CP_ACP (0), the system code page is used. 
-	SendMessage, EM_SETTEXTEX, &SETTEXTEX, &Txt,, ahk_id %HCtrl%	
+								  ; no translation is done. If codepage is CP_ACP (0), the system code page is used.
+	SendMessage, EM_SETTEXTEX, &SETTEXTEX, &Txt,, ahk_id %HCtrl%
 	return ERRORLEVEL, prevPos != "" ? RichEdit_SetSel(HCtrl, min, max) :
 }
 
@@ -1599,10 +1651,10 @@ RichEdit_ShowScrollBar(hCtrl, Bar, State=true)  {
 			TextMode - Space separated list of options (see below). If omitted, current text mode is returned.
 
  Options:
-		Specify one of the following values to set the text mode parameter. 
+		Specify one of the following values to set the text mode parameter.
 		If you don't specify a text mode value, the text mode remains at its current setting.
 
-		PLAINTEXT		 - Indicates plain-text mode, in which the control is similar to a standard edit control. 
+		PLAINTEXT		 - Indicates plain-text mode, in which the control is similar to a standard edit control.
 		RICHTEXT		 - Indicates rich-text mode (default text mode).
 
 		Specify one of the following values to set the undo level parameter. If you don't specify an undo level value, the undo level remains at its current setting.
@@ -1626,12 +1678,12 @@ RichEdit_ShowScrollBar(hCtrl, Bar, State=true)  {
  Remarks:
 		The control text will be deleted when calling this function.
 
-		In rich text mode, a rich edit control has standard rich edit functionality. 
+		In rich text mode, a rich edit control has standard rich edit functionality.
 		However, in plain text mode, the control is similar to a standard edit control :
 
-		- The text in a plain text control can have only one format (such as Bold, 10pt Arial). 
-		- The user cannot paste rich text formats, such as Rich Text Format (RTF) or embedded objects into a plain text control. 
-		- Rich text mode controls always have a default end-of-document marker or carriage return, to format paragraphs. 
+		- The text in a plain text control can have only one format (such as Bold, 10pt Arial).
+		- The user cannot paste rich text formats, such as Rich Text Format (RTF) or embedded objects into a plain text control.
+		- Rich text mode controls always have a default end-of-document marker or carriage return, to format paragraphs.
 		- Plain text controls, on the other hand, do not need the default, end-of-document marker, so it is omitted.
 
  Related:
@@ -1640,7 +1692,7 @@ RichEdit_ShowScrollBar(hCtrl, Bar, State=true)  {
  Example:
 	(start code)
 	  MsgBox, % "mode= " RichEdit_TextMode(hRichEdit)
-	 
+
 	  If RichEdit_TextMode( hRichEdit, "PLAINTEXT SINGLELEVELUNDO" )
 			MsgBox, % "new mode= " RichEdit_TextMode(hRichEdit)
 	  Else	MsgBox, % errorlevel
@@ -1678,7 +1730,7 @@ RichEdit_TextMode(HCtrl, TextMode="")  {
 
  Parameters:
 				Flag	- True / False.
- 
+
  Returns:
 				The return value is zero if the operation fails, or nonzero if it succeeds.
  */
@@ -1716,7 +1768,7 @@ Richedit_Zoom(hCtrl, zoom=0)  {
   VarSetCapacity(numer, 4)  , VarSetCapacity(denom, 4)
   SendMessage, WM_USER | EM_GETZOOM, &numer,&denom,, ahk_id %hCtrl%
   numerator := NumGet(numer, 0, "UShort") ;, denominator := NumGet(denom, 0, "UShort")
-	
+
   If zoom is not integer
     return false, errorlevel := "ERROR: '" zoom "' is not an integer, stupid"
   If (!zoom)
@@ -1724,7 +1776,7 @@ Richedit_Zoom(hCtrl, zoom=0)  {
 
   ; Calculate new numerator value (denominator not currently changed)
   InStr(zoom,"-") ?  numerator-=SubStr(zoom,2)  :  numerator+=zoom
-    
+
   ; Set the zoom ratio
   SendMessage, WM_USER | EM_SETZOOM, %numerator%, 1,, ahk_id %hCtrl%
   return ERRORLEVEL
@@ -1736,7 +1788,7 @@ Richedit_Zoom(hCtrl, zoom=0)  {
 		    optionally empty the undo buffer by resetting the undo flag.
 
  Parameters:
-			Reset - Set to TRUE to clear the undo buffer rather than send undo command. 
+			Reset - Set to TRUE to clear the undo buffer rather than send undo command.
 
  Returns:
 			For a single-line edit control, the return value is always TRUE.
@@ -1764,18 +1816,18 @@ RichEdit_add2Form(hParent, Txt, Opt){
 RichEdit_onNotify(Wparam, Lparam, Msg, Hwnd) {
 	static MODULEID := 091009, oldNotify="*", oldCOMMAND="*"
 		  ,ENM_PROTECTED=1796, ENM_REQUESTRESIZE=1793, ENM_SELCHANGE=1794, ENM_DROPFILES=1795, ENM_DRAGDROPDONE=1804, ENM_LINK=1803
- 
+
 	critical		;its OK, always executed in its own thread.
 	if (_ := (NumGet(Lparam+4))) != MODULEID
 	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
-	 else { 
+	 else {
 		ifEqual, oldNotify, *, SetEnv, oldNotify, % RichEdit("oldNotify")
 		if oldNotify !=
 			 return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
-		else return	
+		else return
 		;ifEqual, oldCOMMAND, *, SetEnv, oldCOMMAND, % RichEdit("oldCOMMAND")
 		;if oldCOMMAND !=
-		;	return DllCall(oldCOMMAND, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)			
+		;	return DllCall(oldCOMMAND, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
 	 }
 
 	hw :=  NumGet(Lparam+0), code := NumGet(Lparam+8, 0, "UInt"),  handler := RichEdit(hw "Handler")
@@ -1790,17 +1842,17 @@ RichEdit_onNotify(Wparam, Lparam, Msg, Hwnd) {
 			return %handler%(hw, %Umsg%, key, "", "")
 	}
 
-	If (code = ENM_REQUESTRESIZE)  {  
+	If (code = ENM_REQUESTRESIZE)  {
 		rc := NumGet(lparam+24) ;Requested new size.
 		return %handler%(hw, "REQUESTRESIZE", rc, "", "")
 	}
 
-	if (code = ENM_SELCHANGE)  {          
+	if (code = ENM_SELCHANGE)  {
 		cpMin := NumGet(lparam+12), cpMax := NumGet(lparam+16), selType := RichEdit_SelectionType(-NumGet(lparam+20))
 		return %handler%(hw, "SELCHANGE", cpMin, cpMax, seltype)
 	}
 
-	If (code = ENM_DROPFILES)  {          ; 
+	If (code = ENM_DROPFILES)  {          ;
 		hDrop := NumGet(lparam+8, 4 , "UInt"), cp := NumGet(lparam+8, 8 , "Int")
 
 		; (thanks DerRaphael!)  http://www.autohotkey.com/forum/post-234905.html&highlight=#234905
@@ -1811,19 +1863,19 @@ RichEdit_onNotify(Wparam, Lparam, Msg, Hwnd) {
 		   files .= ((A_Index>1) ? "`n" : "") lpSzFile
 		}
 		return %handler%(hw, "DROPFILES", file_count, files, cp)
-	}	
+	}
 
-	If (code = ENM_DRAGDROPDONE)  {         
+	If (code = ENM_DRAGDROPDONE)  {
 		chars := NumGet(lparam+12), cpMax := NumGet(lparam+16)
 		return %handler%(hw, "DRAGDROPDONE", chars, cpMax-chars, cpMax)
 	}
 
-	If (code = ENM_PROTECTED)  {       
+	If (code = ENM_PROTECTED)  {
 		cpMin := NumGet(lparam+24), cpMax := NumGet(lparam+28)
 		return %handler%(hw, "PROTECTED", cpMin, cpMax, "") ; This message returns a nonzero value to prevent the operation.
 	}
-  
-	If (code = ENM_LINK )  { 
+
+	If (code = ENM_LINK )  {
 		umsg := NumGet(lparam+12)
 		If umsg Not In 513,516
 			 return
@@ -1832,12 +1884,12 @@ RichEdit_onNotify(Wparam, Lparam, Msg, Hwnd) {
 	}
 }
 
-RichEdit_wndProc(hwnd, uMsg, wParam, lParam){ 
-	
+RichEdit_wndProc(hwnd, uMsg, wParam, lParam){
+
    if (uMsg = 0x87)  ;WM_GETDLGCODE
 		return 4	 ;DLGC_WANTALLKEYS
 
-   return DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", hwnd, "UInt", uMsg, "UInt", wParam, "UInt", lParam) 
+   return DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", hwnd, "UInt", uMsg, "UInt", wParam, "UInt", lParam)
 }
 
 RichEdit_editStreamCallBack(dwCookie, pbBuff, cb, pcb) {
@@ -1853,7 +1905,7 @@ RichEdit_editStreamCallBack(dwCookie, pbBuff, cb, pcb) {
 
 	if s =
 		 VarSetCapacity(s, dwCookie)
-	
+
 	s .= DllCall("MulDiv", "Int", pbBuff, "Int",1, "Int", 1, "str")
 }
 
