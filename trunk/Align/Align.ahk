@@ -44,7 +44,7 @@
 
   About:
 		o 1.04 by majkinetor.
-		o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
+		o Licensed under BSD <http://creativecommons.org/licenses/BSD/> 
  */
 Align(HCtrl, Type="", Dim="", HGlueCtrl=""){
 	static 
