@@ -20,7 +20,7 @@
 			 
  About:
 	o 1.0 by majkinetor.
-	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */
 Ext_Tooltip(HCtrl, Text){
 	static SS_NOTIFY=0x100		;, adrWndProc="Ext_Tooltip_WndProc"

@@ -40,6 +40,7 @@
 
  About:
 				o v1.2 by majkinetor
+				o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */
 ShowMenu( mDef, mnu="", sub="", sep="`n", r=0 ) {
 	static p, menus

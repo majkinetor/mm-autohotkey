@@ -155,7 +155,7 @@ Scroller_onScroll(WParam, LParam, Msg, Hwnd){
 /* Group: About
 	o Version 1.0 by majkinetor.
 	o Original code by Lexikos. See <http://www.autohotkey.com/forum/viewtopic.php?p=177673#177673>.
-	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */
 
 #include *i Win.ahk

@@ -44,7 +44,7 @@
 
  About:
 	o 1.2 by majkinetor
-	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
+	o Licensed under BSD <http://creativecommons.org/licenses/BSD/> 
  */
 Ext_Cursor(HCtrl, Shape) { 
 ;	static adrWndProc = "Ext_Cursor_wndProc"

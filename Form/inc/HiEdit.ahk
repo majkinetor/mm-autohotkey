@@ -139,6 +139,29 @@ HE_Clear(hEdit) {
 } 
 
 /*
+ Function: CharFromPos
+           Gets information about the character closest to a specified point in the client area of the Edit control.
+
+ Parameters:
+           X, Y - The coordinates of a point in the Edit control's client area relative to the upper-left corner of the client area.
+
+ Returns:
+           The character index of the specified point or the character index to
+           the last character if the given point is beyond the last character in the control.
+ */
+HE_CharFromPos(hEdit,X,Y) {
+    Static EM_CHARFROMPOS=0xD7
+
+	WinGetClass, cls, ahk_id %hEdit%
+	if cls in RICHEDIT50W
+		 VarSetCapacity(POINTL, 8), lParam := &POINTL, NumPut(X, POINTL), NumPut(Y,POINTL)
+	else lParam := (Y<<16)|X
+
+    SendMessage EM_CHARFROMPOS,,lParam,,ahk_id %hEdit%
+    return ErrorLevel
+}
+
+/*
  Function:	ConvertCase  
 			Convert case of selected text
 
@@ -1210,7 +1233,8 @@ HiEdit_add2Form(hParent, Txt, Opt) {
 	o HiEdit control is copyright of Antonis Kyprianou (aka akyprian). See <http://www.winasm.net>.
 	o Available for *NON commercial purposes* provided you have previous line in your about box. 
 	  You need author's written permission to use HiEdit in commercial applications.
-	o AHK wrapper version 4.0.0.4-3 by majkinetor.
-	o AHK module licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+	o AHK wrapper version 4.0.0.4-4 by majkinetor.
     o Additonal functions by jballi.
+	o AHK module licensed under BSD <http://creativecommons.org/licenses/BSD/>.
+
  */

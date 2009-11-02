@@ -21,7 +21,7 @@
 	About:
 		o Version 1.0 by majkinetor.
 		o Original code by (de)nick, See: <http://www.autohotkey.com/forum/topic238864.html>.
-		o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+		o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */
 CColor(Hwnd, Background="", Foreground="") {
 	return CColor_(Background, Foreground, "", Hwnd+0)
