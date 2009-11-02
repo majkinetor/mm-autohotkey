@@ -183,7 +183,7 @@ RichEdit_CanPaste(hEdit, ClipboardFormat=0x1) {
 RichEdit_CanRedo(hEdit) {
     Static EM_CANREDO=1109
     SendMessage EM_CANREDO,,,,ahk_id %hEdit%
-    return ErrorLevel
+	return ErrorLevel ? True : False
 }
 
 /*
@@ -561,6 +561,28 @@ RichEdit_GetModify(hEdit){
     SendMessage EM_GETMODIFY,,,,ahk_id %hEdit%
     Return ErrorLevel = 4294967295 ? 1 : 0
 }
+
+/*
+ Function:  GetRect 
+            Gets the formatting rectangle of the Edit control.  
+
+ Parameters:
+			Left..Bottom	- Output variables, can be omitted.
+
+ Returns:
+		   Space separated rectangle.
+ */ 
+RichEdit_GetRect(hEdit,ByRef Left="",ByRef Top="",ByRef Right="",ByRef Bottom="") { 
+    static EM_GETRECT:=0xB2
+
+	VarSetCapacity(RECT,16) 
+    SendMessage EM_GETRECT,0,&RECT,,ahk_id %hEdit% 
+      Left  :=NumGet(RECT, 0,"Int")
+    , Top   :=NumGet(RECT, 4,"Int") 
+    , Right :=NumGet(RECT, 8,"Int") 
+    , Bottom:=NumGet(RECT,12,"Int") 
+    return  Left " " Top " " Right " " Bottom
+} 
 
 /*
   Function: GetSel
