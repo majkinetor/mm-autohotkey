@@ -279,5 +279,5 @@ ScrollBar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="
 /*
  Group: About
 	o v2.01 by majkinetor.
-	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */
