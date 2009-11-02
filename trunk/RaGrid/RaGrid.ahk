@@ -844,7 +844,7 @@ RaGrid_add2Form(hParent, Txt, Opt) {
 	o RaGrid control version: 2.0.1.6 by KetilO. See <http://www.masm32.com/board/index.php?topic=55>
 	o AHK module ver 2.0.1.6-2 by majkinetor.
 	o RaGrid is freely distributed for any kind of purpose.
-	o AHK module licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+	o AHK module licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */
 
 ;HexView structure:
