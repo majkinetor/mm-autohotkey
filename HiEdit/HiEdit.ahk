@@ -139,6 +139,29 @@ HE_Clear(hEdit) {
 } 
 
 /*
+ Function: CharFromPos
+           Gets information about the character closest to a specified point in the client area of the Edit control.
+
+ Parameters:
+           X, Y - The coordinates of a point in the Edit control's client area relative to the upper-left corner of the client area.
+
+ Returns:
+           The character index of the specified point or the character index to
+           the last character if the given point is beyond the last character in the control.
+ */
+HE_CharFromPos(hEdit,X,Y) {
+    Static EM_CHARFROMPOS=0xD7
+
+	WinGetClass, cls, ahk_id %hEdit%
+	if cls in RICHEDIT50W
+		 VarSetCapacity(POINTL, 8), lParam := &POINTL, NumPut(X, POINTL), NumPut(Y,POINTL)
+	else lParam := (Y<<16)|X
+
+    SendMessage EM_CHARFROMPOS,,lParam,,ahk_id %hEdit%
+    return ErrorLevel
+}
+
+/*
  Function:	ConvertCase  
 			Convert case of selected text
 
