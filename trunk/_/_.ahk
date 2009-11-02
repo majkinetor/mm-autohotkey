@@ -402,5 +402,5 @@ Fatal(Message, E=1, ExitCode="") {
 
 /* Group: About
 	o 0.44 by majkinetor
-	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
+	o Licensed under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
  */
