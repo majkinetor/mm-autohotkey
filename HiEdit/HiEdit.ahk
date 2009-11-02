@@ -103,7 +103,7 @@ HE_CanPaste(hEdit,ClipboardFormat=0x1) {
 HE_CanRedo(hEdit) { 
     Static EM_CANREDO=1109  ;-- 1109=WM_USER+85 
     SendMessage EM_CANREDO,,,,ahk_id %hEdit% 
-    return ErrorLevel 
+    return ErrorLevel ? True : False
 }
 
 /*
@@ -136,26 +136,6 @@ HE_CloseFile(hEdit, idx=-1){
 HE_Clear(hEdit) {
     Static WM_CLEAR:=0x303 
     SendMessage WM_CLEAR,,,,ahk_id %hEdit% 
-} 
-
-/* 
- Function: CharFromPos 
-           Gets information about the character closest to a specified point 
-           in the client area of the HiEdit control. 
- 
- Parameters: 
-           x, y - The x/y-coordinates of a point in the HiEdit control's client 
-           area relative to the upper-left corner of the client area. 
- 
- Returns: 
-           The character index of the specified point or the character index to 
-           the last character if the given point is beyond the last character 
-           in the control.  
- */
-HE_CharFromPos(hEdit,X,Y) { 
-    Static EM_CHARFROMPOS:=0xD7 
-    SendMessage EM_CHARFROMPOS,,(y<<16)|x,,ahk_id %hEdit% 
-    return ErrorLevel 
 } 
 
 /*
@@ -398,10 +378,10 @@ HE_GetRect(hEdit,ByRef Left="",ByRef Top="",ByRef Right="",ByRef Bottom="") {
 
 	VarSetCapacity(RECT,16) 
     SendMessage EM_GETRECT,0,&RECT,,ahk_id %hEdit% 
-    Left  :=NumGet(RECT,0,"Int") 
-    Top   :=NumGet(RECT,4,"Int") 
-    Right :=NumGet(RECT,8,"Int") 
-    Bottom:=NumGet(RECTe,12,"Int") 
+      Left  :=NumGet(RECT, 0,"Int")
+    , Top   :=NumGet(RECT, 4,"Int") 
+    , Right :=NumGet(RECT, 8,"Int") 
+    , Bottom:=NumGet(RECT,12,"Int") 
     return  Left " " Top " " Right " " Bottom
 } 
 
