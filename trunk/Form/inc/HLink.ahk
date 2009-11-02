@@ -135,5 +135,5 @@ HLink_add2Form(hParent, Txt, Opt) {
 /* Group: About
 		o Ver 2.01 by majkinetor. See http://www.autohotkey.com/forum/topic19508.html
 		o HLink Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760704.aspx>
-		o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
+		o Licensed under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
  */

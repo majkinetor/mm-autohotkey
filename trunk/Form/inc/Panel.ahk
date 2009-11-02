@@ -178,5 +178,5 @@ Panel_add2Form(hParent, Txt, Opt){
 
 /* Group: About
 	o Ver 0.2 by majkinetor. 
-	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
 */

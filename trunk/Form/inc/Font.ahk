@@ -100,5 +100,5 @@ Font_DrawText(Text, DC="", Font="", Flags="", Rect="") {
 
 /* Group: About
 	o Version 1.0 by majkinetor.
-	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */

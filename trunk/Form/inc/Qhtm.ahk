@@ -656,5 +656,5 @@ QHTM(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", By
  Group: About 
  	o AHK module ver 1.03 by majkinetor.
 	o QHTML copyright © GipsySoft. See http://www.gipsysoft.com/qhtm/
-	o Licenced under Creative Commons Attribution-Noncommercial <http://creativecommons.org/licenses/by-nc/3.0/>.
+	o Licensed under Creative Commons Attribution-Noncommercial <http://creativecommons.org/licenses/by-nc/3.0/>.
  */

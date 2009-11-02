@@ -21,7 +21,7 @@
 
  About:
 		o Version 1.0 by majkinetor.
-		o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
+		o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */
 CMenu(HCtrl, MenuName="", Sub="") { 
 	oldTrim := A_AutoTrim
