@@ -1,4 +1,4 @@
-_("c-1")
+_("")
 	w := 550, h := 250
 	hForm1 := Form_New("+Resize w" w " h" h)
 		
@@ -6,14 +6,13 @@ _("c-1")
 	Form_Show()
 return
 
-Writer_Add(hParent, X, Y, W, H, Style="") {
+Writer_Add(hParent, X, Y, W, H, Style="", Init="s10 -bold,Tahoma") {
 	global 
 
   ;create layout
 	pnlMain	:= Panel_Add(hParent, X, Y, W, H)
-	pnlTool	:= Panel_Add(pnlMain, 0, 0, W, 30)
+	pnlTool	:= Panel_Add(pnlMain, 0, 0, W, 60)
 	hRE		:= RichEdit_Add(pnlMain, "", "", "", "", "NOHIDESEL MULTILINE SELECTIONBAR VSCROLL"), RichEdit_FixKeys(hRE)
-	RichEdit_SetCharFormat(hRE, "Tahoma", "s10 -bold")
 	ControlFocus,,ahk_id %hRe% 
 	
 	Align(pnlTool, "T"), Align(hRE, "F")
@@ -41,17 +40,21 @@ Writer_Add(hParent, X, Y, W, H, Style="") {
 		Back Color,,,DROPDOWN
 		Text Color,,,DROPDOWN
 	 )
-	cbFonts := Form_Add(pnlTool, "ComboBox", "Arial||", "gWriter_OnTool x0 y0 w180", "Align L")
-	Form_Add(pnlTool, "ComboBox", "8|9|10||11|12|14|16|18|20|22|24|26|28|36|48|72", "gWriter_OnTool w50", "Align L")
-	hToolbar := Form_Add(pnlTool, "Toolbar", btns, "gWriter_OnToolbar x0 style='flat list nodivider tooltips' il" hIL, "Align L")
+
+	cbFonts := Form_Add(pnlTool, "ComboBox", Writer_enumFonts(), "gWriter_OnTool y6 x4 w180")
+	Form_Add(pnlTool, "ComboBox", "8|9|10||11|12|14|16|18|20|22|24|26|28|36|48|72", "gWriter_OnTool x+5 w50")
+	hToolbar := Form_Add(pnlTool, "Toolbar", btns, "gWriter_OnToolbar x2 y30 style='flat list nodivider tooltips' il" hIL)
 	Toolbar_AutoSize(hToolbar)
   	Form_AutoSize(pnlTool, .2)
 	Align(pnlMain)
 
+	StringSplit, Init, Init, `,, %A_SPACE%
+	Control, ChooseString, %Init2%,,ahk_id %cbFonts%
+	RichEdit_SetCharFormat(hRE, Init2, Init1)
+
 	Attach(hRE, "w h")
 	Attach(pnlTool, "w")
 
-	Writer_enumFonts()
 	return pnlMain
 }
 
@@ -87,15 +90,12 @@ Writer_OnTool:
 return
 
 Writer_enumFonts() {
-	global 
 
 	hDC := DllCall("GetDC", "Uint", 0) 
 	DllCall("EnumFonts", "Uint", hDC, "Uint", 0, "Uint", RegisterCallback("Writer_enumFontsProc", "F"), "Uint", 0) 
 	DllCall("ReleaseDC", "Uint", 0, "Uint", hDC)
 	
-	s := Writer_enumFontsProc(0, 0, 0, 0)
-	loop, parse, s, |
-		Control, Add, %A_LoopField%,,ahk_id %cbFonts%
+	return Writer_enumFontsProc(0, 0, 0, 0)
 }
 
 Writer_enumFontsProc(lplf, lptm, dwType, lpData) {
