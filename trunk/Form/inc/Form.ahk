@@ -469,6 +469,8 @@ Form(Var="", Value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", B
 ;==================================== PRIVATE ================================================
 
 Form_addAhkControl(hParent, Ctrl, Txt, Opt ) {
+	local x, y, hCtrl, cls		;must be global so variables can be created with vXXX
+
 	Form_Parse(Opt, "x# y#", x, y)
 	WinGetClass, cls, ahk_id %hParent%
 ;	if (cls = "Panel") {	;prevent Panel having GUI margin.
