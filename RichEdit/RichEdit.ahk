@@ -395,14 +395,14 @@ RichEdit_FixKeys(hCtrl) {
 
 /*
  Function:	GetLine
-			Get the text of the desired line from the control.
+			Get the text of the desired line from an Edit control.
 
  Parameters:
 			LineNumber	- Zero-based index of the line. -1 means current line.
 
  Returns:
 			The return value is the text.
-			The return value is empty string if the line number specified by the line parameter is greater than the number of lines in the HiEdit control
+			The return value is empty string if the line number specified by the line parameter is greater than the number of lines in the Edit control.
  */
 RichEdit_GetLine(hEdit, LineNumber=-1){
 	static EM_GETLINE=196	  ;The return value is the number of characters copied. The return value is zero if the line number specified by the line parameter is greater than the number of lines in the HiEdit control
