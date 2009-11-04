@@ -577,6 +577,9 @@ RichEdit_GetRedo(hCtrl, ByRef name="-")  {
 
  Returns:
       TRUE if the content of Edit control has been modified, FALSE otherwise.
+      
+  Related:
+      <SetModify>, <Save>
  */
 RichEdit_GetModify(hEdit)  {
     Static EM_GETMODIFY=0xB8
@@ -1008,6 +1011,9 @@ RichEdit_ReplaceSel(hEdit, Text=""){
 
  Parameters:
 			FileName	- File name to save RTF file to. If omitted, function will return content.
+			
+  Related:
+      <GetModify>, <SetModify>
  */
 RichEdit_Save(hCtrl, FileName="") {
 	static EM_STREAMOUT=0x44A
@@ -1338,6 +1344,19 @@ RichEdit_SetFontSize(hCtrl, Add) {
 	static EM_SETFONTSIZE=0x4DF
 	SendMessage, EM_SETFONTSIZE,Add,,, ahk_id %hCtrl%
 	return ErrorLEvel
+}
+
+/*
+ Function: SetModify
+      Sets or clears the modification flag for an edit control. The modification flag indicates
+      whether the text within the edit control has been modified.
+
+  Related:
+      <GetModify>, <Save>
+ */
+RichEdit_SetModify(hEdit, State=true)  {
+  Static EM_SETMODIFY = 185
+  SendMessage EM_SETMODIFY,%State%,,,ahk_id %hEdit%
 }
 
 /*
