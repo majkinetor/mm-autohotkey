@@ -472,8 +472,8 @@ RichEdit_GetOptions(hCtrl)  {
 			Face	- Optional byref parameter will contain the name of the font.
 			Style	- Optional byref parameter will contain a space separated list
 					  of styles. See <SetCharFormat> for list of styles.
-			TextColor		- Text forground color.
-			BackColor		- Text background color.
+			TextColor		- Text forground color. If starts with "-" the color is AUTOCOLOR.
+			BackColor		- Text background color. If starts with "-" the color is AUTOCOLOR.
 			Mode	- If empty, this optional parameter retrieves the formatting to all text in the
 					  control. Otherwise, pass "SELECTION" (default) to get formatting of the current selection. If the selection
 					  is empty, the function will get the character of the insertion point.
@@ -490,13 +490,15 @@ RichEdit_GetOptions(hCtrl)  {
  */
 RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef TextColor="", ByRef BackColor="", Mode="SELECTION")  {
 	static EM_GETCHARFORMAT=1082, SCF_SELECTION=1
-  		  , CFM_CHARSET:=0x8000000,CFM_COLOR:=0x40000000, CFM_FACE:=0x20000000, CFM_OFFSET:=0x10000000, CFM_SIZE:=0x80000000, CFM_WEIGHT=0x400000, CFM_UNDERLINETYPE=0x800000
+  		  , CFM_CHARSET:=0x8000000, CFM_BACKCOLOR=0x4000000, CFM_COLOR:=0x40000000, CFM_FACE:=0x20000000, CFM_OFFSET:=0x10000000, CFM_SIZE:=0x80000000, CFM_WEIGHT=0x400000, CFM_UNDERLINETYPE=0x800000
 		  , CFE_HIDDEN=0x100, CFE_BOLD=1, CFE_ITALIC=2, CFE_LINK=0x20, CFE_PROTECTED=0x10, CFE_STRIKEOUT=8, CFE_UNDERLINE=4, CFE_SUPERSCRIPT=0x30000, CFE_SUBSCRIPT=0x30000
-		  , CFM_ALL2=0xFEFFFFFF
+		  , CFM_ALL2=0xFEFFFFFF, COLOR_WINDOW=5, COLOR_WINDOWTEXT=8
 		  , styles="HIDDEN BOLD ITALIC LINK PROTECTED STRIKEOUT UNDERLINE SUPERSCRIPT SUBSCRIPT"
 
 	VarSetCapacity(CF, 84, 0), NumPut(84, CF), NumPut(CFM_ALL2, CF, 4)
 	SendMessage, EM_GETCHARFORMAT, SCF_%Mode%, &CF,, ahk_id %hCtrl%
+	dwMask := NumGet(CF, 4)
+
 	Face := DllCall("MulDiv", "UInt", &CF+26, "Int",1, "Int",1, "str")
 
 	Style := "", dwEffects := NumGet(CF, 8, "UInt")
@@ -506,12 +508,17 @@ RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef TextColor="",
     s := NumGet(CF, 12, "Int") // 20,  o := NumGet(CF, 16, "Int")
 	Style .= "s" s (o ? " o" o : "")
 
-	TextColor := NumGet(CF, 20), BackColor := NumGet(CF, 64)
-
 	oldFormat := A_FormatInteger
     SetFormat, integer, hex
-    TextColor := (TextColor & 0xff00) + ((TextColor & 0xff0000) >> 16) + ((TextColor & 0xff) << 16)
-    BackColor := (BackColor & 0xff00) + ((BackColor & 0xff0000) >> 16) + ((BackColor & 0xff) << 16)
+	
+	if (dwEffects & CFM_BACKCOLOR)
+		 BackColor := "-" DllCall("GetSysColor", "int", COLOR_WINDOW)
+	else BackColor := NumGet(CF, 64), BackColor := (BackColor & 0xff00) + ((BackColor & 0xff0000) >> 16) + ((BackColor & 0xff) << 16)
+
+	if (dwEffects & CFM_COLOR)
+		 TextColor := "-" DllCall("GetSysColor", "int", COLOR_WINDOWTEXT)
+	else TextColor := NumGet(CF, 20), TextColor := (TextColor & 0xff00) + ((TextColor & 0xff0000) >> 16) + ((TextColor & 0xff) << 16)
+
     SetFormat, integer, %oldFormat%
 }
 
@@ -1123,8 +1130,8 @@ RichEdit_SetBgColor(hCtrl, Color)  {
  Styles:
 			s<Num>		- Character size, usual AHK represntation (i.e. s12)
 			o<Num>		- Character offset from the baseline, in twips,. If the value of this member is positive, the character is a superscript; if the value is negative, the character is a subscript.
-			AUTOBACKCOLOR - The background color is the return value of GetSysColor(COLOR_WINDOW). If this flag is set, BackColor member is ignored.
-			AUTOCOLOR	- The text color is the return value of GetSysColor(COLOR_WINDOWTEXT). If this flag is set, the TextColor member is ignored.
+			AUTOBACKCOLOR - The background color is the return value of GetSysColor(COLOR_WINDOW:=5). If this flag is set, BackColor member is ignored.
+			AUTOCOLOR	- The text color is the return value of GetSysColor(COLOR_WINDOWTEXT:=8). If this flag is set, the TextColor member is ignored.
 			BOLD		- Characters are bold.
 			HIDDEN		- Characters are not displayed.
 			ITALIC		- Characters are italic.
@@ -1950,7 +1957,7 @@ RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 }
 
 /* Group: About
-	o Version 1.0b1 by freakkk & majkinetor.
+	o Version 1.0b2 by freakkk & majkinetor.
 	o MSDN Reference : <http://msdn.microsoft.com/en-us/library/bb787605(VS.85).aspx>.
 	o RichEdit control shortcut keys: <http://msdn.microsoft.com/en-us/library/bb787873(VS.85).aspx#rich_edit_shortcut_keys>.
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
