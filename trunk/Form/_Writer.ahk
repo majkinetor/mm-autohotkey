@@ -18,7 +18,6 @@ Writer_Add(hParent, X, Y, W, H, Style="", Init="s10 -bold,Tahoma") {
 	pnlMain	:= Panel_Add(hParent, X, Y, W, H)
 	pnlTool	:= Panel_Add(pnlMain, 0, 0, W, 60)
 	hRE		:= RichEdit_Add(pnlMain, "", "", "", "", "NOHIDESEL MULTILINE SELECTIONBAR VSCROLL"), RichEdit_FixKeys(hRE)
-
 	ControlFocus,,ahk_id %hRe% 
 	
 	Align(pnlTool, "T"), Align(hRE, "F")
@@ -47,17 +46,17 @@ Writer_Add(hParent, X, Y, W, H, Style="", Init="s10 -bold,Tahoma") {
 		Text Color,,,DROPDOWN
 	 )
 
-	cbFont  := Form_Add(pnlTool, "ComboBox", Writer_enumFonts(), "gWriter_OnTool y6 x4 w180")
+	cbFont  := Form_Add(pnlTool, "ComboBox", Writer_enumFonts(), "sort gWriter_OnTool y6 x4 w180")
 	cbSize  := Form_Add(pnlTool, "ComboBox", "8|9|10||11|12|14|16|18|20|22|24|26|28|36|48|72", "gWriter_OnTool x+5 w50")
 	hToolbar := Form_Add(pnlTool, "Toolbar", btns, "gWriter_OnToolbar x2 y30 style='flat list nodivider tooltips' il" hIL)
 	Toolbar_AutoSize(hToolbar)
   	Form_AutoSize(pnlTool, .2)
-	Align(pnlMain)
+	Align(pnlMain)	;realign
 
 	StringSplit, Init, Init, `,, %A_SPACE%
 	Control, ChooseString, %Init2%,,ahk_id %cbFont%
 
-	RichEdit_SetCharFormat(hRE, Init2, Init1)
+	RichEdit_SetCharFormat(hRE, Init2, Init1, "", "", "DEFAULT")
 	RichEdit_AutoUrlDetect(hRE, true ) 
 	RichEdit_SetEvents(hRE, "Writer_onRichEdit", "SELCHANGE LINK")
 
