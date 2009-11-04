@@ -1,4 +1,4 @@
-_("")
+_("mo!")
 	w := 550, h := 250
 	hForm1 := Form_New("+Resize w" w " h" h)
 		
@@ -24,10 +24,10 @@ Writer_Add(hParent, X, Y, W, H, Style="", Init="s10 -bold,Tahoma") {
 	;populate toolbars
 	btns =
 	 (LTrim
-		Bold,,,
-		Italic,,, 
-		Underline,,, 
-		Strikeout,,, 
+		Bold,,,check
+		Italic,,,check 
+		Underline,,,check 
+		Strikeout,,,check 
 		-
 		Left,,,
 		Center,,,
@@ -50,7 +50,10 @@ Writer_Add(hParent, X, Y, W, H, Style="", Init="s10 -bold,Tahoma") {
 
 	StringSplit, Init, Init, `,, %A_SPACE%
 	Control, ChooseString, %Init2%,,ahk_id %cbFonts%
+
 	RichEdit_SetCharFormat(hRE, Init2, Init1)
+	RichEdit_AutoUrlDetect(hRE, true ) 
+	RichEdit_SetEvents(hRE, "Writer_onRichEdit", "SELCHANGE LINK")
 
 	Attach(hRE, "w h")
 	Attach(pnlTool, "w")
@@ -58,6 +61,46 @@ Writer_Add(hParent, X, Y, W, H, Style="", Init="s10 -bold,Tahoma") {
 	return pnlMain
 }
 
+Writer_onRichEdit(hCtrl, Event, p1, p2, p3 ) {
+	if Event = SELCHANGE
+	{
+		SetTimer, Writer_SetUI, -50		; don't spam while typing...
+		return
+	}
+
+	if Event = Link
+		Run, % RichEdit_GetText(hCtrl, p2, p3)
+
+	return
+
+ Writer_SetUI:
+	Writer_SetUI()
+ return
+}
+
+
+Writer_SetUI() {
+	global hRE, hToolbar
+	static bold=1, italic=2, underline=3, strikeout=4, btns="bold,italic,underline,strikeout"
+
+	RichEdit_GetCharFormat(hRE, font, style, fg, bg)
+	StringSplit, style, style, %A_Space%
+
+	oldDelay := A_ControlDelay 
+	SetControlDelay, -1
+
+	loop, %style0%
+		s := style%A_Index%,  Toolbar_SetButton(hToolbar, %s%, "checked"), _%s% := 1
+
+	loop, parse, btns, `,
+		if !_%A_LoopField%
+			Toolbar_SetButton(hToolbar, %A_LoopField%, "-checked")
+
+	;Control, ChooseString, %Font%,,ahk_id %cbFonts%	
+
+				
+	SetControlDelay, %oldDelay%
+}
 
 Writer_OnToolbar(Hwnd, Event, Txt) {
 	global 
@@ -86,7 +129,7 @@ Writer_OnToolbar(Hwnd, Event, Txt) {
 }
 
 Writer_OnTool:
-	Writer_OnToolbar(0, "", A_GuiControl)
+;	 Writer_OnToolbar(0, "", A_GuiControl)
 return
 
 Writer_enumFonts() {
