@@ -16,13 +16,12 @@
 				Style	- White space separated list of control styles. Any integer style or one of the style keywords (see below).
 						  Invalid styles are skipped. "*MULTILINE WANTRETURN VSCROLL*" by default.
 				Text	- Control text.
-
  Styles:
      DISABLENOSCROLL - Disables scroll bars instead of hiding them when they are not needed.
      BORDER			- Displays the control with a sunken border style so that the rich edit control appears recessed into its parent window.
      HIDDEN			- Don't show the control.
      VSCROLL		- Enble vertical scroll bar.
-     HSCROLL		- Enable horizontal scroll bar.
+     HSCROLL		- Enable horizontal scroll bar. If this style is present control starts with wrap mode deactivated. Otherwise, wrap mode is active.
      SCROLL			- Enable both scroll bars.
      AUTOHSCROLL	- Automatically scrolls text to the right by 10 characters when the user types a character at the end of the line. When the user presses the ENTER key, the control scrolls all text back to position zero.
      AUTOVSCROLL	- Automatically scrolls text up one page when the user presses the ENTER key on the last line.
@@ -34,7 +33,7 @@
      PASSWORD		- Displays an asterisk (*) for each character typed into the edit control. This style is valid only for single-line edit controls.
      READONLY		- Prevents the user from typing or editing text in the edit control.
      RIGHT			- Right aligns text in a single-line or multiline edit control.
-     SELECTIONBAR - When set, there is small left margin (wider than default) where cursor changes to right-up arrow allowing full line(s) selection. This style also requires use of *MULTILINE* style.
+     SELECTIONBAR	- When set, there is small left margin (wider than default) where cursor changes to right-up arrow allowing full line(s) selection. This style also requires use of *MULTILINE* style.
      WANTRETURN		- Specifies that a carriage return be inserted when the user presses the ENTER key while entering text into a multiline edit control in a dialog box. If you do not specify this style, pressing the ENTER key has the same effect as pressing the dialog box's default push button. This style has no effect on a single-line edit control.
 
  Returns:
@@ -1787,6 +1786,7 @@ RichEdit_TextMode(HCtrl, TextMode="")  {
 
  Returns:
 				The return value is zero if the operation fails, or nonzero if it succeeds.
+
  */
 RichEdit_WordWrap(HCtrl, Flag)  {
 	static EM_SETTARGETDEVICE=0x448
