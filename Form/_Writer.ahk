@@ -80,7 +80,8 @@ Writer_onRichEdit(hCtrl, Event, p1, p2, p3 ) {
 
 
 Writer_SetUI() {
-	global hRE, hToolbar
+	global hRE, hToolbar,cbFonts
+
 	static bold=1, italic=2, underline=3, strikeout=4, btns="bold,italic,underline,strikeout"
 
 	RichEdit_GetCharFormat(hRE, font, style, fg, bg)
@@ -96,7 +97,7 @@ Writer_SetUI() {
 		if !_%A_LoopField%
 			Toolbar_SetButton(hToolbar, %A_LoopField%, "-checked")
 
-	;Control, ChooseString, %Font%,,ahk_id %cbFonts%	
+	Control, ChooseString, %Font%,,ahk_id %cbFonts%	
 
 				
 	SetControlDelay, %oldDelay%
