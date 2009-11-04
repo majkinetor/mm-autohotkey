@@ -209,7 +209,7 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 	if Txt in <-,->
 		return RichEdit_SetParaFormat(hRichEdit, "Ident=" (Txt="<-" ? -1:1)*1000)
 	
-	if Txt in Num,Bullet
+	if Txt in Number,Bullet
 		return RichEdit_SetParaFormat(hRichEdit, "Num=" (Txt="Num" ? "DECIMAL" : "BULLET") ",1,D")
 }
 
@@ -259,8 +259,64 @@ F1:: IfNotEqual, api, API, goto _%api%
 #include inc
 #include _Forms.ahk
 
+RTF_Table(Rows, Cols, ColWidths, Fun="") {
+	
+	sTable	:= ""
+	row		:= "\trowd\trgaph108\trleft8\trbrdrl\brdrs\brdrw10 \trbrdrt\brdrs\brdrw10 \trbrdrr\brdrs\brdrw10 \trbrdrb\brdrs\brdrw10 \trpaddl108\trpaddr108\trpaddfl3\trpaddfr3"
+	col		:= "\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs\cellx"
+	endcell := "\cell"
+	endrow	:= "\row"
 
+	bFunc := IsFunc(Fun)
+	StringSplit, cw, ColWidths, %A_Space%%A_Tab%
+	ifEqual, cw1,,SetEnv, cw1, 100
+	loop, %Rows%
+	{
+		sTable .= row, 	j := 0
+		loop, %Cols%
+			sTable .= col ( j += (cw%A_Index%="" ? cw1 : cw%A_Index%) *12 ) 
+
+		sTable .= "\pard\intbl", r := A_Index
+		loop, %cols%
+		{
+			if bFunc
+				f := %Fun%(r, A_Index)
+			sTable .= " " f  endcell
+		}
+		sTable .= endrow
+	}
+	sTable .= "\par}"
+	return sTable
+}
+
+RTF_Fonts() {
+	s = 
+	(LTrim Join
+	{\fonttbl
+	 {\f0\fsnil\fcharset0 Arial;}
+	 {\f1\fsnil\fcharset0 Courier New;}
+     {\f3\fsnil\fcharset0 Symbol;}
+	}
+	)
+	return s
+}
+
+RTF(Text) {
+	return "{\rtf" Text
+}
 ;================================ DEMO ==============================
+table(r,c){
+   return r "." c
+}
+
+_AddRTF:		;-
+	rtf := "{\rtf"  RTF_Fonts()  
+			. "\f1\qc centered one\par\ql ej \i ej \i0"
+			. RTF_Table(5,5,"100 200", "table") 
+
+	RichEdit_SetText(hRichEdit, rtf, "", 0)
+return
+
 _GetCharFormat:	;Determines the character formatting in a rich edit control.
 	RichEdit_GetCharFormat(hRichEdit, font, style, textclr, backclr)
 	Log("Char Format: ", font, style, textclr, backclr)
