@@ -1155,6 +1155,7 @@ RichEdit_SetBgColor(hCtrl, Color)  {
 			UNDERLINE	- Characters are underlined.
 
  Modes:
+			DEFAULT		- Changes the formating for the default text in the control. This is also the style used if you don't specify valid style.
 			ALL			- Applies the formatting to all text in the control.
 			SELECTION	- Applies the formatting to the current selection. If the selection is empty, the character formatting is applied
 						  to the insertion point, and the new character format is in effect only until the insertion point changes. 
