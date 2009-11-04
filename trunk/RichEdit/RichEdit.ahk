@@ -497,7 +497,6 @@ RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef TextColor="",
 
 	VarSetCapacity(CF, 84, 0), NumPut(84, CF), NumPut(CFM_ALL2, CF, 4)
 	SendMessage, EM_GETCHARFORMAT, SCF_%Mode%, &CF,, ahk_id %hCtrl%
-	dwMask := NumGet(CF, 4)
 
 	Face := DllCall("MulDiv", "UInt", &CF+26, "Int",1, "Int",1, "str")
 
@@ -1159,11 +1158,14 @@ RichEdit_SetBgColor(hCtrl, Color)  {
  Modes:
 			ALL			- Applies the formatting to all text in the control.
 			SELECTION	- Applies the formatting to the current selection. If the selection is empty, the character formatting is applied
-						  to the insertion point, and the new character format is in effect only until the insertion point changes.
+						  to the insertion point, and the new character format is in effect only until the insertion point changes. 
 			WORD		- Applies the formatting to the selected word or words. If the selection is empty but the insertion point is inside a word
 						  ,the formatting is applied to the word.
  Returns:
 			TRUE or FALSE.
+
+ Remarks:
+			This function will fire up SELCHANGE message even if selection isn't changed.
  */
 RichEdit_SetCharFormat(HCtrl, Face="", Style="", TextColor="", BackColor="", Mode="SELECTION")  {
 	static EM_SETCHARFORMAT=0x444
