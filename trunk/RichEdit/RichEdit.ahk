@@ -237,16 +237,21 @@ RichEdit_Convert(Input, Direction=0) {
 /*
  Function: Copy
 		   Copy selection of the Edit control.
+
+ Related:
+		<Cut>, <Clear>, <Paste>
  */
 RichEdit_Copy(hEdit) {
     Static WM_COPY:=0x301
     SendMessage WM_COPY,0,0,,ahk_id %hEdit%
 }
 
-
 /*
  Function: Cut
 		   Cut selection from the Edit control.
+
+ Related:
+		<Copy>, <Clear>, <Paste>
  */
 RichEdit_Cut(hEdit) {
     Static WM_CUT:=0x300
@@ -275,6 +280,36 @@ RichEdit_Cut(hEdit) {
  Remarks
 			The CpMin member always specifies the starting-point of the search, and CpMax specifies the end point.
 			When searching backward, CpMin must be equal to or greater than CpMax.
+
+ Example:
+ (start code)
+  ^f::
+    RichEdit_HideSelection( hRichEdit, false )
+    Dlg_Find( hwnd, "OnFind", "d" )
+  return
+
+  OnFind(Event, Flags, FindText, ReplaceText)  {
+    global hRichEdit
+
+    IfNotEqual, Event, F,  return
+    RichEdit_GetSel(hRichEdit, min, max)
+    word := InStr(Flags,"w") ? " WHOLEWORD" : ""
+    case := InStr(Flags,"c") ? " MATCHCASE" : ""
+    InStr( Flags, "d" ) ? (pos:=max+1 , direction:=" DOWN")
+                        : (pos:=max-1)
+
+    ; search control for word
+    pos:=RichEdit_FindText(hRichEdit,FindText,pos,-1,"unicode" direction word case)
+
+    ; highlight found match
+  	if pos != -1
+  		RichEdit_SetSel(hRichEdit, pos, pos+StrLen(FindText))
+
+  	Else
+      MsgBox, no matches found..
+  }
+  return
+ (end code)
  */
 RichEdit_FindText(hEdit, Text, CpMin=0, CpMax=-1, Flags="UNICODE") {
 	static EM_FINDTEXT=1080, FR_DOWN=1, FR_WHOLEWORD=2, FR_MATCHCASE=4, FR_UNICODE=0
@@ -543,26 +578,26 @@ RichEdit_GetModify(hEdit){
 }
 
 /*
- Function:  GetRect 
-            Gets the formatting rectangle of the Edit control.  
+ Function:  GetRect
+            Gets the formatting rectangle of the Edit control.
 
  Parameters:
 			Left..Bottom	- Output variables, can be omitted.
 
  Returns:
 		   Space separated rectangle.
- */ 
-RichEdit_GetRect(hEdit,ByRef Left="",ByRef Top="",ByRef Right="",ByRef Bottom="") { 
+ */
+RichEdit_GetRect(hEdit,ByRef Left="",ByRef Top="",ByRef Right="",ByRef Bottom="") {
     static EM_GETRECT:=0xB2
 
-	VarSetCapacity(RECT,16) 
-    SendMessage EM_GETRECT,0,&RECT,,ahk_id %hEdit% 
+	VarSetCapacity(RECT,16)
+    SendMessage EM_GETRECT,0,&RECT,,ahk_id %hEdit%
       Left  :=NumGet(RECT, 0,"Int")
-    , Top   :=NumGet(RECT, 4,"Int") 
-    , Right :=NumGet(RECT, 8,"Int") 
-    , Bottom:=NumGet(RECT,12,"Int") 
+    , Top   :=NumGet(RECT, 4,"Int")
+    , Right :=NumGet(RECT, 8,"Int")
+    , Bottom:=NumGet(RECT,12,"Int")
     return  Left " " Top " " Right " " Bottom
-} 
+}
 
 /*
   Function: GetSel
@@ -754,6 +789,22 @@ RichEdit_GetUndo(hCtrl, ByRef Name="-")  {
 }
 
 /*
+ Function:  HideSelection
+			Hides or shows the selection in a rich edit control.
+
+ Parameters:
+			State - *TRUE* or *FALSE*.
+
+ Remarks:
+     This function is noticeable when it is set to *FALSE* and the rich edit control isn't the active control or window.  The example included in <FindText> demonstrates use.
+
+ */
+RichEdit_HideSelection(hCtrl, State=true)  {
+  static EM_HIDESELECTION = 1087
+  SendMessage, EM_HIDESELECTION,%State%,0,, ahk_id %hCtrl%
+}
+
+/*
  Function:  LineFromChar
 			Determines which line contains the specified character in a rich edit control.
 
@@ -849,7 +900,7 @@ RichEdit_LimitText(hCtrl,txtSize=0)  {
 		   Paste clipboard into the Edit control.
 
  Related:
-		<CanPaste>, <PasteSpecial>
+		<CanPaste>, <PasteSpecial>, <Cut>, <Copy>, <Clear>
  */
 RichEdit_Paste(hEdit) {
     Static WM_PASTE:=0x302
