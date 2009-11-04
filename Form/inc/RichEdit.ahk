@@ -585,14 +585,16 @@ RichEdit_GetModify(hEdit){
 
 /*
  Function:	GetParaFormat
-			Retrieves the paragraph formatting of the current selection in a rich edit control. (*** not implemented ***)
+			Retrieves the paragraph formatting of the current selection in a rich edit control. (*** not implemented ***)	
  */
-RichEdit_GetParaFormat(hCtrl, "Num,Align,Line,Ident,Space,Tabs") {
+; Num,Align,Line,Ident,Space,Tabs
+RichEdit_GetParaFormat(hCtrl) {
 	static EM_GETPARAFORMAT=1085
 		   ,PFM_ALL2=0xc0fffdff
 	VarSetCapacity(PF, 188, 0), NumPut(188, PF),  NumPut(PFM_ALL2, PF, 4)
 	SendMessage, EM_GETPARAFORMAT,, &PF,, ahk_id %hCtrl%
 }
+
 
 /*
  Function:  GetRect
