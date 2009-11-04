@@ -1,8 +1,13 @@
 _("mo!")
 	w := 550, h := 250
 	hForm1 := Form_New("+Resize w" w " h" h)
-		
-	h := Writer_Add(hForm1, 0, 0, w, h), Attach(h, "w h")
+
+	hWritter := Writer_Add(hForm1, 0, 0, w, h-35), Attach(hWritter, "w h")
+
+
+	Form_Add(hForm1, "Button", "Send", "x5 y" h-30, "Attach y")
+	Form_Add(hForm1, "Button", "Save", "yp x" w-50, "Attach x y")
+
 	Form_Show()
 return
 
@@ -13,6 +18,7 @@ Writer_Add(hParent, X, Y, W, H, Style="", Init="s10 -bold,Tahoma") {
 	pnlMain	:= Panel_Add(hParent, X, Y, W, H)
 	pnlTool	:= Panel_Add(pnlMain, 0, 0, W, 60)
 	hRE		:= RichEdit_Add(pnlMain, "", "", "", "", "NOHIDESEL MULTILINE SELECTIONBAR VSCROLL"), RichEdit_FixKeys(hRE)
+
 	ControlFocus,,ahk_id %hRe% 
 	
 	Align(pnlTool, "T"), Align(hRE, "F")
