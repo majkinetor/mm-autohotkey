@@ -41,15 +41,15 @@ Writer_Add(hParent, X, Y, W, H, Style="", Init="s10 -bold,Tahoma") {
 		Text Color,,,DROPDOWN
 	 )
 
-	cbFonts := Form_Add(pnlTool, "ComboBox", Writer_enumFonts(), "gWriter_OnTool y6 x4 w180")
-	Form_Add(pnlTool, "ComboBox", "8|9|10||11|12|14|16|18|20|22|24|26|28|36|48|72", "gWriter_OnTool x+5 w50")
+	cbFont  := Form_Add(pnlTool, "ComboBox", Writer_enumFonts(), "gWriter_OnTool y6 x4 w180")
+	cbSize  := Form_Add(pnlTool, "ComboBox", "8|9|10||11|12|14|16|18|20|22|24|26|28|36|48|72", "gWriter_OnTool x+5 w50")
 	hToolbar := Form_Add(pnlTool, "Toolbar", btns, "gWriter_OnToolbar x2 y30 style='flat list nodivider tooltips' il" hIL)
 	Toolbar_AutoSize(hToolbar)
   	Form_AutoSize(pnlTool, .2)
 	Align(pnlMain)
 
 	StringSplit, Init, Init, `,, %A_SPACE%
-	Control, ChooseString, %Init2%,,ahk_id %cbFonts%
+	Control, ChooseString, %Init2%,,ahk_id %cbFont%
 
 	RichEdit_SetCharFormat(hRE, Init2, Init1)
 	RichEdit_AutoUrlDetect(hRE, true ) 
@@ -62,9 +62,15 @@ Writer_Add(hParent, X, Y, W, H, Style="", Init="s10 -bold,Tahoma") {
 }
 
 Writer_onRichEdit(hCtrl, Event, p1, p2, p3 ) {
+	static _sp1, _sp2
+
 	if Event = SELCHANGE
-	{
-		SetTimer, Writer_SetUI, -50		; don't spam while typing...
+	{		
+		if (_sp1 = p1) && (_sp2 = p2)
+			return
+		_sp1 := p1, _sp2 := p2				;!!!!!
+
+		SetTimer, Writer_SetUI, -100		; don't spam while typing...
 		return
 	}
 
@@ -80,38 +86,38 @@ Writer_onRichEdit(hCtrl, Event, p1, p2, p3 ) {
 
 
 Writer_SetUI() {
-	global hRE, hToolbar,cbFonts
+	global hRE, hToolbar,cbFont, cbSize, Writer_cbFont, Writer_cbSize
 
 	static bold=1, italic=2, underline=3, strikeout=4, btns="bold,italic,underline,strikeout"
 
 	RichEdit_GetCharFormat(hRE, font, style, fg, bg)
 	StringSplit, style, style, %A_Space%
 
-	oldDelay := A_ControlDelay 
-	SetControlDelay, -1
+	ControlSetText, ,%Font%, ahk_id %cbFont%
 
 	loop, %style0%
-		s := style%A_Index%,  Toolbar_SetButton(hToolbar, %s%, "checked"), _%s% := 1
-
+	{
+		s := style%A_Index%
+		if s in %btns%
+			Toolbar_SetButton(hToolbar, %s%, "checked"), _%s% := 1
+		else if (SubStr(s,1,1)="s") && (size := SubStr(s,2))
+			ControlSetText,,%size%,ahk_id %cbSize%	
+	}
+	
 	loop, parse, btns, `,
 		if !_%A_LoopField%
 			Toolbar_SetButton(hToolbar, %A_LoopField%, "-checked")
-
-	Control, ChooseString, %Font%,,ahk_id %cbFonts%	
-
-				
-	SetControlDelay, %oldDelay%
 }
 
 Writer_OnToolbar(Hwnd, Event, Txt) {
-	global 
-	local style, font
+	global hRE
 
 	ifEqual, event, hot, return
+
 	if !Hwnd
-	{
+	{	
 		if Txt is not integer
-			 font := Txt, 
+			 font := Txt
 		else style := "s" Txt
 		return RichEdit_SetCharFormat(hRE, font, style )
 	}
@@ -130,7 +136,7 @@ Writer_OnToolbar(Hwnd, Event, Txt) {
 }
 
 Writer_OnTool:
-;	 Writer_OnToolbar(0, "", A_GuiControl)
+	Writer_OnToolbar(0, "", A_GuiControl)
 return
 
 Writer_enumFonts() {
