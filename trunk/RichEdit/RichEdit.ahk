@@ -1623,7 +1623,7 @@ RichEdit_SetSel(hCtrl, CpMin=0, CpMax=0)  {
 			Set text from string or file in rich edit control using either rich text or plain text.
 
  Parameters:
-			Txt		- The text string to set within control.
+			Txt		- The text string to set within control. To set RTF mark-up the Txt must be prefixed with "{rtf".
 			Flag	- Space separated list of options.  See below list.
 			Pos		- This optional parameter allows you to specify a character position you want text inserted to,
 					  rather than replacing current selection. To append to the end, use -1.
