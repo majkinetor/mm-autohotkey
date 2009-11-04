@@ -29,11 +29,11 @@
 			If you have deep hierarchy of Panels(>10), script may block or show some undesired behavior. Using #MaxThreads, 255 can sometimes help.
 
 			Depending on control you want to host inside the Panel, you may need to redifine which messages Panel redirects to the main window.
-			This is hardcoded in Panel_wndProc function:
+			This is hardcoded in Panel_wndProc function. For instance it may look like this:
 
  >			redirect = "32,78,273,276,277"  ;WM_SETCURSOR=32, WM_COMMAND=78, WM_NOTIFY=273, WM_HSCROLL=276, WM_VSCROLL=277
  */
-Panel_Add(HParent, X, Y, W, H, Style="", Text="") {
+Panel_Add(HParent, X="", Y="", W="", H="", Style="", Text="") {
 	static WS_CHILD=0x40000000, WS_CLIPCHILDREN=0x2000000,init=0
 
 	if !init
@@ -59,7 +59,7 @@ Panel_wndProc(Hwnd, UMsg, WParam, LParam) {
 	global hButton
 	static	WM_SIZE:=5, WM_SHOWWINDOW=24, WM_CHANGEUISTATE=295, GWL_ROOT=2, GWL_WNDPROC=-4, GWL_USERDATA=-2
 			,rootProc, attach, scroller_updatebars, scroller_onscroll, adrGetWindowLong, adrDefWindowProc, hRoot
-			,redirect="78,273"  ;WM_SETCURSOR=32 !!!, WM_COMMAND=78, WM_NOTIFY=273, WM_HSCROLL=276, WM_VSCROLL=277
+			,redirect="78,273"  ;WM_COMMAND=78, WM_NOTIFY=273
 
 	critical 100
 	if !rootProc {

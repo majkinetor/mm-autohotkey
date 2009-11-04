@@ -121,19 +121,19 @@ Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5="",E6="",E7="
  			Resize the window so all controls fit. 
 
  Remarks:
-			This function works similar to Gui, Show, AutoSize. The difference is that it takes into account custom controls and
-			it isn't connected to other gui operations.
+			This function works similar to Gui, Show, AutoSize. The difference is that it works on <Panel> also and
+			takes into account custom controls.
 
-			HForm	- Form handle.
-			Delta	- Dot delimited string, DeltaW "." DeltaH. Delta is added to the calculated window size. Both arguments are optional.
+			Hwnd	- Handle of the parent.
+			Delta	- Dot delimited string of DeltaW & DeltaH. Delta is added to the calculated window size. Both arguments are optional.
 
  Dependencies:
 			<Win> 1.22
  */
-Form_AutoSize( HForm, Delta="" ) {
+Form_AutoSize( Hwnd, Delta="" ) {
 	static win_GetChildren = "Win_GetChildren", win_Get = "Win_Get", win_Move = "Win_Move", win_GetRect = "Win_GetRect"
 
-    width := height := 0, %win_Get%(HForm, "NhBxy", th, bx, by), children := %win_GetChildren%(HForm)
+    width := height := 0, %win_Get%(Hwnd, "NhBxy", th, bx, by), children := %win_GetChildren%(Hwnd)
     Loop, Parse, children, `n
     { 
 		ifEqual, A_LoopField,, continue
@@ -145,7 +145,7 @@ Form_AutoSize( HForm, Delta="" ) {
 	IfEqual, Delta1, , SetEnv, Delta1, 0
 	IfEqual, Delta2, , SetEnv, Delta2, 0
 	width +=2*bx + Delta1 , height += th + 2*by + Delta2
-	%win_Move%(HForm, "", "", width, height)
+	%win_Move%(Hwnd, "", "", width, height)
 }
 
 /*
