@@ -1240,6 +1240,7 @@ RichEdit_SetCharFormat(HCtrl, Face="", Style="", TextColor="", BackColor="", Mod
 		*SELCHANGE*: The current selection has changed.
 		 o P1 - Beginning character position of range.
 		 o P2 - Ending character position of range.
+		 o P3 - Selection type.
 
 		*LINK*: The hyperlink has been clicked.
 		 o P1 - LClick or RClick.
