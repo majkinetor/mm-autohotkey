@@ -497,7 +497,6 @@ RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef TextColor="",
 
 	VarSetCapacity(CF, 84, 0), NumPut(84, CF), NumPut(CFM_ALL2, CF, 4)
 	SendMessage, EM_GETCHARFORMAT, SCF_%Mode%, &CF,, ahk_id %hCtrl%
-	dwMask := NumGet(CF, 4)
 
 	Face := DllCall("MulDiv", "UInt", &CF+26, "Int",1, "Int",1, "str")
 
@@ -582,6 +581,17 @@ RichEdit_GetModify(hEdit){
     Static EM_GETMODIFY=0xB8
     SendMessage EM_GETMODIFY,,,,ahk_id %hEdit%
     Return ErrorLevel = 4294967295 ? 1 : 0
+}
+
+/*
+ Function:	GetParaFormat
+			Retrieves the paragraph formatting of the current selection in a rich edit control. (*** not implemented ***)
+ */
+RichEdit_GetParaFormat(hCtrl, "Num,Align,Line,Ident,Space,Tabs") {
+	static EM_GETPARAFORMAT=1085
+		   ,PFM_ALL2=0xc0fffdff
+	VarSetCapacity(PF, 188, 0), NumPut(188, PF),  NumPut(PFM_ALL2, PF, 4)
+	SendMessage, EM_GETPARAFORMAT,, &PF,, ahk_id %hCtrl%
 }
 
 /*
