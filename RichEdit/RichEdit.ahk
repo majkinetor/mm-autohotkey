@@ -430,7 +430,7 @@ RichEdit_GetLine(hEdit, LineNumber=-1){
 			If the control has no text, the return value is 1. The return value will never be less than 1.
 
  Remarks:
-			The function etrieves the total number of text lines, not just the number of lines that are currently visible.
+			The function retrieves the total number of text lines, not just the number of lines that are currently visible.
 			If the Wordwrap feature is enabled, the number of lines can change when the dimensions of the editing window change.
  */
 RichEdit_GetLineCount(hEdit){
@@ -482,10 +482,12 @@ RichEdit_GetOptions(hCtrl)  {
 
  Related:
 		<SetCharFormat>, <SetBgColor>
-
+ 
  Example:
- > RichEdit_GetCharFormat(hRichEdit, face, style, color)
- > MsgBox, Face = %Face% `nstyle = %style%  `ncolor = %color%
+ (start code)
+  RichEdit_GetCharFormat(hRichEdit, face, style, color)
+  MsgBox, Face = %Face% `nstyle = %style%  `ncolor = %color%
+ (end code)
  */
 RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef TextColor="", ByRef BackColor="", Mode="SELECTION")  {
 	static EM_GETCHARFORMAT=1082, SCF_SELECTION=1
@@ -570,13 +572,13 @@ RichEdit_GetRedo(hCtrl, ByRef name="-")  {
 
 /*
  Function: GetModify
-           Gets the state of the modification flag for the Edit control.
-		   The flag indicates whether the contents of the control has been modified.
+      Gets the state of the modification flag for the Edit control.
+      The flag indicates whether the contents of the control has been modified.
 
  Returns:
-           TRUE if the content of HiEdit control has been modified, FALSE otherwise.
+      TRUE if the content of Edit control has been modified, FALSE otherwise.
  */
-RichEdit_GetModify(hEdit){
+RichEdit_GetModify(hEdit)  {
     Static EM_GETMODIFY=0xB8
     SendMessage EM_GETMODIFY,,,,ahk_id %hEdit%
     Return ErrorLevel = 4294967295 ? 1 : 0
@@ -594,16 +596,15 @@ RichEdit_GetParaFormat(hCtrl) {
 	SendMessage, EM_GETPARAFORMAT,, &PF,, ahk_id %hCtrl%
 }
 
-
 /*
  Function:  GetRect
-            Gets the formatting rectangle of the Edit control.
+ 			Gets the formatting rectangle of the Edit control.
 
  Parameters:
 			Left..Bottom	- Output variables, can be omitted.
 
  Returns:
-		   Space separated rectangle.
+ 			Space separated rectangle.
  */
 RichEdit_GetRect(hEdit,ByRef Left="",ByRef Top="",ByRef Right="",ByRef Bottom="") {
     static EM_GETRECT:=0xB2
@@ -628,7 +629,7 @@ RichEdit_GetRect(hEdit,ByRef Left="",ByRef Top="",ByRef Right="",ByRef Bottom=""
               following the last character in the range.
 
   Returns:
- 			Returns cpMin. If there is no selection this is cursor position.
+ 			Returns *cpMin*. If there is no selection this is cursor position.
 
   Related:
       <GetText>, <GetTextLength>, <SetSel>, <SetText>, <LineFromChar>
@@ -660,6 +661,13 @@ RichEdit_GetSel(hCtrl, ByRef cpMin="", ByRef cpMax="" )  {
 
  Related:
 			<GetSel>, <SetText>, <SetSel>, <GetTextLength>
+			
+ Example:
+ (start code)
+  MsgBox, % RichEdit_GetText( hRichEdit ) ; get current selection
+  MsgBox, % RichEdit_GetText( hRichEdit, 0, -1 ) ; get all
+  MsgBox, % RichEdit_GetText( hRichEdit, 4, 10 ) ; get range
+ (end code)
  */
 RichEdit_GetText(HCtrl, CpMin="-", CpMax="-", CodePage="")  {
 	static EM_EXGETSEL=0x434, EM_GETTEXTEX=0x45E, EM_GETTEXTRANGE=0x44B, GT_SELECTION=2
@@ -763,31 +771,33 @@ RichEdit_GetTextLength(hCtrl, Flags=0, CodePage="")  {
 
 /*
  Function:	GetUndo
-			Determine whether there are any actions in the Edit control undo queue, and optionally retrieve
-			the type of the next undo action.
+    Determine whether there are any actions in the Edit control undo queue, and optionally retrieve
+    the type of the next undo action.
 
  Parameters:
-			Name - Optional byref parameter will contain the type of undo action, if any.
+    Name - Optional byref parameter will contain the type of undo action, if any.
 
  Types:
-			UNKNOWN	 - The type of undo action is unknown.
-			TYPING	 - Typing operation.
-			DELETE	 - Delete operation.
-			DRAGDROP - Drag-and-drop operation.
-			CUT		 - Cut operation.
-			PASTE	 - Paste operation.
+    UNKNOWN	 - The type of undo action is unknown.
+    TYPING	 - Typing operation.
+    DELETE	 - Delete operation.
+    DRAGDROP - Drag-and-drop operation.
+    CUT		 - Cut operation.
+    PASTE	 - Paste operation.
 
  Returns:
-			If there are actions in the control undo queue, the return value is a nonzero value.
-			If the undo queue is empty, the return value is zero.
+    If there are actions in the control undo queue, the return value is a nonzero value.
+    If the undo queue is empty, the return value is zero.
 
  Related:
-			<Undo>, <SetUndoLimit>, <GetRedo>, <Redo>
+    <Undo>, <SetUndoLimit>, <GetRedo>, <Redo>
 
  Example:
- >	If RichEdit_GetRedo( hRichEdit, name )
- >		 MsgBox, The next redo is a %name% type
- >	Else MsgBox, Nothing left to redo.
+ (start code)
+  If RichEdit_GetRedo( hRichEdit, name )
+    MsgBox, The next redo is a %name% type
+  Else MsgBox, Nothing left to redo.
+ (end code)
  */
 RichEdit_GetUndo(hCtrl, ByRef Name="-")  {
   static EM_CANUNDO=0xC6,EM_GETUNDONAME=86,WM_USER=0x400
@@ -808,13 +818,13 @@ RichEdit_GetUndo(hCtrl, ByRef Name="-")  {
 
 /*
  Function:  HideSelection
-			Hides or shows the selection in a rich edit control.
+    Hides or shows the selection in a rich edit control.
 
  Parameters:
-			State - *TRUE* or *FALSE*.
+    State - *TRUE* or *FALSE*.
 
  Remarks:
-     This function is noticeable when it is set to *FALSE* and the rich edit control isn't the active control or window.  The example included in <FindText> demonstrates use.
+    This function is noticeable when it is set to *FALSE* and the rich edit control isn't the active control or window.  The example included in <FindText> demonstrates use.
 
  */
 RichEdit_HideSelection(hCtrl, State=true)  {
@@ -875,17 +885,17 @@ RichEdit_LineLength(hEdit, LineNumber=-1) {
 
 /*
  Function: LineScroll
-           Scrolls the text in the Edit control.
+			Scrolls the text in the Edit control.
 
  Parameters:
-           XScroll -	The number of characters to scroll horizontally.  Use a
-						negative number to scroll to the left and a positive number to
-						scroll to the right.
-           YScroll -	The number of lines to scroll vertically.  Use a negative
-						number to scroll up and a positive number to scroll down.
+			XScroll -	The number of characters to scroll horizontally.  Use a
+								negative number to scroll to the left and a positive number to
+								scroll to the right.
+			YScroll -	The number of lines to scroll vertically.  Use a negative
+						    number to scroll up and a positive number to scroll down.
  Remarks:
-           This message does not move the caret.
-           This function can be used to scroll horizontally past the last character of any line.
+			This message does not move the caret.
+			This function can be used to scroll horizontally past the last character of any line.
  */
 RichEdit_LineScroll(hEdit,XScroll=0,YScroll=0){
     Static EM_LINESCROLL:=0xB6
@@ -1317,9 +1327,12 @@ RichEdit_SetEvents(hCtrl, Handler="", Events="selchange"){
 			Sets the font size for the selected text in the rich edit control.
 
  Parameters:
-			Add - Change in point size of the selected text.The change is applied to
+			Add - Change in point size of the selected text. The change is applied to
 					each part of the selection. So, if some of the text is 10pt and some 20pt,
 					after a call with wParam set to 1, the font sizes become 11pt and 22pt, respectively.
+					
+ Returns:
+			TRUE if no error occurred, FALSE otherwise.
  */
 RichEdit_SetFontSize(hCtrl, Add) {
 	static EM_SETFONTSIZE=0x4DF
@@ -1840,7 +1853,7 @@ Richedit_Zoom(hCtrl, zoom=0)  {
 /*
  Function:	Undo
 			Send message to Edit control to undo the next action in the control's undo queue &
-		    optionally empty the undo buffer by resetting the undo flag.
+		  optionally empty the undo buffer by resetting the undo flag.
 
  Parameters:
 			Reset - Set to TRUE to clear the undo buffer rather than send undo command.
