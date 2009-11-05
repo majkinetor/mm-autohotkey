@@ -1416,7 +1416,7 @@ RichEdit_SetModify(hEdit, State=true)  {
 			Returns the current options of the edit control.
  */
 RichEdit_SetOptions(hCtrl, Operation, Options)  {
-  static EM_SETOPTIONS=1101
+	static EM_SETOPTIONS=1101
 		, ECOOP_SET=0x1,ECOOP_OR=0x2,ECOOP_AND=0x3,ECOOP_XOR=0x4
 		, ECO_AUTOWORDSELECTION=0x1,ECO_AUTOVSCROLL=0x40,ECO_AUTOHSCROLL=0x80,ECO_NOHIDESEL=0x100,ECO_READONLY=0x800,ECO_WANTRETURN=0x1000,ECO_SELECTIONBAR=0x1000000
 
@@ -1430,6 +1430,27 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
 
 	SendMessage, EM_SETOPTIONS, operation, hOptions,, ahk_id %hCtrl%
 	return RichEdit_GetOptions( "." ErrorLevel)
+}
+
+/*
+ Function:	PageRotate
+			Rotate page.
+ 
+ Parameters:
+		    R	- Can be one of the following: 0,90,180,270. 
+
+ Returns:
+			If R is omitted, functin returns current rotation.
+ */
+RichEdit_PageRotate(hCtrl, R="") {
+	static EM_SETPAGEROTATE=1260, EM_GETPAGEROTATE=1259, EPR_270 = 1, EPR_180 = 2, EPR_90 = 3, 1=270, 2=180, 3=90
+	
+	if (R="") { 
+		SendMessage, EM_GETPAGEROTATE,,,, ahk_id %hCtrl%
+		return (%ErrorLevel%)
+	}
+	
+	SendMessage, EM_SETPAGEROTATE,EPR_%R%,,, ahk_id %hCtrl%
 }
 
 /*
