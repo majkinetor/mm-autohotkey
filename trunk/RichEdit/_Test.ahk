@@ -309,12 +309,23 @@ table(r,c){
    return r "." c
 }
 
+_PageRotate:	;Page Rotate
+	
+	RichEdit_PageRotate(hRichEdit, 90)
+	sleep 1000
+	RichEdit_PageRotate(hRichEdit, 180)
+	sleep 1000
+	RichEdit_PageRotate(hRichEdit, 270)
+	sleep 1000
+	RichEdit_PageRotate(hRichEdit, 0)
+return
+
 _AddRTF:		;-
 	rtf := "{\rtf"  RTF_Fonts()  
 			. "\f1\qc centered one\par\ql ej \i ej \i0"
 			. RTF_Table(5,5,"100 200", "table") 
 
-	RichEdit_SetText(hRichEdit, rtf, "", 0)
+	RichEdit_SetText(hRichEdit, rtf, "SELECTION")
 return
 
 _GetCharFormat:	;Determines the character formatting in a rich edit control.
