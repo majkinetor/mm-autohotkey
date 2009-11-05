@@ -1,23 +1,11 @@
-_("mo!")
-	w := 550, h := 250
-	hForm1 := Form_New("+Resize w" w " h" h)
-
-	hWritter := Writer_Add(hForm1, 0, 0, w, h-35), Attach(hWritter, "w h")
-
-
-	Form_Add(hForm1, "Button", "Send", "x5 y" h-30, "Attach y")
-	Form_Add(hForm1, "Button", "Save", "yp x" w-50, "Attach x y")
-
-	Form_Show()
-return
-
-Writer_Add(hParent, X, Y, W, H, Style="", Init="s10 -bold,Tahoma") {
+;Dependecies: Form, Panel, Attach, Align, Toolbar, RichEdit
+Writer_Add(hParent, X, Y, W, H, Style="", DefText="", DefFont="s10 -bold,Tahoma") {
 	global 
 
   ;create layout
 	pnlMain	:= Panel_Add(hParent, X, Y, W, H)
 	pnlTool	:= Panel_Add(pnlMain, 0, 0, W, 60)
-	hRE		:= RichEdit_Add(pnlMain, "", "", "", "", "NOHIDESEL MULTILINE SELECTIONBAR VSCROLL"), RichEdit_FixKeys(hRE)
+	hRE		:= RichEdit_Add(pnlMain, "", "", "", "", "NOHIDESEL MULTILINE SELECTIONBAR VSCROLL", DefText), RichEdit_FixKeys(hRE)
 	ControlFocus,,ahk_id %hRe% 
 	
 	Align(pnlTool, "T"), Align(hRE, "F")
@@ -40,23 +28,22 @@ Writer_Add(hParent, X, Y, W, H, Style="", Init="s10 -bold,Tahoma") {
 		-
 		Ident,,,
 		Dedent,,,
-		Number,,, 
-		Bullet,,, 
-		Back Color,,,DROPDOWN
-		Text Color,,,DROPDOWN
+		Bullet,,,DROPDOWN 
+		Back Color,,,
+		Text Color,,,
 	 )
 
-	cbFont  := Form_Add(pnlTool, "ComboBox", Writer_enumFonts(), "sort gWriter_OnTool y6 x4 w180")
-	cbSize  := Form_Add(pnlTool, "ComboBox", "8|9|10||11|12|14|16|18|20|22|24|26|28|36|48|72", "gWriter_OnTool x+5 w50")
-	hToolbar := Form_Add(pnlTool, "Toolbar", btns, "gWriter_OnToolbar x2 y30 style='flat list nodivider tooltips' il" hIL)
+	cbFont   := Form_Add(pnlTool, "ComboBox", Writer_enumFonts(), "sort gWriter_OnTool y6 x0 w180")
+	cbSize   := Form_Add(pnlTool, "ComboBox", "8|9|10||11|12|14|16|18|20|22|24|26|28|36|48|72", "gWriter_OnTool x+5 w50")
+	hToolbar := Form_Add(pnlTool,"Toolbar", btns, "gWriter_OnToolbar y30 style='flat list nodivider tooltips' il" hIL)
 	Toolbar_AutoSize(hToolbar)
   	Form_AutoSize(pnlTool, .2)
 	Align(pnlMain)	;realign
 
-	StringSplit, Init, Init, `,, %A_SPACE%
-	Control, ChooseString, %Init2%,,ahk_id %cbFont%
+	StringSplit, DefFont, DefFont, `,, %A_SPACE%
+	Control, ChooseString, %DefFont2%,,ahk_id %cbFont%
 
-	RichEdit_SetCharFormat(hRE, Init2, Init1, "", "", "DEFAULT")
+	RichEdit_SetCharFormat(hRE, DefFont2, DefFont1, "", "", "DEFAULT")
 	RichEdit_AutoUrlDetect(hRE, true ) 
 	RichEdit_SetEvents(hRE, "Writer_onRichEdit", "SELCHANGE LINK")
 
@@ -73,7 +60,7 @@ Writer_onRichEdit(hCtrl, Event, p1, p2, p3 ) {
 	{		
 		if (_sp1 = p1) && (_sp2 = p2)
 			return
-		_sp1 := p1, _sp2 := p2				;!!!!!
+		_sp1 := p1, _sp2 := p2				
 
 		SetTimer, Writer_SetUI, -100		; don't spam while typing...
 		return
@@ -90,7 +77,7 @@ Writer_onRichEdit(hCtrl, Event, p1, p2, p3 ) {
 }
 
 
-Writer_SetUI() {
+Writer_setUI() {
 	global hRE, hToolbar,cbFont, cbSize, Writer_cbFont, Writer_cbSize
 
 	static bold=1, italic=2, underline=3, strikeout=4, btns="bold,italic,underline,strikeout"
@@ -114,7 +101,7 @@ Writer_SetUI() {
 			Toolbar_SetButton(hToolbar, %A_LoopField%, "-checked")
 }
 
-Writer_OnToolbar(Hwnd, Event, Txt) {
+Writer_onToolbar(Hwnd, Event, Txt) {
 	global hRE
 
 	ifEqual, event, hot, return
@@ -136,11 +123,27 @@ Writer_OnToolbar(Hwnd, Event, Txt) {
 	if Txt in ident,dedent
 		return RichEdit_SetParaFormat(hRE, "Ident=" (Txt="dedent" ? -1:1)*500)
 
-	if Txt in Number,Bullet
-		return RichEdit_SetParaFormat(hRE, "Num=" (Txt="Number" ? "DECIMAL" : "BULLET") ",1,D")
+
+	if Txt in Back Color,Text Color
+	{
+		 b := Txt="Back Color"
+		 RichEdit_GetCharFormat(hRE, _, _, fg, bg)
+		 clr := b ? bg : fg
+		 if Dlg_Color(clr, hRE) 
+			return RichEdit_SetCharFormat(hRE, "", "", b ? "" : clr, b ? clr : ""  )		
+	}
+
+	If Txt in Number,Bullet,None
+		if event=menu
+			 return ShowMenu("[Writer_Bullet]`nBullet`nNumber`nNone")
+		else return RichEdit_SetParaFormat(hRE,"Num=" (Txt = "None" ? "" : (Event="rclick" || Txt="Number" ? "DECIMAL" : "BULLET") ",1,D"))
 }
 
-Writer_OnTool:
+Writer_bullet:
+	Writer_OnToolbar(1, "click", A_ThisMenuItem)
+return
+
+Writer_onTool:
 	Writer_OnToolbar(0, "", A_GuiControl)
 return
 
@@ -163,5 +166,4 @@ Writer_enumFontsProc(lplf, lptm, dwType, lpData) {
 }
 
 
-#include inc
-#include _Forms.ahk
+#include *i _Forms.ahk
