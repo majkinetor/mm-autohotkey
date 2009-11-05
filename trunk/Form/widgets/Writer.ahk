@@ -1,11 +1,12 @@
 ;Dependecies: Form, Panel, Attach, Align, Toolbar, RichEdit
-Writer_Add(hParent, X, Y, W, H, Style="", DefText="", DefFont="s10 -bold,Tahoma") {
+Writer_Add(hParent, X, Y, W, H, Style="", Text="", Font="") {
 	global 
 
+	ifEqual, Font,,SetEnv,Font,s10 -bold,Tahoma
   ;create layout
 	pnlMain	:= Panel_Add(hParent, X, Y, W, H)
 	pnlTool	:= Panel_Add(pnlMain, 0, 0, W, 60)
-	hRE		:= RichEdit_Add(pnlMain, "", "", "", "", "NOHIDESEL MULTILINE SELECTIONBAR VSCROLL", DefText), RichEdit_FixKeys(hRE)
+	hRE		:= RichEdit_Add(pnlMain, "", "", "", "", "NOHIDESEL MULTILINE SELECTIONBAR VSCROLL", Text), RichEdit_FixKeys(hRE)
 	ControlFocus,,ahk_id %hRe% 
 	
 	Align(pnlTool, "T"), Align(hRE, "F")
@@ -40,10 +41,10 @@ Writer_Add(hParent, X, Y, W, H, Style="", DefText="", DefFont="s10 -bold,Tahoma"
   	Form_AutoSize(pnlTool, .2)
 	Align(pnlMain)	;realign
 
-	StringSplit, DefFont, DefFont, `,, %A_SPACE%
-	Control, ChooseString, %DefFont2%,,ahk_id %cbFont%
+	StringSplit, Font, Font, `,, %A_SPACE%
+	Control, ChooseString, %Font2%,,ahk_id %cbFont%
 
-	RichEdit_SetCharFormat(hRE, DefFont2, DefFont1, "", "", "DEFAULT")
+	RichEdit_SetCharFormat(hRE, Font2, Font1, "", "", "DEFAULT")
 	RichEdit_AutoUrlDetect(hRE, true ) 
 	RichEdit_SetEvents(hRE, "Writer_onRichEdit", "SELCHANGE LINK")
 
@@ -51,6 +52,12 @@ Writer_Add(hParent, X, Y, W, H, Style="", DefText="", DefFont="s10 -bold,Tahoma"
 	Attach(pnlTool, "w")
 
 	return pnlMain
+}
+
+Writer_add2Form(hParent, Txt, Opt){
+	Form_Parse(Opt, "x# y# w# h# style font", x, y, w, h, style, font)
+	hCtrl := Writer_Add(hParent, x, y, w, h, style, Txt, font)
+	return hCtrl
 }
 
 Writer_onRichEdit(hCtrl, Event, p1, p2, p3 ) {
