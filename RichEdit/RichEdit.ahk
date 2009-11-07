@@ -117,7 +117,7 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
  			 Enable, disable, or toggle automatic detection of URLs in the RichEdit control.
 
   Parameters:
- 			Flag - Specify *TRUE* to enable automatic URL detection or *FALSE* to disable it. Specify
+ 			Flag - Specify true to enable automatic URL detection or false to disable it. Specify
              *"^"* to toggle its current state. Omit to only return current state without any change.
 
   Returns:
@@ -152,7 +152,7 @@ RichEdit_AutoUrlDetect(HCtrl, Flag="" )  {	;wParam Specify TRUE to enable automa
 							 The default is 0x1 (CF_TEXT).
 
  Returns:
-           *TRUE* if the clipboard format can be pasted otherwise *FALSE*.
+           True if the clipboard format can be pasted otherwise false.
 
  Remarks:
            For additional information on clipboard formats, see the following:
@@ -344,7 +344,7 @@ RichEdit_FindText(hEdit, Text, CpMin=0, CpMax=-1, Flags="UNICODE") {
 
  Flag:
 			CLASSIFY	- Returns the character class and word-break flags of the character at the specified position.
-			ISDELIMITER - Returns *TRUE* if the character at the specified position is a delimiter, or *FALSE* otherwise.
+			ISDELIMITER - Returns true if the character at the specified position is a delimiter, or false otherwise.
 			LEFT		- Finds the nearest character before the specified position that begins a word.
 			LEFTBREAK	- Finds the next word end before the specified position. This value is the same as PREVBREAK.
 			MOVEWORDLEFT  - Finds the next character that begins a word before the specified position. This value is used during CTRL+LEFT ARROW key processing.
@@ -355,7 +355,7 @@ RichEdit_FindText(hEdit, Text, CpMin=0, CpMax=-1, Flags="UNICODE") {
  Returns:
 		  The message returns a value based on the wParam parameter.
 			o CLASSIFY		- Returns the character class and word-break flags of the character at the specified position.
-			o ISDELIMITER	- Returns *TRUE* if the character at the specified position is a delimiter, otherwise it returns *FALSE*.
+			o ISDELIMITER	- Returns true if the character at the specified position is a delimiter, otherwise it returns false.
 			o Other			- Returns the character index of the word break.
  */
 RichEdit_FindWordBreak(hCtrl, CharIndex, Flag="")  {
@@ -371,7 +371,7 @@ RichEdit_FindWordBreak(hCtrl, CharIndex, Flag="")  {
 	  	   Fix Tab and Esc key handling in rich edit control.
 
  Returns:
-		  *TRUE* or *FALSE*.
+		  True or false.
 
  Remarks:
 	Whenever you press Escape in a multiline edit control it sends a WM_CLOSE message to its parent. Both the regular edit control and the rich edit control have this problem.
@@ -586,7 +586,7 @@ RichEdit_GetRedo(hCtrl, ByRef name="-")  {
       The flag indicates whether the contents of the control has been modified.
 
  Returns:
-      *TRUE* if the content of Edit control has been modified, *FALSE* otherwise.
+      True if the content of Edit control has been modified, false otherwise.
       
   Related:
       <SetModify>, <Save>
@@ -834,10 +834,10 @@ RichEdit_GetUndo(hCtrl, ByRef Name="-")  {
     Hides or shows the selection in a rich edit control.
 
  Parameters:
-    State - *TRUE* or *FALSE*.
+    State - True or false.
 
  Remarks:
-    This function is noticeable when it is set to *FALSE* and the rich edit control isn't the active control or window.  The example included in <FindText> demonstrates use.
+    This function is noticeable when it is set to false and the rich edit control isn't the active control or window.  The example included in <FindText> demonstrates use.
 
  Related:
 			<SetSel>, <GetSel>
@@ -1003,7 +1003,7 @@ RichEdit_PosFromChar(hEdit, CharIndex, ByRef X, ByRef Y) {
 			Do redo operation.
 
  Returns:
-			TRUE if the Redo operation succeeds, FALSE otherwise.
+			True if the Redo operation succeeds, false otherwise.
  */
 RichEdit_Redo(hEdit) {
 	static EM_REDO := 1108
@@ -1207,8 +1207,9 @@ RichEdit_SetBgColor(hCtrl, Color)  {
 						  to the insertion point, and the new character format is in effect only until the insertion point changes. 
 			WORD		- Applies the formatting to the selected word or words. If the selection is empty but the insertion point is inside a word
 						  ,the formatting is applied to the word.
+						  
  Returns:
-			TRUE or FALSE.
+			True or false.
 
  Remarks:
 			This function will fire up SELCHANGE message even if selection isn't changed.
@@ -1277,6 +1278,7 @@ RichEdit_SetCharFormat(HCtrl, Face="", Style="", TextColor="", BackColor="", Mod
 		Data	- Numeric data of the cell. Pointer to string for textual cells and DWORD value for numeric.
 		Result  - Return 1 to prevent action.
 
+	Events:
 		*CHANGE*: Sent when the user has taken an action that may have altered text in an edit control.
 				  Sent after the system updates the screen. (***)
 
@@ -1368,7 +1370,7 @@ RichEdit_SetEvents(hCtrl, Handler="", Events="selchange"){
 					after a call with wParam set to 1, the font sizes become 11pt and 22pt, respectively.
 					
  Returns:
-			TRUE if no error occurred, FALSE otherwise.
+			True if no error occurred, false otherwise.
  */
 RichEdit_SetFontSize(hCtrl, Add) {
 	static EM_SETFONTSIZE=0x4DF
@@ -1508,7 +1510,7 @@ RichEdit_PageRotate(hCtrl, R="") {
 			List	- Space separated list of absolute tab stop positions in twips.
 
  Returns:
-			TRUE if succeessiful, FALSE otherwise.
+			True if succeessiful, false otherwise.
 
  Remarks:
 			Control uses carriage return character (`r) for paragraph markers by default.
@@ -1757,7 +1759,7 @@ RichEdit_SetUndoLimit(hCtrl, nMax)  {
 			Bar - Identifies which scroll bar to display: horizontal or vertical. This parameter must be
 				  "*V*", "*H*", or a combination of the two.
 
-			State - *TRUE* or *FALSE*.
+			State - True or false.
 
  Remarks:
      This method is only valid when the control is in-place active. Calls made while the control is inactive may fail.
@@ -1812,7 +1814,7 @@ RichEdit_ShowScrollBar(hCtrl, Bar, State=true)  {
 
  Returns:
 		If *TextMode* is omitted, the return value is the current text mode settings.
-		When *TextMode* is given, function will return *TRUE* or *FALSE*.
+		When *TextMode* is given, function will return true or false.
 
  Remarks:
 		The control text will be deleted when calling this function.
@@ -1868,7 +1870,7 @@ RichEdit_TextMode(HCtrl, TextMode="")  {
 				Set word wrap mode in rich edit control.
 
  Parameters:
-				Flag	- *TRUE* or *FALSE*.
+				Flag	- True or false.
 
  Returns:
 				The return value is zero if the operation fails, or nonzero if it succeeds.
@@ -1888,8 +1890,8 @@ RichEdit_WordWrap(HCtrl, Flag)  {
 			zoom - Integer amount to increase or decrease zoom with *+* or *-* infront of it (see examples).
 
  Returns:
-			If the new zoom setting is accepted, the return value is *TRUE*.
-			If the new zoom setting is not accepted, the return value is *FALSE*.
+			If the new zoom setting is accepted, the return value is true.
+			If the new zoom setting is not accepted, the return value is false.
 			If *zoom* param is omitted, current numerator/denominator ratio is returned.
 
  Examples:
@@ -1928,12 +1930,12 @@ Richedit_Zoom(hCtrl, zoom=0)  {
 		  optionally empty the undo buffer by resetting the undo flag.
 
  Parameters:
-			Reset - Set to *TRUE* to clear the undo buffer rather than send undo command.
+			Reset - Set to true to clear the undo buffer rather than send undo command.
 
  Returns:
-			For a single-line edit control, the return value is always TRUE.
-			For a multiline edit control, the return value is *TRUE* if the undo operation is
-			successful, or *FALSE* if the undo operation fails, or your resetting the undo queue.
+			For a single-line edit control, the return value is always true.
+			For a multiline edit control, the return value is true if the undo operation is
+			successful, or false if the undo operation fails, or your resetting the undo queue.
  */
 RichEdit_Undo(hCtrl, Reset=false)  {
   static EM_UNDO=0xC7,EM_EMPTYUNDOBUFFER=0xCD
