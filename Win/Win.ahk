@@ -265,6 +265,37 @@ Win_GetChildren(Hwnd){
 
 
 /*
+ Function:	GetClassNN
+			Get a control ClassNN.
+ 
+ Parameters:
+			HCtrl	- Handle of the parent window.
+			HRoot	- Handle of the top level window containing control.
+
+ Returns:
+			ClassNN
+ 
+ About:
+			o Developed by Lexikos. See <http://www.autohotkey.com/forum/viewtopic.php?p=308628#308628>
+ */
+Win_GetClassNN(HCtrl, HRoot="") {
+	ifEqual, HRoot,, SetEnv, HRoot, % DllCall("GetAncestor", "uint", HCtrl, "Uint", 2, "Uint")
+	WinGet, hlist, ControlListHwnd, ahk_id %HRoot% 
+    WinGetClass, tclass, ahk_id %HCtrl% 
+    Loop, Parse, hlist, `n 
+    { 
+        WinGetClass, lclass, ahk_id %A_LoopField% 
+        if (lclass == tclass) 
+        { 
+            nn += 1 
+            if A_LoopField = %hctl% 
+                return tclass nn 
+        } 
+    }
+}
+
+
+/*
  Function:	Is
  			Checks handle against specified criterium.
  
@@ -745,7 +776,7 @@ Win_Subclass(hCtrl, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.22 by majkinetor.
+	o v1.23 by majkinetor.
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
 	o Licensed under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*
