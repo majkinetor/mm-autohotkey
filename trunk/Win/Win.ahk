@@ -732,10 +732,10 @@ Win_ShowSysMenu(Hwnd, X="mouse", Y="") {
 
 /*
  Function:	Subclass 
-			Subclass child window (control)
+			Subclass window.
  
  Parameters: 
-			hCtrl   - Handle to the child window to be subclassed
+			Hwnd    - Handle to the window to be subclassed.
 			Fun		- New window procedure. You can also pass function address here in order to subclass child window
 					  with previously created window procedure.
 			Opt		- Optional callback options for Fun, by default "" 
@@ -761,17 +761,17 @@ Win_ShowSysMenu(Hwnd, X="mouse", Y="") {
   	}
 	(end code)
  */
-Win_Subclass(hCtrl, Fun, Opt="", ByRef $WndProc="") { 
+Win_Subclass(Hwnd, Fun, Opt="", ByRef $WndProc="") { 
 	if Fun is not integer
 	{
-		 oldProc := DllCall("GetWindowLong", "uint", hCtrl, "uint", -4) 
+		 oldProc := DllCall("GetWindowLong", "uint", Hwnd, "uint", -4) 
 		 ifEqual, oldProc, 0, return 0 
 		 $WndProc := RegisterCallback(Fun, Opt, 4, oldProc) 
 		 ifEqual, $WndProc, , return 0
 	}
 	else $WndProc := Fun
 	   
-    return DllCall("SetWindowLong", "UInt", hCtrl, "Int", -4, "Int", $WndProc, "UInt") 
+    return DllCall("SetWindowLong", "UInt", Hwnd, "Int", -4, "Int", $WndProc, "UInt") 
 }
 
 /*
