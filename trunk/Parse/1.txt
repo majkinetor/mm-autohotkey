@@ -1,0 +1,42 @@
+"mislim" "dakle postojim" /k "zasto je to tako"
+"mislim" "dakle postojim" /k="zasto je to tako"
+"mislim" "dakle postojim" -k zasto
+"mislim" "dakle postojim" -k=zasto
+
+problemi:
+
+
+ sample			name		value
+ -k`==zasto		-k=		 zasto
+ -k`=`=zasto				-k==zasto
+ 'pera`=sima"				pera=sima
+ 'pera=sima"		pera		sima
+ 'pera=`=sima"		pera		=sima
+
+ 
+ 'pera==sima"		pera		=sima
+			pera=		sima
+
+
+SYN:
+ <s>		named param		-param=value
+ <s>?		present ?		
+ <s>*		numeric param		-returns * if parameter is present but not numeric.
+ <s>#		prefix			-name is param prefix
+ N		option by position.	
+ <s>!		parameter value follow param name as next param.
+ 
+ Problems:	
+	/?	if / is present 
+	/??     if /? is present
+	*#	if * is followed with taraba
+	**	if * is followed by numeric
+	*	param named *
+	?	param named ?
+	??	if ? is there
+	*?	if * is there
+	!	param named !
+	val!	param val is followed by value
+	val!!	param val! is followed by value
+
+Its suggested not to use ?!*# in param names.
