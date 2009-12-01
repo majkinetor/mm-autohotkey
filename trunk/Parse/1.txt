@@ -12,8 +12,6 @@ problemi:
  'pera`=sima"				pera=sima
  'pera=sima"		pera		sima
  'pera=`=sima"		pera		=sima
-
- 
  'pera==sima"		pera		=sima
 			pera=		sima
 
@@ -23,20 +21,10 @@ SYN:
  <s>?		present ?		
  <s>*		numeric param		-returns * if parameter is present but not numeric.
  <s>#		prefix			-name is param prefix
- N		option by position.	
  <s>!		parameter value follow param name as next param.
- 
- Problems:	
-	/?	if / is present 
-	/??     if /? is present
-	*#	if * is followed with taraba
-	**	if * is followed by numeric
-	*	param named *
-	?	param named ?
-	??	if ? is there
-	*?	if * is there
-	!	param named !
-	val!	param val is followed by value
-	val!!	param val! is followed by value
 
-Its suggested not to use ?!*# in param names.
+  N		option by position.	
+
+
+
+Do not to use query meta params as param names (and space). 
