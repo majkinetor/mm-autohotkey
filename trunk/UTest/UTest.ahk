@@ -1,7 +1,9 @@
 /* Title: UTest 
 		  Unit testing framework.
 
-   Usage:	
+		  (see Utest.png)
+
+ Usage:	
 		 UTest will scan the script for functions which name starts with "Test_". Test functions have no parameter and use one of the 
 		 Assert functions. If Assert function fails, test will fail and you will see that in the result CSV (or in ListView representing that CSV).
 		 Result shows the the test state, the function name, line number and test name if you have it. 
@@ -22,44 +24,59 @@
 			#include FunctionToTest.ahk
 		(end code)
 
-   Remarks:
+ Remarks:
 		By default, executing the test script will show the GUI with the results. To get the same results in textual form you can set NoGui option and 
 		query Result variable from UTest storage:
 
 		>  UTest("NoGUI", true)
 		>  #include UTest.ahk
-		>  msgbox  UTest("Result")		
+		>  msgbox  UTest("Result")	
+		
+ CSV:
+		Result	- Test result (OK | FAIL).
+		Test	- Test function name.
+		Line	- Line number of the test.
+		Name	- List of names that failed. Name is the Assert user label. Give name to the Assert function if you have multiple Assert functions inside single test.
+		Param	- List of parameters which failed (Assert_True, Assert_False)
+
+		Aditionally, if you use Gui, tests that failed will be selected and if any of the test failed, complete operation will be marked as failed at the bottom of the gui.
 */
 #SingleInstance, force
 
 UTest("Result", UTest_Start( UTest("NoGui") ))	;execute tests
 
 /*
- Function: True 
-		   Check if conditions are true.
+ Function: Assert_True 
+		   Check if conditions are true. 
+		   All parameters must be expressions except the first one which may be the string representing the test name.
  */
 Assert_True( b1="", b2="", b3="", b4="", b5="", b6="", b7="", b8="", b9="", b10="") {
+	bName := b1 + 0 = "", Name := bName ? b1 : ""
 	loop, 10
-		ifNotEqual, b%A_Index%,, ifNotEqual, b%A_Index%, 1
-		{
-			UTest_setFail( Name )
-			break
-		}
+		if (A_Index = 1) && (Name != "")
+			 continue
+		else ifNotEqual, b%A_Index%,,ifNotEqual, b%A_Index%, 1
+			 b := UTest_setFail( "", A_Index - (bName ? 1 : 0))
+
+	if b
+		UTest_setFail( Name, "," )
 }
 /*
- Function: False
+ Function: Assert_False
  		   Check if conditions are false.
+		   All parameters must be expressions except the first one which may be the string representing the test name.
  */
 Assert_False( b1="", b2="", b3="", b4="", b5="", b6="", b7="", b8="", b9="", b10="" ) {
+	Name := b1 + 0 = "" ? b1 : ""
 	loop, 10
 		ifNotEqual, b%A_Index%,, ifNotEqual, b%A_Index%, 0
-		{
-			UTest_setFail( Name )
-			break
-		}
+			b := UTest_setFail( Name, A_Index - (bName ? 1 : 0))
+	
+	if b
+		UTest_setFail( Name, "," )
 }
 /*
- Function:	Empty 
+ Function:	Assert_Empty 
 			Check if variable is empty.
  */
 Assert_Empty( Var, Name="" ){
@@ -67,7 +84,7 @@ Assert_Empty( Var, Name="" ){
 		UTest_setFail( Name )
 }
 /*
- Function: NotEmpty 
+ Function: Assert_NotEmpty 
 		   Check if variable is not empty.
  */
 Assert_NotEmpty( Var, Name="" ){
@@ -75,7 +92,7 @@ Assert_NotEmpty( Var, Name="" ){
 		UTest_setFail( Name )
 }
 /*
- Function: Contains 
+ Function: Assert_Contains 
  		   Check if variable contains string.
  */
 Assert_Contains(Var, String, Name=""){
@@ -84,7 +101,7 @@ Assert_Contains(Var, String, Name=""){
 }
 
 /*
- Function:  StartsWith
+ Function:  Assert_StartsWith
  			Check if variable starts with string.
  */
 Assert_StartsWith(Var, String, Name=""){
@@ -92,7 +109,7 @@ Assert_StartsWith(Var, String, Name=""){
 		UTest_SetFail( Name )
 }
 /*
- Function: EndsWith
+ Function: Assert_EndsWith
  		   Check if variable ends with string.
  */
 Assert_EndsWith(Var, String, Name=""){
@@ -102,7 +119,7 @@ Assert_EndsWith(Var, String, Name=""){
 }
 
 /*
- Function: Match
+ Function: Assert_Match
 		   Check if variable content matches RegEx pattern.
  */
 Assert_Match(Var, RegEx, Name=""){
@@ -110,11 +127,24 @@ Assert_Match(Var, RegEx, Name=""){
 		UTest_setFail( Name )
 }
 
-UTest_setFail(Name) {
-	UTest("Name", Name), UTest("F", 1 )
+
+/*
+ Function: UTest_Edit
+		   Open editor with given file and go to line number.
+		   Required to be implemented by the user in order for double click in GUI to work.
+ */
+UTest_Edit( Path, LineNumber ) 
+{
+	Run, "d:\Utils\Edit Plus\EditPlus.exe" "%Path%"
+	WinWait, EditPlus
+	WinMenuSelectItem,,,Search, Go To, 1&
+	Send %LineNumber%{Enter}
 }
 
-UTest_RunTests(){
+;===================================================== PRIVATE ======================================
+
+
+UTest_runTests(){
 	tests := UTest_GetTests(), bNoGui := UTest("NoGui")
 	if  (tests = "") {
 		msgbox No tests found !
@@ -126,14 +156,14 @@ UTest_RunTests(){
 	{
 		StringSplit, f, A_LoopField, %A_Space%
 		%f1%()		
-		bFail := UTest("F"), Name := UTest("Name"), fName := SubStr(f1,6)
+		bFail := UTest("F"), Param := UTest("Param"), Name := UTest("Name"), fName := SubStr(f1,6)
 		ifEqual, bFail, 1, SetEnv, bTestsFail, 1
 
-		s .= (bFail ? "FAIL" : "OK") "," fName "," f2 "," Name "`n"
-		UTest("F", 0),	UTest("Name", "")
+		s .= (bFail ? "FAIL" : "OK") "," fName "," f2 "," Name "," Param "`n"
+		UTest("F", 0),	UTest("Param", ""), UTest("Name", "")
 
 		if !bNoGui
-			LV_Add("", bFail ? "FAIL" : "OK", fName, f2, Name)
+			LV_Add(bFail ? "Select" : "", bFail ? "FAIL" : "OK", fName, f2, Name, Param)
 	}
 	if !bNoGui
 		LV_ModifyCol(), LV_ModifyCol(1, 100), LV_ModifyCol(3, 50), LV_ModifyCol(4, 150)
@@ -142,7 +172,7 @@ UTest_RunTests(){
 	return SubStr(s, 1, -1)
 }
 
-UTest_GetTests() {
+UTest_getTests() {
 	s := UTest_GetFunctions()
 	loop, parse, s, `n
 	{
@@ -152,7 +182,7 @@ UTest_GetTests() {
 	return SubStr(t, 1, -1)
 }
 
-UTest_GetFunctions() {
+UTest_getFunctions() {
 	LowLevel_init()
 	func_ptr := __getFirstFunc()
 	loop{			
@@ -173,7 +203,7 @@ UTest_getFreeGuiNum(){
 	return 0
 }
 
-UTest_Start( bNoGui = false) {
+UTest_start( bNoGui = false) {
 	if !bNoGui
 		hGui := UTest_CreateGui()
 	s := UTest_RunTests()
@@ -185,14 +215,14 @@ UTest_Start( bNoGui = false) {
 	return s
 }
 
-UTest_CreateGui() {
-	w := 400, h := 400
+UTest_createGui() {
+	w := 500, h := 400
 	n := UTest_getFreeGuiNum() 
 
 	Gui, %n%: +LastFound +LabelUTest_
 	hGui := WinExist()
-	Gui, %n%: Add, ListView, w%w% h%h%, Result|Function|Line|Name
-	Gui, %n%: Font, s10 bold, Courier New
+	Gui, %n%: Add, ListView, w%w% h%h% gUTest_OnList, Result|Test|Line|Name|Param
+	Gui, %n%: Font, s20 bold cRED, Courier New
 	Gui, %n%: Add, Text, w%w% h40
 	Gui, %n%: Show,autosize, UTest - %A_ScriptName%
 	UTest("GUINO", n)
@@ -206,6 +236,20 @@ UTest_CreateGui() {
  	ExitApp
  return
 }
+
+UTest_setFail(Name="", Param="") {
+	UTest("Param", UTest("Param") " " Param)
+	UTest("Name",  UTest("Name") " " Name)
+	UTest("F", 1 )
+	return 1
+}
+
+UTest_onList:
+	ifNotEqual, A_GuiEvent, DoubleClick, return
+
+	LV_GetText(lineNumber, LV_GetNext(), 3)
+	UTest_Edit(A_ScriptFullPath, lineNumber)
+return
 
 UTest(var="", value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="") { 
 	static
@@ -674,7 +718,7 @@ __addVar(var, func)
     NumPut(mVarCount+1, func+28)
 }
 /* Group:  About
-		o v0.1 by majkinetor.
+		o v0.2 by majkinetor.
 		o Includes LowLevel.ahk by Lexikos. See <http://www.autohotkey.com/forum/topic26300.html>
 		o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
