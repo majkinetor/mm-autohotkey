@@ -31,13 +31,18 @@ Test_Quotes() {
 }
 
 Test_Escape() {
-	o =	'param1' 'param2' 'param`=`'param3' param4
-	no := Parse(o, "1 2 3 4", p1, p2, p3, p4)
-	Assert_True("Normal", p1="param1", p2="param2", p3="param='param3", no=4)
+	o =	'param`=`' meh'
+	no := Parse(o, "1", p1, no)
+	Assert_True(p1, no=1, p1="param`=`' meh")
 
-	o =	"param1" "param2" "param`=`"param3" param4
-	no := Parse(o, "q"")1 2 3 4", p1, p2, p3, p4)
-	Assert_True("Custom", p1="param1", p2="param2", p3="param=""param3", no=4)
+	
+;	o =	'param1' 'param2' 'param`=`'param3' param4
+;	no := Parse(o, "1 2 3 4", p1, p2, p3, p4)
+;	Assert_True("Normal", p1="param1", p2="param2", p3="param='param3", p4="param4", no=4)
+;
+;	o =	"param1" "param2" "param`=`"param3" param4
+;	no := Parse(o, "q"")1 2 3 4", p1, p2, p3, p4)
+;	Assert_True("Custom", p1="param1", p2="param2", p3="param=""param3", p4="param4", no=4)
 }
 Test_AHKGuiLike() {
 	o = x20 y40 w0 h0 red HWNDvar gLabel                                                     

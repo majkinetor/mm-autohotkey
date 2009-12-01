@@ -41,11 +41,11 @@
 			
 			In above example, | is used as separator, : is used as assignment char and case sensitivity is turned on (style wont be found as it starts with S in options string).
 
-			sC	- Set separator char to C (default is space)
-			aC	- Set assignment char to C (default is =)
-			qC	- Set quote char to C (default is ')
-			eC	- Set escape char to C  (default is `)
-			cN	- Set case sensitivity to number N (default is 0 = off)
+			sC	- Set separator char to C (default is space). Parameters are separated by this char except if it is found inside quotes (specified by quote char qC).
+			aC	- Set assignment char to C (default is =). Assigment char is used to name parameter. Everything after aC will be set as parameter value, everything before as parameter name.
+			qC	- Set quote char to C (default is '). Quote char is used to delimit parameter values that contain separator char.
+			eC	- Set escape char to C  (default is `). Escape char can be used to specify characters sC, aC, qC and eC inside parameter string.
+			cN	- Set case sensitivity to number N (default is 0 = off,  1 = on).
 
  Remarks:
 			Currently you can extract maximum 10 options at a time, but this restriction can be removed for up to 29 options.
@@ -55,8 +55,8 @@
 			Number of options in the string.
 
  About:
-			o v 1.0 by majkinetor
-			o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
+			o v2.0 by majkinetor.
+			o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */
 Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",ByRef o6="",ByRef o7="",ByRef o8="", ByRef o9="", ByRef o10=""){
 	cS := " ", cA := "=", cQ := "'", cE := "``", cC := 0
@@ -65,25 +65,39 @@ Parse(O, pQ, ByRef o1="",ByRef o2="",ByRef o3="",ByRef o4="",ByRef o5="",ByRef o
 			  mod(A_Index, 2) ? f:=A_LoopField : c%f%:=A_LoopField
 
 	p__0 := 0, st := "n"
-	loop, parse, O						;  states: normal(n), separator(s), quote(q), escape(e)
+	loop, parse, O						;  states: next(n), separator(s), quote(q), escape(e)
 	{
 		c := A_LoopField
 		if (c = cS) {
-			if !InStr("qs", st)	
-				p__0++,  p__%p__0% := token,  token := "",  st := "s"			
+			if !InStr("qs", st)		;is state is not q or s.
+				p__0++,  p__%p__0% := token,  token := "",  st := "s"		
 		}
-		else if (c = cE)
-			st := "e"
-		else if (c = cQ) && (st != "e") 
-			 ifNotEqual, st, q, SetEnv, st, q				 
-			else st := "n"		
+
+		else if (c = cE) 
+		{
+			ifNotEqual, st, e, SetEnv, st, e
+			else st := "n"
+		}
+
+		else if (c = cQ) && (st != "e")  {
+			ifNotEqual, st, q, SetEnv, st, q				;`cA (!) `cQ  `cS  `cE	 ``   ``
+			else st := "n"
+		}													
+
+		else if (c = cA) && (st != "e")  {
+			p__%p__0%_name := 1
+			st := "n"
+		}
+
 		else ifNotEqual, st, q, SetEnv, st, n
+		
 		if st not in s,e
-			 token .= c		
+			 token .= c
 	}
 	if (token != "")
 		p__0++, p__%p__0% := token
 	
+
 	loop, parse, pQ, %A_Space%
 	{
 		c := SubStr(f := A_LoopField, 0),  n := InStr("?#*", c) ? SubStr(f, 1, -1) : f,  j := A_Index, o := ""
