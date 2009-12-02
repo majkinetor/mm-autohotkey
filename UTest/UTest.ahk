@@ -6,7 +6,7 @@
  Usage:	
 		 UTest will scan the script for functions which name starts with "Test_". Test functions have no parameter and use one of the 
 		 Assert functions. If Assert function fails, test will fail and you will see that in the result CSV (or in ListView representing that CSV).
-		 Result shows the the test state, the function name, line number and test name if you have it. 
+		 Result shows the test state, the function name, line number and test name if you have it. 
 
 		 To test your script, use the following template :
 
@@ -39,7 +39,7 @@
 		Name	- List of names that failed. Name is the Assert user label. Give name to the Assert function if you have multiple Assert functions inside single test.
 		Param	- List of parameters which failed (Assert_True, Assert_False)
 
-		Aditionally, if you use Gui, tests that failed will be selected and if any of the test failed, complete operation will be marked as failed at the bottom of the gui.
+		Additionally, if you use Gui, tests that failed will be selected and if any of the test failed, complete operation will be marked as failed at the bottom of the gui.
 */
 #SingleInstance, force
 
