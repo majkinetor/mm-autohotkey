@@ -47,6 +47,9 @@ Splitter_Add(Opt="", Text="", Handler="") {
 /*
  Function:	GetPos
  			Get position of the splitter.
+
+ Remarks:
+			Position of the splitter is its x or y coordinate inside parent window.
  */
 Splitter_GetPos( HSep ) {
 	return Win_GetRect(HSep, Splitter_IsVertical(HSep) ? "*x" : "*y")
@@ -96,7 +99,7 @@ Splitter_Set( HSep, Def, Pos="" ) {
  			Set position of the splitter.
 
  Parameters:
-			Pos		- Position to set. If empty, function simply returns.
+			Pos	- Position to set. If empty, function does nothing.
 
  Remarks:
 			Resets <Attach> for the parent.
@@ -214,11 +217,12 @@ Splitter_move(HSep, Delta, Def, manual=""){
 		%handler%(HSep, Splitter_GetPos(HSep))
 }
 
+;Draws focus rectangle on mouse position
 Splitter_updateVisual( HSep="", bVert="" ) {
 	static
 
 	if !HSep
-		return dc := 0
+		return pos, dc := 0
 	
 	MouseGetPos, mx, my
 	if !dc 
@@ -228,18 +232,23 @@ Splitter_updateVisual( HSep="", bVert="" ) {
 
 		root := Win_Get(hSep, "A")
 		Win_Get(root, "NhB" (bVert ? "x" : "y"), ch, b)		;get caption and border size
-		ifGreater, ch, 1000, SetEnv, ch, 0
 
 		dc := DllCall("GetDC", "Uint", root, "Uint")
-		Win_GetRect(HSep, "!xywh", sx, sy, sw, sh),	  sz := (bVert ? sw : sh) // 2
-		VarSetCapacity(RECT, 16),  NumPut(sx, RECT), NumPut(sy, RECT, 4), NumPut(sx+sw, RECT, 8), NumPut(sy+sh, RECT, 12)
+
+		Win_GetRect(HSep, "!xywh", sx, sy, sw, sh)
+		VarSetCapacity(RECT, 16), NumPut(sx, RECT), NumPut(sy, RECT, 4), NumPut(sx+sw, RECT, 8), NumPut(sy+sh, RECT, 12) , sz := sh
+		
+		delta := bVert ? mx - sx : my - sy
+		
 		return DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	}
 	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
-	if (bVert)
-		 NumPut(mx-b-sz, RECT),	NumPut(mx-b+sz, RECT, 8)
-	else NumPut(my-ch-b-sz, RECT, 4),  NumPut(my-ch-b+sz, RECT, 12)
-	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
+
+	if bVert
+		 pos := mx - delta, idx := 0
+	else pos := my - delta, idx := 4
+
+	NumPut(pos, RECT, idx),   NumPut(pos+sz, RECT, idx+8),  DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 }
 
 Splitter_IsVertical(Hwnd) {
@@ -283,6 +292,6 @@ Splitter(Var="", Value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="
  */
 
 /* Group: About
-	o Ver 1.11 by majkinetor. 
+	o Ver 1.5 by majkinetor. 
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */

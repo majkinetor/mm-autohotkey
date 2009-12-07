@@ -12,9 +12,14 @@
 	} else 	x:=y:="Center", w:=600, h:=500
 
 	h1 := spos,	 h2 := h-h1-ssize
+
+
 	gui, margin, 0, 0
 	Gui +Resize +LastFound ;-Caption
 	hGui := WinExist()
+	Menu, mnu, Add, File
+	Gui, Menu, mnu
+
 
 	gui, add, edit, HWNDhc1 w%w% h%h1%, ESC - exit and save window.`nF1 - Set splitter position to 40
 	hSep := Splitter_Add("h" ssize " w" w " center sunken", "drag me", "OnSplitter")
@@ -31,6 +36,9 @@
 	Attach( hc3,  "y x.5 w.5 r2")
 	
 	Gui, Show, x%x% y%y% w%w% h%h%
+return
+
+File:
 return
 
 OnSplitter(HCtrl, Pos){
