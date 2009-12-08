@@ -8,7 +8,7 @@
 
  Effects:	
 			- While user moves splitter, CoordMode of mouse is always returned to relative.
-			- Upon movement, splitter will reset <Attach> for the parent, if present.
+			- Upon movement, splitter will reset <Attach> for the parent, if present.			
  */
 
 /*
@@ -248,8 +248,8 @@ Splitter_updateFocus( HSep="" ) {
 		VarSetCapacity(RECT, 16), NumPut(sx, RECT), NumPut(sy, RECT, 4), NumPut(sx+sw, RECT, 8), NumPut(sy+sh, RECT, 12) , sz := sh
 		
 		if bVert := Splitter( HSep "bVert" )
-			 idx := 0, delta := mx-sx,  sz := sw
-		else idx := 4, delta := my-sy,  sz := sh
+			 idx := 0,   delta := mx-sx,   sz := sw
+		else idx := 4,   delta := my-sy,   sz := sh
 
       ;if in Panel, there will be offset to mouse movement according to its position.
 		parent := Win_Get(HSep, "P")			
@@ -259,14 +259,9 @@ Splitter_updateFocus( HSep="" ) {
 		pos := Splitter_GetPos(HSep),  max := Splitter_getMax(HSep) + offset,	 min := offset
 		return DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	}
-	new_pos := bVert ? mx - delta : my - delta
-	if (new_pos < min) 
-		ifGreater, pos, %min%, SetEnv, pos, %min%
-		else return
-	else if (new_pos > max)
-		ifGreater pos, %max%, SetEnv, pos, %max%
-		else return
-	else pos := new_pos
+	pos := bVert ? mx-delta : my-delta
+	ifLess, pos, %min%, SetEnv, pos, %min%
+	else ifGreater, pos, %max%, SetEnv, pos, %max%
 
 	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	NumPut(pos, RECT, idx),   NumPut(pos+sz, RECT, idx+8),  DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
@@ -279,7 +274,6 @@ Splitter(Var="", Value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="
 	ifNotEqual, value,~`a , SetEnv, %var%, %value%
 	return _
 }
-
 
 #include *i Win.ahk
 
