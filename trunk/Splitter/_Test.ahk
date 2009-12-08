@@ -1,4 +1,4 @@
-;_("mo! e")
+_("mo! e")
 #NoEnv
 #SIngleInstance, force
 	
@@ -36,6 +36,11 @@
 
 	w += 100, h+=100
 	gui, show, w%w% h%h%
+return
+
+F1::
+;	m(Splitter_GetPos(hsep1))
+	Splitter_SetPos(hSep1, 0)
 return
 		
 #include Splitter.ahk

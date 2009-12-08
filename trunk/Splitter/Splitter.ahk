@@ -233,7 +233,7 @@ Splitter_updateFocus( HSep="" ) {
 	static
 
 	if !HSep
-		return pos, dc := 0
+		return pos - offset, dc := 0
 	
 	MouseGetPos, mx, my
 	if !dc 
@@ -242,7 +242,7 @@ Splitter_updateFocus( HSep="" ) {
 		CoordMode, mouse, relative
 
 	  ;initialize dc, RECT, idx, delta(distance between mouse and splitter position), sz, pos & max when user starts moving.
-		dc := DllCall("GetDC", "Uint", Win_Get(hSep, "A"), "Uint")	; take root DC, for some reason it doesn't work good on parent's DC
+		dc := Win_Get( Win_Get(HSep, "A"), "D")		; take root DC, for some reason it doesn't work good on parent's DC
 
 		Win_GetRect(HSep, "!xywh", sx, sy, sw, sh)
 		VarSetCapacity(RECT, 16), NumPut(sx, RECT), NumPut(sy, RECT, 4), NumPut(sx+sw, RECT, 8), NumPut(sy+sh, RECT, 12) , sz := sh
@@ -251,17 +251,21 @@ Splitter_updateFocus( HSep="" ) {
 			 idx := 0, delta := mx-sx,  sz := sw
 		else idx := 4, delta := my-sy,  sz := sh
 
-		pos := Splitter_GetPos(HSep),  max := Splitter_getMax(HSep)
+      ;if in Panel, there will be offset to mouse movement according to its position.
+		parent := Win_Get(HSep, "P")			
+		WinGetClass, cls, ahk_id %parent%
+		offset :=  cls != "Panel" ? 0 : Win_GetRect( parent, bVert ? "*x" : "*y")			
+
+		pos := Splitter_GetPos(HSep),  max := Splitter_getMax(HSep) + offset,	 min := offset
 		return DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	}
-	
 	new_pos := bVert ? mx - delta : my - delta
-	if (new_pos < 0) 
-		ifGreater, pos, 0, SetEnv, pos, 0
+	if (new_pos < min) 
+		ifGreater, pos, %min%, SetEnv, pos, %min%
 		else return
 	else if (new_pos > max)
 		ifGreater pos, %max%, SetEnv, pos, %max%
-		else pos := max
+		else return
 	else pos := new_pos
 
 	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
