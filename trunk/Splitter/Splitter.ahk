@@ -2,7 +2,7 @@
 			 Splitter control.
 
 			 (see splitter.png)
-
+			 
  Dependency:
 			<Win> 1.23++
 
@@ -254,7 +254,7 @@ Splitter_updateFocus( HSep="" ) {
       ;if in Panel, there will be offset to mouse movement according to its position.
 		parent := Win_Get(HSep, "P")			
 		WinGetClass, cls, ahk_id %parent%
-		offset :=  cls != "Panel" ? 0 : Win_GetRect( parent, bVert ? "*x" : "*y")			
+		offset :=  cls != "Panel" ? 0 : Win_GetRect( parent, bVert ? "!x" : "!y")
 
 		pos := Splitter_GetPos(HSep),  max := Splitter_getMax(HSep) + offset,	 min := offset
 		return DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
