@@ -152,7 +152,7 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 
 	  ;prevent user from going offscreen with separator
 	  ; let the separator always be visible a little if it is pulled up to the edge
-		NumPut( NumGet(Rect, 0) + sz-1	,RECT, 0)
+		NumPut( NumGet(RECT, 0) + sz-1	,RECT, 0)
 		NumPut( NumGet(RECT, 4) + sz+ch ,RECT, 4)
 		NumPut( NumGet(RECT, 8) - sz+4 	,RECT, 8)
 		NumPut( NumGet(RECT, 12)- sz+4	,RECT, 12)
@@ -231,23 +231,20 @@ Splitter_updateVisual( HSep="", bVert="" ) {
 		CoordMode, mouse, relative
 
 		root := Win_Get(hSep, "A")
-		Win_Get(root, "NhB" (bVert ? "x" : "y"), ch, b)		;get caption and border size
-
 		dc := DllCall("GetDC", "Uint", root, "Uint")
 
 		Win_GetRect(HSep, "!xywh", sx, sy, sw, sh)
 		VarSetCapacity(RECT, 16), NumPut(sx, RECT), NumPut(sy, RECT, 4), NumPut(sx+sw, RECT, 8), NumPut(sy+sh, RECT, 12) , sz := sh
 		
-		delta := bVert ? mx - sx : my - sy
+		if bVert
+			 idx := 0, delta := mx-sx,  sz := sw
+		else idx := 4, delta := my-sy,  sz := sh
 		
 		return DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	}
 	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 
-	if bVert
-		 pos := mx - delta, idx := 0
-	else pos := my - delta, idx := 4
-
+	pos := bVert ? mx - delta : my - delta
 	NumPut(pos, RECT, idx),   NumPut(pos+sz, RECT, idx+8),  DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 }
 
