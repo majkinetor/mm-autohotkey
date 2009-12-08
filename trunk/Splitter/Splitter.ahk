@@ -168,9 +168,9 @@ Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {
 		moving := false, Splitter_UpdateVisual(), Splitter_move(Hwnd, delta, %Hwnd%_def, Wparam=12345)
 	}
 
-;	if (UMsg =  WM_LBUTTONDBLCLK){
-;		return	; move splitter to 0 or to max
-;	}
+ ;	if (UMsg =  WM_LBUTTONDBLCLK){
+ ;		return	; move splitter to 0 or to max
+ ;	}
 
 	return DllCall("CallWindowProc","uint",A_EventInfo,"uint",hwnd,"uint",uMsg,"uint",wParam,"uint",lParam)
 }
@@ -217,7 +217,6 @@ Splitter_move(HSep, Delta, Def, manual=""){
 		%handler%(HSep, Splitter_GetPos(HSep))
 }
 
-;Draws focus rectangle on mouse position
 Splitter_updateVisual( HSep="", bVert="" ) {
 	static
 
@@ -243,7 +242,6 @@ Splitter_updateVisual( HSep="", bVert="" ) {
 		return DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	}
 	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
-
 	pos := bVert ? mx - delta : my - delta
 	NumPut(pos, RECT, idx),   NumPut(pos+sz, RECT, idx+8),  DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 }
