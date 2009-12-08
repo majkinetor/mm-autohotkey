@@ -83,6 +83,7 @@ Win_FromPoint(X="mouse", Y="") {
  		    P,A,O		- Parents handle, Ancestors handle, Owners handle.
  			M			- Module full path (owner exe), unlike WinGet,,ProcessName which returns only name without path.
  			T			- Title for a top level window or text for a child window.
+			D			- DC.
  
  Returns:
 			o1
@@ -180,6 +181,9 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
 				continue
 			VarSetCapacity(buf, 512, 0), DllCall( "psapi.dll\GetModuleFileNameExA", "uint", hp, "uint", 0, "str", buf, "uint", 512),  DllCall( "CloseHandle", hp ) 
 			o%i% := buf 
+		continue
+		Win_Get_D:
+			o%i% := DllCall("GetDC", "uint", Hwnd, "UInt")
 		continue
 	}	
 	DetectHiddenWindows, %oldDetect%
