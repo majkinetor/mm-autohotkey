@@ -66,7 +66,7 @@ Win_FromPoint(X="mouse", Y="") {
 
 /*
  Function:	Get
- 			Get window information
+ 			Get window information.
  
  Parameters:
  			pQ			- List of query parameters.
@@ -80,9 +80,10 @@ Win_FromPoint(X="mouse", Y="") {
 						  For all 4 query parameters you can additionaly specify x,y,w,h arguments in any order (except Border which can have only x(hor) and y(ver) arguments) to
 						  extract desired number into output variable.
 			S,E			- Style, Extended style.
- 		    P,A,O		- Parents handle, Ancestors handle, Owners handle
+ 		    P,A,O		- Parents handle, Ancestors handle, Owners handle.
  			M			- Module full path (owner exe), unlike WinGet,,ProcessName which returns only name without path.
- 			T			- Title for top level windows or Text for child windows.
+ 			T			- Title for a top level window or text for a child window.
+			D			- DC.
  
  Returns:
 			o1
@@ -120,12 +121,12 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
 		continue
 
 		Win_Get_I:
-				WinGet, o%i%, PID, ahk_id20/08/2009 %hwnd%		
+				WinGet, o%i%, PID, ahk_id %hwnd%		
 		continue
 
 		Win_Get_N:
 				rect := "title"
-				VarSetCapacity(TBI, 44, 0), NumPut(44, TBI, 0), DllCall("GetTitleBarInfo", "uint", hwnd, "str", TBI)
+				VarSetCapacity(TBI, 44, 0), NumPut(44, TBI, 0), DllCall("GetTitleBarInfo", "uint", Hwnd, "str", TBI)
 				title_x := NumGet(TBI, 4, "Int"), title_y := NumGet(TBI, 8, "Int"), title_w := NumGet(TBI, 12) - title_x, title_h := NumGet(TBI, 16) - title_y 
 				WinGet, style, style, ahk_id %Hwnd%				
 				title_h :=  style & 0xC00000 ? title_h : 0			  ; if no WS_CAPTION style, set 0 as win sets randoms otherwise...
@@ -160,16 +161,16 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
 			WinGet, o%i%, ExStyle, ahk_id %Hwnd%
 		continue
 		Win_Get_P: 
-			o%i% := DllCall("GetParent", "uint", Hwnd)
+			o%i% := DllCall("GetParent", "uint", Hwnd, "UInt")
 		continue
 		Win_Get_A: 
-			o%i% := DllCall("GetAncestor", "uint", Hwnd, "uint", 2) ; GA_ROOT
+			o%i% := DllCall("GetAncestor", "uint", Hwnd, "uint", 2, "UInt") ; GA_ROOT
 		continue
 		Win_Get_O: 
-			o%i% := DllCall("GetWindowLong", "uint", Hwnd, "int", -8) ; GWL_HWNDPARENT
+			o%i% := DllCall("GetWindowLong", "uint", Hwnd, "int", -8, "UInt") ; GWL_HWNDPARENT
 		continue
 		Win_Get_T:
-			if DllCall("IsChild", "uint", hwnd)
+			if DllCall("IsChild", "uint", Hwnd)
 				 WinGetText, o%i%, ahk_id %hwnd%
 			else WinGetTitle, o%i%, ahk_id %hwnd%
 		continue
@@ -180,6 +181,9 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
 				continue
 			VarSetCapacity(buf, 512, 0), DllCall( "psapi.dll\GetModuleFileNameExA", "uint", hp, "uint", 0, "str", buf, "uint", 512),  DllCall( "CloseHandle", hp ) 
 			o%i% := buf 
+		continue
+		Win_Get_D:
+			o%i% := DllCall("GetDC", "uint", Hwnd, "UInt")
 		continue
 	}	
 	DetectHiddenWindows, %oldDetect%
