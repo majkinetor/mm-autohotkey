@@ -41,7 +41,7 @@ return
 File:
 return
 
-OnSplitter(HCtrl, Pos){
+OnSplitter(HCtrl, Event, Pos){
 	txt = position: %pos%
 	ControlSetText, ,%txt%, ahk_id %HCtrl%
 }
