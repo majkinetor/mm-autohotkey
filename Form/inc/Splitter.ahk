@@ -4,7 +4,11 @@
 			 (see splitter.png)
 
  Dependency:
-			 <Win> 1.2++
+			<Win> 1.23++
+
+ Effects:	
+			- While user moves splitter, CoordMode of mouse is always returned to relative.
+			- Upon movement, splitter will reset <Attach> for the parent, if present.			
  */
 
 /*
@@ -12,10 +16,17 @@
  			Add new Splitter.
  
  Parameters:
- 			Opt	  - Splitter Gui options. Splitter is subclassed Text control (Static), so it accepts any Text options.
-					plus one the following: blackframe, blackrect, grayframe, grayrect, whiteframe, whiterect, sunken.	
-			Text  - Text to set.
-			Handler - Notification function. Triggered when user changes the position. Accepts two parameters - control handle and new position.
+ 			Opt	    - Splitter Gui options. Splitter is subclassed Text control (Static), so it accepts any Text options.
+					plus one the following: blackframe, blackrect, grayframe, grayrect, whiteframe, whiterect, sunken.
+			Text    - Text to set.
+			Handler - Notification function. See bellow.
+			
+ Handler:
+ >			OnSplitter(Hwnd, Event, Pos)
+		
+			P - Triggered when user changes the position by dragging the splitter with mouse.
+			D - User doubleclicked the splitter.
+			R - User right clicked the splitter.
 
  Returns:
 			Splitter handle.
@@ -24,9 +35,6 @@
 			This function adds a new splitter on the given position. User is responsible for correct position of the splitter.
 			Splitter is inactive until you call <Set> function.
 			When setting dimension of the splitter (width or height) use even numbers.
-			Splitter will set CoordMode, mouse, relative.
-
-			Upon movement, splitter will reset <Attach> for the parent, if present.
  */
 Splitter_Add(Opt="", Text="", Handler="") {
 	static SS_NOTIFY=0x100, SS_CENTER=0x200, SS_SUNKEN=0x1000, SS_BLACKRECT=4, SS_GRAYRECT=5, SS_WHITERECT=6, SS_BLACKFRAME=7, SS_GRAYFRAM=8, SS_WHITEFRAME=9
@@ -45,22 +53,64 @@ Splitter_Add(Opt="", Text="", Handler="") {
 }
 
 /*
- Function:	GetPos
- 			Get position of the splitter.
+ Function:	Add2Form
+ 			Add Splitter into the form. 
+
+ Options:
+			handler	- Splitter handler name.
+			extra	- Extra parameters are transmited to <Splitter_Add> Opt parameter.
+ 
+ Remarks:
+			Function is required by the Forms framework.
  */
-Splitter_GetPos( HSep ) {
-	return Win_GetRect(HSep, Splitter_IsVertical(HSep) ? "*x" : "*y")
+Splitter_Add2Form(HParent, Txt, Opt){
+	static parse = "Form_Parse"
+	%parse%(Opt, "handler", handler, extra)
+	DllCall("SetParent", "uint", hCtrl := Splitter_Add(extra, Txt, handler), "uint", HParent)
+	return hCtrl
 }
 
+/*
+ Function:	GetMax
+ 			Returns maximum position of the splitter.
+
+ Remarks:
+			Maximum position of the splitter will change if parent control is resized.
+ */
+Splitter_GetMax(HSep) {
+	Win_Get( Win_Get(HSep, "P") , "Lwh", plw, plh)
+	return (Splitter(HSep "bVert") ? plw : plh) - Splitter_getSize(HSep)
+}
+
+/*
+ Function:	GetPos
+ 			Get position of the splitter.
+
+ Remarks:
+			Position of the splitter is its x or y coordinate inside parent window.
+ */
+Splitter_GetPos( HSep ) {
+	return Win_GetRect(HSep, Splitter(HSep "bVert") ? "*x" : "*y")
+}
+
+
+/*
+ Function:	GetSize
+ 			Get size of the splitter.
+ */
+Splitter_GetSize(HSep) {
+	Win_GetRect(HSep, "wh", w, h)
+	return Splitter( HSep "bVert") ? w : h
+}
 
 /*
  Function:	Set
  			Initiates separation of controls.
  
  Parameters:
- 			hSep - Splitter handle.
+ 			HSep - Splitter handle.
 			Def	 - Splitter definition or words "off" or "on". The syntax of splitter definition is given bellow.
-			Pos	 - Position of the splitter, optional.
+			Pos	 - Position of the splitter to apply upon initialization (optional).
 
  Splitter Defintion:
  >		c11 c12 c13 ... Type c21 c22 c23 ...
@@ -68,9 +118,6 @@ Splitter_GetPos( HSep ) {
 		c1n - Controls left or top of the splitter.
 		Type - Splitter type: " | " vertical or " - " horizontal.
 		c2n	- Controls right or bottom of the splitter.
-							
- Returns:
-		Splitter handle
  */
 Splitter_Set( HSep, Def, Pos="" ) {
 	static
@@ -81,121 +128,31 @@ Splitter_Set( HSep, Def, Pos="" ) {
 		return Win_subclass(HSep, wndProc)
 
 	if bVert := (InStr(Def, "|") != 0)
-		WinSet, Style, +0x80, ahk_id %HSep%		; SS_NOPREFIX=0x80  style used to mark vertical splitter
+		Splitter(HSep "bVert", bVert)
 
-
-	Splitter_wndProc(0, bVert, Def, HSep)
 	old := Win_subclass(HSep, wnadProc = "" ? "Splitter_wndProc" : wndProc, "", wndProc)
 
-	if Pos != 
-		Splitter_SetPos(HSep, Pos)
+	Splitter(HSep "Def", Def)
+	return 	Splitter_SetPos(HSep, Pos)
 }
-
 /*
  Function:	SetPos
- 			Set position of the splitter.
-
+			Set splitter position.
+ 
  Parameters:
-			Pos		- Position to set. If empty, function simply returns.
-
- Remarks:
-			Resets <Attach> for the parent.
+   			HSep - Splitter handle.
+			Pos	 - Position to set. Position is the client x/y coordinate of the splitter control.
  */
-Splitter_SetPos( HSep, Pos ) {
-	static WM_LBUTTONUP := 0x202
-	ifEqual, Pos, , return
+Splitter_SetPos(HSep, Pos, bInternal=false) {
+	ifEqual, Pos,, return
 
-	bVert := Splitter_IsVertical(HSep)
-	sz := Win_GetRect(HSep, bVert ? "w" : "h") // 2
-	cpos := Splitter_GetPos(HSep), delta := Pos + sz - cpos
-	Splitter_wndProc(HSep, WM_LBUTTONUP, 12345, bVert ? delta : delta << 16)
-}
+	bVert := Splitter(HSep "bVert"),  Def := Splitter(HSep "Def")
 
-;=============================================== PRIVATE ===============================================
-;required by forms framework.
-Splitter_add2Form(HParent, Txt, Opt){
-	static parse = "Form_Parse"
-	%parse%(Opt, "handler", handler, extra)
-	DllCall("SetParent", "uint", hCtrl := Splitter_Add(extra, Txt, handler), "uint", HParent)
-	return hCtrl
-}
-
-Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {	
-	static
-	static WM_SETCURSOR := 0x20, WM_MOUSEMOVE := 0x200, WM_LBUTTONDOWN=0x201, WM_LBUTTONUP=0x202, WM_LBUTTONDBLCLK=0x203,  SIZENS := 32645, SIZEWE := 32644
-
-	Hwnd += 0
-	if !Hwnd
-		return 	hwnd := Lparam+0, %hwnd%_bVert := Umsg, %hwnd%_def := WParam, %hwnd%_cursor := DllCall("LoadCursor", "Uint", 0, "Int", UMsg ? SIZEWE : SIZENS, "Uint")
-
-	bVert := %Hwnd%_bVert
-	If (UMsg = WM_SETCURSOR)
-		return 1 
-	
-	if (UMsg = WM_MOUSEMOVE) {
-		critical 100	;always in new thread.
-		DllCall("SetCursor", "uint", %Hwnd%_cursor)
-		if moving 
-			Splitter_updateVisual(Hwnd, bVert)
-	}
-
-	if (UMsg = WM_LBUTTONDOWN) {
-		DllCall("SetCapture", "uint", Hwnd),  parent := DllCall("GetParent", "uint", Hwnd, "Uint")
-		VarSetCapacity(RECT, 16), DllCall("GetWindowRect", "uint", parent, "uint", &RECT)
-
-		sz := Win_GetRect(Hwnd, bVert ? "w" : "h") // 2
-		ch := Win_Get(parent, "Nh" )				;get caption size of parent window
-		ifGreater, ch, 1000, SetEnv, ch, 0			;Gui, -Caption returns large numbers here...
-
-	  ;prevent user from going offscreen with separator
-	  ; let the separator always be visible a little if it is pulled up to the edge
-		NumPut( NumGet(Rect, 0) + sz-1	,RECT, 0)
-		NumPut( NumGet(RECT, 4) + sz+ch ,RECT, 4)
-		NumPut( NumGet(RECT, 8) - sz+4 	,RECT, 8)
-		NumPut( NumGet(RECT, 12)- sz+4	,RECT, 12)
-
-		DllCall("ClipCursor", "uint", &RECT), DllCall("SetCursor", "uint", %Hwnd%_cursor),	moving := true
-	}
-	if (UMsg = WM_LBUTTONUP){
-		delta := bVert ? LParam & 0xFFFF : LParam >> 16
-		if delta > 10000
-			delta -= 0xFFFF
-
-		DllCall("ClipCursor", "uint", 0),  DllCall("ReleaseCapture")
-		moving := false, Splitter_UpdateVisual(), Splitter_move(Hwnd, delta, %Hwnd%_def, Wparam=12345)
-	}
-
-;	if (UMsg =  WM_LBUTTONDBLCLK){
-;		return	; move splitter to 0 or to max
-;	}
-
-	return DllCall("CallWindowProc","uint",A_EventInfo,"uint",hwnd,"uint",uMsg,"uint",wParam,"uint",lParam)
-}
-
-;delta - offset by which to move splitter
-Splitter_move(HSep, Delta, Def, manual=""){
-	bVert := Splitter_IsVertical(HSep)
-
-	Delta -= Win_GetRect(HSep,  bVert ? "*wx" : "*hy", szf, d) // 2
-	parent := DllCall("GetParent", "uint", HSep, "Uint")	;prevent it from going too much positive. if that happens you can't pull it back.
-	Win_Get(parent, "RwhBxyNh", pw, ph, bx, by, ch)
-	ifGreater, ch, 1000, SetEnv, ch, 0		;Gui, -Caption returns large numbers here and panel too.
-
-	min := bVert ? bx : by + ch
-	max := bVert ? pw - szf - bx*2 : ph - szf - by*2 - ch		
-
-	if (d + Delta < min)					;prevent going too much negative, if that happens controls become overlapped.
-		Delta := - d
-
-	if !manual								
-		if (d + Delta > max )				;prevent going too much positive, but only if user is actually dragging it, not do it when using SetPos.
-			Delta := max-d
-
-	j := InStr(Def, "|") or InStr(Def, "-")
+	ifLess, Pos, 0, SetEnv, Pos, 0
 	StringSplit, s, Def, %A_Space%
-	
-	v := bVert ? Delta : 0,	  h := bVert ? 0 : Delta
 
+	Delta := Pos - Splitter_GetPos(HSep)
+	v := bVert ? Delta : "",  h := bVert ? "" : Delta
 	loop, %s0%
 	{
 		s := s%A_Index%
@@ -207,18 +164,76 @@ Splitter_move(HSep, Delta, Def, manual=""){
 		} else 	Win_MoveDelta(s, v, h, -v, -h)
 	}		
 					
-	Win_Redraw( Win_Get(HSep, "A") )	;redrawing imediate parent was not that good.
-	IsFunc(f := "Attach") ? %f%(DllCall("GetParent", "uint", HSep, "Uint")) : ""
+	Win_Redraw( Win_Get(HSep, "A") )						;redrawing imediate parent was not that good.
+	IsFunc(f := "Attach") ? %f%( Win_Get(HSep, "P") ) : ""	;reset attach for parent of HSep
 
-	if (handler := Splitter(HSep "Handler")) && !manual
-		%handler%(HSep, Splitter_GetPos(HSep))
+	if (handler := Splitter(HSep "Handler")) && bInternal
+		%handler%(HSep, "P", Splitter_GetPos(HSep))
 }
 
-Splitter_updateVisual( HSep="", bVert="" ) {
+;=============================================== PRIVATE ===============================================
+
+Splitter_wndProc(Hwnd, UMsg, WParam, LParam) {	
+	static
+	static WM_SETCURSOR := 0x20, WM_MOUSEMOVE := 0x200, WM_LBUTTONDOWN=0x201, WM_LBUTTONUP=0x202, WM_LBUTTONDBLCLK=515, WM_RBUTTONUP=517, SIZENS := 32645, SIZEWE := 32644
+
+	If (UMsg = WM_SETCURSOR)
+		return 1 
+	
+	if (UMsg = WM_MOUSEMOVE) {
+		if !%Hwnd%_cursor
+			%Hwnd%_bVert := Splitter(Hwnd "bVert"), %Hwnd%_cursor := DllCall("LoadCursor", "Uint", 0, "Int", %Hwnd%_bVert ? SIZEWE : SIZENS, "Uint")
+
+		critical 	;safe, always in new thread.
+			DllCall("SetCursor", "uint", %Hwnd%_cursor)
+		if moving 
+			Splitter_updateFocus(Hwnd)
+	}
+
+	if (UMsg = WM_LBUTTONDOWN) {
+		DllCall("SetCapture", "uint", Hwnd),  parent := DllCall("GetParent", "uint", Hwnd, "Uint")
+		VarSetCapacity(RECT, 16), DllCall("GetWindowRect", "uint", parent, "uint", &RECT)
+
+		sz := Win_GetRect(Hwnd, %Hwnd%_bVert ? "w" : "h") // 2
+		ch := Win_Get(parent, "Nh" )			;get caption size of parent window
+
+	  ;prevent user from going offscreen with separator
+		NumPut( NumGet(RECT, 0) + sz-1	,RECT, 0)
+		NumPut( NumGet(RECT, 4) + sz+ch ,RECT, 4)
+		NumPut( NumGet(RECT, 8) - sz+4 	,RECT, 8)
+		NumPut( NumGet(RECT, 12)- sz+4	,RECT, 12)
+				
+		DllCall("ClipCursor", "uint", &RECT), DllCall("SetCursor", "uint", %Hwnd%_cursor)
+		moving := true
+	}
+	if (UMsg = WM_LBUTTONUP){
+		moving := false
+	
+		DllCall("ClipCursor", "uint", 0),  DllCall("ReleaseCapture")
+		Splitter_SetPos(Hwnd, Splitter_updateFocus(), true)
+	}
+
+	if UMsg in %WM_LBUTTONDBLCLK%,%WM_RBUTTONUP%
+	{
+		handler := Splitter(Hwnd "Handler")
+		ifEqual, handler,,return
+
+		ifEqual, UMsg, %WM_LBUTTONDBLCLK%, SetEnv, Event, D
+		else ifEqual, UMsg, %WM_RBUTTONUP%, SetEnv, Event, R
+			
+		%handler%(Hwnd, Event, Splitter_GetPos(Hwnd))
+	}
+
+	return DllCall("CallWindowProc","uint",A_EventInfo,"uint",hwnd,"uint",uMsg,"uint",wParam,"uint",lParam)
+}
+
+;Updates focus rectangle while mouse is moving. 
+;If called without arguments it returns latest focus rectangle position.
+Splitter_updateFocus( HSep="" ) {
 	static
 
 	if !HSep
-		return dc := 0
+		return pos - offset, dc := 0
 	
 	MouseGetPos, mx, my
 	if !dc 
@@ -226,28 +241,30 @@ Splitter_updateVisual( HSep="", bVert="" ) {
 		ifEqual, adrDrawFocusRect,, SetEnv, adrDrawFocusRect, % DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "DrawFocusRect")
 		CoordMode, mouse, relative
 
-		root := Win_Get(hSep, "A")
-		Win_Get(root, "NhB" (bVert ? "x" : "y"), ch, b)		;get caption and border size
-		ifGreater, ch, 1000, SetEnv, ch, 0
+	  ;initialize dc, RECT, idx, delta(distance between mouse and splitter position), sz, pos & max when user starts moving.
+		dc := Win_Get( Win_Get(HSep, "A"), "D")		; take root DC, for some reason it doesn't work good on parent's DC
 
-		dc := DllCall("GetDC", "Uint", root, "Uint")
-		Win_GetRect(HSep, "!xywh", sx, sy, sw, sh),	  sz := (bVert ? sw : sh) // 2
-		VarSetCapacity(RECT, 16),  NumPut(sx, RECT), NumPut(sy, RECT, 4), NumPut(sx+sw, RECT, 8), NumPut(sy+sh, RECT, 12)
+		Win_GetRect(HSep, "!xywh", sx, sy, sw, sh)
+		VarSetCapacity(RECT, 16), NumPut(sx, RECT), NumPut(sy, RECT, 4), NumPut(sx+sw, RECT, 8), NumPut(sy+sh, RECT, 12) , sz := sh
+		
+		if bVert := Splitter( HSep "bVert" )
+			 idx := 0,   delta := mx-sx,   sz := sw
+		else idx := 4,   delta := my-sy,   sz := sh
+
+      ;if in Panel, there will be offset to mouse movement according to its position.
+		parent := Win_Get(HSep, "P")			
+		WinGetClass, cls, ahk_id %parent%
+		offset :=  cls != "Panel" ? 0 : Win_GetRect( parent, bVert ? "!x" : "!y")			
+
+		pos := Splitter_GetPos(HSep),  max := Splitter_getMax(HSep) + offset,	 min := offset
 		return DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	}
-	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
-	if (bVert)
-		 NumPut(mx-b-sz, RECT),	NumPut(mx-b+sz, RECT, 8)
-	else NumPut(my-ch-b-sz, RECT, 4),  NumPut(my-ch-b+sz, RECT, 12)
-	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
-}
+	pos := bVert ? mx-delta : my-delta
+	ifLess, pos, %min%, SetEnv, pos, %min%
+	else ifGreater, pos, %max%, SetEnv, pos, %max%
 
-Splitter_IsVertical(Hwnd) {
-	old := A_DetectHiddenWindows
-	DetectHiddenWindows, on
-	WinGet, s, Style, ahk_id %Hwnd%
-	DetectHiddenWindows, %old%
-	return s & 0x80 
+	DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
+	NumPut(pos, RECT, idx),   NumPut(pos+sz, RECT, idx+8),  DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 }
 
 ;storage
@@ -257,7 +274,6 @@ Splitter(Var="", Value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="
 	ifNotEqual, value,~`a , SetEnv, %var%, %value%
 	return _
 }
-
 
 #include *i Win.ahk
 
@@ -283,6 +299,6 @@ Splitter(Var="", Value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="
  */
 
 /* Group: About
-	o Ver 1.11 by majkinetor. 
+	o Ver 1.5 by majkinetor. 
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */
