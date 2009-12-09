@@ -23,9 +23,10 @@
 
 	gui, add, edit, HWNDhc1 w%w% h%h1%, ESC - exit and save window.`nF1 - Set splitter position to 40
 	hSep := Splitter_Add("h" ssize " w" w " center sunken", "drag me", "OnSplitter")
-	w1 := w//2
+	w1 := w//2, h2-=30
 	gui, add, monthcal, HWNDhc2 w%w1% h%h2%
 	gui, add, monthcal, HWNDhc3 x+0 w%w1% h%h2%
+	gui, add, statusbar, , 123
 
 	IniRead, spos, config.ini, Config, Splitter, %A_Space%
 	Splitter_Set( hSep, hc1 " - " hc2 " " hc3, spos)
