@@ -4,10 +4,12 @@
 			 (see splitter.png)
 
 			 Splitter is control that is created between controls that need to have dynamic separation.
-			 To use it, you first need to create the splitter (<Add>), then you have to activate it when all controls
-			 that it separates are created (<Set>).
+			 To use it, you first need to create the splitter using <Add> function, then you have to activate 
+			 it with <Set> function when all controls that it separates are created.
+
 			 You can set splitter position with <SetPos> and obtain it with <GetPos>. 
-			 You can also limit splitter movement with <Limit> function if you don't want controls it separates to be set completely invisible by the user.
+			 You can also limit splitter movement with <Set> function and its "Limit" parameter
+			 if you don't want controls it separates to be set completely invisible by the user.
 			 
  Dependency:
 			<Win> 1.24
