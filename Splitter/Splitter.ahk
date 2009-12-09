@@ -79,7 +79,7 @@ Splitter_Add2Form(HParent, Txt, Opt){
  */
 Splitter_GetMax(HSep) {
 	Win_Get( Win_Get(HSep, "P") , "Lwh", plw, plh)
-	return (Splitter(HSep "bVert") ? plw : plh) - Splitter_getSize(HSep)
+	return (Splitter(HSep "bVert") ? plw : plh) - Splitter_getSize(HSep) - Splitter(HSep "L2")
 }
 
 /*
@@ -111,6 +111,8 @@ Splitter_GetSize(HSep) {
  			HSep - Splitter handle.
 			Def	 - Splitter definition or words "off" or "on". The syntax of splitter definition is given bellow.
 			Pos	 - Position of the splitter to apply upon initialization (optional).
+			Limit - Decimal, sets start and end limits for splitter movement. The minimum and maximum splitter value will
+					be adjusted by this value. For instance, .100 means that maximum value will be less by 100.
 
  Splitter Defintion:
  >		c11 c12 c13 ... Type c21 c22 c23 ...
@@ -119,7 +121,7 @@ Splitter_GetSize(HSep) {
 		Type - Splitter type: " | " vertical or " - " horizontal.
 		c2n	- Controls right or bottom of the splitter.
  */
-Splitter_Set( HSep, Def, Pos="" ) {
+Splitter_Set( HSep, Def, Pos="", Limit=0.0 ) {
 	static
 
 	if Def=off
@@ -132,7 +134,8 @@ Splitter_Set( HSep, Def, Pos="" ) {
 
 	old := Win_subclass(HSep, wnadProc = "" ? "Splitter_wndProc" : wndProc, "", wndProc)
 
-	Splitter(HSep "Def", Def)
+	StringSplit, L, Limit, .
+	Splitter(HSep "Def", Def),  Splitter(HSep "L1", L1),  Splitter(HSep "L2", L2)
 	return 	Splitter_SetPos(HSep, Pos)
 }
 /*
@@ -256,7 +259,8 @@ Splitter_updateFocus( HSep="" ) {
 		WinGetClass, cls, ahk_id %parent%
 		offset :=  cls != "Panel" ? 0 : Win_GetRect( parent, bVert ? "!x" : "!y")
 
-		pos := Splitter_GetPos(HSep),  max := Splitter_getMax(HSep) + offset,	 min := offset
+		pos := Splitter_GetPos(HSep),  
+		max := offset + Splitter_getMax(HSep),	 min := offset + Splitter(HSep "L1")
 		return DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	}
 	pos := bVert ? mx-delta : my-delta
@@ -299,6 +303,6 @@ Splitter(Var="", Value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="
  */
 
 /* Group: About
-	o Ver 1.5 by majkinetor. 
+	o Ver 1.51 by majkinetor.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */

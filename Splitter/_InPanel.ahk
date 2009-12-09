@@ -27,7 +27,7 @@
 	Win_SetParent(hc11, hp1), Win_SetParent(hc12, hp1),  Win_SetParent(hSep1, hp1)
 	Win_SetParent(hc21, hp2), Win_SetParent(hc22, hp2) Win_SetParent(hSep2, hp2)
 	
-	Splitter_Set( hSep1, hc11 " | " hc12 ), Splitter_Set( hSep2, hc21 " - " hc22 )
+	Splitter_Set( hSep1, hc11 " | " hc12, "", 50.50), Splitter_Set( hSep2, hc21 " - " hc22 )
 
 	Attach(hc11, "h")
 	Attach(hc12, "w h")
