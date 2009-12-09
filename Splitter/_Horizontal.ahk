@@ -21,7 +21,7 @@
 	Gui, Menu, mnu
 
 
-	gui, add, edit, HWNDhc1 w%w% h%h1%, ESC - exit and save window.`nF1 - Set splitter position to 40`nRight click on splitter to move to ending positions.`nDouble click on splitter for the menu.
+	gui, add, edit, HWNDhc1 w%w% h%h1%, ESC - exit and save window.`nF1 - Set splitter position to 50`%`nRight click on splitter to move to ending positions.`nDouble click on splitter for the menu.
 	hSep := Splitter_Add("h" ssize " w" w " center sunken", "drag me", "OnSplitter")
 	w1 := w//2, h2-=30
 	gui, add, monthcal, HWNDhc2 w%w1% h%h2%
@@ -35,7 +35,7 @@
 	Attach( hSep, "y w r2")
 	Attach( hc2,  "y w.5 r2")
 	Attach( hc3,  "y x.5 w.5 r2")
-	
+
 	Gui, Show, x%x% y%y% w%w% h%h%
 return
 
@@ -45,7 +45,8 @@ return
 OnSplitter(HCtrl, Event, Pos){
 	if Event = R
 	{
-		Pos := Pos=0 ? Splitter_GetMax(HCtrl) : 0
+		min := Splitter_GetMin(HCtrl),	max := Splitter_GetMax(HCtrl)
+		Pos := Pos=min ? max : min
 		Splitter_SetPos(HCtrl, Pos)
 	}
 
@@ -57,16 +58,13 @@ OnSplitter(HCtrl, Event, Pos){
 }
 
 Splitter_Menu:
-	p := A_ThisMenuItem
-	max := Splitter_GetMax(HSep)
-	Splitter_SetPos(HSep,  pos := (max * p // 100))
-	txt = position: %pos%
-	ControlSetText, ,%txt%, ahk_id %HSep%
+	Splitter_SetPos(HSep, A_ThisMenuItem "%")
 return
 
 F1::
-	Splitter_SetPos(hSep, 40)
+	Splitter_SetPos(hSep, 50 "%")
 return
+
 
 Esc:: 
 GuiClose:
