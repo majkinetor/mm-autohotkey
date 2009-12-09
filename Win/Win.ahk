@@ -105,19 +105,23 @@ Win_FromPoint(X="mouse", Y="") {
  */ 
 Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="", ByRef o7="", ByRef o8="", ByRef o9="") {
 	c := SubStr(pQ, 1, 1)
-	if c is integer
+	if c is integer 
+	{
 		if (c = 0)
-			Hwnd := DllCall("GetAncestor", "uint", Hwnd, "uint", 2, "UInt") 
+			Hwnd := DllCall("GetAncestor", "uint", Hwnd, "uint", 2, "UInt")
 		else loop, %c%
 			Hwnd := DllCall("GetParent", "uint", Hwnd, "UInt")
+
+		pQ := SubStr(pQ, 2)
+	}
 		
 	if pQ contains R,B,L
 		VarSetCapacity(WI, 60, 0), NumPut(60, WI),  DllCall("GetWindowInfo", "uint", Hwnd, "uint", &WI)
 	
 	oldDetect := A_DetectHiddenWindows
 	DetectHiddenWindows, on
-
-	k := i := c ? 1 : 0
+	
+	k := i := 0
 	loop
 	{
 		i++, k++
