@@ -406,34 +406,35 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 
 /* 
   Function:	Recall
-			Store & recall window position, size and/or state.
+			Store & recall window placement (position, size and state).
 
   Parameters:
 		Options		- White space separated list of options. See bellow.		
-		Hwnd		- Hwnd of the window for which to store data or Gui number if AHK window. 
-					If omitted, function will use Hwnd of the default AHK Gui. You can also use Gui, N:Default 
+		Hwnd		- Hwnd of the window or Gui number if AHK window. 
+					In store mode (">") it determines window for which to store placement information.
+					If omitted function will use Hwnd of the default AHK Gui. You can also use Gui, N:Default 
 					prior to calling the function. For 3td party windows, this parameter is mandatory. 
-					Set 0 as hwnd to return position string without applying it to any window. This can be used for AHK Guis to
-					calculate size of controls based on window size and position, when needed. 
+					In recall mode ("<") it determines window which placement is to be set.
+					Use 0 as hwnd to return placement string without applying it to any window. T
+					his can be used for AHK Guis to calculate size of controls based on window size and position. 
 
 		IniFileName	- Ini file to use as storage. Function will save the data under the [Recall] section.
 					If omitted, Windows Registry key HKEY_CURRENT_USER\AutoHotKey\Win is used. Each script is uniquely determined by its full path 
 					so same scripts with different name will not share the storage.
 					
   Options:
-		">", "<", "-", "--" - Operation, mandatory option. Use ">" to store or "<" to recall window position.
+		">", "<", "-", "--" - Operation, mandatory option. Use ">" to store or "<" to recall window placement.
 					It can be optionally followed by the string representing the name of the storage location for that window.
 					You need to use name if your script stores more then one window, otherwise it will be saved under unnamed location.
-					">" and "<" are special names that can be used to store or recall all AHK Guis.
+					">" and "<" are special names that can be used to store or recall placements of all existing AHK Guis.
 					"-"	operation is used alone as an argument to delete Registry or Ini sections belonging to the script.
 					"--" operation is used alone as an argument to delete all Registry entries for all scripts.
-
 		
 		-Min	  - Don't save minimize state.
 		-Max	  - Don't save maximized state.		
 					
   Returns:
-			Position string, space separated list of syntax "left top right bottom state cw ch" of the window. 
+			Placement string, space separated list of syntax "left top right bottom state cw ch" of the window. 
 			Empty if no recall data is stored for the window.
 			State can be 1 (normal) 2 (minimized) or 3 (maximized).
 			cw & ch numbers are present only for AHK Guis and represent client width & height which can be used 
@@ -444,7 +445,7 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 		(start code)
 		 Gui, +Resize +LastFound
 		 WinSetTitle, MyGui
-		 if !Win_Recall("<")                     ;Recall gui if its position is already saved
+		 if !Win_Recall("<")                    ;Recall gui if its position is already saved
 			Gui, Show, h300 w300, MyGui         ; otherwise use these defaults.
 		return
 
@@ -456,10 +457,10 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 
 		Snippets:
 		(start code)
-			Win_Recall(">MyGui")					;Save position for default Gui under name MyGui.
-			Win_Recall("<MyGui")					;Recall position for MyGui for default Gui
+			Win_Recall(">MyGui")					;Save placement of default Gui under name "MyGui".
+			Win_Recall("<MyGui")					;Recall placement saved under the name "MyGui" for default Gui.
 			
-			Win_Recall(">MyGui2", Hwnd)				;Save window position under MyGui2 name, given the window handle or Gui number.
+			Win_Recall(">MyGui2", Hwnd)				;Save window placement under MyGui2 name, given the window handle.
 			Win_Recall(">>")						;Save all Guis. The names will be given by their number.
 			Win_Recall("<<")						;Recall all Guis.
 
