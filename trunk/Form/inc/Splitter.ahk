@@ -3,8 +3,14 @@
 
 			 (see splitter.png)
 
+			 Splitter is control that is created between controls that need to have dynamic separation.
+			 To use it, you first need to create the splitter (<Add>), then you have to activate it when all controls
+			 that it separates are created (<Set>).
+			 You can set splitter position with <SetPos> and obtain it with <GetPos>. 
+			 You can also limit splitter movement with <Limit> function if you don't want controls it separates to be set completely invisible by the user.
+			 
  Dependency:
-			<Win> 1.23++
+			<Win> 1.24
 
  Effects:	
 			- While user moves splitter, CoordMode of mouse is always returned to relative.
@@ -58,7 +64,7 @@ Splitter_Add(Opt="", Text="", Handler="") {
 
  Options:
 			handler	- Splitter handler name.
-			extra	- Extra parameters are transmited to <Splitter_Add> Opt parameter.
+			extra	- Extra parameters are transmited to <Add> Opt parameter.
  
  Remarks:
 			Function is required by the Forms framework.
@@ -79,20 +85,30 @@ Splitter_Add2Form(HParent, Txt, Opt){
  */
 Splitter_GetMax(HSep) {
 	Win_Get( Win_Get(HSep, "P") , "Lwh", plw, plh)
-	return (Splitter(HSep "bVert") ? plw : plh) - Splitter_getSize(HSep)
+	return (Splitter(HSep "bVert") ? plw : plh) - Splitter_getSize(HSep) - Splitter(HSep "L2")
+}
+
+Splitter_GetMin(HSep) {
+	return Splitter(HSep "L1")
 }
 
 /*
  Function:	GetPos
  			Get position of the splitter.
 
- Remarks:
-			Position of the splitter is its x or y coordinate inside parent window.
- */
-Splitter_GetPos( HSep ) {
-	return Win_GetRect(HSep, Splitter(HSep "bVert") ? "*x" : "*y")
-}
+ Parameters:
+			Flag	- Set to "%" to return procentage instead position.
 
+ Remarks:
+			Position of the splitter is its x or y coordinate inside the parent window.
+ */
+Splitter_GetPos( HSep, Flag="" ) {
+	pos := Win_GetRect(HSep, Splitter(HSep "bVert") ? "*x" : "*y")
+	if (Flag = "%"){
+		min := Splitter_GetMin(HSep), max := Splitter_GetMax(HSep)
+		return 100*(pos-min)/(max-min)
+	} else return pos
+}
 
 /*
  Function:	GetSize
@@ -111,6 +127,8 @@ Splitter_GetSize(HSep) {
  			HSep - Splitter handle.
 			Def	 - Splitter definition or words "off" or "on". The syntax of splitter definition is given bellow.
 			Pos	 - Position of the splitter to apply upon initialization (optional).
+			Limit - Decimal, sets start and end limits for splitter movement. The minimum and maximum splitter value will
+					be adjusted by this value. For instance, .100 means that maximum value will be less by 100.
 
  Splitter Defintion:
  >		c11 c12 c13 ... Type c21 c22 c23 ...
@@ -119,7 +137,7 @@ Splitter_GetSize(HSep) {
 		Type - Splitter type: " | " vertical or " - " horizontal.
 		c2n	- Controls right or bottom of the splitter.
  */
-Splitter_Set( HSep, Def, Pos="" ) {
+Splitter_Set( HSep, Def, Pos="", Limit=0.0 ) {
 	static
 
 	if Def=off
@@ -132,7 +150,8 @@ Splitter_Set( HSep, Def, Pos="" ) {
 
 	old := Win_subclass(HSep, wnadProc = "" ? "Splitter_wndProc" : wndProc, "", wndProc)
 
-	Splitter(HSep "Def", Def)
+	StringSplit, L, Limit, .
+	Splitter(HSep "Def", Def),  Splitter(HSep "L1", L1),  Splitter(HSep "L2", L2)
 	return 	Splitter_SetPos(HSep, Pos)
 }
 /*
@@ -141,14 +160,24 @@ Splitter_Set( HSep, Def, Pos="" ) {
  
  Parameters:
    			HSep - Splitter handle.
-			Pos	 - Position to set. Position is the client x/y coordinate of the splitter control.
+			Pos	 - Position to set. Position is the client x/y coordinate of the splitter control. 
+				   If followed by the sign %, position is set using procentage of splitter range. 
+				   If Pos is empty, function returns without any action. 
+
+ Remarks:
+			Due to the rounding, if you set position using procentage, actuall position may be slightly different.
+			You can find out what is exact position set if you use <GetPos> with Flag set to "%".
  */
 Splitter_SetPos(HSep, Pos, bInternal=false) {
 	ifEqual, Pos,, return
+	min := Splitter_GetMin(HSep), max := Splitter_GetMax(HSep)
+
+	if SubStr(Pos, 0) = "%"
+		Pos := min + SubStr(Pos, 1, -1)*(max-min)//100
 
 	bVert := Splitter(HSep "bVert"),  Def := Splitter(HSep "Def")
 
-	ifLess, Pos, 0, SetEnv, Pos, 0
+	ifLess, Pos, %min%, SetEnv, Pos, %min%
 	StringSplit, s, Def, %A_Space%
 
 	Delta := Pos - Splitter_GetPos(HSep)
@@ -242,7 +271,7 @@ Splitter_updateFocus( HSep="" ) {
 		CoordMode, mouse, relative
 
 	  ;initialize dc, RECT, idx, delta(distance between mouse and splitter position), sz, pos & max when user starts moving.
-		dc := Win_Get( Win_Get(HSep, "A"), "D")		; take root DC, for some reason it doesn't work good on parent's DC
+		dc := Win_Get( HSep, "0D")		; take root DC, for some reason it doesn't work good on parent's DC
 
 		Win_GetRect(HSep, "!xywh", sx, sy, sw, sh)
 		VarSetCapacity(RECT, 16), NumPut(sx, RECT), NumPut(sy, RECT, 4), NumPut(sx+sw, RECT, 8), NumPut(sy+sh, RECT, 12) , sz := sh
@@ -252,11 +281,12 @@ Splitter_updateFocus( HSep="" ) {
 		else idx := 4,   delta := my-sy,   sz := sh
 
       ;if in Panel, there will be offset to mouse movement according to its position.
-		parent := Win_Get(HSep, "P")			
+		parent := Win_Get(HSep, "P")
 		WinGetClass, cls, ahk_id %parent%
-		offset :=  cls != "Panel" ? 0 : Win_GetRect( parent, bVert ? "!x" : "!y")			
+		offset :=  cls != "Panel" ? 0 : Win_GetRect( parent, bVert ? "!x" : "!y")
 
-		pos := Splitter_GetPos(HSep),  max := Splitter_getMax(HSep) + offset,	 min := offset
+		pos := Splitter_GetPos(HSep),  
+		max := offset + Splitter_getMax(HSep),	 min := offset + Splitter_getMin(HSep)
 		return DllCall(adrDrawFocusRect, "uint", dc, "uint", &RECT)
 	}
 	pos := bVert ? mx-delta : my-delta
@@ -299,6 +329,6 @@ Splitter(Var="", Value="~`a ", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="
  */
 
 /* Group: About
-	o Ver 1.5 by majkinetor. 
+	o Ver 1.6 by majkinetor.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/>.
  */

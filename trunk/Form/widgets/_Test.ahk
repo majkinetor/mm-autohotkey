@@ -1,14 +1,13 @@
 _()
-	hForm1	:=	Form_New("w380 e1 h500 +Resize +ToolWindow")
+	hForm1	:=	Form_New("w400 e1 h500 +Resize +ToolWindow")
 
-	hWriter := Form_Add(hForm1, "Writer", "", "w100 h1", "Align T,200")
+	hWriter := Form_Add(hForm1, "Writer", "", "w100 h100", "Align T,200")
 	hPanel  := Form_Add(hForm1, "Panel", "", "", "Align T,40")
 	Form_AutoSize(hForm1)
 	Attach(hWriter, "w h"), Attach(hPanel, "y w")
 
 	Form_Add(hPanel, "Button", "Save", "gOnBtn xm ym w100 0x8000")
 	Form_Add(hPanel, "Button", "Clear","gOnBtn ym w100 0x8000 x" 275, "Attach x")
-
 	Form_Show()
 return
 
