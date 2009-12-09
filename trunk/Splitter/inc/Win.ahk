@@ -84,6 +84,8 @@ Win_FromPoint(X="mouse", Y="") {
  			M			- Module full path (owner exe), unlike WinGet,,ProcessName which returns only name without path.
  			T			- Title for a top level window or text for a child window.
 			D			- DC.
+			#			- Non-negative integer. If present must be first option in the query string. Function will return window information
+						  not for passed window but for its ancestor. 1 is imidiate parent, 2 is parent's parent etc... 0 represents root window.
  
  Returns:
 			o1
@@ -94,17 +96,31 @@ Win_FromPoint(X="mouse", Y="") {
     Win_Get(hwnd, "RxwTC", x, w, t, c)						;get x & width attributes of window rect, title and class
   	Win_Get(hwnd, "RxywhCLxyTBy",wx,wy,ww,wh,c,lx,ly,t,b)	;get all 4 attributes of window rect, class, x & y of client rect, text and horizontal border height
     right := Win_Get(hwnd, "Rx") + Win_Get(hwnd, "Rw")		;first output is returned as function result so u can use function in expressions.
-    Win_Get(hwnd, "Rxw", x, w), right := x+w				;the same as above but faster
-    right := Win_Get(hwnd, "Rxw", x, w ) + w				;not recommended
+    Win_Get(hwnd, "Rxw", x, w), right := x+w				;the same as above but faster.
+    right := Win_Get(hwnd, "Rxw", x, w ) + w				;not recommended.
+
+	Win_Get(hwnd, "1CIT", class, pid, text)					;get class, pid and text for parent of the hwnd.
+	rect := Win_Get(hwnd, "0R")								;get rectangle of the root window.
  (end code)
- */
+ */ 
 Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o5="", ByRef o6="", ByRef o7="", ByRef o8="", ByRef o9="") {
+	c := SubStr(pQ, 1, 1)
+	if c is integer 
+	{
+		if (c = 0)
+			Hwnd := DllCall("GetAncestor", "uint", Hwnd, "uint", 2, "UInt")
+		else loop, %c%
+			Hwnd := DllCall("GetParent", "uint", Hwnd, "UInt")
+
+		pQ := SubStr(pQ, 2)
+	}
+		
 	if pQ contains R,B,L
 		VarSetCapacity(WI, 60, 0), NumPut(60, WI),  DllCall("GetWindowInfo", "uint", Hwnd, "uint", &WI)
 	
 	oldDetect := A_DetectHiddenWindows
 	DetectHiddenWindows, on
-
+	
 	k := i := 0
 	loop
 	{
@@ -780,7 +796,7 @@ Win_Subclass(Hwnd, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.23 by majkinetor.
+	o v1.24 by majkinetor.
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
 	o Licensed under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*

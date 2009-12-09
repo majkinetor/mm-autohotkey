@@ -4,7 +4,7 @@
 			 (see splitter.png)
 			 
  Dependency:
-			<Win> 1.23++
+			<Win> 1.24
 
  Effects:	
 			- While user moves splitter, CoordMode of mouse is always returned to relative.
@@ -242,7 +242,7 @@ Splitter_updateFocus( HSep="" ) {
 		CoordMode, mouse, relative
 
 	  ;initialize dc, RECT, idx, delta(distance between mouse and splitter position), sz, pos & max when user starts moving.
-		dc := Win_Get( Win_Get(HSep, "A"), "D")		; take root DC, for some reason it doesn't work good on parent's DC
+		dc := Win_Get( HSep, "0D")		; take root DC, for some reason it doesn't work good on parent's DC
 
 		Win_GetRect(HSep, "!xywh", sx, sy, sw, sh)
 		VarSetCapacity(RECT, 16), NumPut(sx, RECT), NumPut(sy, RECT, 4), NumPut(sx+sw, RECT, 8), NumPut(sy+sh, RECT, 12) , sz := sh
@@ -252,7 +252,7 @@ Splitter_updateFocus( HSep="" ) {
 		else idx := 4,   delta := my-sy,   sz := sh
 
       ;if in Panel, there will be offset to mouse movement according to its position.
-		parent := Win_Get(HSep, "P")			
+		parent := Win_Get(HSep, "P")
 		WinGetClass, cls, ahk_id %parent%
 		offset :=  cls != "Panel" ? 0 : Win_GetRect( parent, bVert ? "!x" : "!y")
 
