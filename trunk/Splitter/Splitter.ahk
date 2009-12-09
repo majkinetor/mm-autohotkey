@@ -90,6 +90,10 @@ Splitter_GetMax(HSep) {
 	return (Splitter(HSep "bVert") ? plw : plh) - Splitter_getSize(HSep) - Splitter(HSep "L2")
 }
 
+/*
+ Function:	GetMin
+ 			Returns minimum position of the splitter.
+ */
 Splitter_GetMin(HSep) {
 	return Splitter(HSep "L1")
 }
