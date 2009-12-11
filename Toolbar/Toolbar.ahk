@@ -227,7 +227,7 @@ Toolbar_Customize(hCtrl) {
 }
 
 /*
-	Function:  GetButton
+		Function:  GetButton
 			Get button information
 
 	Parameters:
@@ -406,7 +406,6 @@ Toolbar_GetButtonSize(hCtrl, ByRef W, ByRef H) {
 	W := ErrorLevel & 0xFFFF, H := ErrorLevel >> 16
 }
 
-
 /*
  Function:  GetRect
  			Get button rectangle
@@ -535,8 +534,8 @@ Toolbar_Insert(hCtrl, Btns, Pos=""){
 	Toolbar_mfree(cBTN)
 
    ;for some reason, you need to call this 2 times for proper results in some scenarios .... !?
-	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
- 	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
+;	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
+ ;	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
 }
 
 /*
@@ -696,7 +695,7 @@ Toolbar_SetButtonSize(hCtrl, W, H="") {
 	static TB_SETBUTTONSIZE = 0x41F
 	IfEqual, H, ,SetEnv, H, %W%
 	SendMessage, TB_SETBUTTONSIZE, ,(H<<16)|W ,,ahk_id %hCtrl%
-	SendMessage, 0x421,,,,ahk_id %hCtrl%	;autosize
+;	SendMessage, 0x421,,,,ahk_id %hCtrl%	;autosize
 }
 
 /*
