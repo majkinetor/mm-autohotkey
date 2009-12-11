@@ -154,11 +154,10 @@ Toolbar_Add(hGui, Handler, Style="", ImageList="", Pos="") {
  			change either by setting the button or bitmap size or by adding strings for the first time.
  */
 Toolbar_AutoSize(hCtrl, Align="fit"){
-	dhw := A_DetectHiddenWindows
-	DetectHiddenWindows,on
-
 	if align !=
 	{
+		dhw := A_DetectHiddenWindows
+		DetectHiddenWindows,on
 		Toolbar_GetMaxSize(hCtrl, w, h)
 
 		SysGet, f, 8		;SM_CYFIXEDFRAME , Thickness of the frame around the perimeter of a window that has a caption but is not sizable
@@ -176,10 +175,9 @@ Toolbar_AutoSize(hCtrl, Align="fit"){
 			ControlMove,,pw-w-f,ph-h-f,%w%,%h%, ahk_id %hCtrl%
 		else if Align = bl
 			ControlMove,,,ph-h-f,%w%,%h%, ahk_id %hCtrl%
+		DetectHiddenWindows, %dhw%
 	}
 	else SendMessage,0x421,,,,ahk_id %hCtrl%
-
-	DetectHiddenWindows, %dhw%
 }
 
 /*
