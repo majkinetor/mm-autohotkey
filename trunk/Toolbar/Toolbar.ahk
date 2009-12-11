@@ -534,8 +534,8 @@ Toolbar_Insert(hCtrl, Btns, Pos=""){
 	Toolbar_mfree(cBTN)
 
    ;for some reason, you need to call this 2 times for proper results in some scenarios .... !?
-;	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
- ;	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
+	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
+ 	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
 }
 
 /*
@@ -652,10 +652,7 @@ Toolbar_SetButtonWidth(hCtrl, Min, Max=""){
 	ifEqual, Max, , SetEnv, Max, %Min%
 
 	SendMessage, TB_SETBUTTONWIDTH, 0,(Max<<16) | Min,,ahk_id %hCtrl%
-	ret := ErrorLevel
-
- 	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
-	return ret
+	return ErrorLevel
 }
 
 /*
@@ -738,7 +735,7 @@ Toolbar_SetMaxTextRows(hCtrl, iMaxRows=0) {
 	static TB_SETMAXTEXTROWS = 0x43C
     SendMessage, TB_SETMAXTEXTROWS,iMaxRows,,,ahk_id %hCtrl%
 	res := ErrorLevel
- 	SendMessage,0x421,,,,ahk_id %hCtrl% ;autosize
+; 	SendMessage,0x421,,,,ahk_id %hCtrl% ;autosize
 	return res
 }
 
@@ -769,7 +766,7 @@ Toolbar_ToggleStyle(hCtrl, Style="LIST"){
 		Toolbar_SetMaxTextRows(hCtrl, 1)	
 	}
 
- 	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
+; 	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
 }
 
 /*
@@ -1121,7 +1118,7 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 
 /*
  Group: About
-	o Ver 2.3m by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Ver 2.31 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
 	o Parts of code in Toolbar_onNotify by jballi.
 	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
 	o Licensed under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
