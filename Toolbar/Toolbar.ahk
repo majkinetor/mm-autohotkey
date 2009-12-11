@@ -217,6 +217,25 @@ Toolbar_Count(hCtrl, pQ="c") {
 }
 
 /*
+ Function:  CommandToIndex
+ 			Retrieves the button position given the ID.
+ 
+ Parameters:
+ 			ID	- Button ID, number > 0.
+ 
+ Returns:
+ 			0 if button with that ID doesn't exist, pos > 0 otherwise.
+ */
+
+Toolbar_CommandToIndex( hCtrl, ID ) {
+	static TB_COMMANDTOINDEX=0x419
+
+	SendMessage, TB_COMMANDTOINDEX, ID,, ,ahk_id %hCtrl%
+	ifEqual, ErrorLevel, 4294967295, return 0
+	return ErrorLevel + 1
+}
+
+/*
  Function:  Customize
  			Launches customization dialog
  			(see Toolbar_customize.png)
@@ -227,18 +246,18 @@ Toolbar_Customize(hCtrl) {
 }
 
 /*
-		Function:  GetButton
+ Function:  CheckButton
 			Get button information
 
-	Parameters:
+ Parameters:
 			WhichButtton - One of the ways to identify the button: 1-based button position or button ID.
 						  If WhichButton is negative, the information about available (*) button on position -WhichButton will be returned.	
 			bCheck		 - Set to 1 to check the button (default). 
 
-	Returns:
+ Returns:
 			Returns TRUE if successful, or FALSE otherwise.
 
-	Remarks:
+ Remarks:
 			With groupcheck use this function to check button. Using <SetButton> function will not uncheck other buttons in the group.
  */
 Toolbar_CheckButton(hCtrl, WhichButton, bCheck=1) {
@@ -407,6 +426,25 @@ Toolbar_GetButtonSize(hCtrl, ByRef W, ByRef H) {
 }
 
 /*
+ Function:  GetMaxSize
+ 			Retrieves the total size of all of the visible buttons and separators in the toolbar.
+ 
+ Parameters:
+ 			Width, Height		- Variables which will receive size.
+ 
+ Returns:
+ 			Returns TRUE if successful.
+ */
+Toolbar_GetMaxSize(hCtrl, ByRef Width, ByRef Height){
+	static TB_GETMAXSIZE = 0x453
+
+	VarSetCapacity(SIZE, 8)
+	SendMessage, TB_GETMAXSIZE, 0, &SIZE, , ahk_id %hCtrl%
+	res := ErrorLevel, 	Width := NumGet(SIZE), Height := NumGet(SIZE, 4)
+	return res
+}
+
+/*
  Function:  GetRect
  			Get button rectangle
  
@@ -432,44 +470,6 @@ Toolbar_GetRect(hCtrl, Pos="", pQ="") {
 
 	x := NumGet(RECT, 0), y := NumGet(RECT, 4), r := NumGet(RECT, 8), b := NumGet(RECT, 12)
 	return (pQ = "x") ? x : (pQ = "y") ? y : (pQ = "w") ? r-x : (pQ = "h") ? b-y : x " " y " " r-x " " b-y
-}
-
-/*
- Function:  GetMaxSize
- 			Retrieves the total size of all of the visible buttons and separators in the toolbar.
- 
- Parameters:
- 			Width, Height		- Variables which will receive size.
- 
- Returns:
- 			Returns TRUE if successful.
- */
-Toolbar_GetMaxSize(hCtrl, ByRef Width, ByRef Height){
-	static TB_GETMAXSIZE = 0x453
-
-	VarSetCapacity(SIZE, 8)
-	SendMessage, TB_GETMAXSIZE, 0, &SIZE, , ahk_id %hCtrl%
-	res := ErrorLevel, 	Width := NumGet(SIZE), Height := NumGet(SIZE, 4)
-	return res
-}
-
-/*
- Function:  CommandToIndex
- 			Retrieves the button position given the ID.
- 
- Parameters:
- 			ID	- Button ID, number > 0.
- 
- Returns:
- 			0 if button with that ID doesn't exist, pos > 0 otherwise.
- */
-
-Toolbar_CommandToIndex( hCtrl, ID ) {
-	static TB_COMMANDTOINDEX=0x419
-
-	SendMessage, TB_COMMANDTOINDEX, ID,, ,ahk_id %hCtrl%
-	ifEqual, ErrorLevel, 4294967295, return 0
-	return ErrorLevel + 1
 }
 
 /*
