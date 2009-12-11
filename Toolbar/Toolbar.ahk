@@ -193,6 +193,30 @@ Toolbar_Clear(hCtrl){
 }
 
 /*
+ Function:  Count
+ 			Get count of buttons on the toolbar
+ 
+ Parameters:
+ 			pQ			- Query parameter, set to "c" to get the number of current buttons (default)
+ 						  Set to "a" to get the number of available buttons. Set to empty string to return both.
+ 
+ Returns:
+			if pQ is empty function returns rational number in the form cntC.cntA otherwise  requested count
+ */
+Toolbar_Count(hCtrl, pQ="c") {
+	static TB_BUTTONCOUNT = 0x418
+
+	SendMessage, TB_BUTTONCOUNT, , , ,ahk_id %hCtrl%
+	c := ErrorLevel	
+	IfEqual, pQ, c, return c
+
+	a := NumGet( Toolbar(hCtrl "aBTN") )
+	ifEqual, pQ, a, return a
+
+	return c "." a
+}
+
+/*
  Function:  Customize
  			Launches customization dialog
  			(see Toolbar_customize.png)
@@ -203,7 +227,7 @@ Toolbar_Customize(hCtrl) {
 }
 
 /*
-Function:  GetButton
+	Function:  GetButton
 			Get button information
 
 	Parameters:
@@ -382,29 +406,6 @@ Toolbar_GetButtonSize(hCtrl, ByRef W, ByRef H) {
 	W := ErrorLevel & 0xFFFF, H := ErrorLevel >> 16
 }
 
-/*
- Function:  Count
- 			Get count of buttons on the toolbar
- 
- Parameters:
- 			pQ			- Query parameter, set to "c" to get the number of current buttons (default)
- 						  Set to "a" to get the number of available buttons. Set to empty string to return both.
- 
- Returns:
-			if pQ is empty function returns rational number in the form cntC.cntA otherwise  requested count
- */
-Toolbar_Count(hCtrl, pQ="c") {
-	static TB_BUTTONCOUNT = 0x418
-
-	SendMessage, TB_BUTTONCOUNT, , , ,ahk_id %hCtrl%
-	c := ErrorLevel	
-	IfEqual, pQ, c, return c
-
-	a := NumGet( Toolbar(hCtrl "aBTN") )
-	ifEqual, pQ, a, return a
-
-	return c "." a
-}
 
 /*
  Function:  GetRect
