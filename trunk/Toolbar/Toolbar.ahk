@@ -370,6 +370,21 @@ Toolbar_GetButton(hCtrl, WhichButton, pQ="") {
 }
 
 /*
+	Function:	GetButtonSize
+ 				Gets the size of buttons.
+ 
+	Parameters:
+ 				W, H - Output width & height.
+ 
+ */
+Toolbar_GetButtonSize(hCtrl, ByRef W, ByRef H) {
+	static TB_GETBUTTONSIZE=1082
+
+	SendMessage, TB_GETBUTTONSIZE, , , ,ahk_id %hCtrl%
+	W := ErrorLevel & 0xFFFF, H := ErrorLevel >> 16
+}
+
+/*
  Function:  Count
  			Get count of buttons on the toolbar
  
@@ -1108,7 +1123,7 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 
 /*
  Group: About
-	o Ver 2.3 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Ver 2.3m by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
 	o Parts of code in Toolbar_onNotify by jballi.
 	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
 	o Licensed under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
