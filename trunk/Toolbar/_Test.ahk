@@ -18,7 +18,6 @@ SetBatchLines, -1
 		btn &1  ,	,checked,check
 		btn &2	,	,		,dropdown check showtext, 101
 		btn &3	,	,		,,
-		-
 		btn &4	,7	,		,dropdown check showtext, 102
 		btn &5	,	,		,showtext a
 
@@ -27,12 +26,14 @@ SetBatchLines, -1
 		*a3		,130
 	)
 	Toolbar_Insert(hToolbar, btns)
+;	Toolbar_GetButtonSize(hToolbar, ww, hh)
+	Toolbar_SetButtonSize(hToolbar, 53, 67)
+	Toolbar_SetButtonSize(hToolbar, 53, 67)
+
 	MakeTestGui(w/2, h-430)
 	Gui, Show
 return
-F1::
-	Toolbar_SetBitmapSize(hCtrl)
-return
+
 
 OnToolbar(hwnd, event, txt, pos, id) {
 	if event = hot
@@ -68,7 +69,10 @@ MakeTestGui(w, h){
 	Gui, Add, BUTTON, w100 x+5 yp gOnBtn, SetButtonSize
 	Gui, Add, BUTTON, w100 x+5 gOnBtn, SetButton
 
-	Gui, Add, BUTTON, w350 h40 Xs y+30  gOnBtn, Open Help`n(right click on any buttton for its help)
+	Gui, Add, BUTTON, w100 xs gOnBtn, AutoSize
+	Gui, Add, BUTTON, w100 x+%d% yp gOnBtn, GetButtonSize
+
+	Gui, Add, BUTTON, w350 h45 Xs y+10  gOnBtn, Open Help`n(right click on any buttton)
 
 }
 
@@ -102,9 +106,16 @@ OnBtn:
 
 	if A_GuiControl = Delete
 		Toolbar_DeleteButton(hToolbar, p1 != "" ? p1 : 1)
-	
+
+	if A_GuiControl = AutoSize
+		Toolbar_AutoSize(hToolbar, p1)
+
 	if A_GuiControl = GetButton
 		Set( Toolbar_GetButton(hToolbar, p1 != "" ? p1 : 1) )
+
+	if A_GuiControl = GetButtonSize
+		Toolbar_GetButtonSize(hToolbar, ww, hh), Set(ww "," hh)
+
 	
 	if A_GuiControl = Clear
 		Toolbar_Clear(hToolbar)
@@ -133,7 +144,6 @@ Get() {
 }
 
 GuiEscape:
-
 GuiClose:
 	ExitApp
 return
@@ -147,5 +157,6 @@ RButton::
 	Run, %A_ProgramFIles%\Internet Explorer\iexplore "%A_ScriptDir%\Toolbar.html#%txt%"
 return
 
+F5:: Reload
 
 #Include Toolbar.ahk
