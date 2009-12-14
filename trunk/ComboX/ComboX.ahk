@@ -16,7 +16,7 @@
 					  it will be positioned relative to the glue control.			
 			PHW		- Letters specifying how control is positioned relative to the glue control. P specifies on wich corner of glue control to bind (1..4), 
 					  W how width is expanded - L (left) R(right), H how height is expanded - U (up) D (down). 
-					  For instance 1RD.
+					  For instance 4LD mimic standard combobox control.
  */
 ComboX_Set( HCtrl, Options="", Handler="") {
 	ifEqual, Options,,SetEnv, Options, esc click
@@ -25,11 +25,26 @@ ComboX_Set( HCtrl, Options="", Handler="") {
 	Win_Show(HCtrl, false)
 	Win_SetParent(HCtrl, 0, true)
 	Win_Subclass(HCtrl, "ComboX_wndProc")
+	
 	RegExMatch(Options, "S)[\d]+", out)
 	ComboX( HCtrl "HButton", out)
+
+	RegExMatch(Options, "Si)[1-4][LR][UD]", out)
+	ComboX( HCtrl "Pos", out)
 	ComboX( HCtrl "Options", Options)
 	if IsFunc(Handler)
 		ComboX(	HCtrl "Handler", Handler)
+}
+
+ComboX_setPosition( HCtrl, Pos, Hwnd ) {
+	ifEqual, Pos, , SetEnv, Pos, 4LD
+	StringSplit, p, Pos
+
+	WinGetPos, x, y, w, h, ahk_id %Hwnd%
+	Win_Get(HCtrl, "Rwh", cw, ch)
+	cx := (p1=1 || p1=3 ? x : x + w) + (p2="R" ? 0 : -cw)
+	cy := (p1=1 || p1=2 ? y : y + h) + (p3="D" ? 0 : -ch)
+	Win_Move(HCtrl, cx, cy)
 }
 
 /*
@@ -40,11 +55,13 @@ ComboX_Set( HCtrl, Options="", Handler="") {
 			hCombo	- handle of the combox control to be shown
  */
 ComboX_Show( HCtrl ) {
-	ComboX("", HCtrl+0 ")handler HButton", handler, hBtn)
+	HCtrl += 0
+	ComboX("", HCtrl ")handler HButton Pos", handler, hBtn, Pos)
 	if handler !=
-		%handler%(HCtrl+0, "Show")	
+		%handler%(HCtrl, "Show")	
 	WinGetPos, x, y, , , ahk_id %hBtn%
-	Win_Move(HCtrl, x, y)
+
+	ComboX_setPosition(HCtrl, Pos, hBtn)
 	Win_Show(HCtrl)
 	WinActivate, ahk_id %HCtrl%
 }
