@@ -664,12 +664,6 @@ Win_SetParent(Hwnd, HParent=0, bFixStyle=false){
 	return r
 }
 
-;Famous misleading statement. Almost as misleading as the choice of GWL_HWNDPARENT as the name. It has nothing to do with a window's parent. 
-;It really changes the Owner exactly the same thing as including the Owner argument in the Show statement. 
-;A more accurate version might be: "SetWindowLong with the GWL_HWNDPARENT will not change the parent of a child window. Instead, use the SetParent function."
-;GWL_HWNDPARENT should have been called GWL_HWNDOWNER, but nobody noticed it until after a bazillion copies of the SDK had gone out. This is what happens 
-;when the the dev team lives on M&Ms and CocaCola for to long. Too bad. Live with it.
-;
 /*
  Function:	SetOwner
  			Changes the owner window of the specified window.
@@ -685,6 +679,12 @@ Win_SetParent(Hwnd, HParent=0, bFixStyle=false){
 			Only an overlapped or pop-up window can be an owner window; a child window cannot be an owner window.
  */
 Win_SetOwner(Hwnd, hOwner){
+	;Famous misleading statement. Almost as misleading as the choice of GWL_HWNDPARENT as the name. It has nothing to do with a window's parent. 
+	;It really changes the Owner exactly the same thing as including the Owner argument in the Show statement. 
+	;A more accurate version might be: "SetWindowLong with the GWL_HWNDPARENT will not change the parent of a child window. Instead, use the SetParent function."
+	;GWL_HWNDPARENT should have been called GWL_HWNDOWNER, but nobody noticed it until after a bazillion copies of the SDK had gone out. This is what happens 
+	;when the the dev team lives on M&Ms and CocaCola for to long. Too bad. Live with it.
+
 	static GWL_HWNDPARENT = -8
 	return DllCall("SetWindowLong", "uint", Hwnd, "int", GWL_HWNDPARENT, "uint", hOwner)		
 }
@@ -795,7 +795,7 @@ Win_Subclass(Hwnd, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.24 by majkinetor.
+	o v1.25 by majkinetor.
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
 	o Licensed under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*
