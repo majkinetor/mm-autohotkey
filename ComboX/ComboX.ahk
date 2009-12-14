@@ -8,17 +8,23 @@
  Parameters:
 			HCtrl	- Handle of the control that is to get combobox behavior.
 			Handler	- Notification function. Optional.
-			Options	- space esc enter click hwnd.  By Default "esc click"
+			Options	- Space separated list of options. See below. By Default "esc click enter".
+
+ Options:
+			space, esc, enter, click	- Specify one or more of these options to close the control on it. Space and Enter will trigger "Select" event.
+			Hwnd	- Handle of the glue control. This control represents the "arrow button" in normal ComboBox control. When ComboX control is shown,
+					  it will be positioned relative to the glue control.			
+			PHW		- Letters specifying how control is positioned relative to the glue control. P specifies on wich corner of glue control to bind (1..4), 
+					  W how width is expanded - L (left) R(right), H how height is expanded - U (up) D (down). 
+					  For instance 1RD.
  */
 ComboX_Set( HCtrl, Options="", Handler="") {
 	ifEqual, Options,,SetEnv, Options, esc click
 
 	HCtrl += 0
-
+	Win_Show(HCtrl, false)
 	Win_SetParent(HCtrl, 0, true)
 	Win_Subclass(HCtrl, "ComboX_wndProc")
-	Win_Show(HCtrl, false)
-
 	RegExMatch(Options, "S)[\d]+", out)
 	ComboX( HCtrl "HButton", out)
 	ComboX( HCtrl "Options", Options)
