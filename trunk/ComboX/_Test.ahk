@@ -16,11 +16,11 @@ SetBatchLines, -1
 	Gui, Add, ListView, HWNDhcxLV w348 h190 x20 y28 gOnCombo1 altsubmit, Font|Style 
 	FillTheList()
 
-	Gui, Add, Edit, HWNDhcxTV w300 h190 xm y+3 gOnCombo2 altsubmit
+	Gui, Add, Edit, HWNDhcxTV w370 h190 xm y+3 gOnCombo2 altsubmit
 	Gui, Add, Button, HWNDhBtn2 gCxTV x360 y260 ,V
 	FillTheTreeView()
 
-	ComboX_Set( hcxLV, "esc space enter click " hBtn+0, "OnComboX"),	ComboX_Set( hcxTV, "enter " hbtn2+0, "OnComboX")
+	ComboX_Set( hcxLV, "esc space enter click " hBtn+0, "OnComboX"),	ComboX_Set( hcxTV, "enter esc" hbtn2+0, "OnComboX")
 	Gui, Show, w385 h300, ComboX Test
 return 
 
