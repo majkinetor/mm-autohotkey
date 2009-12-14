@@ -658,13 +658,18 @@ Win_SetParent(Hwnd, HParent=0, bFixStyle=false){
 		WinSet, Style, %s1%%WS_CHILD%, ahk_id %Hwnd%
 		WinSet, Style, %s2%%WS_POPUP%, ahk_id %Hwnd%
 	}
-	r := DllCall("SetParent", "uint", Hwnd, "uint", HParent)
+	r := DllCall("SetParent", "uint", Hwnd, "uint", HParent, "Uint")
 	ifEqual, r, 0, return 0
 	SendMessage, WM_CHANGEUISTATE, UIS_INITIALIZE,,,ahk_id %HParent%
 	return r
 }
 
-
+;Famous misleading statement. Almost as misleading as the choice of GWL_HWNDPARENT as the name. It has nothing to do with a window's parent. 
+;It really changes the Owner exactly the same thing as including the Owner argument in the Show statement. 
+;A more accurate version might be: "SetWindowLong with the GWL_HWNDPARENT will not change the parent of a child window. Instead, use the SetParent function."
+;GWL_HWNDPARENT should have been called GWL_HWNDOWNER, but nobody noticed it until after a bazillion copies of the SDK had gone out. This is what happens 
+;when the the dev team lives on M&Ms and CocaCola for to long. Too bad. Live with it.
+;
 /*
  Function:	SetOwner
  			Changes the owner window of the specified window.
@@ -679,13 +684,6 @@ Win_SetParent(Hwnd, HParent=0, bFixStyle=false){
 			An owned window is always above its owner in the z-order. The system automatically destroys an owned window when its owner is destroyed. An owned window is hidden when its owner is minimized. 
 			Only an overlapped or pop-up window can be an owner window; a child window cannot be an owner window.
  */
-
-;Famous misleading statement. Almost as misleading as the choice of GWL_HWNDPARENT as the name. It has nothing to do with a window's parent. 
-;It really changes the Owner exactly the same thing as including the Owner argument in the Show statement. 
-;A more accurate version might be: "SetWindowLong with the GWL_HWNDPARENT will not change the parent of a child window. Instead, use the SetParent function."
-;GWL_HWNDPARENT should have been called GWL_HWNDOWNER, but nobody noticed it until after a bazillion copies of the SDK had gone out. This is what happens 
-;when the the dev team lives on M&Ms and CocaCola for to long. Too bad. Live with it.
-;
 Win_SetOwner(Hwnd, hOwner){
 	static GWL_HWNDPARENT = -8
 	return DllCall("SetWindowLong", "uint", Hwnd, "int", GWL_HWNDPARENT, "uint", hOwner)		
