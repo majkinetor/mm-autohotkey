@@ -13,7 +13,7 @@ SetBatchLines, -1
 	Gui, Add, Edit, xm vMainEdit xm w350 h250,Some Test text`nbla bla bla bla`n`n`n`n`nSome more text 
 
 
-	Gui, Add, ListView, HWNDhcxLV w300 h190 x20 y28 gOnCombo1 altsubmit, Font|Style 
+	Gui, Add, ListView, HWNDhcxLV w348 h190 x20 y28 gOnCombo1 altsubmit, Font|Style 
 	FillTheList()
 
 	Gui, Add, Edit, HWNDhcxTV w300 h190 xm y+3 gOnCombo2 altsubmit
