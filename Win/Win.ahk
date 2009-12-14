@@ -654,7 +654,7 @@ Win_SetParent(Hwnd, HParent=0, bFixStyle=false){
 	static WS_POPUP=0x80000000, WS_CHILD=0x40000000, WM_CHANGEUISTATE=0x127, UIS_INITIALIZE=3
 	
 	if (bFixStyle) {
-		s1 := Hwnd ? "+" : "-", s2 := Hwnd ? "-" : "+"
+		s1 := HParent ? "+" : "-", s2 := HParent ? "-" : "+"
 		WinSet, Style, %s1%%WS_CHILD%, ahk_id %Hwnd%
 		WinSet, Style, %s2%%WS_POPUP%, ahk_id %Hwnd%
 	}
@@ -715,7 +715,7 @@ Win_SetToolWindow(Hwnd, Flag="^") {
 		If the window was previously visible, the return value is nonzero. 
 		If the window was previously hidden, the return value is zero.
  */
-Win_Show(Hwnd, bShow=true) {
+Win_Show(Hwnd, bShow=true) {	
 	return DllCall("ShowWindow", "uint", Hwnd, "uint", bShow ? 5:0)
 }
 
