@@ -13,7 +13,7 @@ SetBatchLines, -1
 	Gui, Add, Edit, xm vMainEdit xm w350 h250
 
 
-	Gui, Add, ListView, gOnList HWNDhcxLV w348 h190 x20 y28 -Hdr, Font|Style 
+	Gui, Add, ListView, HWNDhcxLV w348 h190 x20 y28 -Hdr, Font|Style 
 	FillTheList()
 	ComboX_Set( hcxLV, "2RD esc space enter click " hbtn+0, "OnComboX")
 	
