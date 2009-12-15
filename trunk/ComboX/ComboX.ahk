@@ -162,6 +162,9 @@ ComboX(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", 
 }
 
 
+#include *i Win.ahk
+
+
 /* Group: About
 	o Ver 2.0 by majkinetor.
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>
