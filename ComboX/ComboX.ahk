@@ -1,33 +1,67 @@
-/* Title:	ComboX
-			Impose combobox behavior on arbitrary control.
+/*	Title:	ComboX
+
+			Impose ComboBox like behavior on arbitrary control.
+			:
+			To create ComboX control, first create any kind of control and initialize it using <Set> function.
+			After that, control will be stay visible only from the moment it is shown (via <Show> or <Toggle>)
+			until it losses focus. You can optionally create trigger button for the ComboX control that will be used
+			for showing and positioning of the control.
+
+	Dependency:
+			Win 1.24++
+*/
 
 /*
- Function:	ComboX
-			Initialises control as ComboX control
+ Function:	Hide
+			Hide ComboX control.
  
  Parameters:
-			HCtrl	- Handle of the control that is to get combobox behavior.
-			Handler	- Notification function. Optional.
-			Options	- Space separated list of options. See below. By Default "esc click enter".
+			hCombo	- Handle of the control.
+ */
+ComboX_Hide( HCtrl ) {
+ 	Win_Show( HCtrl, false )
+	handler := ComboX(HCtrl "Handler")
+	if handler !=
+		%handler%(HCtrl, "Hide")
+}
+
+/*
+ Function:	Set
+			Initializes control as a ComboX control.
+ 
+ Parameters:
+			HCtrl	- Handle of the control to be affected.
+			Handler	- Notification handler. Optional.
+			Options	- Space separated list of options. See below. OPtional, by default "Esc Enter".
 
  Options:
-			space, esc, enter, click	- Specify one or more of these options to close the control on it. Space and Enter will trigger "Select" event.
-			Hwnd	- Handle of the glue control. This control represents the "arrow button" in normal ComboBox control. When ComboX control is shown,
+			Space, Esc, Enter, Click	- Specifing one or more of these controls when to hide ComboX control.
+			Hwnd	- Handle of the glue control in integer format. This control represents the "arrow button" in normal ComboBox control. When ComboX control is shown,
 					  it will be positioned relative to the glue control.			
-			PHW		- Letters specifying how control is positioned relative to the glue control. P specifies on wich corner of glue control to bind (1..4), 
-					  W how width is expanded - L (left) R(right), H how height is expanded - U (up) D (down). 
-					  For instance 4LD mimic standard combobox control.
+			PHW		- Letters specifying how control is positioned relative to the glue control. P specifies on which corner of glue control to bind (1..4), 
+					  W how width is expanded L (left) R(right), H how height is expanded U (up) D (down).  
+					  For instance 4LD mimic standard ComboBox control.
+
+ Handler:
+  >			OnComboX( Hwnd, Event )
+			
+			Hwnd	- Handle of the control that triggered event.
+			Event	- "Show", "Hide" or "Select". Space and Enter will trigger "Select" event after control is hidden. Esc and loosing focus will triger "Hide" event after control is hidden.
+					  "Show" event is triggered before control is shown as a call to <Show> or <Toggle> functions.
+ 
+ Remarks:
+			Some controls may have their g labels not working after being set as ComboX control.
  */
 ComboX_Set( HCtrl, Options="", Handler="") {
-	ifEqual, Options,,SetEnv, Options, esc click
+	ifEqual, Options,,SetEnv, Options, esc enter
 
 	HCtrl += 0
 	Win_Show(HCtrl, false)
 	Win_SetParent(HCtrl, 0, true)
 	Win_Subclass(HCtrl, "ComboX_wndProc")
 	
-	RegExMatch(Options, "S)[\d]+", out)
-	ComboX( HCtrl "HButton", out)
+	RegExMatch(Options, "S)[\d]+(?=$|[ ])", out)
+	ComboX( HCtrl "HButton", out+0)
 
 	RegExMatch(Options, "Si)[1-4][LR][UD]", out)
 	ComboX( HCtrl "Pos", out)
@@ -36,61 +70,50 @@ ComboX_Set( HCtrl, Options="", Handler="") {
 		ComboX(	HCtrl "Handler", Handler)
 }
 
-ComboX_setPosition( HCtrl, Pos, Hwnd ) {
-	ifEqual, Pos, , SetEnv, Pos, 4LD
-	StringSplit, p, Pos
-
-	WinGetPos, x, y, w, h, ahk_id %Hwnd%
-	Win_Get(HCtrl, "Rwh", cw, ch)
-	cx := (p1=1 || p1=3 ? x : x + w) + (p2="R" ? 0 : -cw)
-	cy := (p1=1 || p1=2 ? y : y + h) + (p3="D" ? 0 : -ch)
-	Win_Move(HCtrl, cx, cy)
-}
-
 /*
  Function:	Show
 			Show ComboX control. Sets ComboX_Active to currently shown control.
  
  Parameters:
-			hCombo	- handle of the combox control to be shown
+			HCtrl	- Handle of the control.
+			X,Y		- Optinal screen coordinates on which to show control.
  */
-ComboX_Show( HCtrl ) {
+ComboX_Show( HCtrl, X="", Y="" ) {	
 	HCtrl += 0
 	ComboX("", HCtrl ")handler HButton Pos", handler, hBtn, Pos)
+
+	if (X Y = "")
+		 ComboX_setPosition(HCtrl, Pos, hBtn)
+	else Win_Move(HCtrl, X, Y)
+
 	if handler !=
 		%handler%(HCtrl, "Show")	
-	WinGetPos, x, y, , , ahk_id %hBtn%
-
-	ComboX_setPosition(HCtrl, Pos, hBtn)
 	Win_Show(HCtrl)
-	WinActivate, ahk_id %HCtrl%
 }
 
 /*
- Function:	Hide
-			Hide ComboX control 
+ Function:	Toggle
+			Toggle ComboX control.
  
  Parameters:
-			hCombo	- handle of the combox control to be hidden
+			HCtrl	- Handle of the control.
  */
-ComboX_Hide( hCombo ) {
- 	Win_Show( hCombo, false )
+ComboX_Toggle(HCtrl) {
+	return Win_Is(HCtrl, "visible") ? ComboX_Hide(HCtrl) : ComboX_Show(HCtrl)
 }
 
-
+;==================================== PRIVATE ===================================
 
 ComboX_wndProc(Hwnd, UMsg, WParam, LParam){ 
-	static WM_KEYDOWN = 0x100, WM_KILLFOCUS=8, WM_LBUTTONDOWN=0x201, WM_LBUTTONUP=0x202
-		  ,VK_ESCAPE=27, VK_ENTER=13, VK_SPACE=32
-
+	static WM_KEYDOWN = 0x100, WM_KILLFOCUS=8, WM_LBUTTONDOWN=0x201, WM_LBUTTONUP=0x202,        VK_ESCAPE=27, VK_ENTER=13, VK_SPACE=32
 
 	critical		;safe, always in new thread
 
 	res := DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", hwnd, "UInt", uMsg, "UInt", wParam, "UInt", lParam) 
 
-	ComboX("", Hwnd ")handler Options", handler, op)
+	ComboX("", Hwnd ")Handler Options HButton", handler, op, hBtn)
 
-	if (UMsg = WM_KILLFOCUS)
+	if (UMsg = WM_KILLFOCUS) 
 		ComboX_Hide(Hwnd)
 	
 	if (UMsg = WM_KEYDOWN)
@@ -99,17 +122,29 @@ ComboX_wndProc(Hwnd, UMsg, WParam, LParam){
 		else if ((WParam = VK_ENTER) && InStr(op, "enter")) || ((WParam = VK_SPACE) && InStr(op, "space"))
 			goto %A_ThisFunc%
 
-	if (Umsg = WM_LBUTTONUP) && InStr(op, "click") 
+	if (Umsg = WM_LBUTTONUP) && InStr(op, "click")
 		goto %A_ThisFunc%
 
 	return res  
 
  ComboX_wndProc:
-		Sleep 100
+		Sleep 100				;wait 100s on select event so user can see selection shortly.
 		ComboX_Hide(Hwnd)
 		if handler !=
 			%handler%(Hwnd, "Select")	
  return
+}
+
+ComboX_setPosition( HCtrl, Pos, Hwnd ) {
+	ifEqual, Pos, , SetEnv, Pos, 4LD
+	StringSplit, p, Pos
+
+	Win_Get(Hwnd, "Rxywh", x, y, w, h)
+	Win_Get(HCtrl, "Rwh", cw, ch)		;4LU
+
+	cx := (p1=1 || p1=3 ? x : x + w) + (p2="R" ? 0 : -cw)
+	cy := (p1=1 || p1=2 ? y : y + h) + (p3="D" ? 0 : -ch)	
+	Win_Move(HCtrl, cx, cy)
 }
 
 ;Storage
@@ -125,3 +160,9 @@ ComboX(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", 
 	ifNotEqual, value, ~`a, SetEnv, %var%, %value%
 	return _
 }
+
+
+/* Group: About
+	o Ver 2.0 by majkinetor.
+	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>
+ */
