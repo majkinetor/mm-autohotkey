@@ -109,7 +109,7 @@ ComboX_wndProc(Hwnd, UMsg, WParam, LParam){
 
 	critical		;safe, always in new thread
 
-	res := DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", hwnd, "UInt", uMsg, "UInt", wParam, "UInt", lParam) 
+	res := DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", Hwnd, "UInt", UMsg, "UInt", WParam, "UInt", LParam, "Uint") 
 
 	ComboX("", Hwnd ")Handler Options HButton", handler, op, hBtn)
 
