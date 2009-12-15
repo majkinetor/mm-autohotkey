@@ -128,7 +128,6 @@ ComboX_wndProc(Hwnd, UMsg, WParam, LParam){
 	return res  
 
  ComboX_wndProc:
-		Sleep 100				;wait 100s on select event so user can see selection shortly.
 		ComboX_Hide(Hwnd)
 		if handler !=
 			%handler%(Hwnd, "Select")	
