@@ -20,7 +20,7 @@
 
 	About:
 		o Version 1.0 by majkinetor.
-		o Original code by (de)nick, See: <http://www.autohotkey.com/forum/topic238864.html>.
+		o Original code by (de)nick, See: <http://www.autohotkey.com/forum/topic39055.html>.
 		o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */
 CColor(Hwnd, Background="", Foreground="") {
