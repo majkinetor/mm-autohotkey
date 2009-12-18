@@ -9,9 +9,9 @@
 			Creates the font and optimally, sets it for the control.
 
  Parameters:
-			hCtrl - Handle of the control. If omitted, function will create font and return its handle.
+			HCtrl - Handle of the control. If omitted, function will create font and return its handle.
 			Font  - AHK font definition ("s10 italic, Courier New"). If you already have created font, pass its handle here.
-			bRedraw	  - If this parameter is TRUE, the control redraws itself. By default 1.
+			BRedraw	  - If this parameter is TRUE, the control redraws itself. By default 1.
 
  Returns:	
 			Font handle.
@@ -21,8 +21,7 @@ Font(HCtrl="", Font="", BRedraw=1) {
 	
 	if Font is not integer
 	{
-		StringSplit, Font, Font, `,,%A_Space%%A_Tab%
-		fontStyle := Font1, fontFace := Font2
+		StringSplit, font, Font, `,,%A_Space%%A_Tab%	;fontStyle := font1, fontFace := font2
 
 	  ;parse font 
 		italic      := InStr(Font1, "italic")    ?  1    :  0 
@@ -31,17 +30,18 @@ Font(HCtrl="", Font="", BRedraw=1) {
 		weight      := InStr(Font1, "bold")      ? 700   : 400 
 
 	  ;height 
-
-		RegExMatch(Font1, "(?<=[S|s])(\d{1,2})(?=[ ,]*)", height) 
+		RegExMatch(font1, "(?<=[S|s])(\d{1,2})(?=[ ,]*)", height) 
 		ifEqual, height,, SetEnv, height, 10
-		RegRead, LogPixels, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontDPI, LogPixels 
-		height := -DllCall("MulDiv", "int", Height, "int", LogPixels, "int", 72) 
+;		RegRead, LogPixels, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontDPI, LogPixels 
+	    logPixels := DllCall("GetDeviceCaps", "uint", DllCall("GetDC", "uint", hGui), "uint", 90)	;LOGPIXELSY
+		height := -DllCall("MulDiv", "int", height, "int", logPixels, "int", 72) 
 	
-		IfEqual, Font2,,SetEnv Font2, MS Sans Serif
+		IfEqual, font2,,SetEnv Font2, MS Sans Serif
+
 	 ;create font 
 		hFont   := DllCall("CreateFont", "int",  height, "int",  0, "int",  0, "int", 0
 						  ,"int",  weight,   "Uint", italic,   "Uint", underline 
-						  ,"uint", strikeOut, "Uint", nCharSet, "Uint", 0, "Uint", 0, "Uint", 0, "Uint", 0, "str", Font2, "Uint")
+						  ,"uint", strikeOut, "Uint", nCharSet, "Uint", 0, "Uint", 0, "Uint", 0, "Uint", 0, "str", font2, "Uint")
 	} else hFont := Font
 	ifNotEqual, HCtrl,,SendMessage, WM_SETFONT, hFont, BRedraw,,ahk_id %HCtrl%
 	return hFont
