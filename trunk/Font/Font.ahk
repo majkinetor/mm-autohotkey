@@ -1,16 +1,16 @@
 /* Title:	Font
 			
-			This module can create font for you in memory and return its handle that can be used with some Windows API's.
+			This module can create font for in memory and return its handle that can be used with some Windows API's.
 			It can also assign this font to the control, draw text on screen and measure it using <DrawText> with CALCRECT flag.
  */
 
 /*
  Function:  Font
-			Creates the font and optinally, sets it for the control.
+			Creates the font and optimally, sets it for the control.
 
  Parameters:
 			hCtrl - Handle of the control. If omitted, function will create font and return its handle.
-			Font  - AHK font defintion ("s10 italic, Courier New"). If you already have created font, pass its handle here.
+			Font  - AHK font definition ("s10 italic, Courier New"). If you already have created font, pass its handle here.
 			bRedraw	  - If this parameter is TRUE, the control redraws itself. By default 1.
 
  Returns:	
