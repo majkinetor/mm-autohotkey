@@ -11,12 +11,12 @@
  Parameters:
 			HCtrl - Handle of the control. If omitted, function will create font and return its handle.
 			Font  - AHK font definition ("s10 italic, Courier New"). If you already have created font, pass its handle here.
-			BRedraw	  - If this parameter is TRUE, the control redraws itself. By default 1.
+			BRedraw	  - If this parameter is TRUE, the control redraws itself. By default FALSE.
 
  Returns:	
 			Font handle.
  */
-Font(HCtrl="", Font="", BRedraw=1) {
+Font(HCtrl="", Font="", BRedraw=false) {
 	static WM_SETFONT := 0x30
 	
 	if Font is not integer
