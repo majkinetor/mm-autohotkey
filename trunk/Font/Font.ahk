@@ -55,12 +55,14 @@ Font(HCtrl="", Font="", BRedraw=1) {
 		Text	- Text to be drawn or measured. 
 		DC		- Device context to use. If omitted, function will use Desktop's DC.
 		Font	- If string, font description in AHK syntax. If number, font handle. If omitted, uses the system font to calculate text metrics.
-		Flags	- Drawing/Calculating flags. Space separated combination of flag names. For the description of the flags see <http://msdn.microsoft.com/en-us/library/ms901121.aspx>.
+		Flags	- Drawing/Calculating flags. Space separated combination of flag names.
 		Rect	- Bounding rectangle. Space separated list of left,top,right,bottom coordinates. 
 				  Width could also be used with CALCRECT WORDBREAK style to calculate word-wrapped height of the text given its width.
 				
  Flags:
-		CALCRECT, BOTTOM, CALCRECT, CENTER, VCENTER, TABSTOP, SINGLELINE, RIGHT, NOPREFIX, NOCLIP, INTERNAL, EXPANDTABS, AHKSIZE.
+		BOTTOM, CALCRECT, CENTER, VCENTER, TABSTOP, SINGLELINE, RIGHT, NOPREFIX, NOCLIP, INTERNAL, EXPANDTABS, AHKSIZE.
+
+		For the description of the flags see <http://msdn.microsoft.com/en-us/library/ms901121.aspx>.
 
  Returns:
 		Decimal number. Width "." Height of text. If AHKSIZE flag is set, the size will be returned as w%w% h%h%
