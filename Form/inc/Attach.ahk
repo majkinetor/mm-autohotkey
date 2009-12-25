@@ -168,7 +168,7 @@ Attach_(hCtrl, aDef, Msg, hParent){
 		%hParent%_s := %hParent%_pw " " %hParent%_ph
 
 	oldCritical := A_IsCritical
-	critical, 100
+	critical, 5000
 
 	StringSplit, s, %hParent%_s, %A_Space%
 	loop, parse, %hParent%a, %A_Space%
