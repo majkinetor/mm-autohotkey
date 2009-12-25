@@ -32,7 +32,7 @@ _()
 	loop, parse, ctrls, %A_Space%
 	{		
 		lf := A_LoopField
-		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "Panel " A_Index, "w100 h100 style='hidden'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
+		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "Panel " A_Index, "w100 h100 style='hidden'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel. Remove - to see how hidden controls influence the attaching speed if left enabled.
 		hCtrl := Form_Add(hPanel%A_Index%, lf,	lf  "(" A_Index ")", MakeOptions(lf), "Align F", "Attach p r2", "Cursor HAND", "Tooltip Tooltip for " lf, "Font " hFont)
 		ctrl%hCtrl% := A_LoopField, ctrl%hCtrl%i := A_Index
 		InitControl(lf, hCtrl), %lf% := ctrlNo := A_Index, h%lf% := hCtrl
