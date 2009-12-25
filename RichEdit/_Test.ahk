@@ -1,4 +1,5 @@
 _("mo!")
+#MaxThreads 255
 
 	CreateGui(text)
 	
@@ -209,7 +210,7 @@ OnToolbar(hCtrl, Event, Txt, Pos=""){
 	if Txt in <-,->
 		return RichEdit_SetParaFormat(hRichEdit, "Ident=" (Txt="<-" ? -1:1)*1000)
 	
-	if Txt in Number,Bullet
+	if Txt in Num,Bullet
 		return RichEdit_SetParaFormat(hRichEdit, "Num=" (Txt="Num" ? "DECIMAL" : "BULLET") ",1,D")
 }
 
