@@ -1,12 +1,12 @@
-_("mo!")
-#MaxThreads 255
+#SingleInstance, force
+;#MaxThreads 255
 
 	CreateGui(text)
 	
 	RichEdit_SetText(hRichEdit, "colors.rtf", "FROMFILE")
 	RichEdit_AutoUrlDetect( hRichEdit, "^" )
 	
-	Form_Show("", "Maximize", "Rich Edit Test Script")
+	Form_Show("", "", "Rich Edit Test Script")
 
 	Log("Press F1 or doubleclick to execute selected API")
 	Log("Sort API by clicking ListView header.")
