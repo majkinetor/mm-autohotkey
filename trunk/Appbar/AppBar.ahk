@@ -1,3 +1,4 @@
+
 /*
 	Title:	Appbar
 
@@ -9,7 +10,7 @@
 
 /* 
 	Function:	New
-				Creates new Appbar
+				Creates new Appbar.
 	
 	Parameters:
 				Hwnd	- Reference to the handle of the existing window. If variable is empty, function will create Gui
@@ -136,6 +137,14 @@ Appbar_Remove(Hwnd){
 			
 			oldState := Shell_SetTaskBar("disable")		;disable it.
 			Shell_SetTaskBar( oldState )				; & restore it when you are done ...
+
+
+			;Hotkey to enable/disable taskbar in reliable way.
+			F12::
+				if bIsEnabled := !bIsEnabled
+					oldState := AppBar_SetTaskbar("^disable")
+			else	AppBar_SetTaskbar(oldState) 
+		return
 		(end code)
 */
 Appbar_SetTaskBar(State=""){
