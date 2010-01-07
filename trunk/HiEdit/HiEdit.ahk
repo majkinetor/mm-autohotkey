@@ -333,14 +333,15 @@ HE_GetLine(hEdit, idx=-1){
 	ifEqual, len, 0, return	 
 
 	VarSetCapacity(txt, len, 0), NumPut(len = 1 ? 2 : len, txt)		; bug! if line contains only 1 character SendMessage returns FAIL.
-	SendMessage, EM_GETLINE, idx, &txt,, ahk_id %hEdit% 
+	SendMessage, EM_GETLINE, idx, &txt,, ahk_id %hEdit%
 	if ErrorLevel = FAIL
 	{
 		Msgbox %A_ThisFunc% failed
 		return
 	}
+
 	VarSetCapacity(txt, -1)
-	return len = 1 ? SubStr(txt, 1, -1) : txt
+	return SubStr(txt, 0) = "`r" ? SubStr(txt, 1, -1) : txt
 }
 
 /*
@@ -1233,7 +1234,7 @@ HiEdit_add2Form(hParent, Txt, Opt) {
 	o HiEdit control is copyright of Antonis Kyprianou (aka akyprian). See <http://www.winasm.net>.
 	o Available for *NON commercial purposes* provided you have previous line in your about box. 
 	  You need author's written permission to use HiEdit in commercial applications.
-	o AHK wrapper version 4.0.0.4-4 by majkinetor.
+	o AHK wrapper version 4.0.0.4-5 by majkinetor.
     o Additonal functions by jballi.
 	o AHK module licensed under BSD <http://creativecommons.org/licenses/BSD/>.
 
