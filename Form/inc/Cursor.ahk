@@ -39,8 +39,7 @@
  Remarks:
 	 Setting the same cursor type on several controls uses the same cursor resource.
      Some controls may host child windows. In that case you should pass handle of the
-	 topmost child window it contains instead handle of the control itself (for instance RaGrid
-	 SpreedSheat ...)
+	 topmost child window it contains instead handle of the control itself (for instance RaGrid, SpreedSheat ...)
 
  About:
 	o 1.2 by majkinetor
