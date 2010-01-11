@@ -5,7 +5,7 @@
 			<Win> 1.22
 
  Parameters: 
-			HCtrl	- Contorls handle.
+			HCtrl	- Control handle.
             Shape   - Name of the system cursor to set or cursor handle or full cursor path (must have .ani or .cur extension).
 
  System Cursors: 
