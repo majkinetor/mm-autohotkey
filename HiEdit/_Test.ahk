@@ -1,3 +1,4 @@
+
 ; ` 
 #SingleInstance force
 CoordMode, Mouse, screen
@@ -40,7 +41,7 @@ F3:: FindNext(hedit)
 ^F:: Dlg_Find( hwnd, "OnFind" )
 ^G:: GoToLine()
 F1:: MsgBox % """" HE_GetLine(hEdit) """"
-
+#IfWinActive
 
 SetColors(hEdit) {
 	colors=
