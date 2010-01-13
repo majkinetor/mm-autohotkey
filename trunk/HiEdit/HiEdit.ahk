@@ -325,23 +325,24 @@ HE_GetLastVisibleLine(hEdit)  {
 			The return value is the text.
 			The return value is empty string if the line number specified by the line parameter is greater than the number of lines in the HiEdit control
  */
-HE_GetLine(hEdit, idx=-1){
-	static EM_GETLINE=196	  ;The return value is the number of characters copied. The return value is zero if the line number specified by the line parameter is greater than the number of lines in the HiEdit control
-	if (idx = -1) 
-		idx := HE_LineFromChar(hEdit, HE_LineIndex(hEdit))
-	len := HE_LineLength(hEdit, idx)
-	ifEqual, len, 0, return	 
+HE_GetLine(hEdit,idx=-1){ 
+    static EM_GETLINE=0xC4 
+    if (idx=-1) 
+		idx := HE_LineFromChar(hEdit,HE_LineIndex(hEdit)) 
+    len := HE_LineLength(hEdit,idx)
+    IfEqual,len,0,return
 
-	VarSetCapacity(txt, len, 0), NumPut(len = 1 ? 2 : len, txt)		; bug! if line contains only 1 character SendMessage returns FAIL.
-	SendMessage, EM_GETLINE, idx, &txt,, ahk_id %hEdit%
-	if ErrorLevel = FAIL
-	{
-		Msgbox %A_ThisFunc% failed
-		return
-	}
-
-	VarSetCapacity(txt, -1)
-	return SubStr(txt, 0) = "`r" ? SubStr(txt, 1, -1) : txt
+    VarSetCapacity(txt,len=1 ? 2:len,0) 
+    NumPut(len=1 ? 2:len,txt,0,"Short") 
+    SendMessage EM_GETLINE,idx,&txt,,ahk_id %hEdit% 
+    if ErrorLevel=FAIL ;-- Test remains as a fail-safe 
+	{ 
+        Msgbox %A_ThisFunc% failed. 
+        return 
+    } 
+    
+    VarSetCapacity(txt,-1) 
+    return len=1 ? SubStr(txt,1,1):txt 
 }
 
 /*
@@ -1235,7 +1236,7 @@ HiEdit_add2Form(hParent, Txt, Opt) {
 	o Available for *NON commercial purposes* provided you have previous line in your about box. 
 	  You need author's written permission to use HiEdit in commercial applications.
 	o AHK wrapper version 4.0.0.4-5 by majkinetor.
-    o Additonal functions by jballi.
+    o Additonal functions and fixes by jballi.
 	o AHK module licensed under BSD <http://creativecommons.org/licenses/BSD/>.
 
  */
