@@ -79,7 +79,7 @@ ILButton(HBtn, Images, Cx=16, Cy=16, Align="Left", Margin="1 1 1 1") {
 	return hIL
 }
 
-/*
+/* --
  Function:  Image
 			Adds image to the Button control.
 
