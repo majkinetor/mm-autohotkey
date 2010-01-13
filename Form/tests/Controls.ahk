@@ -15,7 +15,7 @@ _("mo! e d c w")
 	SetWorkingDir, inc		;required to load some dll's that are put there
 	hForm  := Form_New("w700 h620 e3 Resize")
 
-	htmlCtrls := RegExReplace(custom, "\w+", "<a href=$0 id=$0>$0</a><a href='" A_ScriptDir "\_doc\files\inc\$0-ahk.html'>&nbsp;+</a>&nbsp;&nbsp;")
+	htmlCtrls := RegExReplace(custom, "\w+", "<a href=$0 id=$0>$0</a><a href='" A_ScriptDir "\..\_doc\files\inc\$0-ahk.html'>&nbsp;+</a>&nbsp;&nbsp;")
 			   . "<br><br>" RegExReplace(ahk, "\w+", "<a href=$0 id=$0>$0</a>&nbsp;&nbsp;")
 
 	infoText=
