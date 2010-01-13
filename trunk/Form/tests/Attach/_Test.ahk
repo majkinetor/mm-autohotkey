@@ -1,4 +1,3 @@
-;_("mo! e")
 #SingleInstance, off
 	goto MakeGui
 return

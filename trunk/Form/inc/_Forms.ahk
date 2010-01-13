@@ -2,11 +2,13 @@
 	Title:	_Forms
 
  Group: Overview
+
 		Forms framework is a group of modules used together to create AHK graphical user interfaces.
 		It contains the list of optional module includes with each module designed to work with or *without* the framework in place.
 		It includes number of custom controls, extensions and useful libraries. <Form> module is a backbone of the framework.
 		
  Group: Features
+
 		All modules are developed so they fulfill specific goals :
 
 		o Standalone. All modules are independent of each other unless stated differently. You can copy any module to your script and use it without other modules.
@@ -20,6 +22,23 @@
 		  single include using ScriptMerge, which gives you the option to keep the framework and its documentation in single file.
 		o Free. All modules are open source and free.
 
+
+ Group: How to Use
+
+		If framework is located in "\inc" folder its enough to add the following line at the end of your script :
+
+		>#include inc
+		>#include _Forms.ahk
+
+		After that you can use any of the Forms modules. You might need to specify
+		>SetWorkingDir inc
+
+		before calling modules that use 3thd party dll's. This is not mandatory since Add function for such modules always 
+		have DllPath parameter.
+
+		After the development is complete, you can *delete* all modules you didn't use.
+		Optionally, you can pack your script and modules you used into the single file using ScriptMerge (if you want to distribute 
+		your script as single ahk file).
 
  Group: Modules
  		o <_>			- Script initializer and set of helper functions.

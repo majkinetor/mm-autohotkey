@@ -1,6 +1,4 @@
-;_("mo! w e d")
-#SingleInstance, force
-SetWinDelay, -1
+_("mo! w d")
 
 	Choose()
 
@@ -104,9 +102,6 @@ Choose() {
 	}
 }
 
-ChooseClose:
-return
-
 OnLayout:
 	if A_GuiEvent = DoubleClick
 	{
@@ -143,7 +138,7 @@ SaveGui() {
 	IniWrite, %b%, config2.ini, Config, Visible
 }
 
-Esc:: 
+GuiEscape:
 GuiClose:
 	if iLayout !=
 		SaveGui()

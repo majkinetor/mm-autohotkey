@@ -1,7 +1,4 @@
-;_("mo! e2 d")
-
-DetectHiddenWindows, on
-#SingleInstance, force
+_("e2 d")
 	goto MakeGui
 return
 
@@ -71,10 +68,6 @@ Randomize(no){
 	Random, y, 0, A_ScreenHeight - h - 10
 	Gui, %no%:Show, x%x% y%y% w%w% h%h%, No: %no%
 }
-
-ESC::
-	ExitApp
-return
 
 #include ..\..\inc
 #include _Forms.ahk

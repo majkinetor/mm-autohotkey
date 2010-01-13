@@ -1,9 +1,4 @@
-;_("mo w e d")
-#SingleInstance, force
-SetWinDelay, -1
-
-	;===============================
-
+_("mo w e d")
 	Gui, +LastFounds
 	hGui := WinExist()
 	hGui := Panel_Add(hGui, 0, 0, 500, 500)
@@ -12,7 +7,6 @@ SetWinDelay, -1
 
 	;Gui, Add, ListView,	HWNDhMarker x100 y100 w300 h300, 
 	hMarker := Panel_Add(hGui, 100, 100, 300, 300, "hidden", "panel")
-
 
 	loop, 5
 	{

@@ -1,5 +1,4 @@
 _("e d")
-#SingleInstance, force
 	Gui, 1:+LastFound +Resize +LabelForm1_
 	Gui, 1:Show,  w400 h300, Form1
 	hForm1 := WinExist()
