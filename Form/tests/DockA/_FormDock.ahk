@@ -1,8 +1,6 @@
-_("mo! w d e")
-SetWorkingDir ..\inc
+_("mo! d e")
+SetWorkingDir ..\..\inc
 
-DetectHiddenWindows, on
-	SetWorkingDir, inc
 	hForm1	:=	Form_New("w400 e3 h300 +Resize ")
 
 	hForm2 := Form_New("w300 h200 e1 +Resize +ToolWindow -Sysmenu ")
@@ -46,10 +44,6 @@ return
 
 Form2_ContextMenu:
 	ShowMenu("[cm]`nset left|set right|set top|set bottom", "", "", "|")
-return
-
-cm:
-
 return
 
 ShowForms(BShow) {
@@ -127,5 +121,5 @@ F4::
 	DockA(hForm1, hForm2, "")
 return
 
-#include ..\inc
+#include ..\..\inc
 #include _Forms.ahk

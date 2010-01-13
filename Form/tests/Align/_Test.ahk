@@ -1,9 +1,4 @@
-;_("m! w e d")
-#SingleInstance, force
-SetWinDelay, -1
-
-	;===============================
-
+_("m! w e d")
 	Gui, +LastFounds +Resize
 	hGui := WinExist()
 
@@ -64,12 +59,6 @@ SaveGui() {
 	IniWrite, %p%, config.ini, Config, Splitter
 	IniWrite, %b%, config.ini, Config, Visible
 }
-
-Esc:: 
-GuiClose:
-	SaveGui()
-	ExitApp
-return
 
 #include ..\..\inc
 #include _Forms.ahk

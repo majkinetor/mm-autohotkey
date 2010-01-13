@@ -1,9 +1,9 @@
-SetWorkingDir ..\..\inc
-
 ; ` 
 #SingleInstance force
-CoordMode, Mouse, screen
 #NoEnv
+SetWorkingDir ..\..\inc
+CoordMode, Mouse, screen
+
 	Gui, +LastFound +Resize
 	hwnd := WinExist()
 

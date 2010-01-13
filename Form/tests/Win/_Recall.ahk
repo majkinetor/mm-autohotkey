@@ -1,5 +1,5 @@
-;_("mo!"), _ := " "
-#SingleInstance, force
+_("mo!")
+
 MakeGui:
 	n++
 	Gui, %n%:+Resize +LastFound

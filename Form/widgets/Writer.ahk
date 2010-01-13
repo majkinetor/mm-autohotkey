@@ -142,8 +142,9 @@ Writer_onToolbar(Hwnd, Event, Txt) {
 
 	If Txt in Number,Bullet,None
 		if event=menu
-			 return ShowMenu("[Writer_Bullet]`nBullet`nNumber`nNone")
-		else return RichEdit_SetParaFormat(hRE,"Num=" (Txt = "None" ? "" : (Event="rclick" || Txt="Number" ? "DECIMAL" : "BULLET") ",1,D"))
+			  return ShowMenu("[Writer_Bullet]`nBullet`nNumber`nNone")
+		else  RichEdit_SetParaFormat(hRE,"Num=" (Txt = "None" ? " " : (Event="rclick" || Txt="Number" ? "DECIMAL" : "BULLET") ",1,D"))
+	
 }
 
 Writer_bullet:
