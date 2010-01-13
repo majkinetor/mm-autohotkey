@@ -258,7 +258,7 @@ QHTM_Init( DllPath="qhtm.dll" ){
 	ifNotEqual, init, , return 1
 
 ;	i := DllCall("GetWindowLong", "uint", hGui, "int", GWL_HINSTANCE := -6)		;doesn't make any difference, I can just put 0.
-
+	
 	init := DllCall("LoadLibrary", "Str", DllPath)
 	DllCall("qhtm\QHTM_Initialize", "UInt", 0)
 	DllCall("qhtm\QHTM_EnableCooltips", "UInt", 0)
