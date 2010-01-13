@@ -26,8 +26,8 @@
  			Form can make any internal AHK control and any custom control.
 			Making internal control is similar to using native command Gui, Add :
  
- > 			Gui, Add,		   CtrlName,  Options, Text
- > 			Form_Add(hParent, "CtrlName", "Text", "Options")
+ >	Gui, Add,		   CtrlName,  Options, Text
+ >	Form_Add(hParent, "CtrlName", "Text", "Options")
  
  			To make custom control, you must include appropriate module. If the module contains *Add2Form* function you can create it the same
 			way as internal control, by specifying its textual name in Ctrl parameter. Otherwise, after creating the control the way described in the
