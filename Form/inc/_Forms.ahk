@@ -57,7 +57,7 @@
 		format for practical reasons (it would have to be repeated on far too many places).
 		If you set different integer format restore it back to default one once you are finished.
 
- Links:
+ Group: Links
 		o Natural Docs Custom Installer: <http://www.autohotkey.com/forum/topic20361.html>
 		o Script Merge: <http://www.autohotkey.com/forum/topic18545.html>
  */
