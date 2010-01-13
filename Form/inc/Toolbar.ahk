@@ -154,11 +154,10 @@ Toolbar_Add(hGui, Handler, Style="", ImageList="", Pos="") {
  			change either by setting the button or bitmap size or by adding strings for the first time.
  */
 Toolbar_AutoSize(hCtrl, Align="fit"){
-	dhw := A_DetectHiddenWindows
-	DetectHiddenWindows,on
-
 	if align !=
 	{
+		dhw := A_DetectHiddenWindows
+		DetectHiddenWindows,on
 		Toolbar_GetMaxSize(hCtrl, w, h)
 
 		SysGet, f, 8		;SM_CYFIXEDFRAME , Thickness of the frame around the perimeter of a window that has a caption but is not sizable
@@ -176,10 +175,9 @@ Toolbar_AutoSize(hCtrl, Align="fit"){
 			ControlMove,,pw-w-f,ph-h-f,%w%,%h%, ahk_id %hCtrl%
 		else if Align = bl
 			ControlMove,,,ph-h-f,%w%,%h%, ahk_id %hCtrl%
+		DetectHiddenWindows, %dhw%
 	}
 	else SendMessage,0x421,,,,ahk_id %hCtrl%
-
-	DetectHiddenWindows, %dhw%
 }
 
 /*
@@ -195,6 +193,49 @@ Toolbar_Clear(hCtrl){
 }
 
 /*
+ Function:  Count
+ 			Get count of buttons on the toolbar
+ 
+ Parameters:
+ 			pQ			- Query parameter, set to "c" to get the number of current buttons (default)
+ 						  Set to "a" to get the number of available buttons. Set to empty string to return both.
+ 
+ Returns:
+			if pQ is empty function returns rational number in the form cntC.cntA otherwise  requested count
+ */
+Toolbar_Count(hCtrl, pQ="c") {
+	static TB_BUTTONCOUNT = 0x418
+
+	SendMessage, TB_BUTTONCOUNT, , , ,ahk_id %hCtrl%
+	c := ErrorLevel	
+	IfEqual, pQ, c, return c
+
+	a := NumGet( Toolbar(hCtrl "aBTN") )
+	ifEqual, pQ, a, return a
+
+	return c "." a
+}
+
+/*
+ Function:  CommandToIndex
+ 			Retrieves the button position given the ID.
+ 
+ Parameters:
+ 			ID	- Button ID, number > 0.
+ 
+ Returns:
+ 			0 if button with that ID doesn't exist, pos > 0 otherwise.
+ */
+
+Toolbar_CommandToIndex( hCtrl, ID ) {
+	static TB_COMMANDTOINDEX=0x419
+
+	SendMessage, TB_COMMANDTOINDEX, ID,, ,ahk_id %hCtrl%
+	ifEqual, ErrorLevel, 4294967295, return 0
+	return ErrorLevel + 1
+}
+
+/*
  Function:  Customize
  			Launches customization dialog
  			(see Toolbar_customize.png)
@@ -205,18 +246,18 @@ Toolbar_Customize(hCtrl) {
 }
 
 /*
-Function:  GetButton
+ Function:  CheckButton
 			Get button information
 
-	Parameters:
+ Parameters:
 			WhichButtton - One of the ways to identify the button: 1-based button position or button ID.
 						  If WhichButton is negative, the information about available (*) button on position -WhichButton will be returned.	
 			bCheck		 - Set to 1 to check the button (default). 
 
-	Returns:
+ Returns:
 			Returns TRUE if successful, or FALSE otherwise.
 
-	Remarks:
+ Remarks:
 			With groupcheck use this function to check button. Using <SetButton> function will not uncheck other buttons in the group.
  */
 Toolbar_CheckButton(hCtrl, WhichButton, bCheck=1) {
@@ -370,27 +411,37 @@ Toolbar_GetButton(hCtrl, WhichButton, pQ="") {
 }
 
 /*
- Function:  Count
- 			Get count of buttons on the toolbar
+	Function:	GetButtonSize
+ 				Gets the size of buttons.
+ 
+	Parameters:
+ 				W, H - Output width & height.
+ 
+ */
+Toolbar_GetButtonSize(hCtrl, ByRef W, ByRef H) {
+	static TB_GETBUTTONSIZE=1082
+
+	SendMessage, TB_GETBUTTONSIZE, , , ,ahk_id %hCtrl%
+	W := ErrorLevel & 0xFFFF, H := ErrorLevel >> 16
+}
+
+/*
+ Function:  GetMaxSize
+ 			Retrieves the total size of all of the visible buttons and separators in the toolbar.
  
  Parameters:
- 			pQ			- Query parameter, set to "c" to get the number of current buttons (default)
- 						  Set to "a" to get the number of available buttons. Set to empty string to return both.
+ 			Width, Height		- Variables which will receive size.
  
  Returns:
-			if pQ is empty function returns rational number in the form cntC.cntA otherwise  requested count
+ 			Returns TRUE if successful.
  */
-Toolbar_Count(hCtrl, pQ="c") {
-	static TB_BUTTONCOUNT = 0x418
+Toolbar_GetMaxSize(hCtrl, ByRef Width, ByRef Height){
+	static TB_GETMAXSIZE = 0x453
 
-	SendMessage, TB_BUTTONCOUNT, , , ,ahk_id %hCtrl%
-	c := ErrorLevel	
-	IfEqual, pQ, c, return c
-
-	a := NumGet( Toolbar(hCtrl "aBTN") )
-	ifEqual, pQ, a, return a
-
-	return c "." a
+	VarSetCapacity(SIZE, 8)
+	SendMessage, TB_GETMAXSIZE, 0, &SIZE, , ahk_id %hCtrl%
+	res := ErrorLevel, 	Width := NumGet(SIZE), Height := NumGet(SIZE, 4)
+	return res
 }
 
 /*
@@ -419,44 +470,6 @@ Toolbar_GetRect(hCtrl, Pos="", pQ="") {
 
 	x := NumGet(RECT, 0), y := NumGet(RECT, 4), r := NumGet(RECT, 8), b := NumGet(RECT, 12)
 	return (pQ = "x") ? x : (pQ = "y") ? y : (pQ = "w") ? r-x : (pQ = "h") ? b-y : x " " y " " r-x " " b-y
-}
-
-/*
- Function:  GetMaxSize
- 			Retrieves the total size of all of the visible buttons and separators in the toolbar.
- 
- Parameters:
- 			Width, Height		- Variables which will receive size.
- 
- Returns:
- 			Returns TRUE if successful.
- */
-Toolbar_GetMaxSize(hCtrl, ByRef Width, ByRef Height){
-	static TB_GETMAXSIZE = 0x453
-
-	VarSetCapacity(SIZE, 8)
-	SendMessage, TB_GETMAXSIZE, 0, &SIZE, , ahk_id %hCtrl%
-	res := ErrorLevel, 	Width := NumGet(SIZE), Height := NumGet(SIZE, 4)
-	return res
-}
-
-/*
- Function:  CommandToIndex
- 			Retrieves the button position given the ID.
- 
- Parameters:
- 			ID	- Button ID, number > 0.
- 
- Returns:
- 			0 if button with that ID doesn't exist, pos > 0 otherwise.
- */
-
-Toolbar_CommandToIndex( hCtrl, ID ) {
-	static TB_COMMANDTOINDEX=0x419
-
-	SendMessage, TB_COMMANDTOINDEX, ID,, ,ahk_id %hCtrl%
-	ifEqual, ErrorLevel, 4294967295, return 0
-	return ErrorLevel + 1
 }
 
 /*
@@ -639,10 +652,7 @@ Toolbar_SetButtonWidth(hCtrl, Min, Max=""){
 	ifEqual, Max, , SetEnv, Max, %Min%
 
 	SendMessage, TB_SETBUTTONWIDTH, 0,(Max<<16) | Min,,ahk_id %hCtrl%
-	ret := ErrorLevel
-
- 	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
-	return ret
+	return ErrorLevel
 }
 
 /*
@@ -682,7 +692,7 @@ Toolbar_SetButtonSize(hCtrl, W, H="") {
 	static TB_SETBUTTONSIZE = 0x41F
 	IfEqual, H, ,SetEnv, H, %W%
 	SendMessage, TB_SETBUTTONSIZE, ,(H<<16)|W ,,ahk_id %hCtrl%
-	SendMessage, 0x421,,,,ahk_id %hCtrl%	;autosize
+;	SendMessage, 0x421,,,,ahk_id %hCtrl%	;autosize
 }
 
 /*
@@ -725,7 +735,7 @@ Toolbar_SetMaxTextRows(hCtrl, iMaxRows=0) {
 	static TB_SETMAXTEXTROWS = 0x43C
     SendMessage, TB_SETMAXTEXTROWS,iMaxRows,,,ahk_id %hCtrl%
 	res := ErrorLevel
- 	SendMessage,0x421,,,,ahk_id %hCtrl% ;autosize
+; 	SendMessage,0x421,,,,ahk_id %hCtrl% ;autosize
 	return res
 }
 
@@ -756,7 +766,7 @@ Toolbar_ToggleStyle(hCtrl, Style="LIST"){
 		Toolbar_SetMaxTextRows(hCtrl, 1)	
 	}
 
- 	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
+; 	SendMessage,0x421,,,,ahk_id %hCtrl%	;autosize
 }
 
 /*
@@ -1108,7 +1118,7 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 
 /*
  Group: About
-	o Ver 2.3 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Ver 2.31 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
 	o Parts of code in Toolbar_onNotify by jballi.
 	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
 	o Licensed under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>

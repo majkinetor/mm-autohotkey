@@ -117,7 +117,7 @@ RichEdit_Add(HParent, X="", Y="", W="", H="", Style="", Text="")  {
  			 Enable, disable, or toggle automatic detection of URLs in the RichEdit control.
 
   Parameters:
- 			Flag - Specify *TRUE* to enable automatic URL detection or *FALSE* to disable it. Specify
+ 			Flag - Specify true to enable automatic URL detection or false to disable it. Specify
              *"^"* to toggle its current state. Omit to only return current state without any change.
 
   Returns:
@@ -152,7 +152,7 @@ RichEdit_AutoUrlDetect(HCtrl, Flag="" )  {	;wParam Specify TRUE to enable automa
 							 The default is 0x1 (CF_TEXT).
 
  Returns:
-           *TRUE* if the clipboard format can be pasted otherwise *FALSE*.
+           True if the clipboard format can be pasted otherwise false.
 
  Remarks:
            For additional information on clipboard formats, see the following:
@@ -166,7 +166,7 @@ RichEdit_AutoUrlDetect(HCtrl, Flag="" )  {	;wParam Specify TRUE to enable automa
   If RichEdit_CanPaste( hRichEdit, 0 )
     RichEdit_Paste( hRichEdit )
   Else
-    MsgBox,262144,, Cannot paste your clipboard into control..
+    MsgBox, Cannot paste your clipboard into control..
  (end code)
  */
 RichEdit_CanPaste(hEdit, ClipboardFormat=0x1) {
@@ -200,10 +200,13 @@ RichEdit_CharFromPos(hEdit,X,Y) {
 
 /*
  Function:	Clear
-			Send to an Edit control or combo box to delete (clear) the current selection.
+    Send to an Edit control or combo box to delete (clear) the current selection.
 
  Remarks:
-			To delete the current selection and place the deleted content on the clipboard, use the Cut operation.
+    To delete the current selection and place the deleted content on the clipboard, use the Cut operation.
+			
+ Related:
+    <Cut>, <Copy>, <Paste>
  */
 RichEdit_Clear(hEdit) {
     static WM_CLEAR=0x303
@@ -235,7 +238,7 @@ RichEdit_Convert(Input, Direction=0) {
 
 /*
  Function: Copy
-		   Copy selection of the Edit control.
+    Copy selection of the Edit control.
 
  Related:
 		<Cut>, <Clear>, <Paste>
@@ -247,10 +250,10 @@ RichEdit_Copy(hEdit) {
 
 /*
  Function: Cut
-		   Cut selection from the Edit control.
+    Cut selection from the Edit control.
 
  Related:
-		<Copy>, <Clear>, <Paste>
+    <Copy>, <Clear>, <Paste>
  */
 RichEdit_Cut(hEdit) {
     Static WM_CUT:=0x300
@@ -277,8 +280,8 @@ RichEdit_Cut(hEdit) {
 			The zero-based character position of the next match, or -1 if there are no more matches.
 
  Remarks
-			The CpMin member always specifies the starting-point of the search, and CpMax specifies the end point.
-			When searching backward, CpMin must be equal to or greater than CpMax.
+			The *CpMin* member always specifies the starting-point of the search, and *CpMax* specifies the end point.
+			When searching backward, *CpMin* must be equal to or greater than *CpMax*.
 
  Example:
  (start code)
@@ -330,6 +333,7 @@ RichEdit_FindText(hEdit, Text, CpMin=0, CpMax=-1, Flags="UNICODE") {
 	SendMessage, EM_FINDTEXT, hFlags, &FT,, ahk_id %hEdit%
 	Return ErrorLevel=4294967295 ? -1 : ErrorLevel
 }
+
 /*
  Function:	FindWordBreak
 			Finds the next word break in rich edit conttrol, before or after the specified character position or retrieves information about the character at that position.
@@ -340,7 +344,7 @@ RichEdit_FindText(hEdit, Text, CpMin=0, CpMax=-1, Flags="UNICODE") {
 
  Flag:
 			CLASSIFY	- Returns the character class and word-break flags of the character at the specified position.
-			ISDELIMITER - Returns TRUE if the character at the specified position is a delimiter, or FALSE otherwise.
+			ISDELIMITER - Returns true if the character at the specified position is a delimiter, or false otherwise.
 			LEFT		- Finds the nearest character before the specified position that begins a word.
 			LEFTBREAK	- Finds the next word end before the specified position. This value is the same as PREVBREAK.
 			MOVEWORDLEFT  - Finds the next character that begins a word before the specified position. This value is used during CTRL+LEFT ARROW key processing.
@@ -351,7 +355,7 @@ RichEdit_FindText(hEdit, Text, CpMin=0, CpMax=-1, Flags="UNICODE") {
  Returns:
 		  The message returns a value based on the wParam parameter.
 			o CLASSIFY		- Returns the character class and word-break flags of the character at the specified position.
-			o ISDELIMITER	- Returns TRUE if the character at the specified position is a delimiter, otherwise it returns FALSE.
+			o ISDELIMITER	- Returns true if the character at the specified position is a delimiter, otherwise it returns false.
 			o Other			- Returns the character index of the word break.
  */
 RichEdit_FindWordBreak(hCtrl, CharIndex, Flag="")  {
@@ -367,7 +371,7 @@ RichEdit_FindWordBreak(hCtrl, CharIndex, Flag="")  {
 	  	   Fix Tab and Esc key handling in rich edit control.
 
  Returns:
-		  True or False.
+		  True or false.
 
  Remarks:
 	Whenever you press Escape in a multiline edit control it sends a WM_CLOSE message to its parent. Both the regular edit control and the rich edit control have this problem.
@@ -394,15 +398,18 @@ RichEdit_FixKeys(hCtrl) {
 }
 
 /*
- Function:	GetLine
-			Get the text of the desired line from the control.
+ Function: GetLine
+			Get the text of the desired line from an Edit control.
 
  Parameters:
 			LineNumber	- Zero-based index of the line. -1 means current line.
 
  Returns:
 			The return value is the text.
-			The return value is empty string if the line number specified by the line parameter is greater than the number of lines in the HiEdit control
+			The return value is empty string if the line number specified by the line parameter is greater than the number of lines in the Edit control.
+
+ Related:
+     <GetText>, <LineIndex>, <LineLength>
  */
 RichEdit_GetLine(hEdit, LineNumber=-1){
 	static EM_GETLINE=196	  ;The return value is the number of characters copied. The return value is zero if the line number specified by the line parameter is greater than the number of lines in the HiEdit control
@@ -430,8 +437,11 @@ RichEdit_GetLine(hEdit, LineNumber=-1){
 			If the control has no text, the return value is 1. The return value will never be less than 1.
 
  Remarks:
-			The function etrieves the total number of text lines, not just the number of lines that are currently visible.
+			The function retrieves the total number of text lines, not just the number of lines that are currently visible.
 			If the Wordwrap feature is enabled, the number of lines can change when the dimensions of the editing window change.
+
+ Related:
+     <GetTextLength>, <LineLength>
  */
 RichEdit_GetLineCount(hEdit){
 	static EM_GETLINECOUNT=0xBA
@@ -482,10 +492,12 @@ RichEdit_GetOptions(hCtrl)  {
 
  Related:
 		<SetCharFormat>, <SetBgColor>
-
+ 
  Example:
- > RichEdit_GetCharFormat(hRichEdit, face, style, color)
- > MsgBox, Face = %Face% `nstyle = %style%  `ncolor = %color%
+ (start code)
+  RichEdit_GetCharFormat(hRichEdit, face, style, color)
+  MsgBox, Face = %Face% `nstyle = %style%  `ncolor = %color%
+ (end code)
  */
 RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef TextColor="", ByRef BackColor="", Mode="SELECTION")  {
 	static EM_GETCHARFORMAT=1082, SCF_SELECTION=1
@@ -570,13 +582,16 @@ RichEdit_GetRedo(hCtrl, ByRef name="-")  {
 
 /*
  Function: GetModify
-           Gets the state of the modification flag for the Edit control.
-		   The flag indicates whether the contents of the control has been modified.
+      Gets the state of the modification flag for the Edit control.
+      The flag indicates whether the contents of the control has been modified.
 
  Returns:
-           TRUE if the content of HiEdit control has been modified, FALSE otherwise.
+      True if the content of Edit control has been modified, false otherwise.
+      
+  Related:
+      <SetModify>, <Save>
  */
-RichEdit_GetModify(hEdit){
+RichEdit_GetModify(hEdit)  {
     Static EM_GETMODIFY=0xB8
     SendMessage EM_GETMODIFY,,,,ahk_id %hEdit%
     Return ErrorLevel = 4294967295 ? 1 : 0
@@ -594,16 +609,15 @@ RichEdit_GetParaFormat(hCtrl) {
 	SendMessage, EM_GETPARAFORMAT,, &PF,, ahk_id %hCtrl%
 }
 
-
 /*
  Function:  GetRect
-            Gets the formatting rectangle of the Edit control.
+ 			Gets the formatting rectangle of the Edit control.
 
  Parameters:
 			Left..Bottom	- Output variables, can be omitted.
 
  Returns:
-		   Space separated rectangle.
+ 			Space separated rectangle.
  */
 RichEdit_GetRect(hEdit,ByRef Left="",ByRef Top="",ByRef Right="",ByRef Bottom="") {
     static EM_GETRECT:=0xB2
@@ -628,10 +642,10 @@ RichEdit_GetRect(hEdit,ByRef Left="",ByRef Top="",ByRef Right="",ByRef Bottom=""
               following the last character in the range.
 
   Returns:
- 			Returns cpMin. If there is no selection this is cursor position.
+ 			Returns *cpMin*. If there is no selection this is cursor position.
 
   Related:
-      <GetText>, <GetTextLength>, <SetSel>, <SetText>, <LineFromChar>
+      <GetText>, <GetTextLength>, <SetSel>, <SetText>, <HideSelection>, <LineFromChar>
  */
 RichEdit_GetSel(hCtrl, ByRef cpMin="", ByRef cpMax="" )  {
   static EM_EXGETSEL=0x434
@@ -659,7 +673,14 @@ RichEdit_GetSel(hCtrl, ByRef cpMin="", ByRef cpMax="" )  {
 			Returns the retrieved text.
 
  Related:
-			<GetSel>, <SetText>, <SetSel>, <GetTextLength>
+			<GetSel>, <GetLine>, <GetTextLength>, <SetText>, <SetSel>, <FindText>
+			
+ Example:
+ (start code)
+  MsgBox, % RichEdit_GetText( hRichEdit ) ; get current selection
+  MsgBox, % RichEdit_GetText( hRichEdit, 0, -1 ) ; get all
+  MsgBox, % RichEdit_GetText( hRichEdit, 4, 10 ) ; get range
+ (end code)
  */
 RichEdit_GetText(HCtrl, CpMin="-", CpMax="-", CodePage="")  {
 	static EM_EXGETSEL=0x434, EM_GETTEXTEX=0x45E, EM_GETTEXTRANGE=0x44B, GT_SELECTION=2
@@ -733,7 +754,7 @@ RichEdit_GetText(HCtrl, CpMin="-", CpMax="-", CodePage="")  {
      characters.
 
  Related:
-     <LimitText>, <GetSel>
+     <LineLength>, <LimitText>, <GetSel>
 
  Example:
  (start code)
@@ -763,31 +784,33 @@ RichEdit_GetTextLength(hCtrl, Flags=0, CodePage="")  {
 
 /*
  Function:	GetUndo
-			Determine whether there are any actions in the Edit control undo queue, and optionally retrieve
-			the type of the next undo action.
+    Determine whether there are any actions in the Edit control undo queue, and optionally retrieve
+    the type of the next undo action.
 
  Parameters:
-			Name - Optional byref parameter will contain the type of undo action, if any.
+    Name - Optional byref parameter will contain the type of undo action, if any.
 
  Types:
-			UNKNOWN	 - The type of undo action is unknown.
-			TYPING	 - Typing operation.
-			DELETE	 - Delete operation.
-			DRAGDROP - Drag-and-drop operation.
-			CUT		 - Cut operation.
-			PASTE	 - Paste operation.
+    UNKNOWN	 - The type of undo action is unknown.
+    TYPING	 - Typing operation.
+    DELETE	 - Delete operation.
+    DRAGDROP - Drag-and-drop operation.
+    CUT		 - Cut operation.
+    PASTE	 - Paste operation.
 
  Returns:
-			If there are actions in the control undo queue, the return value is a nonzero value.
-			If the undo queue is empty, the return value is zero.
+    If there are actions in the control undo queue, the return value is a nonzero value.
+    If the undo queue is empty, the return value is zero.
 
  Related:
-			<Undo>, <SetUndoLimit>, <GetRedo>, <Redo>
+    <Undo>, <SetUndoLimit>, <GetRedo>, <Redo>
 
  Example:
- >	If RichEdit_GetRedo( hRichEdit, name )
- >		 MsgBox, The next redo is a %name% type
- >	Else MsgBox, Nothing left to redo.
+ (start code)
+  If RichEdit_GetRedo( hRichEdit, name )
+    MsgBox, The next redo is a %name% type
+  Else MsgBox, Nothing left to redo.
+ (end code)
  */
 RichEdit_GetUndo(hCtrl, ByRef Name="-")  {
   static EM_CANUNDO=0xC6,EM_GETUNDONAME=86,WM_USER=0x400
@@ -808,14 +831,16 @@ RichEdit_GetUndo(hCtrl, ByRef Name="-")  {
 
 /*
  Function:  HideSelection
-			Hides or shows the selection in a rich edit control.
+    Hides or shows the selection in a rich edit control.
 
  Parameters:
-			State - *TRUE* or *FALSE*.
+    State - True or false.
 
  Remarks:
-     This function is noticeable when it is set to *FALSE* and the rich edit control isn't the active control or window.  The example included in <FindText> demonstrates use.
+    This function is noticeable when it is set to false and the rich edit control isn't the active control or window.  The example included in <FindText> demonstrates use.
 
+ Related:
+			<SetSel>, <GetSel>
  */
 RichEdit_HideSelection(hCtrl, State=true)  {
   static EM_HIDESELECTION = 1087
@@ -827,15 +852,15 @@ RichEdit_HideSelection(hCtrl, State=true)  {
 			Determines which line contains the specified character in a rich edit control.
 
  Parameters:
-			CharIndex -	Zero-based integer index of the character.
+			CharIndex -	Zero-based integer index of the character. -1 (default) means current line.
 
  Returns:
 			Zero-based index of the line.
 
  Related:
-			<GetSel>, <SetSel>
+			<LineIndex>, <GetLineCount>
  */
-RichEdit_LineFromChar(hCtrl, CharIndex)  {
+RichEdit_LineFromChar(hCtrl, CharIndex=-1)  {
   static EM_EXLINEFROMCHAR=1078
   SendMessage, EM_EXLINEFROMCHAR,,CharIndex,, ahk_id %hCtrl%
   return ERRORLEVEL
@@ -843,13 +868,16 @@ RichEdit_LineFromChar(hCtrl, CharIndex)  {
 
 /*
  Function:	LineIndex
-			Returns the character index of the line in the Edit control.
+			Returns the character index of the first character of a specified line in an Edit control.
 
  Parameters:
 			LineNumber	- Line number for which to retreive character index. -1 (default) means current line.
 
  Returns:
 			The character index of the line specified, or -1 if the specified line number is greater than the number of lines.
+
+ Related:
+			<LineLength>, <LineFromChar>, <GetLine>, <GetLineCount>
  */
 RichEdit_LineIndex(hEdit, LineNumber=-1) {
 	static EM_LINEINDEX=187
@@ -859,13 +887,16 @@ RichEdit_LineIndex(hEdit, LineNumber=-1) {
 
 /*
  Function:	LineLength
-			Returns the lenght of the line in the Edit control.
+			Returns the length of a line in an Edit control.
 
  Parameters:
 			LineNumber	- Line number for which to retreive line length. -1 (default) means current line.
 
  Returns:
 			The length (in characters) of the line.
+			
+ Related:
+			<GetTextLength>, <LineIndex>, <LineFromChar>
  */
 RichEdit_LineLength(hEdit, LineNumber=-1) {
 	static EM_LINELENGTH=193
@@ -875,17 +906,17 @@ RichEdit_LineLength(hEdit, LineNumber=-1) {
 
 /*
  Function: LineScroll
-           Scrolls the text in the Edit control.
+			Scrolls the text in the Edit control.
 
  Parameters:
-           XScroll -	The number of characters to scroll horizontally.  Use a
-						negative number to scroll to the left and a positive number to
-						scroll to the right.
-           YScroll -	The number of lines to scroll vertically.  Use a negative
-						number to scroll up and a positive number to scroll down.
+			XScroll -	The number of characters to scroll horizontally.  Use a
+								negative number to scroll to the left and a positive number to
+								scroll to the right.
+			YScroll -	The number of lines to scroll vertically.  Use a negative
+						    number to scroll up and a positive number to scroll down.
  Remarks:
-           This message does not move the caret.
-           This function can be used to scroll horizontally past the last character of any line.
+			This message does not move the caret.
+			This function can be used to scroll horizontally past the last character of any line.
  */
 RichEdit_LineScroll(hEdit,XScroll=0,YScroll=0){
     Static EM_LINESCROLL:=0xB6
@@ -972,7 +1003,7 @@ RichEdit_PosFromChar(hEdit, CharIndex, ByRef X, ByRef Y) {
 			Do redo operation.
 
  Returns:
-			TRUE if the Redo operation succeeds, FALSE otherwise.
+			True if the Redo operation succeeds, false otherwise.
  */
 RichEdit_Redo(hEdit) {
 	static EM_REDO := 1108
@@ -998,6 +1029,21 @@ RichEdit_ReplaceSel(hEdit, Text=""){
 
  Parameters:
 			FileName	- File name to save RTF file to. If omitted, function will return content.
+			
+  Related:
+      <GetModify>, <SetModify>
+      
+ Example:
+ (start code)
+  If !RichEdit_GetModify( hRichEdit )  {
+    MsgBox, No changes detected
+    return
+  }
+
+  RichEdit_Save( hRichEdit, file )
+  RichEdit_SetModify( hRichEdit, false )
+  MsgBox, File has been saved
+ (end code)
  */
 RichEdit_Save(hCtrl, FileName="") {
 	static EM_STREAMOUT=0x44A
@@ -1155,13 +1201,15 @@ RichEdit_SetBgColor(hCtrl, Color)  {
 			UNDERLINE	- Characters are underlined.
 
  Modes:
+			DEFAULT		- Changes the formating for the default text in the control. This is also the style used if you don't specify valid style.
 			ALL			- Applies the formatting to all text in the control.
 			SELECTION	- Applies the formatting to the current selection. If the selection is empty, the character formatting is applied
 						  to the insertion point, and the new character format is in effect only until the insertion point changes. 
 			WORD		- Applies the formatting to the selected word or words. If the selection is empty but the insertion point is inside a word
 						  ,the formatting is applied to the word.
+						  
  Returns:
-			TRUE or FALSE.
+			True or false.
 
  Remarks:
 			This function will fire up SELCHANGE message even if selection isn't changed.
@@ -1230,6 +1278,7 @@ RichEdit_SetCharFormat(HCtrl, Face="", Style="", TextColor="", BackColor="", Mod
 		Data	- Numeric data of the cell. Pointer to string for textual cells and DWORD value for numeric.
 		Result  - Return 1 to prevent action.
 
+	Events:
 		*CHANGE*: Sent when the user has taken an action that may have altered text in an edit control.
 				  Sent after the system updates the screen. (***)
 
@@ -1316,14 +1365,30 @@ RichEdit_SetEvents(hCtrl, Handler="", Events="selchange"){
 			Sets the font size for the selected text in the rich edit control.
 
  Parameters:
-			Add - Change in point size of the selected text.The change is applied to
+			Add - Change in point size of the selected text. The change is applied to
 					each part of the selection. So, if some of the text is 10pt and some 20pt,
 					after a call with wParam set to 1, the font sizes become 11pt and 22pt, respectively.
+					
+ Returns:
+			True if no error occurred, false otherwise.
  */
 RichEdit_SetFontSize(hCtrl, Add) {
 	static EM_SETFONTSIZE=0x4DF
 	SendMessage, EM_SETFONTSIZE,Add,,, ahk_id %hCtrl%
 	return ErrorLEvel
+}
+
+/*
+ Function: SetModify
+      Sets or clears the modification flag for an edit control. The modification flag indicates
+      whether the text within the edit control has been modified.
+
+  Related:
+      <GetModify>, <Save>
+ */
+RichEdit_SetModify(hEdit, State=true)  {
+  Static EM_SETMODIFY = 185
+  SendMessage EM_SETMODIFY,%State%,,,ahk_id %hEdit%
 }
 
 /*
@@ -1353,7 +1418,7 @@ RichEdit_SetFontSize(hCtrl, Add) {
 			Returns the current options of the edit control.
  */
 RichEdit_SetOptions(hCtrl, Operation, Options)  {
-  static EM_SETOPTIONS=1101
+	static EM_SETOPTIONS=1101
 		, ECOOP_SET=0x1,ECOOP_OR=0x2,ECOOP_AND=0x3,ECOOP_XOR=0x4
 		, ECO_AUTOWORDSELECTION=0x1,ECO_AUTOVSCROLL=0x40,ECO_AUTOHSCROLL=0x80,ECO_NOHIDESEL=0x100,ECO_READONLY=0x800,ECO_WANTRETURN=0x1000,ECO_SELECTIONBAR=0x1000000
 
@@ -1367,6 +1432,27 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
 
 	SendMessage, EM_SETOPTIONS, operation, hOptions,, ahk_id %hCtrl%
 	return RichEdit_GetOptions( "." ErrorLevel)
+}
+
+/*
+ Function:	PageRotate
+			Rotate page.
+ 
+ Parameters:
+		    R	- Can be one of the following: 0,90,180,270. 
+
+ Returns:
+			If R is omitted, functin returns current rotation.
+ */
+RichEdit_PageRotate(hCtrl, R="") {
+	static EM_SETPAGEROTATE=1260, EM_GETPAGEROTATE=1259, EPR_270 = 1, EPR_180 = 2, EPR_90 = 3, 1=270, 2=180, 3=90
+	
+	if (R="") { 
+		SendMessage, EM_GETPAGEROTATE,,,, ahk_id %hCtrl%
+		return (%ErrorLevel%)
+	}
+	
+	SendMessage, EM_SETPAGEROTATE,EPR_%R%,,, ahk_id %hCtrl%
 }
 
 /*
@@ -1424,7 +1510,7 @@ RichEdit_SetOptions(hCtrl, Operation, Options)  {
 			List	- Space separated list of absolute tab stop positions in twips.
 
  Returns:
-			TRUE if succeessiful, FALSE otherwise.
+			True if succeessiful, false otherwise.
 
  Remarks:
 			Control uses carriage return character (`r) for paragraph markers by default.
@@ -1538,12 +1624,14 @@ RichEdit_SetEditStyle(hCtrl, Style)  {
 			The selection that is actually set.
 
  Related:
-			<SetText>, <GetSel>, <GetText>, <GetTextLength>
+			<HideSelection>, <SetText>, <GetSel>, <GetText>, <GetTextLength>
 
  Example:
- > RichEdit_SetSel( hRichEdit, 4, 10 ) ; select range
- > RichEdit_SetSel( hRichEdit, 2 )     ; move cursor to right of 2nd character
- > RichEdit_SetSel( hRichEdit, 0, -1 ) ; select all
+ (start code)
+  RichEdit_SetSel( hRichEdit, 4, 10 ) ; select range
+  RichEdit_SetSel( hRichEdit, 2 )     ; move cursor to right of 2nd character
+  RichEdit_SetSel( hRichEdit, 0, -1 ) ; select all
+ (end code)
  */
 RichEdit_SetSel(hCtrl, CpMin=0, CpMax=0)  {
 	static EM_EXSETSEL=1079
@@ -1558,7 +1646,7 @@ RichEdit_SetSel(hCtrl, CpMin=0, CpMax=0)  {
 			Set text from string or file in rich edit control using either rich text or plain text.
 
  Parameters:
-			Txt		- The text string to set within control.
+			Txt		- The text string to set within control. To set RTF mark-up the Txt must be prefixed with "{rtf".
 			Flag	- Space separated list of options.  See below list.
 			Pos		- This optional parameter allows you to specify a character position you want text inserted to,
 					  rather than replacing current selection. To append to the end, use -1.
@@ -1671,7 +1759,7 @@ RichEdit_SetUndoLimit(hCtrl, nMax)  {
 			Bar - Identifies which scroll bar to display: horizontal or vertical. This parameter must be
 				  "*V*", "*H*", or a combination of the two.
 
-			State - *TRUE* or *FALSE*.
+			State - True or false.
 
  Remarks:
      This method is only valid when the control is in-place active. Calls made while the control is inactive may fail.
@@ -1726,7 +1814,7 @@ RichEdit_ShowScrollBar(hCtrl, Bar, State=true)  {
 
  Returns:
 		If *TextMode* is omitted, the return value is the current text mode settings.
-		When *TextMode* is given, function will return *TRUE* or *FALSE*.
+		When *TextMode* is given, function will return true or false.
 
  Remarks:
 		The control text will be deleted when calling this function.
@@ -1782,7 +1870,7 @@ RichEdit_TextMode(HCtrl, TextMode="")  {
 				Set word wrap mode in rich edit control.
 
  Parameters:
-				Flag	- True / False.
+				Flag	- True or false.
 
  Returns:
 				The return value is zero if the operation fails, or nonzero if it succeeds.
@@ -1802,8 +1890,8 @@ RichEdit_WordWrap(HCtrl, Flag)  {
 			zoom - Integer amount to increase or decrease zoom with *+* or *-* infront of it (see examples).
 
  Returns:
-			If the new zoom setting is accepted, the return value is *TRUE*.
-			If the new zoom setting is not accepted, the return value is *FALSE*.
+			If the new zoom setting is accepted, the return value is true.
+			If the new zoom setting is not accepted, the return value is false.
 			If *zoom* param is omitted, current numerator/denominator ratio is returned.
 
  Examples:
@@ -1839,15 +1927,15 @@ Richedit_Zoom(hCtrl, zoom=0)  {
 /*
  Function:	Undo
 			Send message to Edit control to undo the next action in the control's undo queue &
-		    optionally empty the undo buffer by resetting the undo flag.
+		  optionally empty the undo buffer by resetting the undo flag.
 
  Parameters:
-			Reset - Set to TRUE to clear the undo buffer rather than send undo command.
+			Reset - Set to true to clear the undo buffer rather than send undo command.
 
  Returns:
-			For a single-line edit control, the return value is always TRUE.
-			For a multiline edit control, the return value is *TRUE* if the undo operation is
-			successful, or *FALSE* if the undo operation fails, or your resetting the undo queue.
+			For a single-line edit control, the return value is always true.
+			For a multiline edit control, the return value is true if the undo operation is
+			successful, or false if the undo operation fails, or your resetting the undo queue.
  */
 RichEdit_Undo(hCtrl, Reset=false)  {
   static EM_UNDO=0xC7,EM_EMPTYUNDOBUFFER=0xCD

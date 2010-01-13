@@ -98,8 +98,6 @@
 
 /* 
  Group: About
-	o v0.5 by majkinetor.
-	o Licensed under BSD <http://creativecommons.org/licenses/BSD/> .
-
-	(see _Forms.png)
+	o v0.6 by majkinetor.
+	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>
  */
