@@ -46,7 +46,7 @@ QHTM_Add(Hwnd, X, Y, W, H, Text="", Style="", Handler="", DllPath=""){
 		ifEqual, DllPath, ,SetEnv, DllPath, qhtm.dll
 
 		if !QHTM_Init( DllPath )
-			return A_ThisFunc "> Initialisation failed."
+			return A_ThisFunc "> Initialization failed."
 
 		old := OnMessage(0x4E, "QHTM_onNotify"), MODULEID := 171108
 		if old != QHTM_onNotify
