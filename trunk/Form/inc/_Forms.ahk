@@ -1,11 +1,10 @@
 /*
 	Title:	_Forms
-			*Forms framework.*
 
  Group: Overview
-		Forms framework is a group of modules used together to create AHK graphical user interfaces. 
-		It contains the list of optional module includes with each module designed to work with or without the framework in place.
-		It includes number of custom controls, extensions and useful libraries. <Form> module is a backbone of the framework.		
+		Forms framework is a group of modules used together to create AHK graphical user interfaces.
+		It contains the list of optional module includes with each module designed to work with or *without* the framework in place.
+		It includes number of custom controls, extensions and useful libraries. <Form> module is a backbone of the framework.
 		
  Group: Features
 		All modules are developed so they fulfill specific goals :
@@ -14,7 +13,7 @@
 		  They generally don't depend on your script settings.
 		o Standardized. Generally, modules use the same or similar APIs whenever possible. Functions with big number of parameters use
 		  named arguments to avoid long list of empty parameters. Functions doing similar things are declared the same and arguments
-		  having similar purpose are named equaly cross-module.
+		  having similar purpose are named equally cross-module.
 		o Clean. They don't create any globals and try not to influence the hosting script in any way unless specified differently.
 		o Documented. All scripts contain documentation in the source code. You can use mkdoc script to create HTML documentation out of it by simply
 		  running it in the folder with scripts. You can use comment remover to reduce the size of the modules. You can also merge them into
@@ -57,6 +56,10 @@
 		integer format is changed to Hex as it doesn't set and restore integer 
 		format for practical reasons (it would have to be repeated on far too many places).
 		If you set different integer format restore it back to default one once you are finished.
+
+ Links:
+		o Natural Docs Custom Installer: <http://www.autohotkey.com/forum/topic20361.html>
+		o Script Merge: <http://www.autohotkey.com/forum/topic18545.html>
  */
 
 #include *i Form.ahk
