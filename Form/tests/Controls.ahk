@@ -1,9 +1,5 @@
-SetWorkingDir ..\inc
-
-_("mo! e d c w")
-#SingleInstance, force
-#MaxThreads, 255		;Required for this sample with cursor/tooltip extensions.
-#NoEnv
+_("mo! e d c")
+	SetWorkingDir ..\inc
 
 	custom	= HiEdit RichEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter ScrollBar Property
 	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress StatusBar Tab2 GroupBox		;updown may somehow make problem for other controls. in this setup if you put tab2 after updown it will work ok, otherwise it will initially apear on wrong position. There were other kinds of problems all related to UpDo
@@ -12,9 +8,6 @@ _("mo! e d c w")
 	
 	ctrls := custom " " ahk
 	
-	SetWorkingDir, inc		;required to load some dll's that are put there
-	hForm  := Form_New("w700 h620 e3 Resize")
-
 	htmlCtrls := RegExReplace(custom, "\w+", "<a href=$0 id=$0>$0</a><a href='" A_ScriptDir "\..\_doc\files\inc\$0-ahk.html'>&nbsp;+</a>&nbsp;&nbsp;")
 			   . "<br><br>" RegExReplace(ahk, "\w+", "<a href=$0 id=$0>$0</a>&nbsp;&nbsp;")
 
@@ -24,6 +17,8 @@ _("mo! e d c w")
 		Click control name to switch to its tab page. Press & hold F1 and resize window as experiment.</b><br><br>
 		%htmlCtrls%
 	)
+
+	hForm  := Form_New("w700 h620 e3 Resize")
 	hInfo  := Form_Add(hForm, "QHTM", infoText, "gOnQHTM", "Align T, 200", "Attach w")
 	hLog   := Form_Add(hForm, "ListBox", "", "hscroll", "Align R, 300", "Attach x h")
 	hSep   := Form_Add(hForm, "Splitter", "", "sunken", "Align R, 6", "Attach x h" )
@@ -38,6 +33,7 @@ _("mo! e d c w")
 		hCtrl := Form_Add(hPanel%A_Index%, lf,	lf, MakeOptions(lf), "Align F", "Attach p r2", "Cursor HAND", "Tooltip Tooltip for " lf, "Font " hFont), ctrl%hCtrl% := A_LoopField
 		InitControl(lf, hCtrl), %lf% := ctrlNo := A_Index, h%lf% := hCtrl
 	}	
+
 	QHTM_AddHtml(hInfo, "<br><h6>Total: " ctrlNo)
 	Form_Show(), OnQHTM("", "", init )
 	SB_SetText("StatusBar")
@@ -47,13 +43,9 @@ return
 OnAttach(Hwnd) {
 	global
 	
-	;if (Hwnd = hButtonPanel) /* Could be used to stretch button image on resizing */
-	;	hbitmap := Ext_Image(hButton, "..\res\test.bmp") ;remove old bitmap....
-
 	if (Hwnd = pProperty)
 		Property_SetColSize(Win_GetChildren(pProperty), 150)
 }
-
 
 MakeOptions(Name) {
 	global ListBox, MonthCal,TreeView,Hotkey,Slider,UpDown
