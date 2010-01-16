@@ -6,7 +6,7 @@ List of some of the methods used in the code.
 
  * Module does not use globals for its inner working. If module needs globals, it uses its own copy of *storage* function (big storage, lil' storage or mini storage, depending on what storage options it needs).
 
- * Module is independent as much as possible. If there is only few function dependencies to other modules in places not mandatory in usage, they are called using dynamic function calls so that script doesn't fail if dependency isn't included. If this can not be done or is not practical, module states its dependencies as first thing in documentation after specifying Title.
+ * Module is independent as much as possible. If there is only few function dependencies to other modules in places not mandatory for the module use, they are called using dynamic function calls so that script doesn't fail if dependency isn't included. If this can not be done or is not practical, module states its dependencies as first thing in documentation after specifying Title.
 
  * If there is already a module implementing some set of functions using the same or similar terminology as module being implemented, their API's are the same or similar to provide unified experience as much as possible.
 
