@@ -16,4 +16,4 @@ List of some of the methods used in the code.
 
  * Each function returns error with A_ThisFunc "> ... " or using ErrorLevel. Function shouldn't use MsgBox for such purpose (generally). 
 
- * Controls use MODULEID as ID. ID must be unique among controls (date when the controls is created with 6 numbers - DDMMYY, it must be bigger then 10 000). MODULEID is generally used in Add function and onNotify function. Each module having those *must* use the same initialization scheme which is required for message chains to work.
+ * Control classes use MODULEID as ID. ID must be unique among controls (date when the controls is created with 6 numbers - DDMMYY, it must be bigger then 10 000). MODULEID is generally used in Add function and onNotify function to uniquely identify control class in question. Each module having those *must* use the same initialization scheme which is required for message chains to work.
