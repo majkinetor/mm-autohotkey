@@ -1,7 +1,6 @@
  * Public function starts with capitalized word. Private function starts with non-capitalized word. Function name must start the line. Order of the functions in the module is alphabetical.
 
- * Function arguments all start with capitalized word and are used as such in function body. Local arguments always start with small letter (the rest is hungarian style). 
-
+ * Function arguments all start with capitalized word. Local variables always start with small letter (the rest is CamelCase style). The case switching for same variable shouldn't be done.
 
  * Subroutines local to the function have the same name as function (unless there are more then 1).
 
