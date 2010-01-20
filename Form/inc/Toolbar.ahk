@@ -68,7 +68,7 @@
 				}
  (end code)
 
-			If you happen to have unusual control behavior - missing events, redrawing issues etc... try adding _Critical_ command (or better Critical N) at the start of the Toolbar_onNotify function.
+			If you happen to have unusual control behavior-missing events, redrawing issues etc... try adding _Critical_ command (or better Critical N) at the start of the Toolbar_onNotify function.
 			It helps to improve the odds that no messages are dropped. The drawback of using the command is that the function refuses to be interrupted. 
 			This is not a problem if the developer is very careful not to call any routines or functions that use anything more than a few milliseconds. 
 			However, any little mistake -- an unexpected menu, prompt, MsgBox, etc., and the script will lock up. 

@@ -7,7 +7,7 @@ _()
     hPanel   := Form_Add(hForm, "Panel", "", "x5 y50 w" w-15 " h" h-55, "Attach w h")
 
     Loop, 10
-        Form_Add(hPanel, "Edit", "Edit " A_Index, "vscroll R5 H100 W200")
+        Form_Add(hPanel, "Edit", "Edit " A_Index, "vscroll R5 H100 W200", "Attach h w")
 
     Toolbar_Insert(hToolbar, "cut`ncopy`npaste`nredo`nundo")
 
