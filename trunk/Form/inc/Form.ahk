@@ -95,7 +95,7 @@ Form_Add(HParent, Ctrl, Txt="", Opt="", E1="",E2="",E3="",E4="",E5="",E6="",E7="
 		else if IsFunc(f_Add := Ctrl "_Add2Form")
 			 hCtrl := %f_Add%(HParent, Txt, Opt)
 		else return A_ThisFunc "> Custom control doesn't have Add2Form function: " Ctrl 
-	} else 	DllCall("SetParent", "uint", hCtrl := Ctrl, "uint", HParent)
+	} else DllCall("SetParent", "uint", hCtrl := Ctrl, "uint", HParent)
 	
   ;apply extensions
 	loop {
