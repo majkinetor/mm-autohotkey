@@ -81,6 +81,7 @@
  Group: Links
 		o Natural Docs Custom Installer: <http://www.autohotkey.com/forum/topic20361.html>
 		o Script Merge: <http://www.autohotkey.com/forum/topic18545.html>
+		o Comment Remover: <http://www.autohotkey.com/forum/topic53600.html>
  */
 
 #include *i Form.ahk

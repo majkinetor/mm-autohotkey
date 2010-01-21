@@ -22,10 +22,6 @@ Form1_Size:
 	DockA( hForm1 )
 return
 
-Form1_Close:
-	ExitApp
-return
-
 a(w,LParam,m,h){
 	global
 
