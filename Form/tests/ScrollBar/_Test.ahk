@@ -33,10 +33,10 @@ OnScroll(Hwnd, Pos) {
 
 OnBtn:
 	if A_GuiControl in Enable,Disable
-		ScrollBar_Enable(hVBar, A_GuiControl="Enable" ? 1:0 ), ScrollBar_Enable(hvE, A_GuiControl="Enable" ? 1:0 )
+		ScrollBar_Enable(hVBar, A_GuiControl="Enable" ), ScrollBar_Enable(hvE, A_GuiControl="Enable" )
 	
 	if A_GuiControl in Show,Hide
-		ScrollBar_Show(hhE, A_GuiControl="Show" ? 1:0), ScrollBar_Show(hvE, A_GuiControl="Show" ? 1:0)
+		ScrollBar_Show(hhE, A_GuiControl="Show"), ScrollBar_Show(hvE, A_GuiControl="Show")
 return
 
 #include ..\..\inc

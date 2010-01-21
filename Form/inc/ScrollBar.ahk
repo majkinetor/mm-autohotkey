@@ -180,7 +180,8 @@ ScrollBar_Enable(HCtrl, Enable=true) {
 	static SB_CTL=2
 	
 	if !Enable
-		 return DllCall("EnableScrollBar", "uint", HCtrl, "uint", SB_CTL, "uint", 3) 	;it doesn't work for some reason with Enable_Both flag...
+		 ;return DllCall("EnableScrollBar", "uint", HCtrl, "uint", SB_CTL, "uint", 3) 	;it doesn't work for some reason with Enable_Both flag...
+		 WinSet, Disable, , ahk_id %HCtrl%
 	else WinSet, Enable, , ahk_id %HCtrl%
 }
 
@@ -278,6 +279,6 @@ ScrollBar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="
 
 /*
  Group: About
-	o v2.01 by majkinetor.
+	o v2.02 by majkinetor.
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */

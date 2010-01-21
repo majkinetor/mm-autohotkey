@@ -279,6 +279,7 @@ Toolbar_CheckButton(hCtrl, WhichButton, bCheck=1) {
  Parameters:
  			pQ	- Query parameter. Specify "c" to get only current buttons, "a" to get only available buttons.
  				  Leave empty to get all buttons.
+
  Returns:
 			Button definition list. You can use the list directly with <Insert> function.
  */
@@ -412,7 +413,7 @@ Toolbar_GetButton(hCtrl, WhichButton, pQ="") {
 
 /*
 	Function:	GetButtonSize
- 				Gets the size of buttons.
+ 				Gets the size of the buttons.
  
 	Parameters:
  				W, H - Output width & height.

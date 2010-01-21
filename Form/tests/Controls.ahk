@@ -1,6 +1,7 @@
 _("mo! e d c")
+	#MaxThreads, 255
 	SetWorkingDir ..\inc
-
+	
 	custom	= HiEdit RichEdit HLink Toolbar QHTM Rebar SpreadSheet RaGrid Splitter ScrollBar Property
 	ahk		= Text Edit Picture Button Checkbox Radio DropDownList ComboBox ListBox ListView TreeView Hotkey DateTime MonthCal Slider Progress StatusBar Tab2 GroupBox		;updown may somehow make problem for other controls. in this setup if you put tab2 after updown it will work ok, otherwise it will initially apear on wrong position. There were other kinds of problems all related to UpDo
 	init    = HiEdit
@@ -25,11 +26,11 @@ _("mo! e d c")
 	hTab   := Form_Add(hForm, "Panel", "", "", "Align F", "Attach w h")
 	Splitter_Set( hSep, hTab " | " hLog)
 
-	hFont := Font("", "s9, Courier New") 	;create font only once, then use it for every control.
+	hFont := Font("", "s9, Courier New") 	; create font only once, then use it for every control.
 	loop, parse, ctrls, %A_Space%
 	{		
 		lf := A_LoopField
-		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "Panel " lf, "w100 h100 style='hidden'", "Align F,,*" hTab, "Attach p -")		;create hidden attach-disabled panel.
+		hPanel%A_Index%	:=	Form_Add(hTab,  "Panel", "Panel " lf, "w100 h100 style='hidden'", "Align F,,*" hTab, "Attach p -")		; create hidden attach-disabled panel.
 		hCtrl := Form_Add(hPanel%A_Index%, lf,	lf, MakeOptions(lf), "Align F", "Attach p r2", "Cursor HAND", "Tooltip Tooltip for " lf, "Font " hFont), ctrl%hCtrl% := A_LoopField
 		InitControl(lf, hCtrl), %lf% := ctrlNo := A_Index, h%lf% := hCtrl
 	}	
