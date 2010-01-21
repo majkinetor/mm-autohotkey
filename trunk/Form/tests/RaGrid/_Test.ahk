@@ -113,6 +113,6 @@ OnBtn:
 		msgbox % RG_CellConvert(hGrd)
 return
 
-#include IL.ahk
+#include inc\IL.ahk
 #include ..\..\inc
 #include _Forms.ahk
