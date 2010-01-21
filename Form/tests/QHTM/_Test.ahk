@@ -61,12 +61,12 @@ Process()	{
 		Gui, 4:Add, Button, 0x8000 gprocBtn x+5 y320, First
 		Gui, 4:Add, Button, 0x8000 gprocBtn x+15 y320, Prev 
 		Gui, 4:Add, Button, 0x8000 gprocBtn x+0  y320, Next
-		Gui, 4:Add, Text, x+80 y325, Proces:
+		Gui, 4:Add, Text, x+70 y325, Proces:
 		Gui, 4:Add, Button, 0x8000 gprocBtn x+5 y320, Stop
 		Gui, 4:Add, Button, 0x8000 gprocBtn x+5 y320, Start
 
 		hGui := WinExist()
-		hProc := QHTM_Add( hGui, "<h2>Log file:</h2>", 0,0, 400, 300, "transparent")
+		hProc := QHTM_Add( hGui, 0,0, 400, 300, "<h2>Log file:</h2>", "transparent")
 		init := true, 	cfatal := 1
 	}
 	gui, 4:Show, w400 h350, %A_ThisFunc%
@@ -101,7 +101,6 @@ return
 OnProcess:
 	Random, r, 1, 20
 
-
 	time = %A_HOUR%:%A_MIN%:%A_SEC%
 
 
@@ -117,7 +116,6 @@ OnProcess:
 	else if r = 4
 		html = <BR><table><tr><td>Break time at %time%</td><td width=300><img align=right width=40 height=40 src="Res\Monkey.jpg"></td></tr></table> <HR>
 	else return
-
 
 	QHTM_AddHtml(hProc, html, 1)
 return
@@ -149,8 +147,8 @@ DirWalk(){
 	if !init
 	{
 		Gui, 2:+LastFound
-		hGui := WinExist()
-		hQ := QHTM_Add( hGui, DWHTML(), 0,0, 600, 500, "", "OnDirWalk")
+		hGui := WinExist() + 0
+		hQ := QHTM_Add( hGui, 0,0, 600, 500, DWHTML(), "", "OnDirWalk")
 		init := true
 	}
 	gui, 2:Show, w600 h500, %A_ThisFunc%

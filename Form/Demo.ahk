@@ -24,18 +24,15 @@ OnToolbar(hCtrl, Event, Txt) {
 		Run, _doc\index.html 
 }
 
-
 Populate() {
     loop tests\*.*, 1
 		if A_LoopFileName not in _res,.svn
 		{
 			r := TV_Add(A_LoopFileName, 0)
 			loop, %A_LoopFileFullPath%\*.ahk
-				if A_LoopFileName not in il.ahk
-					TV_Add(A_LoopFileName, r)
+				TV_Add(A_LoopFileName, r)
 		}
 }
-
 
 Execute() {
 	
