@@ -21,7 +21,6 @@ Form1_Size:
 return
 
 Toolbar_Size(hToolbar, hPanel) {
-	global hForm
 	static last
 
 	if last =
@@ -32,7 +31,7 @@ Toolbar_Size(hToolbar, hPanel) {
 	{
 		Win_GetRect(hPanel, "*yh", py, ph)
 		Win_Move(hPanel, "", last := th, "", ph-(th-py))
-		Attach(hForm)
+		Attach()	;reset Form1
 	}
 }
 
