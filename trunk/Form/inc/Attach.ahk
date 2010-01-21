@@ -4,8 +4,8 @@
 
 	hCtrl:			
 					- hWnd of the control if aDef is not empty.					
-					- hWnd of the parent to be reset if aDef is empty. If you are using the function with only one parent, you don't have to
-					specify its handle, its enough to call Attach without any parameters.
+					- hWnd of the parent to be reset if aDef is empty. If you omit this parameter function will use
+					the first hWnd passed to it.
 					With multiple parents you need to specify which one you want to reset.					
 					- Handler name, if parameter is string and aDef is empty. Handler will be called after the function has finished 
 					moving controls for the parent. Handler receives hWnd of the parent as its only argument.
@@ -92,7 +92,7 @@
 	(end code)
 
 	About:
-			o 1.06 by majkinetor
+			o 1.07 by majkinetor
 			o Licensed under BSD <http://creativecommons.org/licenses/BSD/> 
  */
 Attach(hCtrl="", aDef="") {
@@ -128,8 +128,10 @@ Attach_(hCtrl, aDef, Msg, hParent){
 			adrSetWindowPos		:= DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), "str", "SetWindowPos")
 			,adrWindowInfo		:= DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), "str", "GetWindowInfo")
 			,OnMessage(5, A_ThisFunc),	VarSetCapacity(B, 60), NumPut(60, B), adrB := &B
+			,hGui := DllCall("GetParent", "uint", hCtrl, "Uint") 
 
-		hGui := hParent := DllCall("GetParent", "uint", hCtrl, "Uint") 
+		hParent := DllCall("GetParent", "uint", hCtrl, "Uint") 
+		
 		if !%hParent%_s
 			DllCall(adrWindowInfo, "uint", hParent, "uint", adrB), %hParent%_pw := NumGet(B, 28) - NumGet(B, 20), %hParent%_ph := NumGet(B, 32) - NumGet(B, 24), %hParent%_s := !%hParent%_pw || !%hParent%_ph ? "" : %hParent%_pw " " %hParent%_ph
 		
