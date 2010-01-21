@@ -527,4 +527,4 @@ Form_setEsc(Hwnd, Type) {
 /* Group: About
 	o v0.81 by majkinetor.
 	o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
-/*
+*/
