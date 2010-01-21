@@ -1,6 +1,6 @@
    Gui, +LastFound
    hGui := WinExist()
-   Gui, Show , w500 h100 Hide                              ;set gui width & height prior to adding toolbar (mandatory)
+   Gui, Show , w500 h100 Hide                              ; set gui width & height prior to adding toolbar (mandatory)
  
    hCtrl := Toolbar_Add(hGui, "OnToolbar", "nodivider FLAT TOOLTIPS", "1L")    ;add the toolbar
  
@@ -17,7 +17,7 @@
 	)
  
 	Toolbar_Insert(hCtrl, btns)
-	Toolbar_SetButtonWidth(hCtrl, 50)                   ;set button width & height to 50 pixels
+	Toolbar_SetButtonWidth(hCtrl, 50)                   ; set button width & height to 50 pixels
  
 	Gui, Show
 return

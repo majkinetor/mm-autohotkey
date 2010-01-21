@@ -60,5 +60,11 @@ SaveGui() {
 	IniWrite, %b%, config.ini, Config, Visible
 }
 
+GuiClose:
+GuiEscape:
+	ExitApp
+return
+
+
 #include ..\..\inc
 #include _Forms.ahk

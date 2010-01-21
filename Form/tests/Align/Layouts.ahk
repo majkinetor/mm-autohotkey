@@ -138,6 +138,11 @@ SaveGui() {
 	IniWrite, %b%, config2.ini, Config, Visible
 }
 
+
+ESC::
+	ExitApp
+return
+
 GuiEscape:
 GuiClose:
 	if iLayout !=

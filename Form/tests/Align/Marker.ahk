@@ -23,5 +23,11 @@ _("mo w e d")
 	Gui, SHow,
 return
 
+GuiClose:
+GuiEscape:
+	ExitApp
+return
+
+
 #include ..\..\inc
 #include _Forms.ahk

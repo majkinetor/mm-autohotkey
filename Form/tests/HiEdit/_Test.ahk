@@ -1,4 +1,4 @@
-; ` 
+; `
 #SingleInstance force
 #NoEnv
 SetWorkingDir ..\..\inc
@@ -11,7 +11,7 @@ CoordMode, Mouse, screen
 	hEdit := HE_Add(hwnd,0,0,800,600, "HSCROLL VSCROLL HILIGHT TABBED FILECHANGEALERT")
 
 
-	fStyle := "s9" ,	fFace  := "Courier New"
+	fStyle := "s10" ,	fFace  := "Courier New"
 	HE_SetFont( hEdit, fStyle "," fFace)
 
 	SetColors(hEdit)
@@ -25,9 +25,11 @@ CoordMode, Mouse, screen
 	Menu, Features, Check, LineNumbersBar
 	Menu, Features, Check, AutoIndent
 
-
 	HE_SetKeywordFile( "Keywords.hes")
-	HE_OpenFile( hEdit, A_ScriptFullPath )
+
+	input = %1%
+	ifEqual, input, , SetEnv, input, %A_ScriptFullPath%
+	HE_OpenFile( hEdit, input)
 
 	Attach(hEdit, "w h")
 	Gui, Show, w800 h600, HiEdit Test
@@ -65,7 +67,8 @@ CreateMenu(){
 	Menu, FileMenu, Add, &Close,	MenuHandler 
 	Menu, FileMenu, Add, 
 	Menu, FileMenu, Add, &Open,		MenuHandler  
-	Menu, FileMenu, Add, &SaveAs,	MenuHandler  
+	Menu, FileMenu, Add, &Save,		MenuHandler 
+	Menu, FileMenu, Add, SaveAs,	MenuHandler  
 	Menu, FileMenu, Add, Reload,	MenuHandler  
 	Menu, FileMenu, Add, 
 	Menu, FileMenu, Add, E&xit,		MenuHandler
@@ -112,8 +115,8 @@ CreateMenu(){
 	Menu, Standard, Add
 	Menu, Standard, Add, Scroll, Standard
 
-	Menu, MyMenuBar, Add,File,		:FileMenu  
-	Menu, MyMenuBar, Add,&Features, :Features 
+	Menu, MyMenuBar, Add,&File,		:FileMenu  
+	Menu, MyMenuBar, Add,Features, :Features 
 	Menu, MyMenuBar, Add,&Standard,  :Standard
 	Menu, MyMenuBar, Add,About,		MenuHandler
 	Menu, MyMenuBar, Color,  DDDDDD
@@ -313,7 +316,10 @@ MenuHandler:
 	if A_ThisMenuItem = &Close
 		HE_CloseFile(hEdit, -1)
 
-	if A_ThisMenuItem = &SaveAs
+	if A_ThisMenuItem = &Save
+		HE_SaveFile(hEdit, HE_GetFileName(hEdit))
+	
+	if A_ThisMenuItem = SaveAs
 	{
 		FileSelectFile, fn, S 16
 		if (Errorlevel)

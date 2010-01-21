@@ -6,9 +6,9 @@ MakeGui:
 	Hwnd := WinExist(), %Hwnd% := n
 
 	Gui, %n%:Add, Button, w205 xm gOnbutton, New Gui (F1)
-	Gui, %n%:Add, Text, w205 xm gOnbutton, Esc to exit
+	Gui, %n%:Add, Text, w205 xm gOnbutton, Move and resize windows, then`nreload and do F1 to see efects`nEsc to exit
 
-	Gui, %n%:Add, Button, w100 y+50 gOnbutton, Save (F2)
+	Gui, %n%:Add, Button, w100 y+15 gOnbutton, Save (F2)
 	Gui, %n%:Add, Button, w100 yp x+5 gOnbutton, Recall (F3)
 	Gui, %n%:Add, Button, w100 xm	 gOnbutton, Save All 
 	Gui, %n%:Add, Button, w100 yp x+5 gOnbutton, Recall All (F4)
