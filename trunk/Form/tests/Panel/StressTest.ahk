@@ -36,7 +36,7 @@ _("mo! e w")
 	Form_Show()
 	Scroller_init()
 
-	;mhm....
+	; mhm....
 	loop, 3		
 		Scroller_UpdateBars(hForm1)
 return

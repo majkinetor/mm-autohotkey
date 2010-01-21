@@ -129,8 +129,8 @@ OnBtn:
 	if A_GuiControl = SetButtonSize
 		Toolbar_SetButtonSize(hToolbar, p1, p2)		
 
-	if A_GuiControl = Open Help`n(right click on any buttton for its help)
-		Run, Toolbar.html
+	if A_GuiControl contains Help
+		Run, ..\..\_doc\files\inc\Toolbar-ahk.html
 return
 
 Set(txt){
@@ -154,7 +154,7 @@ RButton::
 	if !InStr(h, "Button")
 		return
 	ControlGetText,txt,%h%, A
-	Run, %A_ProgramFIles%\Internet Explorer\iexplore "%A_ScriptDir%\Toolbar.html#%txt%"
+	Run, %A_ProgramFIles%\Internet Explorer\iexplore "%A_ScriptDir%\..\..\_doc\files\inc\Toolbar-ahk.html#%txt%"
 return
 
 F5:: Reload

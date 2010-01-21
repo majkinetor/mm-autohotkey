@@ -15,9 +15,9 @@ OnToolbar(hCtrl, Event, Txt) {
 	
 	if Txt = View
 	{
-		script := SelectionPath()
-		ifEqual, script, , return
-		Run, %A_AhkPath% "%A_ScriptDir%\tests\HiEdit\_Test.ahk" "%script%", %A_ScriptDir%\tests\HiEdit
+		script := SelectionPath(dir)
+		ifEqual, script, , Run, %dir%
+		else Run, %A_AhkPath% "%A_ScriptDir%\tests\HiEdit\_Test.ahk" "%script%", %A_ScriptDir%\tests\HiEdit
 	}
 
 	if Txt = Help
@@ -35,7 +35,6 @@ Populate() {
 }
 
 Execute() {
-	
 	script := SelectionPath(dir)
 	Run, %script%, %dir%
 }
@@ -44,12 +43,13 @@ SelectionPath(ByRef dir="") {
 	id := TV_GetSelection()
 	p := TV_GetParent(id)
 	TV_GetText(sn, id)
-	if !InStr(sn, ".ahk")
-		return
 	TV_GetText(pn, p)	
 
-	dir		= %A_ScriptDir%\tests\%pn%
-	return dir "\" sn
+	if b := InStr(sn, ".ahk") 
+		dir  = %A_ScriptDir%\tests\%pn%
+	else 
+		dir = %A_ScriptDir%\tests\%sn%
+	return b ? dir "\" sn : ""
 }
 
 OnTV:
@@ -60,6 +60,8 @@ return
 Form1_Close:
 	ExitApp
 return
+
+F1:: Execute()
 
 #include inc
 #include _Forms.ahk

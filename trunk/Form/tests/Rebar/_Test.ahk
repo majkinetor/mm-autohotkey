@@ -74,8 +74,8 @@ F1::
 return
 
 F2::
-;	Rebar_Lock(hRebar, "~")
-		ReBar_SetBand(hRebar, id, "S hidden")
+	Rebar_Lock(hRebar, "~")
+;	ReBar_SetBand(hRebar, id, "S hidden")
 return
 
 F3::
