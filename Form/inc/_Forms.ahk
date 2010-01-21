@@ -3,7 +3,7 @@
 
  Group: Overview
 
-		Forms framework is a group of modules used together to create AHK graphical user interfaces.
+		Forms framework is a group of modules used together to create rich AHK graphical user interfaces.
 		It contains the list of optional module includes with each module designed to work with or *without* the framework in place.
 		It includes number of custom controls, extensions and useful libraries. <Form> module is a backbone of the framework.
 		
@@ -36,7 +36,9 @@
 		before calling modules that use 3thd party dll's. This is not mandatory since Add function for such modules always 
 		have DllPath parameter.
 
-		After the development is complete, you can *delete* all modules you didn't use.
+		After the development is complete, you can *delete* all modules you didn't use except _Forms.ahk which is used to #include
+		modules you didn't delete.
+
 		Optionally, you can pack your script and modules you used into the single file using ScriptMerge (if you want to distribute 
 		your script as single ahk file).
 
@@ -120,6 +122,6 @@
 
 /* 
  Group: About
-	o v0.6 by majkinetor.
+	o v0.61 by majkinetor.
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>
  */
