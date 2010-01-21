@@ -17,7 +17,7 @@ OnToolbar(hCtrl, Event, Txt) {
 	{
 		script := SelectionPath()
 		ifEqual, script, , return
-		Run, %A_AhkPath% %A_ScriptDir%\tests\HiEdit\_Test.ahk "%script%", %A_ScriptDir%\tests\HiEdit
+		Run, %A_AhkPath% "%A_ScriptDir%\tests\HiEdit\_Test.ahk" "%script%", %A_ScriptDir%\tests\HiEdit
 	}
 
 	if Txt = Help
@@ -31,7 +31,8 @@ Populate() {
 		{
 			r := TV_Add(A_LoopFileName, 0)
 			loop, %A_LoopFileFullPath%\*.ahk
-				TV_Add(A_LoopFileName, r)
+				if A_LoopFileName not in il.ahk
+					TV_Add(A_LoopFileName, r)
 		}
 }
 
