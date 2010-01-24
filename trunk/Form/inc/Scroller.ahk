@@ -38,7 +38,7 @@ Scroller_Init(){
 
 			If you use <Attach> function, you may experience some miscalculation of scrollable area (not happening if <Panel> is the host).
 			This is due to the fact that attached controls may be resized as a consequence of window resizing (WM_SIZE message is sent 
-			scrollbars are added and it will trigger Attach handler) and module doesn't take that change into account. 
+			when scrollbars are added and it will trigger Attach handler) and module doesn't take that change into account. 
 			You can try to call this function 3 times in a row to fix the problem.
   */
 Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
