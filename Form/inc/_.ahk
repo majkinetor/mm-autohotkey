@@ -388,8 +388,8 @@ d_(hwnd, msg, id="", time=""){
 				Exits the script with the message.
 
 	Parameters:
-				E			- Expression. By default 1. The function will exit the script only when E is True.
 				Message		- Message to show.
+				E			- Expression. By default 1. The function will exit the script only when E is True.
 				ExitCode	- Exit code to return to the caller.
  */
 Fatal(Message, E=1, ExitCode="") {
