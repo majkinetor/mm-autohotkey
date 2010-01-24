@@ -23,20 +23,19 @@
 			Dock definition is white space separated combination of parameters which describe Client's position relative to the Host.
 			Parameters are grouped into 4 classes - x, y, w & h parameters. Classes and their parameters are optional.
 			
- > 		Syntax:		x(hw,cw,dx)  y(hh,ch,dy)  w(hw,dw)  h(hh,dh)
+ >	Syntax:		x(hw,cw,dx)  y(hh,ch,dy)  w(hw,dw)  h(hh,dh)
 
-
-            o The *X* coordinate of the top, left corner of the client window is computed as 
+            The *X* coordinate of the top, left corner of the client window is computed as 
             > x(hw,cw,dx) = HostX + hw*HostWidth + cw*ClientWidth + dx
-            o The *Y* coordinate of the top, left corner of the client window is computed as 
+            The *Y* coordinate of the top, left corner of the client window is computed as 
             > y(hh,ch,dy) = HostY + hh*HostHeight + ch*ClientHeight + dy
-            o The width *W* of the client window is computed as
+            The width *W* of the client window is computed as
 			> w(hw,dw) = hw*HostWidth + dw
-            o The height *H* of the client window is computed as 
+            The height *H* of the client window is computed as 
 			> h(hh,dh) = hh*HostHeight + dh
 
 			If you omit any of the class parameters it will default to 0. So, the following expressions all have the same effect :
- > 		    x(0,0,0) = x(0,0) = x(0,0,) = x(0) = x(0,)= x(0,,) = x() = x(0,,0) = x(,0,0) = x(,,0) = ...
+ >			x(0,0,0) = x(0,0) = x(0,0,) = x(0) = x(0,)= x(0,,) = x() = x(0,,0) = x(,0,0) = x(,,0) = ...
  >			y(0,1,0) = y(0,1) = y(,1) = y(,1,) = y(,1,0) = ...
 
 			Notice that x() is not the same as omitting x entirely. First case is equal to x(0,0,0) so it will set Client's X coordinate to be equal as Host's. 
