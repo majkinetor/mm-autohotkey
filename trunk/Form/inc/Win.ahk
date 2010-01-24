@@ -641,6 +641,7 @@ Win_SetIcon(Hwnd, Icon="", Flag=1){
 			HParent	- Handle to the parent window. If this parameter is 0, the desktop window becomes the new parent window.
 			bFixStyle - Set to TRUE to fix WS_CHILD & WS_POPUP styles. SetParent does not modify the WS_CHILD or WS_POPUP window styles of the window whose parent is being changed.
 						If HParent is 0, you should also clear the WS_CHILD bit and set the WS_POPUP style after calling SetParent (and vice-versa).
+ 
  Returns:
 			If the function succeeds, the return value is a handle to the previous parent window. Otherwise, its 0.
 
