@@ -16,6 +16,7 @@
 				Style	- White space separated list of control styles. Any integer style or one of the style keywords (see below).
 						  Invalid styles are skipped. "*MULTILINE WANTRETURN VSCROLL*" by default.
 				Text	- Control text.
+
  Styles:
      DISABLENOSCROLL - Disables scroll bars instead of hiding them when they are not needed.
      BORDER			- Displays the control with a sunken border style so that the rich edit control appears recessed into its parent window.
