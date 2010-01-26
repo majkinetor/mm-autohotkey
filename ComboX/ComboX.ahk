@@ -7,6 +7,8 @@
 			until it losses focus. You can optionally create trigger button for the ComboX control that will be used
 			for showing and positioning of the control.
 
+			(see ComboX.png)
+
 	Dependency:
 			Win 1.24++
 */
@@ -76,7 +78,7 @@ ComboX_Set( HCtrl, Options="", Handler="") {
  
  Parameters:
 			HCtrl	- Handle of the control.
-			X,Y		- Optinal screen coordinates on which to show control.
+			X,Y		- Optional screen coordinates on which to show control.
  */
 ComboX_Show( HCtrl, X="", Y="" ) {	
 	HCtrl += 0
