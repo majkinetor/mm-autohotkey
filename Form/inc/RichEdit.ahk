@@ -398,6 +398,12 @@ RichEdit_FixKeys(hCtrl) {
 	return DllCall("SetWindowLong", "UInt", hCtrl, "Int", -4, "Int", wndProc, "UInt")
 }
 
+RichEdit_GetFirstVisibleLine(hCtrl) {
+	static EM_GETFIRSTVISIBLELINE = 0xCE
+	SendMessage, EM_GETFIRSTVISIBLELINE, 0, 0, , ahk_id %hCtrl%
+	return ErrorLevel
+}
+
 /*
  Function: GetLine
 			Get the text of the desired line from an Edit control.
@@ -2029,7 +2035,7 @@ RichEdit_onNotify(Wparam, Lparam, Msg, Hwnd) {
 
 RichEdit_wndProc(hwnd, uMsg, wParam, lParam){
 
-   if (uMsg = 0x87)  ;WM_GETDLGCODE
+    if (uMsg = 0x87)  ;WM_GETDLGCODE
 		return 4	 ;DLGC_WANTALLKEYS
 
    return DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", hwnd, "UInt", uMsg, "UInt", wParam, "UInt", lParam)
