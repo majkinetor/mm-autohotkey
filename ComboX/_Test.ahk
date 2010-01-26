@@ -1,4 +1,4 @@
-_("mo!")
+;_("mo!")
 SetBatchLines, -1
 #SingleInstance, force 
 
