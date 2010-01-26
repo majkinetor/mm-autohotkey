@@ -173,7 +173,7 @@ RG_AddRow(hGrd, Row="", c1="", c2="", c3="", c4="", c5="", c6="", c7="", c8="", 
 		{
 			ifEqual, c%A_Index%,,continue
 			type := RG_GetColumn(hGrd, A_Index+r2), idx := (A_Index+r2-1)*4
-			if type in COMBOBOX,CHECKBOX,EDITLONG,IMAGE
+			if type in COMBOBOX,CHECKBOX,EDITLONG,IMAGE,HOTKEY,DATE,TIME
 				 NumPut(c%A_Index%,  ROWDATA, idx)       
 			else NumPut(&c%A_Index%, ROWDATA, idx)  
 		}
@@ -842,7 +842,7 @@ RaGrid_add2Form(hParent, Txt, Opt) {
 
 /* Group: About
 	o RaGrid control version: 2.0.1.6 by KetilO. See <http://www.masm32.com/board/index.php?topic=55>
-	o AHK module ver 2.0.1.6-2 by majkinetor.
+	o AHK module ver 2.0.1.6-3 by majkinetor.
 	o RaGrid is freely distributed for any kind of purpose.
 	o AHK module licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */
