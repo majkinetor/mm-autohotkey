@@ -3,7 +3,7 @@
 			Impose ComboBox like behavior on arbitrary control.
 			:
 			To create ComboX control, first create any kind of control and initialize it using <Set> function.
-			After that, control will be stay visible only from the moment it is shown (via <Show> or <Toggle>)
+			After that, control will stay visible only from the moment it is shown (via <Show> or <Toggle>)
 			until it losses focus. You can optionally create trigger button for the ComboX control that will be used
 			for showing and positioning of the control.
 
