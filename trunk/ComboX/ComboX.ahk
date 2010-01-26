@@ -82,8 +82,10 @@ ComboX_Show( HCtrl, X="", Y="" ) {
 	HCtrl += 0
 	ComboX("", HCtrl ")handler HButton Pos", handler, hBtn, Pos)
 
-	if (X Y = "")
-		 ComboX_setPosition(HCtrl, Pos, hBtn)
+	if (X Y = "") {
+		if (hBtn != "")
+			ComboX_setPosition(HCtrl, Pos, hBtn)
+	}
 	else Win_Move(HCtrl, X, Y)
 
 	if handler !=
@@ -165,6 +167,6 @@ ComboX(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", 
 
 
 /* Group: About
-	o Ver 2.0 by majkinetor.
+	o Ver 2.01 by majkinetor.
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>
  */
