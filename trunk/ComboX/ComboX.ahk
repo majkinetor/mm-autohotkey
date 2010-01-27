@@ -3,7 +3,7 @@
 			Impose ComboBox like behavior on arbitrary control.
 			:
 			To create ComboX control, first create any kind of control and initialize it using <Set> function.
-			After that, control will stay visible only from the moment it is shown (via <Show> or <Toggle>)
+			After that, control will be stay visible only from the moment it is shown (via <Show> or <Toggle>)
 			until it losses focus. You can optionally create trigger button for the ComboX control that will be used
 			for showing and positioning of the control.
 
@@ -109,13 +109,16 @@ ComboX_Toggle(HCtrl) {
 ;==================================== PRIVATE ===================================
 
 ComboX_wndProc(Hwnd, UMsg, WParam, LParam){ 
-	static WM_KEYDOWN = 0x100, WM_KILLFOCUS=8, WM_LBUTTONDOWN=0x201, WM_LBUTTONUP=0x202,        VK_ESCAPE=27, VK_ENTER=13, VK_SPACE=32
+	static WM_KEYDOWN = 0x100, WM_KILLFOCUS=8, WM_LBUTTONDOWN=0x201, WM_LBUTTONUP=0x202, WM_ACTIVATE=6, VK_ESCAPE=27, VK_ENTER=13, VK_SPACE=32
 
 	critical		;safe, always in new thread
 
 	res := DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", Hwnd, "UInt", UMsg, "UInt", WParam, "UInt", LParam) 
 
 	ComboX("", Hwnd ")Handler Options HButton", handler, op, hBtn)
+
+;	if (UMsg = WM_ACTIVATE) && !Wparam
+;		ComboX_Hide(Hwnd)
 
 	if (UMsg = WM_KILLFOCUS) 
 		ComboX_Hide(Hwnd)
