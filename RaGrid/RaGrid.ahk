@@ -24,7 +24,7 @@
 		Event   - Specifies event that occurred. Event must be registered to be able to monitor it. 
 		Col,Row - Cell coordinates.
 		Data	- Numeric data of the cell. Pointer to string for textual cells and DWORD value for numeric.
-		Result  - Return 1 to prevent action.
+		Result  - Return 1 to prevent some actions.
 
  Events:
          Headerclick	 - Sent when user clicks header. 
@@ -118,7 +118,7 @@ RG_AddColumn(hGrd, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o9=""
 	if !init
 		init := VarSetCapacity(COLUMN, 48) 
 
-	type := "EDITTEXT"
+	type := "EDITTEXT", w := 100
 	loop, 10 {
 		ifEqual, o%A_Index%,,break
 		else j := InStr( o%A_index%, "=" ), p := SubStr(o%A_index%, 1, j-1 ), %p% := SubStr( o%A_index%, j+1)
@@ -839,6 +839,35 @@ RaGrid_add2Form(hParent, Txt, Opt) {
 	%f%(Opt, "x# y# w# h# style dllPath g*", x, y, w, h, style, dllPath, handler)
 	return RG_Add(hParent, x, y, w, h, style, handler, dllPath)
 }
+
+/*	Group: Examples
+	Read Only Grid:
+	(begin code)
+	SetBatchLines, -1
+	   w := 350, h := 400 
+	   Gui, +LastFound +Resize 
+	   hwnd := WinExist() 
+		
+	   hGrd := RG_Add(hwnd, 0, 0, w, h, "NOSEL", "OnRa" ) 
+	   RG_SetHdrHeight(hGrd, 25), RG_SetRowHeight(hGrd, 26)    
+
+	   loop, 3
+		  RG_AddColumn(hGrd, "txt=Column " A_Index, "type=EditText") 
+
+	   loop, 9
+		  RG_AddRow(hGrd, 0, "1." A_Index, "2." A_Index ,"3." A_Index)
+
+	   Gui, Show, h%h% w%w% 
+	return 
+
+	OnRa(HCtrl, Event, Col, Row, Data="") { 
+	   if (Event = "BeforeEdit") && (Col != 3)
+		  return 1		;return 1 to prevent editing of all columns except 3thd one.
+	}
+
+	#include ragrid.ahk
+	(end code)
+*/
 
 /* Group: About
 	o RaGrid control version: 2.0.1.6 by KetilO. See <http://www.masm32.com/board/index.php?topic=55>
