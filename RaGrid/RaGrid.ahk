@@ -864,14 +864,12 @@ RaGrid_add2Form(hParent, Txt, Opt) {
 	   if (Event = "BeforeEdit") && (Col != 3)
 		  return 1		;return 1 to prevent editing of all columns except 3thd one.
 	}
-
-	#include ragrid.ahk
 	(end code)
 */
 
 /* Group: About
 	o RaGrid control version: 2.0.1.6 by KetilO. See <http://www.masm32.com/board/index.php?topic=55>
-	o AHK module ver 2.0.1.6-3 by majkinetor.
+	o AHK module ver 2.0.1.6-4 by majkinetor.
 	o RaGrid is freely distributed for any kind of purpose.
 	o AHK module licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */
