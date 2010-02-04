@@ -1,4 +1,4 @@
-/*
+﻿/*
 	Title:	Win
 			Set of window functions.
  */
@@ -623,6 +623,9 @@ Win_SetMenu(Hwnd, hMenu=0){
 Win_SetIcon(Hwnd, Icon="", Flag=1){
 	static WM_SETICON = 0x80, LR_LOADFROMFILE=0x10, IMAGE_ICON=1
 
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+
 	if Flag not in 0,1
 		return A_ThisFunc "> Unsupported Flag: " Flag
 
@@ -630,6 +633,7 @@ Win_SetIcon(Hwnd, Icon="", Flag=1){
 		hIcon := Icon+0 != "" ? Icon : DllCall("LoadImage", "Uint", 0, "str", Icon, "uint",IMAGE_ICON, "int", 32, "int", 32, "uint", LR_LOADFROMFILE) 	
 
 	SendMessage, WM_SETICON, %Flag%, hIcon, , ahk_id %Hwnd%
+	DetectHiddenWindows, %oldDetect%
 	return ErrorLevel
 }
 
@@ -796,7 +800,7 @@ Win_Subclass(Hwnd, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.25 by majkinetor.
+	o v1.26 by majkinetor.
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
 	o Licensed under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*
