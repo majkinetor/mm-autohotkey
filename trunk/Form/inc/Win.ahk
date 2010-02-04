@@ -1,4 +1,4 @@
-/*
+﻿/*
 	Title:	Win
 			Set of window functions.
  */
@@ -406,34 +406,35 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 
 /* 
   Function:	Recall
-			Store & recall window position, size and/or state.
+			Store & recall window placement (position, size and state).
 
   Parameters:
 		Options		- White space separated list of options. See bellow.		
-		Hwnd		- Hwnd of the window for which to store data or Gui number if AHK window. 
-					If omitted, function will use Hwnd of the default AHK Gui. You can also use Gui, N:Default 
+		Hwnd		- Hwnd of the window or Gui number if AHK window. 
+					In store mode (">") it determines window for which to store placement information.
+					If omitted function will use Hwnd of the default AHK Gui. You can also use Gui, N:Default 
 					prior to calling the function. For 3td party windows, this parameter is mandatory. 
-					Set 0 as hwnd to return position string without applying it to any window. This can be used for AHK Guis to
-					calculate size of controls based on window size and position, when needed. 
+					In recall mode ("<") it determines window which placement is to be set.
+					Use 0 as hwnd to return placement string without applying it to any window. T
+					his can be used for AHK Guis to calculate size of controls based on window size and position. 
 
 		IniFileName	- Ini file to use as storage. Function will save the data under the [Recall] section.
 					If omitted, Windows Registry key HKEY_CURRENT_USER\AutoHotKey\Win is used. Each script is uniquely determined by its full path 
 					so same scripts with different name will not share the storage.
 					
   Options:
-		">", "<", "-", "--" - Operation, mandatory option. Use ">" to store or "<" to recall window position.
+		">", "<", "-", "--" - Operation, mandatory option. Use ">" to store or "<" to recall window placement.
 					It can be optionally followed by the string representing the name of the storage location for that window.
 					You need to use name if your script stores more then one window, otherwise it will be saved under unnamed location.
-					">" and "<" are special names that can be used to store or recall all AHK Guis.
+					">" and "<" are special names that can be used to store or recall placements of all existing AHK Guis.
 					"-"	operation is used alone as an argument to delete Registry or Ini sections belonging to the script.
 					"--" operation is used alone as an argument to delete all Registry entries for all scripts.
-
 		
 		-Min	  - Don't save minimize state.
 		-Max	  - Don't save maximized state.		
 					
   Returns:
-			Position string, space separated list of syntax "left top right bottom state cw ch" of the window. 
+			Placement string, space separated list of syntax "left top right bottom state cw ch" of the window. 
 			Empty if no recall data is stored for the window.
 			State can be 1 (normal) 2 (minimized) or 3 (maximized).
 			cw & ch numbers are present only for AHK Guis and represent client width & height which can be used 
@@ -444,7 +445,7 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 		(start code)
 		 Gui, +Resize +LastFound
 		 WinSetTitle, MyGui
-		 if !Win_Recall("<")                     ;Recall gui if its position is already saved
+		 if !Win_Recall("<")                    ;Recall gui if its position is already saved
 			Gui, Show, h300 w300, MyGui         ; otherwise use these defaults.
 		return
 
@@ -456,10 +457,10 @@ Win_MoveDelta( Hwnd, Xd="", Yd="", Wd="", Hd="", Flags="" ) {
 
 		Snippets:
 		(start code)
-			Win_Recall(">MyGui")					;Save position for default Gui under name MyGui.
-			Win_Recall("<MyGui")					;Recall position for MyGui for default Gui
+			Win_Recall(">MyGui")					;Save placement of default Gui under name "MyGui".
+			Win_Recall("<MyGui")					;Recall placement saved under the name "MyGui" for default Gui.
 			
-			Win_Recall(">MyGui2", Hwnd)				;Save window position under MyGui2 name, given the window handle or Gui number.
+			Win_Recall(">MyGui2", Hwnd)				;Save window placement under MyGui2 name, given the window handle.
 			Win_Recall(">>")						;Save all Guis. The names will be given by their number.
 			Win_Recall("<<")						;Recall all Guis.
 
@@ -622,6 +623,9 @@ Win_SetMenu(Hwnd, hMenu=0){
 Win_SetIcon(Hwnd, Icon="", Flag=1){
 	static WM_SETICON = 0x80, LR_LOADFROMFILE=0x10, IMAGE_ICON=1
 
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+
 	if Flag not in 0,1
 		return A_ThisFunc "> Unsupported Flag: " Flag
 
@@ -629,6 +633,7 @@ Win_SetIcon(Hwnd, Icon="", Flag=1){
 		hIcon := Icon+0 != "" ? Icon : DllCall("LoadImage", "Uint", 0, "str", Icon, "uint",IMAGE_ICON, "int", 32, "int", 32, "uint", LR_LOADFROMFILE) 	
 
 	SendMessage, WM_SETICON, %Flag%, hIcon, , ahk_id %Hwnd%
+	DetectHiddenWindows, %oldDetect%
 	return ErrorLevel
 }
 
@@ -641,7 +646,7 @@ Win_SetIcon(Hwnd, Icon="", Flag=1){
 			HParent	- Handle to the parent window. If this parameter is 0, the desktop window becomes the new parent window.
 			bFixStyle - Set to TRUE to fix WS_CHILD & WS_POPUP styles. SetParent does not modify the WS_CHILD or WS_POPUP window styles of the window whose parent is being changed.
 						If HParent is 0, you should also clear the WS_CHILD bit and set the WS_POPUP style after calling SetParent (and vice-versa).
- 
+						
  Returns:
 			If the function succeeds, the return value is a handle to the previous parent window. Otherwise, its 0.
 
@@ -654,16 +659,15 @@ Win_SetParent(Hwnd, HParent=0, bFixStyle=false){
 	static WS_POPUP=0x80000000, WS_CHILD=0x40000000, WM_CHANGEUISTATE=0x127, UIS_INITIALIZE=3
 	
 	if (bFixStyle) {
-		s1 := Hwnd ? "+" : "-", s2 := Hwnd ? "-" : "+"
+		s1 := HParent ? "+" : "-", s2 := HParent ? "-" : "+"
 		WinSet, Style, %s1%%WS_CHILD%, ahk_id %Hwnd%
 		WinSet, Style, %s2%%WS_POPUP%, ahk_id %Hwnd%
 	}
-	r := DllCall("SetParent", "uint", Hwnd, "uint", HParent)
+	r := DllCall("SetParent", "uint", Hwnd, "uint", HParent, "Uint")
 	ifEqual, r, 0, return 0
 	SendMessage, WM_CHANGEUISTATE, UIS_INITIALIZE,,,ahk_id %HParent%
 	return r
 }
-
 
 /*
  Function:	SetOwner
@@ -679,14 +683,13 @@ Win_SetParent(Hwnd, HParent=0, bFixStyle=false){
 			An owned window is always above its owner in the z-order. The system automatically destroys an owned window when its owner is destroyed. An owned window is hidden when its owner is minimized. 
 			Only an overlapped or pop-up window can be an owner window; a child window cannot be an owner window.
  */
-
-;Famous misleading statement. Almost as misleading as the choice of GWL_HWNDPARENT as the name. It has nothing to do with a window's parent. 
-;It really changes the Owner exactly the same thing as including the Owner argument in the Show statement. 
-;A more accurate version might be: "SetWindowLong with the GWL_HWNDPARENT will not change the parent of a child window. Instead, use the SetParent function."
-;GWL_HWNDPARENT should have been called GWL_HWNDOWNER, but nobody noticed it until after a bazillion copies of the SDK had gone out. This is what happens 
-;when the the dev team lives on M&Ms and CocaCola for to long. Too bad. Live with it.
-;
 Win_SetOwner(Hwnd, hOwner){
+	;Famous misleading statement. Almost as misleading as the choice of GWL_HWNDPARENT as the name. It has nothing to do with a window's parent. 
+	;It really changes the Owner exactly the same thing as including the Owner argument in the Show statement. 
+	;A more accurate version might be: "SetWindowLong with the GWL_HWNDPARENT will not change the parent of a child window. Instead, use the SetParent function."
+	;GWL_HWNDPARENT should have been called GWL_HWNDOWNER, but nobody noticed it until after a bazillion copies of the SDK had gone out. This is what happens 
+	;when the the dev team lives on M&Ms and CocaCola for to long. Too bad. Live with it.
+
 	static GWL_HWNDPARENT = -8
 	return DllCall("SetWindowLong", "uint", Hwnd, "int", GWL_HWNDPARENT, "uint", hOwner)		
 }
@@ -717,7 +720,7 @@ Win_SetToolWindow(Hwnd, Flag="^") {
 		If the window was previously visible, the return value is nonzero. 
 		If the window was previously hidden, the return value is zero.
  */
-Win_Show(Hwnd, bShow=true) {
+Win_Show(Hwnd, bShow=true) {	
 	return DllCall("ShowWindow", "uint", Hwnd, "uint", bShow ? 5:0)
 }
 
@@ -797,7 +800,7 @@ Win_Subclass(Hwnd, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.24 by majkinetor.
+	o v1.26 by majkinetor.
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
-	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
-*/
+	o Licensed under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
+/*
