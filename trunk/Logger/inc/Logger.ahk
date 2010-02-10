@@ -55,7 +55,7 @@
 								  By default empty, means that this functionality will be disabled.
 				logDir			- Directory in which to save log files. Has no meaning if saveHour is disabled.
 				timeFormat		- Time format used for log file names. See FormatTime for details about the format. Has no meaning if saveHour is disabled.
-				error_kw, info_kw - Space separated list of keywords for <Auto> function.
+				error_kw, warning_kw - Space separated list of keywords for <Auto> function.
 
 	Remarks:
 				The Logger will try to include ahk files it needs (Logger_config.ahk, qhtm.ahk) from the root of the script and from the "inc" folder.
@@ -412,22 +412,26 @@ WebControl_GetHtml(hCtrl){
 /* 
  Group: Example
 (start code)
-
 	#SingleInstance force
 		Gui, +LastFound
 		hGui := WinExist()
-		Log_Add( hGui, 0, 0, 300, 200)
-		Gui, show, w300 h200
-	
-		loop, 3
-		{
-			Log_Info("This is some info")
-			Log_Error("Error ocured`nThis is the description of the error")
-			Log_Warning("This is warning")
-		}
+		Log_Add( hGui, 0, 0, 600, 500)
+		Gui, show, w600 h500
+
+		Log_Info("This is some info"), s()
+		Log_Error("Error ocured`nThis is the description of the error"), s()
+		Log_Warning("This is warning"), s()
+
+		Log_Auto("This is some info"), s()
+		Log_Auto("Error ocured`nThis is the description of the error"), s()
+		Log_Warning("This is warning"), s()
+
 	return
 
-	#include Logger.ahk
+	s() {
+		Random, x, 1, 3
+		Sleep, % x*1000
+	}
 
 (end code)
  */
