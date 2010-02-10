@@ -1,11 +1,11 @@
 /*  
 	Title:  Logger Control
 			*Logging API*
- :
+
 	Logger is an AHK module implementing small HTML logging API. It allows you to use consistent logging between different projects.
 	Logger can display 3 types of messages - info, warning and error. Each message can display icon, category, text and time in fully 
 	customizable manner.
- :
+
 	In its current implementation Logger uses QHTM control and thus it depends on qhtm.ahk wrapper. 
 	The module can be quickly changed to use other controls instead, for instance IE control. This can be done by reimplementing 3
 	functions with _WebControl_ prefix.
@@ -13,18 +13,18 @@
 
 /*
 	Function: Add
-			  Add Logger control to the GUI
+			  Add Logger control to the GUI.
 
 	Parameters:
-			  GUI		- Handle of the parent
-			  X-H		- Control coordinates
+			  GUI		- Handle of the parent.
+			  X-H		- Control coordinates.
 			  Handler	- Notification function that fires when user clicks on the type icon (i.e. properties). Function accepts two parameters - Type and Id.
 	
-	Con fig:
-			 To setup Logger edit *Logger_con fig* or call Logger_Store(var, value) for dynamic set-up (for some values). You can entirely delete Logger_config.ahk if you don't need it.
+	Config:
+			 To setup Logger edit *Logger_config* or call Logger_Store(var, value) for dynamic set-up (for some values). You can entirely delete Logger_config.ahk if you don't need it.
 
 			 You can omit any parameter you don't use, in which case Logger will use default values.
- :
+
 				bg				- Global background, by default "white".
 				fg				- Global foreground, by default "black".
 				fsize			- Global font size, 1-7 for predefined sizes or number with 'pt' sufix (points).
@@ -37,7 +37,7 @@
 				catalign		- Category align, by default "left".
 				tcategory		- If true, type will be set as category. By default false.
 
-  :			   
+	   
 				The following parameters can be set for each type of message. The possible message types are "info", "warning" and "error"
 				If not set, parameter will be set to the global one.
 
@@ -47,7 +47,7 @@
 				%type%_isize    - Type icon size. 
 				%type%_catfg	- Type category foreground color. 
 
-  :
+
 				Behavioral options :
 				
 				saveHour		- N, hour at which to save the content of the Logger in an external file. 
@@ -393,7 +393,7 @@ Log_handler(hLogger, Type, Id) {
 ;================= WEB CONTROL INTERFACE =============================
 
 WebControl_Add(hCtrl, Text, X, Y, W, H, Style="", Fun=""){
-	return QHTM_Add(hCtrl, Text, X, Y, W, H, Style, Fun)
+	return QHTM_Add(hCtrl, X, Y, W, H, Text, Style, Fun)
 }
 
 WebControl_AddHtml(hCtrl, HTML, bScroll=false){
@@ -440,4 +440,4 @@ WebControl_GetHtml(hCtrl){
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
  */
 
-#include *i ..\QHTM\qhtm.ahk
+#include qhtm.ahk

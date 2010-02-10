@@ -67,4 +67,5 @@ RandomLen(){
 	return l
 }
 
-#include inc\Logger.ahk
+#include inc
+#include Logger.ahk
