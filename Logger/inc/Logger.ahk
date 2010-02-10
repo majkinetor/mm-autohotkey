@@ -27,7 +27,7 @@
 
 				bg				- Global background, by default "white".
 				fg				- Global foreground, by default "black".
-				fsize			- Global font size, 1-7 for predefined sizes or number with 'pt' sufix (points).
+				fsize			- Global font size, 1-7 for predefined sizes or number with 'pt' suffix (points).
 				isize			- Global icon size, by default 16.
 				separator		- HTML used to separate log entries, none by default. If starts with *, it will separate only on type change, that is , messages from the same module will not be separated.
 				icongroup		- Icon suffix. Icons are normally grabbed from the icons folder in the script directory. Icons are named by type with eventual suffix. Suffix can be used to quickly change icon group.
@@ -55,7 +55,7 @@
 								  By default empty, means that this functionality will be disabled.
 				logDir			- Directory in which to save log files. Has no meaning if saveHour is disabled.
 				timeFormat		- Time format used for log file names. See FormatTime for details about the format. Has no meaning if saveHour is disabled.
-				error_kw, warning_kw - Space separated list of keywords for <Auto> function.
+				error_kw, warning_kw - Coma separated list of keywords for <Auto> function.
 
 	Remarks:
 				The Logger will try to include ahk files it needs (Logger_config.ahk, qhtm.ahk) from the root of the script and from the "inc" folder.
@@ -95,8 +95,8 @@ Log_Add(hGui, x, y, w, h, Handler=""){
 	Remarks:
 			  Text can be any kind of HTML with usual meaning except for new line, tab and space characters. 
 			  Those will be transformed to their usual meaning. Apart from mentioned, the text
-			  is normal HTML which means that you may want to additionaly stylish the message. 
-			  In some ocasions you may also want to replace special HTML chars - for instance '<' or '>' - with appropriate HTML entities.
+			  is normal HTML which means that you may want to additionally stylish the message. 
+			  In some occasions you may also want to replace special HTML chars - for instance '<' or '>' - with appropriate HTML entities.
 			  	  
 			  Category parameter is optional. Use it to the put the name of the module that posted a message.
 			  If logger option _tcategory_ is enabled, type will be set as category. If you use this parameter make sure you set _catwidth_ 
@@ -136,7 +136,7 @@ Log_Info(txt, category="", link="") {
 
 	Remarks:
 			 By default, if it sees word "error" inside message it will call <Error> function (similarly for warnings).
-			 You can add space separated list of keywords in the config file. Put error keywords in "error_kw" variable and 
+			 You can add comma separated list of keywords in the config file. Put error keywords in "error_kw" variable and 
 			 warning fields in "warning_kw". If keywords are not matched, message will be posted as <Info>.
 
 			 See <Error> function for other remarks.
@@ -424,7 +424,7 @@ WebControl_GetHtml(hCtrl){
 
 		Log_Auto("This is some info"), s()
 		Log_Auto("Error ocured`nThis is the description of the error"), s()
-		Log_Warning("This is warning"), s()
+		Log_Auto("This is warning"), s()
 
 	return
 
