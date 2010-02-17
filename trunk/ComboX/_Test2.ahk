@@ -2,17 +2,14 @@
 #SingleInstance Force  
 SetBatchLines -1 
 DetectHiddenWindows, on
+CoordMode, mouse, screen
 
 	Gui, +LastFound  +Resize
-	Gui, Add, Text, ,Choose Column to edit
-	Gui, Add, DropDownList, gOnDropDown w200 vcbColumns HWNDhDropDown
-
 	Gui, Font, s6
 	Gui, Add, ListView, x w400 h300 hwndhLV gOnListView, Column 1|Column 2|Column 3
 	Gui, Add, Edit, hwndhED vvED, input1|input2|input3		;this will become ComboX 
 
 	FillTheList() 
-	FillTheCombo()
 
 	ComboX_Set( hED, "esc enter", "OnComboX") 
 	Attach(hLV, "w h r2")
@@ -20,26 +17,34 @@ DetectHiddenWindows, on
 	Gui, Show, autosize, ComboX In Cell Editing Test 
 return 
 
-SetComboPosition(HwndLV, HwndCombo) {
+SetComboPosition(HwndLV, HwndCombo) {	
 	global gColNumber
+
+	MouseGetPos, mx
 
 	Win_GetRect(HwndLv, "xywh", lx, ly, lw, lh)
 	LV_ItemRect(HwndLV, LV_GetNext(), i1, i2, i3, i4)
-
-	x := 0
-	loop, % gColNumber - 1
-		x += LV_ColumnWidth(HwndLV, A_Index)
+	
+	x := lx
+	loop, % LV_GetCount("Column")
+	{
+		w := LV_ColumnWidth(HwndLV, A_Index)
+		if (x+w > mx) 
+		{
+			gColNumber := A_Index
+			break
+		} else x+=w
+	}
 	w := LV_ColumnWidth(HwndLV, gColNumber)
 
-	x := lx+x+1,  y := ly+i2+1,  h := i4-i2
+	y := ly+i2+1,  h := i4-i2
 	Win_Move(HwndCombo,x,y,w,h)
 }
 
 ShowCombo(){
 	global
-	
-	LV_GetText(txt, LV_GetNext(), gColNumber)
 	SetComboPosition(hLV, hEd)
+	LV_GetText(txt, LV_GetNext(), gColNumber)
 	ComboX_Show(hEd)
 	ControlSetText,,%txt%, ahk_id %hEd%
 	SendInput {End}^a
@@ -53,15 +58,9 @@ OnComboX(Hwnd, Event) {
 } 
 
 OnListView: 
-	IF A_GuiControlEvent = DoubleClick 
+	if A_GuiControlEvent = DoubleClick 
 		ShowCombo() 
 return 
-
-OnDropDown:
-	GuiControlGet, gColNumber,, cbColumns
-	ControlGet, gColNumber, FindString, %gColNumber%,,ahk_id %hDropDown%
-return
-
 
 FillTheList() {    
 	loop, 10
@@ -70,15 +69,6 @@ FillTheList() {
 	loop, 3
 	    LV_ModifyCol(A_Index,"Auto") 
 } 
-
-FillTheCombo() {
-	global gColNumber
-
-	loop, % gColNumber := LV_GetCount("Column")
-		LV_GetText(txt, 0, A_Index), res .= txt "|"
-
-	GuiControl, ,cbColumns, %res%|
-}
 
 ;====================================================================================================
 
