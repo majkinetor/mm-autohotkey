@@ -109,16 +109,13 @@ ComboX_Toggle(HCtrl) {
 ;==================================== PRIVATE ===================================
 
 ComboX_wndProc(Hwnd, UMsg, WParam, LParam){ 
-	static WM_KEYDOWN = 0x100, WM_KILLFOCUS=8, WM_LBUTTONDOWN=0x201, WM_LBUTTONUP=0x202, WM_ACTIVATE=6, VK_ESCAPE=27, VK_ENTER=13, VK_SPACE=32
+	static WM_KEYDOWN = 0x100, WM_KILLFOCUS=8, WM_LBUTTONDOWN=0x201, WM_LBUTTONUP=0x202,        VK_ESCAPE=27, VK_ENTER=13, VK_SPACE=32
 
 	critical		;safe, always in new thread
 
 	res := DllCall("CallWindowProcA", "UInt", A_EventInfo, "UInt", Hwnd, "UInt", UMsg, "UInt", WParam, "UInt", LParam) 
 
 	ComboX("", Hwnd ")Handler Options HButton", handler, op, hBtn)
-
-;	if (UMsg = WM_ACTIVATE) && !Wparam
-;		ComboX_Hide(Hwnd)
 
 	if (UMsg = WM_KILLFOCUS) 
 		ComboX_Hide(Hwnd)
@@ -169,6 +166,7 @@ ComboX(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", 
 
 
 #include *i Win.ahk
+#include *i inc\Win.ahk
 
 
 /* Group: About
