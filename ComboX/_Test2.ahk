@@ -22,10 +22,11 @@ SetComboPosition(HwndLV, HwndCombo) {
 
 	MouseGetPos, mx
 
+	sbx := DllCall("GetScrollPos", "UInt", HwndLv, "Int", 0)  
 	Win_GetRect(HwndLv, "xywh", lx, ly, lw, lh)
 	LV_ItemRect(HwndLV, LV_GetNext(), i1, i2, i3, i4)
 	
-	x := lx
+	x := lx-sbx
 	loop, % LV_GetCount("Column")
 	{
 		w := LV_ColumnWidth(HwndLV, A_Index)
@@ -63,7 +64,7 @@ OnListView:
 return 
 
 FillTheList() {    
-	loop, 10
+	loop, 100
 	    LV_Add("", "Value 1." A_Index, "Longer Value 2." A_Index, "Some Slightly Longer Value 3." A_Index, A_Index) 
   
 	loop, 3
