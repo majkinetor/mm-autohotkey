@@ -92,7 +92,7 @@
 	(end code)
 
 	About:
-			o 1.07 by majkinetor
+			o 1.1 by majkinetor
 			o Licensed under BSD <http://creativecommons.org/licenses/BSD/> 
  */
 Attach(hCtrl="", aDef="") {
@@ -125,8 +125,8 @@ Attach_(hCtrl, aDef, Msg, hParent){
 
 	if (hParent = "")  {						;Initialize controls 
 		if !adrSetWindowPos
-			adrSetWindowPos		:= DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), "str", "SetWindowPos")
-			,adrWindowInfo		:= DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), "str", "GetWindowInfo")
+			adrSetWindowPos		:= DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), A_IsUnicode ? "astr" : "str", "SetWindowPos")
+			,adrWindowInfo		:= DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), A_IsUnicode ? "astr" : "str", "GetWindowInfo")
 			,OnMessage(5, A_ThisFunc),	VarSetCapacity(B, 60), NumPut(60, B), adrB := &B
 			,hGui := DllCall("GetParent", "uint", hCtrl, "Uint") 
 
