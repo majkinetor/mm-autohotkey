@@ -770,6 +770,7 @@ Win_ShowSysMenu(Hwnd, X="mouse", Y="") {
 
  Remarks:
 			Works only for controls created in the autohotkey process.
+			This function prevents DEP protection to shut down the process.
 
  Example:
 	(start code)
@@ -786,12 +787,14 @@ Win_ShowSysMenu(Hwnd, X="mouse", Y="") {
 	(end code)
  */
 Win_Subclass(Hwnd, Fun, Opt="", ByRef $WndProc="") { 
+	static PAGE_EXECUTE_READWRITE=0x40
 	if Fun is not integer
 	{
-		 oldProc := DllCall("GetWindowLong", "uint", Hwnd, "uint", -4) 
-		 ifEqual, oldProc, 0, return 0 
-		 $WndProc := RegisterCallback(Fun, Opt, 4, oldProc) 
-		 ifEqual, $WndProc, , return 0
+		oldProc := DllCall("GetWindowLong", "uint", Hwnd, "uint", -4) 
+		ifEqual, oldProc, 0, return 0 
+		$WndProc := RegisterCallback(Fun, Opt, 4, oldProc) 
+		ifEqual, $WndProc, , return 0
+		DllCall("VirtualProtect", "UInt", $WndProc, "Uint", 64, "Uint", PAGE_EXECUTE_READWRITE, "Uint*", _)
 	}
 	else $WndProc := Fun
 	   
@@ -800,7 +803,7 @@ Win_Subclass(Hwnd, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.26 by majkinetor.
+	o v1.3 by majkinetor.
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
 	o Licensed under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*
