@@ -130,7 +130,9 @@ Toolbar_Add(hGui, Handler, Style="", ImageList="", Pos="") {
 	
 	SendMessage, TB_BUTTONSTRUCTSIZE, 20, 0, , ahk_id %hCtrl%
 	SendMessage, TB_SETEXTENDEDSTYLE, 0, hExStyle, , ahk_id %hCtrl% 
-	SendMessage, TB_SETUNICODEFORMAT, 0, 0, , ahk_id %hCtrl%		  ;set to ANSI
+
+	SendMessage, TB_SETUNICODEFORMAT, A_IsUnicode,,, ahk_id %hCtrl% ; Ansi = 0, Unicode !=0
+	
 
 	if(ImageList != "")
 		Toolbar_SetImageList(hCtrl, ImageList)
@@ -354,7 +356,7 @@ Toolbar_DeleteButton(hCtrl, Pos=1) {
 	(end code)
  */
 Toolbar_GetButton(hCtrl, WhichButton, pQ="") {
-	static TB_GETBUTTON = 0x417, TB_GETBUTTONTEXT=0x42D, TB_GETSTRING=0x45C, TB_COMMANDTOINDEX=0x419
+	static TB_GETBUTTON=0x417, TB_GETBUTTONTEXTA=0x42D, TB_GETBUTTONTEXTW=0x44B, TB_GETSTRINGA=0x45C, TB_GETSTRINGW=0x45B, TB_COMMANDTOINDEX=0x419
 
 	if WhichButton is not number
 		return A_ThisFunc "> Invalid button position or ID: " WhichButton
@@ -389,8 +391,8 @@ Toolbar_GetButton(hCtrl, WhichButton, pQ="") {
 	}
 
  ;get caption
-	VarSetCapacity( buf, 128 ), sIdx := NumGet(aTBB+0, 16)
-	SendMessage, TB_GETSTRING, (sIdx<<16)|128, &buf, ,ahk_id %hCtrl%			;SendMessage, TB_GETBUTTONTEXT,id,&buf,,ahk_id %hCtrl%
+	VarSetCapacity( buf, 256 ), sIdx := NumGet(aTBB+0, 16)
+	SendMessage, A_IsUnicode ? TB_GETSTRINGW : TB_GETSTRINGA , (sIdx<<16)|128, &buf, ,ahk_id %hCtrl%			;SendMessage, TB_GETBUTTONTEXT,id,&buf,,ahk_id %hCtrl%
 	VarSetCapacity( buf, -1 )
 	if a
 		buf := "*" buf
@@ -524,13 +526,13 @@ Toolbar_GetRect(hCtrl, Pos="", pQ="") {
  	    (i.e. their captions are seen as tooltips and are not displayed.
  */
 Toolbar_Insert(hCtrl, Btns, Pos=""){
-	static TB_INSERTA = 0x414, TB_INSERTBUTTONA=0x415
+	static TB_ADDBUTTONSA=0x414, TB_ADDBUTTONSW=0x444, TB_INSERTBUTTONA=0x415, TB_INSERTBUTTONW = 0x443
 
 	cnt := Toolbar_compileButtons(hCtrl, Btns, cBTN)
 	if Pos =
-		SendMessage, TB_INSERTA, cnt, cBTN ,, ahk_id %hCtrl%
+		SendMessage, A_IsUnicode ? TB_ADDBUTTONSW : TB_ADDBUTTONSA, cnt, cBTN ,, ahk_id %hCtrl%
 	else loop, %cnt%
-		SendMessage, TB_INSERTBUTTONA, Pos+A_Index-2, cBTN + 20*(A_Index-1) ,, ahk_id %hCtrl%
+		SendMessage, A_IsUnicode ? TB_INSERTBUTTONW : TB_INSERTBUTTONA, Pos+A_Index-2, cBTN + 20*(A_Index-1) ,, ahk_id %hCtrl%
 
 	Toolbar_mfree(cBTN)
 
@@ -782,7 +784,7 @@ Button definition:
 Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 	static BTNS_SEP=1, BTNS_CHECK =2, BTNS_CHECKGROUP = 6, BTNS_DROPDOWN = 8, BTNS_A=16, BTNS_AUTOSIZE = 16, BTNS_NOPREFIX = 32, BTNS_SHOWTEXT = 64
 	static TBSTATE_CHECKED=1, TBSTATE_ENABLED=4, TBSTATE_HIDDEN=8, TBSTATE_DISABLED=0, TBSTATE_WRAP = 0x20
-	static TB_ADDSTRING = 0x41C, WS_CLIPSIBLINGS = 0x4000000
+	static TB_ADDSTRINGA=0x41C, TB_ADDSTRINGW=0x44D, WS_CLIPSIBLINGS = 0x4000000
 	static id=10000								;automatic IDing starts form 10000,     1 <= userID < 10 000
 
 	WinGet, bMenu, Style, ahk_id %hCtrl%
@@ -843,8 +845,8 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 	 ;add caption to the string pool
 		if (hStyle != BTNS_SEP) {
 			StringReplace a1, a1, `r, `n, A		;replace `r with new lines (for multiline tooltips)
-			VarSetCapacity(buf, StrLen(a1)+1, 0), buf := a1	 ;Buf must be double-NULL-terminated
-			sIdx := DllCall("SendMessage","uint",hCtrl,"uint", TB_ADDSTRING, "uint",0,"uint",&buf)  ;returns the new index of the string within the string pool
+			VarSetCapacity(buf, StrLen(a1)*2+2, 0), buf := a1	 ;Buf must be double-NULL-terminated, use unicode length in both cases.
+			sIdx := DllCall("SendMessage","uint",hCtrl,"uint", A_IsUnicode ? TB_ADDSTRINGW : TB_ADDSTRINGA, "uint", 0, "str", buf)  ;returns the new index of the string within the string pool
 		} else sIdx := -1,  a2 := (StrLen(A_LoopField)-1)*10 + 1			;if separator, lentgth of the "-" string determines width of the separation. Each - adds 10 pixels.
 
 	 ;TBBUTTON Structure
@@ -875,7 +877,7 @@ Toolbar_compileButtons(hCtrl, Btns, ByRef cBTN) {
 
 Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) { 
 	static MODULEID = 80609, oldNotify="*" 
-	static NM_CLICK=-2, NM_RCLICK=-5, NM_LDOWN=-20, TBN_DROPDOWN=-710, TBN_HOTITEMCHANGE=-713, TBN_ENDDRAG=-702, TBN_BEGINADJUST=-703, TBN_GETBUTTONINFOA=-700, TBN_QUERYINSERT=-706, TBN_QUERYDELETE=-707, TBN_BEGINADJUST=-703, TBN_ENDADJUST=-704, TBN_RESET=-705, TBN_TOOLBARCHANGE=-708, TB_COMMANDTOINDEX=0x419
+	static NM_CLICK=-2, NM_RCLICK=-5, NM_LDOWN=-20, TBN_DROPDOWN=-710, TBN_HOTITEMCHANGE=-713, TBN_ENDDRAG=-702, TBN_BEGINADJUST=-703, TBN_GETBUTTONINFOA=-700, TBN_GETBUTTONINFOAW=-720, TBN_QUERYINSERT=-706, TBN_QUERYDELETE=-707, TBN_BEGINADJUST=-703, TBN_ENDADJUST=-704, TBN_RESET=-705, TBN_TOOLBARCHANGE=-708, TB_COMMANDTOINDEX=0x419
 	static cnt, cnta, cBTN, inDialog, tc=0
 
 	if (_ := (NumGet(Lparam+4))) != MODULEID
@@ -927,7 +929,7 @@ Toolbar_onNotify(Wparam,Lparam,Msg,Hwnd) {
 		return 
 	} 
 
-	if (code = TBN_GETBUTTONINFOA)   { 
+	if (code = TBN_GETBUTTONINFOA || code = TBN_GETBUTTONINFOAW)   { 
 		if (iItem = cnt + cnta)					;iItem is position, not identifier. Win keeps sending incresing numbers until we say "no more" (return 0) 
 			return 0 
        
@@ -1119,7 +1121,7 @@ Toolbar(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="",
 
 /*
  Group: About
-	o Ver 2.31 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
+	o Ver 2.5 by majkinetor. See http://www.autohotkey.com/forum/topic27382.html
 	o Parts of code in Toolbar_onNotify by jballi.
 	o Toolbar Reference at MSDN: <http://msdn2.microsoft.com/en-us/library/bb760435(VS.85).aspx>
 	o Licensed under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
