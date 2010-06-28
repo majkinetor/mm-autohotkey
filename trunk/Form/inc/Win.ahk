@@ -195,7 +195,7 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
 			hp := DllCall( "OpenProcess", "uint", 0x10|0x400, "int", false, "uint", _ ) 
 			if (ErrorLevel or !hp) 
 				continue
-			VarSetCapacity(buf, 512, 0), DllCall( "psapi.dll\GetModuleFileNameEx" A_IsUnicode ? "W" : "A", "uint", hp, "uint", 0, "str", buf, "uint", 512),  DllCall( "CloseHandle", hp ) 
+			VarSetCapacity(buf, 512, 0), DllCall( "psapi.dll\GetModuleFileNameEx" (A_IsUnicode ? "W" : "A"), "uint", hp, "uint", 0, "str", buf, "uint", 512),  DllCall( "CloseHandle", hp ) 
 			o%i% := buf 
 		continue
 		Win_Get_D:

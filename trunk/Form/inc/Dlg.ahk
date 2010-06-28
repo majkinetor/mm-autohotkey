@@ -165,7 +165,7 @@ Dlg_Font(ByRef Name, ByRef Style, ByRef Color, Effects=true, hGui=0) {
    Effects := 0x041 + (Effects ? 0x100 : 0)  ;CF_EFFECTS = 0x100, CF_SCREENFONTS=1, CF_INITTOLOGFONTSTRUCT = 0x40
 
    ;set initial name
-   DllCall("RtlMoveMemory", "uint", &LOGFONT+28, "Uint", &Name, "Uint", 32)
+   DllCall("RtlMoveMemory", "uint", &LOGFONT+28, "Uint", &Name, "Uint", 64)
 
    ;convert from rgb  
    clr := ((Color & 0xFF) << 16) + (Color & 0xFF00) + ((Color >> 16) & 0xFF) 
@@ -197,14 +197,13 @@ Dlg_Font(ByRef Name, ByRef Style, ByRef Color, Effects=true, hGui=0) {
     ,NumPut(Effects, CHOOSEFONT, 20)	
     ,NumPut(clr,	 CHOOSEFONT, 24)	; rgbColors
 
-   r := DllCall("comdlg32\ChooseFontA", "uint", &CHOOSEFONT)  ; Display the dialog.
-   if !r
-      return false
+    r := DllCall("comdlg32\ChooseFont" (A_IsUnicode ? "W" : "A"), "uint", &CHOOSEFONT)  ; Display the dialog.
+    ifEqual, r, 0, return false
 
   ;font name
-	VarSetCapacity(Name, 32)
-	DllCall("RtlMoveMemory", "str", Name, "Uint", &LOGFONT + 28, "Uint", 32)
-	Style := "s" NumGet(CHOOSEFONT, 16) // 10
+	VarSetCapacity(Name, 64)
+	DllCall("RtlMoveMemory", "str", Name, "Uint", &LOGFONT + 28, "Uint", 64)
+	VarSetCapacity(Name, -1)
 
   ;color
 	old := A_FormatInteger
@@ -262,17 +261,24 @@ Dlg_Font(ByRef Name, ByRef Style, ByRef Color, Effects=true, hGui=0) {
 			This is simple and non-flexible dialog. If you need more features, use <IconEx> instead.
  */
 Dlg_Icon(ByRef Icon, ByRef Index, hGui=0) {      
-    VarSetCapacity(wIcon, 1025, 0) 
-    If (Icon) && !DllCall("MultiByteToWideChar", "UInt", 0, "UInt", 0, "Str", Icon, "Int", StrLen(Icon), "UInt", &wIcon, "Int", 1025) 
-		return false
 
-	r := DllCall(DllCall("GetProcAddress", "Uint", DllCall("LoadLibrary", "str", "shell32.dll"), "Uint", 62), "uint", hGui, "uint", &wIcon, "uint", 1025, "intp", --Index)
+    VarSetCapacity(wIcon, 1025, 0), wIcon := Icon
+	if !A_IsUnicode
+	    If (Icon) && !DllCall("MultiByteToWideChar", "UInt", 0, "UInt", 0, "Str", Icon, "Int", StrLen(Icon), "UInt", &wIcon, "Int", 1025) 
+			return false
+
+	adrPickIconDlg := DllCall("GetProcAddress", "Uint", DllCall("LoadLibrary", "str", "shell32.dll"), "Uint", 62)
+	r := DllCall(adrPickIconDlg, "uint", hGui, "str", wIcon, "uint", 1025, "intp", --Index)
+	IfEqual, r, 0, return false
 	Index++
-	IfEqual, r, 0, return false
 
-	VarSetCapacity(Icon, len := DllCall("lstrlenW", "UInt", &wIcon) ) 
-	r := DllCall("WideCharToMultiByte" , "UInt", 0, "UInt", 0, "UInt", &wIcon, "Int", len, "Str", Icon, "Int", len, "UInt", 0, "UInt", 0) 
-	IfEqual, r, 0, return false
+	if !A_IsUnicode
+	{	
+		VarSetCapacity(Icon, len := DllCall("lstrlenW", "UInt", &wIcon) ) 
+		r := DllCall("WideCharToMultiByte" , "UInt", 0, "UInt", 0, "UInt", &wIcon, "Int", len, "Str", Icon, "Int", len, "UInt", 0, "UInt", 0) 
+		IfEqual, r, 0, return false
+	} else VarSetCapacity(wIcon, -1), Icon := wIcon
+	
     Return True 
 }
 
@@ -444,6 +450,6 @@ Dlg_callback(wparam, lparam, msg, hwnd) {
  */
 
 /* Group: About
-		o Ver 5.02 by majkinetor. See http://www.autohotkey.com/forum/topic17230.html
+		o Ver 5.1 by majkinetor. See http://www.autohotkey.com/forum/topic17230.html
 		o Licensed under BSD <http://creativecommons.org/licenses/BSD/>
  */
