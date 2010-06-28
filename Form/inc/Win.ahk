@@ -195,7 +195,7 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
 			hp := DllCall( "OpenProcess", "uint", 0x10|0x400, "int", false, "uint", _ ) 
 			if (ErrorLevel or !hp) 
 				continue
-			VarSetCapacity(buf, 512, 0), DllCall( "psapi.dll\GetModuleFileNameExA", "uint", hp, "uint", 0, "str", buf, "uint", 512),  DllCall( "CloseHandle", hp ) 
+			VarSetCapacity(buf, 512, 0), DllCall( "psapi.dll\GetModuleFileNameEx" A_IsUnicode ? "W" : "A", "uint", hp, "uint", 0, "str", buf, "uint", 512),  DllCall( "CloseHandle", hp ) 
 			o%i% := buf 
 		continue
 		Win_Get_D:
@@ -275,7 +275,7 @@ Win_GetRect(hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="") {
 Win_GetChildren(Hwnd){
 	static GW_HWNDNEXT=2, GW_CHILD=5, adrGetWindow
 	if !adrGetWindow
-		adrGetWindow := DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), "str", "GetWindow")
+		adrGetWindow := DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), A_IsUnicode ? "astr" : "str", "GetWindow")
 	s := hChild := DllCall(adrGetWindow, "uint", Hwnd, "uint", GW_CHILD)
 	ifEqual, s,0, return
 	while (hChild := DllCall(adrGetWindow, "uint", hChild, "uint", GW_HWNDNEXT))
