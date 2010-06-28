@@ -303,20 +303,19 @@ Rebar_ID2Index(hRebar, Id){
 	
  */
 Rebar_Insert(hRebar, hCtrl, o1="", o2="", o3="", o4="", o5="", o6="", o7="", o8="", o9=""){
-	static RB_INSERTBANDA=0x401
+   static RB_INSERTBANDA=0x401, RB_INSERTBANDW=0x40A
 
-	if !(hCtrl+0)
-		return A_ThisFunc "> Invalid child handle: " hCtrl
+   if !(hCtrl+0)
+      return A_ThisFunc "> Invalid child handle: " hCtrl
 
-	pos := Rebar_compileBand(BAND, hCtrl, o1, o2, o3, o4, o5, o6, o7, o8, o9)
-	if pos is not Integer
-		return pos
-	
-	SendMessage, RB_INSERTBANDA, pos, &BAND,, ahk_id %hReBar% 
-	ifEqual, ErrorLevel, 0, return 0
-	return 	NumGet(BAND, 52)   ;return ID
+   pos := Rebar_compileBand(BAND, hCtrl, o1, o2, o3, o4, o5, o6, o7, o8, o9)
+   if pos is not Integer
+      return pos
+   
+   SendMessage, A_IsUnicode ? RB_INSERTBANDW : RB_INSERTBANDA, pos, &BAND,, ahk_id %hReBar% 
+   ifEqual, ErrorLevel, 0, return 0
+   return    NumGet(BAND, 52)   ;return ID
 }
-
 
 /*
   Function: Lock
@@ -746,7 +745,7 @@ Rebar(var="", value="~`a") {
  */
 
 /* Group: About
-	o Ver 2.02 by majkinetor. 
+	o Ver 2.03 by majkinetor. 
 	o MSDN Reference: <http://msdn.microsoft.com/en-us/library/bb774375(VS.85).aspx>.
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>.
 */
