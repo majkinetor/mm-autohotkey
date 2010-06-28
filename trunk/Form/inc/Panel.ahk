@@ -114,8 +114,9 @@ Panel_wndProc(Hwnd, UMsg, WParam, LParam) {
 	critical 100	;will always be started in new thread, so its OK
 	if !rootProc {
 		rootProc := DllCall("GetWindowLong", "uint", hRoot := DllCall("GetAncestor", "uint", Hwnd, "uint", GWL_ROOT), "uint", GWL_WNDPROC)
-		adrGetWindowLong := DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), (A_IsUnicode ? "a" : "") "str", "GetWindowLongA")
-		adrDefWindowProc := DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), (A_IsUnicode ? "a" : "") "str", "DefWindowProcA")
+		api_suffix := A_IsUnicode ? "W" : "A",  str := A_IsUnicode ? "astr" : "str"
+		adrGetWindowLong := DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), str, "GetWindowLong" api_suffix)
+		adrDefWindowProc := DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), str, "DefWindowProc" api_suffix)
 		attach := "Attach_", scroller_onscroll := "Scroller_onScroll", scroller_updatebars := "Scroller_UpdateBars"
 	}
 
