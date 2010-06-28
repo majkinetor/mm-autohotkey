@@ -333,23 +333,26 @@ Dlg_Open( hGui=0, Title="", Filter="", DefaultFilter="", Root="", DefaultExt="",
 			hFlags |= OFN_%A_LoopField%
 
 	ifEqual, hFlags, , return A_ThisFunc "> Some of the flags are invalid: " Flags
-	VarSetCapacity( FN, 0xffff ), VarSetCapacity( lpstrFilter, 2*StrLen(filter))
+	VarSetCapacity( FN, 0xffff ), VarSetCapacity( lpstrFilter, 4*StrLen(Filter), 0)
 
 	if rootFN !=
-		  DllCall("lstrcpyn", "str", FN, "str", rootFN, "int", StrLen(rootFN)+1) 
+		  DllCall("RtlMoveMemory", "str", FN, "str", rootFN, "Uint", (StrLen(rootFN)+1) * (A_IsUnicode ? 2:1) )  ; DllCall("lstrcpyn", "str", FN, "str", rootFN, "int", StrLen(rootFN)*(A_IsUnicode ? 2:1) +1) 
 
 	; Contruct FilterText seperate by \0 
 	delta := 0										;Used by Loop as Offset
 	loop, Parse, Filter, |                
 	{ 
 		desc := A_LoopField,  ext := SubStr(A_LoopField, InStr( A_LoopField,"(" )+1, -1) 
-		lenD := StrLen(A_LoopField)+1,	lenE := StrLen(ext)+1				;including /0
+		lenD := StrLen(A_LoopField)+1 ,	lenE := StrLen(ext)+1				;including /0
+		if A_IsUnicode
+			lend *= 2, lenE *= 2
 
-		DllCall("lstrcpyn", "uint", &lpstrFilter + delta, "uint", &desc, "int", lenD) 
-		DllCall("lstrcpyn", "uint", &lpstrFilter + delta + lenD, "uint", &ext, "int", lenE)
+		DllCall("RtlMoveMemory", "Uint", &lpstrFilter + delta, "str", desc, "Uint", lenD)
+		DllCall("RtlMoveMemory", "uint", &lpstrFilter + delta + lenD, "str", ext, "int", lenE)
 		delta += lenD + lenE
 	} 
-	NumPut(0, lpstrFilter, delta, "UChar" )		  ; Double Zero Termination 
+
+	;HexView(&lpstrFilter, 512)
 
 	; Contruct OPENFILENAME Structure   
 	VarSetCapacity( OFN ,90, 0)
@@ -364,15 +367,16 @@ Dlg_Open( hGui=0, Title="", Filter="", DefaultFilter="", Root="", DefaultExt="",
 	 ,NumPut( hFlags,		 OFN, 52, "UInt" )    ; Flags 
 	 ,NumPut( &DefaultExt,	 OFN, 60, "UInt" )    ; DefaultExt 
 
-	res := SubStr(Flags, 1, 1)="S" ? DllCall("comdlg32\GetSaveFileNameA", "Uint", &OFN ) : DllCall("comdlg32\GetOpenFileNameA", "Uint", &OFN )
+	res := SubStr(Flags, 1, 1)="S" ? DllCall("comdlg32\GetSaveFileName" (A_IsUnicode ? "W" : "A"), "Uint", &OFN ) : DllCall("comdlg32\GetOpenFileName" (A_IsUnicode ? "W" : "A"), "Uint", &OFN )
 	IfEqual, res, 0, return
+
 
 	adr := &FN,  f := d := DllCall("MulDiv", "Int", adr, "Int",1, "Int",1, "str"), res := ""
 	if StrLen(d) != 3			;windows adds \ when in root of the drive and doesn't do that otherwise
 		d.="\"		
 	if ms := InStr(Flags, "ALLOWMULTISELECT")
 		loop 
-			if f := DllCall("MulDiv", "Int", adr += StrLen(f)+1, "Int",1, "Int",1, "str") 
+			if f := DllCall("MulDiv", "Int", adr += (StrLen(f)+1)*(A_IsUnicode ? 2 : 1), "Int",1, "Int",1, "str") 
 				res .= d f "`n"
 			else {
 				 IfEqual, A_Index, 1, SetEnv, res, %d%		;if user selects only 1 file with multiselect flag, windows ignores this flag.... 
