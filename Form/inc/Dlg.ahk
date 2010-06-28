@@ -107,7 +107,7 @@ Dlg_Find( hGui, Handler, Flags="d", FindText="") {
 	Dlg_callback(Handler,"","","")
 	OnMessage( DllCall("RegisterWindowMessage", "str", FINDMSGSTRING), "Dlg_callback" )
 
-	return DllCall("comdlg32\FindTextA", "str", FR)
+	return DllCall("comdlg32\FindText" (A_IsUnicode ? "W" : "A"), "str", FR)
 }
 
 Dlg_Replace( hGui, Handler, Flags="", FindText="", ReplaceText="") {
@@ -140,7 +140,7 @@ Dlg_Replace( hGui, Handler, Flags="", FindText="", ReplaceText="") {
 
 	Dlg_callback(Handler,"","","")
 	OnMessage( DllCall("RegisterWindowMessage", "str", FINDMSGSTRING), "Dlg_callback" )
-	return DllCall("comdlg32\ReplaceTextA", "str", FR)
+	return DllCall("comdlg32\ReplaceText" (A_IsUnicode ? "W" : "A"), "str", FR)
 }
 
 /*
