@@ -157,8 +157,9 @@ Rebar_GetBand(hRebar, WhichBand, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", B
 	loop, parse, pQ
 	{
 		if A_LoopField = T
-			cch := NumGet(BAND, 24), VarSetCapacity(o%A_Index%, cch)
-			, DllCall("WideCharToMultiByte" , "UInt", 0, "UInt", 0, "UInt", &wTxt, "Int", cch, "str", o%A_Index% , "Int", cch , "UInt", 0, "UInt", 0)
+			if !A_IsUnicode
+				 cch := NumGet(BAND, 24), VarSetCapacity(o%A_Index%, cch), DllCall("WideCharToMultiByte", "UInt", 0, "UInt", 0, "UInt", &wTxt, "Int", cch, "str", o%A_Index% , "Int", cch , "UInt", 0, "UInt", 0)
+			else VarSetCapacity(wTxt, -1), o%A_Index% := wTxt
 		 
 		if A_LoopField = S
 			o%A_Index% := Rebar_getStyle(NumGet(BAND, 8))
