@@ -147,7 +147,6 @@ Rebar_GetBand(hRebar, WhichBand, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", B
 
 	hMask := RBBIM_TEXT | RBBIM_STYLE | RBBIM_SIZE | RBBIM_COLORS | RBBIM_IMAGE | RBBIM_ID
 	WhichBand := WhichBand >= 10000 ? Rebar_Id2Index(hrebar, WhichBand)-1 : WhichBand-1 
-
 	
 	VarSetCapacity(BAND, 80, 0), NumPut(80,BAND), NumPut(hMask, BAND, 4)
 	VarSetCapacity(wTxt, 64), NumPut(&wTxt, BAND, 20), NumPut(64, BAND, 24)
@@ -746,7 +745,7 @@ Rebar(var="", value="~`a") {
  */
 
 /* Group: About
-	o Ver 2.03 by majkinetor. 
+	o Ver 2.04 by majkinetor. 
 	o MSDN Reference: <http://msdn.microsoft.com/en-us/library/bb774375(VS.85).aspx>.
 	o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>.
 */
