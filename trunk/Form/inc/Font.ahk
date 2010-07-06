@@ -9,7 +9,7 @@
  Parameters:
 			hCtrl - Handle of the control. If omitted, function will create font and return its handle.
 			Font  - AHK font defintion ("s10 italic, Courier New"). If you already have created font, pass its handle here.
-			bRedraw	  - If this parameter is TRUE, the control redraws itself. By default 1.
+			BRedraw	  - If this parameter is TRUE, the control redraws itself. By default 1.
 
  Returns:	
 			Font handle.
