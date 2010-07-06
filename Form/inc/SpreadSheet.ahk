@@ -564,6 +564,48 @@ SS_GetDateFormat(hCtrl) {
 }
 
 /*
+   Function: GetGlobalFields
+			 Get individual global parameters from the control.
+	
+   Parameters:
+			 Fields -   White space separated list of field names to get.
+			 v1 .. v7 - Field values, respecting the order of names in fields argument.
+
+   Example:
+  >			SS_GetGlobalFields(hCtrl, "nrows ncols", rows, cols)
+ */
+SS_GetGlobalFields(hCtrl, Fields, ByRef v1="", ByRef v2="", ByRef v3="", ByRef v4="", ByRef v5="", ByRef v6="", ByRef v7="") {
+   static SPRM_SETGLOBAL=0x489, SPRM_GETGLOBAL=0x488      ; wParam=0, lParam=cols
+   static colhdrbtn=0,rowhdrbtn=4,winhdrbtn=8,lockcol=12,hdrgrdcol=16,grdcol=20,bcknfcol=24,txtnfcol=28,bckfocol=32,txtfocol=36,ncols=40,nrows=44,ghdrwt=48,ghdrht=52,gcellw=56,gcellht=60
+   static _bg=0, _fg=4, _txtal=8.1, _imgal=9.1, _fnt=10.1, _tpe=11.1
+   static colhdr=64, rowhdr=76, winhdr=88, cell=100
+   static LEFT=0x10, CENTER=0x20, RIGHT=0x30, MIDDLE=0x40, BOTTOM=0x80, GLOBAL=0xF0, MASK=0xF0, XMASK=0x30, YMASK=0xC0
+   static alignments := "LEFT CENTER RIGHT MIDDLE BOTTOM"
+
+   VarSetCapacity(GLOBAL, 112, 0)
+   SendMessage,SPRM_GETGLOBAL,0,&GLOBAL,, ahk_id %hCtrl%
+
+   loop, parse, Fields, %A_Space%%A_Tab%
+   {
+      field := A_LoopField
+      if (j := InStr(field, "_"))
+           offset := SubStr(field, 1, j-1),  offset := %offset%, _ := SubStr(field, j), _ := %_%,  offset += floor(_), t := SubStr(_, -1)
+      else offset := %field%
+      ifEqual, offset, ,return A_ThisFunc "> Invalid field name - " field
+
+      v := NumGet(GLOBAL, offset, t=".1" ? "UChar" : "Uint" )
+      if InStr(field, "al") {
+         v%a_index% := ""
+         loop, parse, alignments, %A_Space%
+            if ( v & %A_LOOPFIELD% )
+               v%a_index% .= A_LOOPFIELD " "
+      } else
+         v%a_index% := v
+   }
+   return ERRORLEVEL
+}
+
+/*
 	Function: GetLockCol
 	Get lock cols in active splitt.
   */
@@ -1143,8 +1185,8 @@ SS_SetGlobal(hCtrl, g, cell, colhdr, rowhdr, winhdr) {
 			  v1 .. v7 - Field values, respecting the order of names in fields argument.
 
 	Example:
->			SS_SetGlobalFields(hCtrl, "nrows ncols", 2, 2)
->			SS_SetGlobalFields(hCtrl, "cell_txtal", "RIGHT MIDDLE")
+ >			SS_SetGlobalFields(hCtrl, "nrows ncols", 2, 2)
+ >			SS_SetGlobalFields(hCtrl, "cell_txtal", "RIGHT MIDDLE")
  */
 SS_SetGlobalFields(hCtrl, Fields, v1="", v2="", v3="", v4="", v5="", v6="", v7="") {
 	static SPRM_SETGLOBAL=0x489, SPRM_GETGLOBAL=0x488		; wParam=0, lParam=cols
