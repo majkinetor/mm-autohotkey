@@ -4,7 +4,7 @@
 
 /*
  Function:  Font
-			Creates the font and optinally, sets it for the control.
+			Creates the font and optionally sets it for the control.
 
  Parameters:
 			hCtrl - Handle of the control. If omitted, function will create font and return its handle.
