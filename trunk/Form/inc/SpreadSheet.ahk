@@ -413,45 +413,49 @@ SS_GetCellRect(hCtrl, ByRef top, ByRef left, ByRef right, ByRef bottom){
 			  For ComboBox selected item will be returned and for CheckBox 1 or 0.
   */
 SS_GetCellText(hCtrl, Col="", Row=""){
-	;fast version for GetCell but only for text
-	static EMPTY=0, COLHDR=1, ROWHDR=2, WINHDR=3, TEXT=4, TEXTMULTILINE=5, INTEGER=6, FLOAT=7, FORMULA=8, GRAPH=9, HYPERLINK=10, CHECKBOX=11, COMBOBOX=12, OWNERDRAWBLOB=13, OWNERDRAWINTEGER=14, EXPANDED=15, BUTTON=16, WIDEBUTTON=0x20, DATE=0x30, FORCETEXT=0x44, FORCETYPE=0x40, FIXEDSIZE=0x80
-	static SPRM_GETCELLDATA=0x482, SPRIF_DATA=0x200, SPRIF_TYPE=0x40
-	static ITEM, init
+   ;fast version for GetCell but only for text
+   static EMPTY=0, COLHDR=1, ROWHDR=2, WINHDR=3, TEXT=4, TEXTMULTILINE=5, INTEGER=6, FLOAT=7, FORMULA=8, GRAPH=9, HYPERLINK=10, CHECKBOX=11, COMBOBOX=12, OWNERDRAWBLOB=13, OWNERDRAWINTEGER=14, EXPANDED=15, BUTTON=16, WIDEBUTTON=0x20, DATE=0x30, FORCETEXT=0x44, FORCETYPE=0x40, FIXEDSIZE=0x80
+   static SPRM_GETCELLDATA=0x482, SPRIF_DATA=0x200, SPRIF_TYPE=0x40
+   static ITEM, init
 
-	if !init
-		init++, VarSetCapacity(ITEM, 40, 0), NumPut(SPRIF_DATA | SPRIF_TYPE, ITEM) 
+   if !init
+      init++, VarSetCapacity(ITEM, 40, 0), NumPut(SPRIF_DATA | SPRIF_TYPE, ITEM)
 
-	if Col=
-		SS_GetCurrentCell(hCtrl, Col, Row)
+   if Col=
+      SS_GetCurrentCell(hCtrl, Col, Row)
 
-	NumPut(Col,	ITEM, 4), NumPut(Row, ITEM, 8)					
-	SendMessage,SPRM_GETCELLDATA,,&ITEM,, ahk_id %hCtrl%
+   NumPut(Col,   ITEM, 4), NumPut(Row, ITEM, 8)
+   SendMessage,SPRM_GETCELLDATA,,&ITEM,, ahk_id %hCtrl%
 
-	type := NumGet(ITEM, 27, "UChar") & ~0xF0	;get base type
-	if type in %TEXT%,%TEXTMULTILINE%,%HYPERLINK%,%CHECKBOX%,%OWNERDRAWBLOB%		;GRAPH and FORMULA don't return text, I don't know how to get their text.
-		return SS_strAtAdr( NumGet(ITEM, 36) + (type=CHECKBOX || type=OWNERDRAWBLOB ? 4 : 0))
+   type := NumGet(ITEM, 27, "UChar") & ~0xF0   ;get base type
 
-	if type in %INTEGER%,%COMBOBOX%,%OWNERDRAWINTEGER%
-	{
-		pData := NumGet(ITEM, 36), txt := NumGet( pData+0 )
-		if (type=COMBOBOX)		;combobox, get the item from the listbox
-		{
-			hCombo := NumGet(pData + 4)
-			old := A_DetectHiddenWindows
-			DetectHiddenWindows, on
-			ControlGet, lst, list,,, ahk_id %hCombo%
-			DetectHiddenWindows, %old%
-			loop, parse, lst, `n
-				if (A_index = txt+1) {
-					txt := A_LoopField
-					break 
-				}				
-		}
-		return txt
-	}
+   if type=%COLHDR%
+      return SS_strAtAdr( NumGet(ITEM, 36)+2 )
 
-	if type in %FLOAT%,%FORMULA%
-		 return SS_getCellFloat(hCtrl, col, row)	
+   if type in %TEXT%,%TEXTMULTILINE%,%HYPERLINK%,%CHECKBOX%,%OWNERDRAWBLOB%      ;GRAPH and FORMULA don't return text, I don't know how to get their text.
+      return SS_strAtAdr( NumGet(ITEM, 36) + (type=CHECKBOX || type=OWNERDRAWBLOB ? 4 : 0))
+
+   if type in %INTEGER%,%COMBOBOX%,%OWNERDRAWINTEGER%
+   {
+      pData := NumGet(ITEM, 36), txt := NumGet( pData+0 )
+      if (type=COMBOBOX)      ;combobox, get the item from the listbox
+      {
+         hCombo := NumGet(pData + 4)
+         old := A_DetectHiddenWindows
+         DetectHiddenWindows, on
+         ControlGet, lst, list,,, ahk_id %hCombo%
+         DetectHiddenWindows, %old%
+         loop, parse, lst, `n
+            if (A_index = txt+1) {
+               txt := A_LoopField
+               break
+            }
+      }
+      return txt
+   }
+
+   if type in %FLOAT%,%FORMULA%
+       return SS_getCellFloat(hCtrl, col, row)
 }
 
 /*
