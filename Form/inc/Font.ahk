@@ -8,8 +8,8 @@
 
  Parameters:
 			hCtrl - Handle of the control. If omitted, function will create font and return its handle.
-			Font  - AHK font defintion ("s10 italic, Courier New"). If you already have created font, pass its handle here.
-			BRedraw	  - If this parameter is TRUE, the control redraws itself. By default 1.
+			Font  - AHK font definition ("s10 italic, Courier New"). If you already have created the font, pass its handle here.
+			BRedraw	  - If this parameter is TRUE, the control redraws itself (default).
 
  Returns:	
 			Font handle.
@@ -47,12 +47,12 @@ Font(HCtrl="", Font="", BRedraw=1) {
 
 /*
  Function: DrawText
-		   Draws text using specified font on device context or calculates width and height of the text.
+		   Draws text using specified font on a device context or calculates width and height of the text.
 
  Parameters: 
 		Text	- Text to be drawn or measured. 
 		DC		- Device context to use. If omitted, function will use Desktop's DC.
-		Font	- If string, font description in AHK syntax. If number, font handle. If omitted, uses the system font to calculate text metrics.
+		Font	- If string, font description in AHK syntax. If number, font handle. If omitted, function will use the system font to calculate text metrics.
 		Flags	- Drawing/Calculating flags. Space separated combination of flag names. For the description of the flags see <http://msdn.microsoft.com/en-us/library/ms901121.aspx>.
 		Rect	- Bounding rectangle. Space separated list of left,top,right,bottom coordinates. 
 				  Width could also be used with CALCRECT WORDBREAK style to calculate word-wrapped height of the text given its width.
