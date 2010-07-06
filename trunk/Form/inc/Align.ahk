@@ -6,7 +6,7 @@
  			HCtrl	- Control's handle or Parent handle. If other parameters are omitted, hCtrl represents Parent that
 					  should be re-aligned. Use re-align when you hide/show/resize controls to reposition remaining controls.
 
-			Type	- String specifying align type. Available align types are Left, Right, Top, Bottom, Fill and N.
+			Type	- String specifying align type. Available align types are Left, Right, Top, Bottom and Fill.
  					  Top and Bottom types are horizontal alignments while Left and Right are vertical. Fill type is both
  					  vertically and horizontally aligned.
  					  Control will be aligned to the edge of given type of its parent. For any given Type, control's
