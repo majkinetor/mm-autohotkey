@@ -1,4 +1,4 @@
-/*
+﻿/*
 	Title:	Win
 			Set of window functions.
  */
@@ -195,7 +195,7 @@ Win_Get(Hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", ByRef o
 			hp := DllCall( "OpenProcess", "uint", 0x10|0x400, "int", false, "uint", _ ) 
 			if (ErrorLevel or !hp) 
 				continue
-			VarSetCapacity(buf, 512, 0), DllCall( "psapi.dll\GetModuleFileNameExA", "uint", hp, "uint", 0, "str", buf, "uint", 512),  DllCall( "CloseHandle", hp ) 
+			VarSetCapacity(buf, 512, 0), DllCall( "psapi.dll\GetModuleFileNameEx" (A_IsUnicode ? "W" : "A"), "uint", hp, "uint", 0, "str", buf, "uint", 512),  DllCall( "CloseHandle", hp ) 
 			o%i% := buf 
 		continue
 		Win_Get_D:
@@ -275,7 +275,7 @@ Win_GetRect(hwnd, pQ="", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="") {
 Win_GetChildren(Hwnd){
 	static GW_HWNDNEXT=2, GW_CHILD=5, adrGetWindow
 	if !adrGetWindow
-		adrGetWindow := DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), "str", "GetWindow")
+		adrGetWindow := DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), A_IsUnicode ? "astr" : "str", "GetWindow")
 	s := hChild := DllCall(adrGetWindow, "uint", Hwnd, "uint", GW_CHILD)
 	ifEqual, s,0, return
 	while (hChild := DllCall(adrGetWindow, "uint", hChild, "uint", GW_HWNDNEXT))
@@ -623,6 +623,9 @@ Win_SetMenu(Hwnd, hMenu=0){
 Win_SetIcon(Hwnd, Icon="", Flag=1){
 	static WM_SETICON = 0x80, LR_LOADFROMFILE=0x10, IMAGE_ICON=1
 
+	oldDetect := A_DetectHiddenWindows
+	DetectHiddenWindows, on
+
 	if Flag not in 0,1
 		return A_ThisFunc "> Unsupported Flag: " Flag
 
@@ -630,6 +633,7 @@ Win_SetIcon(Hwnd, Icon="", Flag=1){
 		hIcon := Icon+0 != "" ? Icon : DllCall("LoadImage", "Uint", 0, "str", Icon, "uint",IMAGE_ICON, "int", 32, "int", 32, "uint", LR_LOADFROMFILE) 	
 
 	SendMessage, WM_SETICON, %Flag%, hIcon, , ahk_id %Hwnd%
+	DetectHiddenWindows, %oldDetect%
 	return ErrorLevel
 }
 
@@ -766,6 +770,7 @@ Win_ShowSysMenu(Hwnd, X="mouse", Y="") {
 
  Remarks:
 			Works only for controls created in the autohotkey process.
+			This function prevents DEP protection to shut down the process.
 
  Example:
 	(start code)
@@ -782,12 +787,14 @@ Win_ShowSysMenu(Hwnd, X="mouse", Y="") {
 	(end code)
  */
 Win_Subclass(Hwnd, Fun, Opt="", ByRef $WndProc="") { 
+	static PAGE_EXECUTE_READWRITE=0x40
 	if Fun is not integer
 	{
-		 oldProc := DllCall("GetWindowLong", "uint", Hwnd, "uint", -4) 
-		 ifEqual, oldProc, 0, return 0 
-		 $WndProc := RegisterCallback(Fun, Opt, 4, oldProc) 
-		 ifEqual, $WndProc, , return 0
+		oldProc := DllCall("GetWindowLong", "uint", Hwnd, "uint", -4) 
+		ifEqual, oldProc, 0, return 0 
+		$WndProc := RegisterCallback(Fun, Opt, 4, oldProc) 
+		ifEqual, $WndProc, , return 0
+		DllCall("VirtualProtect", "UInt", $WndProc, "Uint", 64, "Uint", PAGE_EXECUTE_READWRITE, "Uint*", _)
 	}
 	else $WndProc := Fun
 	   
@@ -796,7 +803,7 @@ Win_Subclass(Hwnd, Fun, Opt="", ByRef $WndProc="") {
 
 /*
 Group: About
-	o v1.25 by majkinetor.
+	o v1.3 by majkinetor.
 	o Reference: <http://msdn.microsoft.com/en-us/library/ms632595(VS.85).aspx>
 	o Licensed under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/>
 /*
