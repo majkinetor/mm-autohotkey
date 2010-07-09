@@ -78,22 +78,23 @@ ComboX_Set( HCtrl, Options="", Handler="") {
  
  Parameters:
 			HCtrl	- Handle of the control.
-			X,Y		- Optional screen coordinates on which to show control.
+			X,Y,W,H	- Optional screen coordinates on which to show control and its width and height.
  */
-ComboX_Show( HCtrl, X="", Y="" ) {	
-	HCtrl += 0
-	ComboX("", HCtrl ")handler HButton Pos", handler, hBtn, Pos)
+ComboX_Show( HCtrl, X="", Y="", W="", H="" ) {
+   HCtrl += 0
+   ComboX("", HCtrl ")Handler HButton Pos", handler, hBtn, pos)
 
-	if (X Y = "") {
-		if (hBtn != "")
-			ComboX_setPosition(HCtrl, Pos, hBtn)
-	}
-	else Win_Move(HCtrl, X, Y)
+   if (X Y = "") {
+      if (hBtn != "")
+         ComboX_setPosition(HCtrl, pos, hBtn, W, H)
+   }
+   else Win_Move(HCtrl, X, Y, W, H)
 
-	if handler !=
-		%handler%(HCtrl, "Show")	
-	Win_Show(HCtrl)
+   if handler !=
+      %handler%(HCtrl, "Show")
+   Win_Show(HCtrl)
 }
+
 
 /*
  Function:	Toggle
@@ -118,7 +119,7 @@ ComboX_wndProc(Hwnd, UMsg, WParam, LParam){
 	ComboX("", Hwnd ")Handler Options HButton", handler, op, hBtn)
 
 	if (UMsg = WM_KILLFOCUS) 
-		ComboX_Hide(Hwnd)
+		return ComboX_Hide(Hwnd)
 	
 	if (UMsg = WM_KEYDOWN)
 		if (WParam = VK_ESCAPE) && InStr(op, "esc")
@@ -138,16 +139,16 @@ ComboX_wndProc(Hwnd, UMsg, WParam, LParam){
  return
 }
 
-ComboX_setPosition( HCtrl, Pos, Hwnd ) {
-	ifEqual, Pos, , SetEnv, Pos, 4LD
-	StringSplit, p, Pos
+ComboX_setPosition( HCtrl, Pos, Hwnd, W="", H="" ) {
+   ifEqual, Pos, , SetEnv, Pos, 4LD
+   StringSplit, p, Pos
 
-	Win_Get(Hwnd, "Rxywh", x, y, w, h)
-	Win_Get(HCtrl, "Rwh", cw, ch)		;4LU
+   Win_Get(Hwnd, "Rxywh", x, y, w, h)
+   Win_Get(HCtrl, "Rwh", cw, ch)      ;4LU
 
-	cx := (p1=1 || p1=3 ? x : x + w) + (p2="R" ? 0 : -cw)
-	cy := (p1=1 || p1=2 ? y : y + h) + (p3="D" ? 0 : -ch)	
-	Win_Move(HCtrl, cx, cy)
+   cx := (p1=1 || p1=3 ? x : x + w) + (p2="R" ? 0 : -cw)
+   cy := (p1=1 || p1=2 ? y : y + h) + (p3="D" ? 0 : -ch)
+   Win_Move(HCtrl, cx, cy, W, H)
 }
 
 ;Storage
@@ -170,6 +171,6 @@ ComboX(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", 
 
 
 /* Group: About
-	o Ver 2.01 by majkinetor.
+	o Ver 2.02 by majkinetor.
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>
  */
