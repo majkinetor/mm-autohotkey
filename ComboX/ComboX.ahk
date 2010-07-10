@@ -59,7 +59,7 @@ ComboX_Set( HCtrl, Options="", Handler="") {
 
 	HCtrl += 0
 	Win_Show(HCtrl, false)
-	Win_SetParent(HCtrl, 0, true)
+	oldParent := Win_SetParent(HCtrl, 0, true)
 	Win_Subclass(HCtrl, "ComboX_wndProc")
 	
 	RegExMatch(Options, "S)[\d]+(?=$|[ ])", out)
@@ -70,6 +70,8 @@ ComboX_Set( HCtrl, Options="", Handler="") {
 	ComboX( HCtrl "Options", Options)
 	if IsFunc(Handler)
 		ComboX(	HCtrl "Handler", Handler)
+
+	Win_SetOwner( HCtrl, oldParent )  ; hbtn works in place of WinExist()
 }
 
 /*
