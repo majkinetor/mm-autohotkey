@@ -52,7 +52,7 @@ ShowCombo(){
 }
 
 OnComboX(Hwnd, Event) { 
-	if (Event != "select") 
+	if (Event != "hide") 
 		return
 
 	LV_SetColumnValue()
