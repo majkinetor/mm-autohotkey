@@ -847,7 +847,7 @@ SS_SetCell(hCtrl, Col="", Row="", o1="", o2="", o3="", o4="", o5="", o6="", o7="
 		}	
 	}
     flag := 0
-	 ,flag |= (data!=""||txt!="") ? SPRIF_DATA  : 0
+	 ,flag |= (data!=""||txt!="~`a ") ? SPRIF_DATA  : 0
 	 ,flag |= (type!="")	? SPRIF_TYPE		: 0
 	 ,flag |= (w != "")		? SPRIF_WIDTH		: 0
 	 ,flag |= (h != "")		? SPRIF_HEIGHT		: 0
@@ -1184,7 +1184,7 @@ SS_SetGlobal(hCtrl, g, cell, colhdr, rowhdr, winhdr) {
 			  fields -	White space separated list of field names to set.
 			  v1 .. v7 - Field values, respecting the order of names in fields argument.
 
-	Example:
+	Example:x
  >			SS_SetGlobalFields(hCtrl, "nrows ncols", 2, 2)
  >			SS_SetGlobalFields(hCtrl, "cell_txtal", "RIGHT MIDDLE")
  */
