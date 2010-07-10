@@ -71,7 +71,7 @@ ComboX_Set( HCtrl, Options="", Handler="") {
 	if IsFunc(Handler)
 		ComboX(	HCtrl "Handler", Handler)
 
-	Win_SetOwner( HCtrl, oldParent )  ; hbtn works in place of WinExist()
+	Win_SetOwner( HCtrl, oldParent )
 }
 
 /*
