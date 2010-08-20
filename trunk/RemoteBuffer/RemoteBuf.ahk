@@ -93,7 +93,7 @@ RemoteBuf_Read(ByRef H, ByRef pLocal, pSize, pOffset = 0){
 RemoteBuf_Write(Byref H, byref pLocal, pSize, pOffset=0) {
 	handle:= NumGet( H, 0),   size := NumGet( H, 4),   adr := NumGet( H, 8)
 	IfEqual, handle, 0, return A_ThisFunc ">   Invalid remote buffer handle"	
-	IfGreaterOrEqual, offset, %size%, return A_ThisFunc ">   Offset is bigger then size"
+	IfGreaterOrEqual, pOffset, %size%, return A_ThisFunc ">   Offset is bigger then size"
 
 	return DllCall( "WriteProcessMemory", "uint", handle,"uint", adr + pOffset,"uint", &pLocal,"uint", pSize, "uint", 0 )
 }
