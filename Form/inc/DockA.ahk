@@ -81,7 +81,7 @@ DockA_(HHost, HClient, DockDef, Hwnd) {
 				%HClient%_%c%%A_Index% := A_LoopField ? A_LoopField : 0			
 		}
 		DllCall("SetWindowLong", "uint", HClient, "int", -8, "uint", hHost)
-		return %HHost% .= (%HHost% = "" ? " " : "") HClient " "
+	    %HHost% .= (%HHost% = "" ? " " : "") HClient " "
 	} 
 	
 	ifEqual, HHost, 0,SetEnv, HHost, %Hwnd%
