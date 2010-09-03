@@ -55,9 +55,7 @@ DockA_(HHost, HClient, DockDef, Hwnd) {
       w := %j%_w1*hW + %j%_w2,  h := %j%_h1*hH + %j%_h2
       , x := hX + %j%_x1*hW + %j%_x2*(w ? w : cW) + %j%_x3
       , y := hY + %j%_y1*hH + %j%_y2*(h ? h : cH) + %j%_y3
-      WinMove ahk_id %j%,,x,y, w ? w : "" ,h ? h : ""         ;   DllCall(adrSetWindowPos, "uint", hwnd, "uint", 0, "uint", x ? x : cX, "uint", y ? y : cY, "uint", w ? w : cW, 
-
-"uint", h ? h :cH, "uint", 1044) ;4 | 0x10 | 0x400 
+      WinMove ahk_id %j%,,x,y, w ? w : "" ,h ? h : ""         ;   DllCall(adrSetWindowPos, "uint", hwnd, "uint", 0, "uint", x ? x : cX, "uint", y ? y : cY, "uint", w ? w : cW, "uint", h ? h :cH, "uint", 1044) ;4 | 0x10 | 0x400 
    }
    SetWinDelay, %oldDelay%
    critical %oldCritical%
