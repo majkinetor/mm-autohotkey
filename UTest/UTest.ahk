@@ -183,15 +183,17 @@ UTest_getTests() {
 }
 
 UTest_getFunctions() {
-	LowLevel_init()
-	func_ptr := __getFirstFunc()
-	loop{			
-		line_ptr :=	NumGet(func_ptr+4, 0, "Uint"), lineno := NumGet(line_ptr+8, 0, "Uint")
-		fNames .= DllCall("MulDiv", "Int", NumGet(func_ptr+0, 0, "UInt"), "Int",1, "Int",1, "str") " " lineno "`n"
-		func_ptr := NumGet(func_ptr+44, 0, "UInt")
-		ifEqual, func_ptr, 0, break
-	}
-	return SubStr(fNames, 1, -1)
+   LowLevel_init()
+   func_ptr := __getFirstFunc()
+   LN_OFFSET := A_AhkVersion <= "1.0.48.05.L52" ? 8 : 4
+   loop{
+      ; line_ptr :=   NumGet(func_ptr+4, 0, "Uint"), lineno := NumGet(line_ptr+8, 0, "Uint")
+      line_ptr :=   NumGet(func_ptr+4), lineno := NumGet(line_ptr+LN_OFFSET)
+      fNames .= DllCall("MulDiv", "Int", NumGet(func_ptr+0, 0, "UInt"), "Int",1, "Int",1, "str") " " lineno "`n"
+      func_ptr := NumGet(func_ptr+44, 0, "UInt")
+      ifEqual, func_ptr, 0, break
+   }
+   return SubStr(fNames, 1, -1)
 }
 
 UTest_getFreeGuiNum(){
@@ -263,6 +265,9 @@ return
 ;====================== LowLevel.ahk =====================
 ; LowLevel
 ; http://www.autohotkey.com/forum/topic26300.html
+; LowLevel
+; http://www.autohotkey.com/forum/topic26300.html
+
 LowLevel_init() {
     if InStr(A_AhkVersion,"L") && A_AhkVersion < "1.0.48.03.L31"
     {
@@ -294,7 +299,7 @@ __init() {
     __mcode("__static","8B4424088B008378080375068B0080481504C3")
     __mcode("__alias","8B4C24088B01837808038B4904751D8B51088B005633F64A74044A4A75028B3185F60F94C189700C8848175EC3")
     __mcode("__cacheEnable","8B4424088B0083780803750F8B008078170075038B400C8060157FC3")
-    __mcode("__getTokenValue","8B4424088B0083780801752B8B008B500883FA0375108B008A481580E13074180FB6D1C1EA048B4C24048951088B1089118B4004894104C38B4C2404C74108040000008B40088901C3")
+    __mcode("__getTokenValue","8B4424088B0083780801753D8B088B510883FA0375128B098A41158AD080E23074280FB6D2C1EA048B4424048950088B1189108B490489480483780805750A8B008B10508B4204FFD0C3A8028B442404740DC74008050000008B118910EBDAC74008040000008B49088908EB")
     __mcode("__init","C3"), __mcode("LowLevel_init","C3") ; C3 = RET
 }
 
@@ -305,13 +310,16 @@ __mcode(Func, Hex)
         return 0
     Loop % StrLen(Hex)//2
         NumPut("0x" . SubStr(Hex,2*A_Index-1,2), pbin-1, A_Index, "char")
+    ptr := A_PtrSize ? "ptr" : "uint"
+    DllCall("VirtualProtect", ptr, pbin, ptr, StrLen(Hex)//2, uint, 0x40, uintp, 0)
     NumPut(pbin,pFunc+4), NumPut(1,pFunc+49,0,"char")
     return pbin
 }
 
 ; Helper function: Format a pointer for inclusion in a hex string.
 __mcodeptr(p) {
-    VarSetCapacity(buf, 20), DllCall("msvcrt\sprintf", "str", buf, "str", "%08X"
+    sprintf:=A_IsUnicode ? "swprintf":"sprintf"
+    VarSetCapacity(buf, 20), DllCall("msvcrt\" sprintf, "str", buf, "str", "%08X"
         , "int", p>>24&255 | (p>>16&255)<<8 | (p>>8&255)<<16 | (p&255)<<24, "cdecl")
     return buf
 }
@@ -450,13 +458,14 @@ __findFunc(FuncName, FirstFunc=0)
 
 __getFirstFunc()
 {
-    static pFirstFunc
+    static pFirstFunc, LINE_ARG_OFFSET
     if !pFirstFunc {
+        LINE_ARG_OFFSET := A_AhkVersion <= "1.0.48.05.L52" ? 4 : 8 ; Arg and LineNumber were swapped to optimize for 8-byte alignment in 64-bit builds. (64-bit isn't supported by this script, but 32-bit is also affected.)
         if !(pLine := __getFirstLine())
             return 0
         Loop {
             Loop % NumGet(pLine+1,0,"uchar") { ; pLine->mArgc
-                pArg := NumGet(pLine+4) + (A_Index-1)*16  ; pLine->mArg[A_Index-1]
+                pArg := NumGet(pLine+LINE_ARG_OFFSET) + (A_Index-1)*16  ; pLine->mArg[A_Index-1]
                 if (NumGet(pArg+0,0,"uchar") != 0) ; pArg->type != ARG_TYPE_NORMAL
                     continue ; arg has no derefs (only a Var*)
                 Loop {
@@ -717,8 +726,9 @@ __addVar(var, func)
     NumPut(var, mVar+low*4)
     NumPut(mVarCount+1, func+28)
 }
+
 /* Group:  About
-		o v0.2 by majkinetor.
+		o v0.3 by majkinetor.
 		o Includes LowLevel.ahk by Lexikos. See <http://www.autohotkey.com/forum/topic26300.html>
 		o Licenced under BSD <http://creativecommons.org/licenses/BSD/> 
  */
