@@ -1,3 +1,50 @@
+/* Title:   DockA
+			Dock AHK windows.
+
+			Using dock module you can glue windows to an AHK window.
+			Docked windows are called Clients and the window that keeps their  position relative to itself is called the Host. 
+			Once Clients are connected to the Host, this group of windows will behave like single window - moving, sizing, focusing, hiding and other
+			OS events will be handled by the module so that the "composite window" behaves like the single window.
+
+			This module is version of Dock module that supports only AHK hosts (hence A in the name).
+			Unlike Dock module, it doesnt'uses system hook to monitor windows changes.
+*/
+
+/*
+	Function:  DockA
+ 
+ 	Parameters: 
+			HHost	  - Hwnd of the host GUI. This window must be AHK window.
+            HClient	  - HWND of the Client GUI. This window can be any window.
+            DockDef   - Dock definition, see bellow. To remove dock client pass "-". 
+						If you pass empty string, client will be docked to the host according to its current position relative to the host. 
+
+	Dock definition:  
+			Dock definition is white space separated combination of parameters which describe Client's position relative to the Host.
+			Parameters are grouped into 4 classes - x, y, w & h parameters. Classes and their parameters are optional.
+			
+ > 		Syntax:		x(hw,cw,dx)  y(hh,ch,dy)  w(hw,dw)  h(hh,dh)
+
+
+            o The *X* coordinate of the top, left corner of the client window is computed as 
+            > x(hw,cw,dx) = HostX + hw*HostWidth + cw*ClientWidth + dx
+            o The *Y* coordinate of the top, left corner of the client window is computed as 
+            > y(hh,ch,dy) = HostY + hh*HostHeight + ch*ClientHeight + dy
+            o The width *W* of the client window is computed as
+			> w(hw,dw) = hw*HostWidth + dw
+            o The height *H* of the client window is computed as 
+			> h(hh,dh) = hh*HostHeight + dh
+
+			If you omit any of the class parameters it will default to 0. So, the following expressions all have the same effect :
+ > 		    x(0,0,0) = x(0,0) = x(0,0,) = x(0) = x(0,)= x(0,,) = x() = x(0,,0) = x(,0,0) = x(,,0) = ...
+ >			y(0,1,0) = y(0,1) = y(,1) = y(,1,) = y(,1,0) = ...
+
+			Notice that x() is not the same as omitting x entirely. First case is equal to x(0,0,0) so it will set Client's X coordinate to be equal as Host's. 
+			In second case, x coordinate of the client will not be affected by the module (client will keep whatever x it has).
+
+	Remarks:
+			You can monitor WM_WINDOWPOSCHANGED=0x47 to detect when user move clients (if they are movable) in order to update dock properties
+ */
 DockA(HHost="", HClient="", DockDef="") {
    DockA_(HHost+0, HClient+0, DockDef, "")
 }
