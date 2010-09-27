@@ -7,7 +7,7 @@ _("mo! w d")
 
 	Gui, Show, w500 h600 Hide
 
-	Gui, Add, Edit,		HWNDhEdit, F1 - hide`nF2 - show
+	Gui, Add, Edit,		HWNDhEdit, F1 - show/hide
 	hSplit := Splitter_Add()
 	Gui, Add, ListView,	HWNDhList, Top control
 	Gui, Add, Text,		h100 0x200 HWNDhText,  Bottom
@@ -24,11 +24,11 @@ _("mo! w d")
 
 	if !Win_Recall("<", "", "config2.ini")
 		Gui, Show
+
+	bHidden := 0
 return
 
-F1:: HideControls(true)
-F2:: HideControls(false)
-F3:: Attach()
+F1:: HideControls(bHidden := !bHidden)
 
 SetGui(type=""){
 	global 
@@ -132,7 +132,7 @@ SaveGui() {
 		HideControls(false)
 
 	p := Splitter_GetPos(hSplit)
-	
+
 	Win_Recall(">", "", "config2.ini")
 	IniWrite, %p%, config2.ini, Config, Splitter
 	IniWrite, %b%, config2.ini, Config, Visible
@@ -140,6 +140,7 @@ SaveGui() {
 
 
 ESC::
+	SaveGui()
 	ExitApp
 return
 

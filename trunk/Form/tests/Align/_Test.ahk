@@ -4,7 +4,7 @@ _("m! w e d")
 
 	Gui, Show, w500 h600 Hide
 
-	Gui, Add, Edit,		HWNDhEdit, F1 - hide`nF2 - show
+	Gui, Add, Edit,		HWNDhEdit, F1 -  show / hide
 	hSplit := Splitter_Add()
 	Gui, Add, ListView,	HWNDhList, Top control
 	Gui, Add, Text,		h100 0x200 HWNDhText,  Bottom
@@ -28,11 +28,11 @@ _("m! w e d")
 
 	if !Win_Recall("<", "", "config.ini")
 		Gui, Show
+
+	bHidden := 0
 return
 
-F1:: HideControls(true)
-F2:: HideControls(false)
-F3:: Attach()
+F1:: HideControls(bHidden := !bHidden)
 
 HideControls(bHide) {
 	global 
