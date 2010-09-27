@@ -15,7 +15,7 @@ _("mm! d e w")
 	hToolbar:=  Form_Add(hPanel3, "Toolbar", "new, 7,`nopen, 8`nsave, 9, disabled`n-`nstate, 11, checked,check", "style='FLAT TOOLTIPS' gOnToolbar")	
 	WinSet, Style, -0x8000, ahk_id %hToolbar%	;remove this style, makes the black background
 
-	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "mrlj",  "",			"Align T, 200", "Attach p")
+	hEdit1	:=  Form_Add(hPanel2, "Edit",	 "Press F2 to switch panel",  "",	"Align T, 200", "Attach p")
 	hLV		:=  Form_Add(hPanel2, "ListView", "1|2|3", "gOnControl","Align T, 200", "Attach p")
 	hCal1	:=  Form_Add(hPanel2, "MonthCal","",	  "",			"Align F", "Attach p")
 	hHE		:=  Form_Add(hPanel2, "HiEdit",	"HiEdit1",  "DllPath=inc\hiedit.dll style='HSCROLL HILIGHT TABBED FILECHANGEALERT'", "Align F", "Attach p")
