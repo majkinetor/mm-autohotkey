@@ -267,7 +267,7 @@ Splitter_updateFocus( HSep="" ) {
 	MouseGetPos, mx, my
 	if !dc 
 	{
-		ifEqual, adrDrawFocusRect,, SetEnv, adrDrawFocusRect, % DllCall("GetProcAddress", uint, DllCall("GetModuleHandle", str, "user32"), str, "DrawFocusRect")
+		ifEqual, adrDrawFocusRect,, SetEnv, adrDrawFocusRect, % DllCall("GetProcAddress", "uint", DllCall("GetModuleHandle", "str", "user32"), A_IsUnicode ? "astr" : "str", "DrawFocusRect")
 		CoordMode, mouse, relative
 
 	  ;initialize dc, RECT, idx, delta(distance between mouse and splitter position), sz, pos & max when user starts moving.
