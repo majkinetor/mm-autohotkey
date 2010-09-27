@@ -29,11 +29,6 @@ SetAttach:
 	Attach(he5%no%, "y x2/3 w1/3")
 return
 
-F6::
-	InputBox, out
-	msgbox %out%
-return
-
 F1::
 	gosub MakeGui
 	Attach()

@@ -1694,10 +1694,10 @@ RichEdit_SetText(HCtrl, Txt="", Flag=0, Pos="" )  {
 	If Flag
   		Loop, parse, Flag, %A_Tab%%A_Space%
 			If (A_LoopField = "FROMFILE") {
-			FileRead, Txt, %Txt%
-			IfNotEqual, Errorlevel, 0, return false, ErrorLevel := A_ThisFunc "> Couldn't open file: '" Txt "'"
-		} else if A_LoopField in KEEPUNDO,SELECTION
-			hFlag |= ST_%A_LoopField%
+				FileRead, Txt, %Txt%
+				IfNotEqual, Errorlevel, 0, return false, ErrorLevel := A_ThisFunc "> Couldn't open file: '" Txt "'"
+			} else if A_LoopField in KEEPUNDO,SELECTION
+				hFlag |= ST_%A_LoopField%
 
   ; If specifying a pos, calculate new range for restoring original selection
 	if (Pos != "")
@@ -1723,10 +1723,10 @@ RichEdit_SetText(HCtrl, Txt="", Flag=0, Pos="" )  {
 		}
 
 	VarSetCapacity(SETTEXTEX, 8), NumPut(hFlag, SETTEXTEX)
-	NumPut(0, SETTEXTEX, 4)		  ;The code page is used to translate the text to Unicode. If codepage is 1200 (Unicode code page),
-								  ; no translation is done. If codepage is CP_ACP (0), the system code page is used.
+	NumPut(A_IsUnicode ? 1200 : 0, SETTEXTEX, 4)  ;The code page is used to translate the text to Unicode. If codepage is 1200 (Unicode code page),
+												  ; no translation is done. If codepage is CP_ACP (0), the system code page is used.
 	SendMessage, EM_SETTEXTEX, &SETTEXTEX, &Txt,, ahk_id %HCtrl%
-	return ERRORLEVEL, prevPos != "" ? RichEdit_SetSel(HCtrl, min, max) :
+	return ERRORLEVEL, prevPos != "" ? RichEdit_SetSel(HCtrl, min, max) : ""
 }
 
 /*
