@@ -123,6 +123,6 @@
 
 /* 
  Group: About
-	o v0.61 by majkinetor.
+	o v0.7 (27.9.2010) by majkinetor.
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>
  */
