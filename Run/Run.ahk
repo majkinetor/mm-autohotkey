@@ -59,7 +59,7 @@ Run(Cmd, Dir = "", Skip=0, Input = "", Stream = "") {
     DllCall("CloseHandle", "Uint", NumGet(pi,4)),  DllCall("CloseHandle", "Uint", hStdOutWr),  DllCall("CloseHandle", "Uint", hStdInRd)
 
 	If Input !=
-		DllCall("WriteFile", "Uint", hStdInWr, "Uint", &Input, "Uint", StrLen(Input), "UintP", nSize, "Uint", 0)
+		DllCall("WriteFile", "Uint", hStdInWr, "Uint", &Input, "Uint", StrLen(Input)*(A_IsUnicode ? 2:1), "UintP", nSize, "Uint", 0)
 	DllCall("CloseHandle", "Uint", hStdInWr)
 
 	if (Stream+0)
@@ -74,7 +74,7 @@ Run(Cmd, Dir = "", Skip=0, Input = "", Stream = "") {
 			if Stream
 				loop
 					if RegExMatch(sOutput, "S)[^\n]*\n", sTrim, nTrim)
-						 Stream+0 ? DllCall("WriteFile", "Uint", hCon, "Uint", &sTrim, "Uint", StrLen(sTrim), "UintP", 0, "Uint", 0) : %Stream%(sTrim), nTrim += StrLen(sTrim)
+						 Stream+0 ? DllCall("WriteFile", "Uint", hCon, "Uint", &sTrim, "Uint", StrLen(sTrim)*(A_IsUnicode ? 2:1), "UintP", 0, "Uint", 0) : %Stream%(sTrim), nTrim += StrLen(sTrim)
 					else break
 		} else break
 
