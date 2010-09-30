@@ -29,13 +29,18 @@
 			}
 		 (end code)
 
+	Remarks:
+			To see Unicode characters, use cmd.exe /u option. 
+			Not all command line programs support Unicode output (for instance sort.exe)
+
 	About:	
-			o v1.2
+			o v1.25
 			o Developed by Sean. Modified and documented by majkinetor.
 			o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
  */
-Run(Cmd, Dir = "", Skip=0, Input = "", Stream = "")
-{
+Run(Cmd, Dir = "", Skip=0, Input = "", Stream = "") {
+	static StrGet := "StrGet"
+
 	DllCall("CreatePipe", "UintP", hStdInRd , "UintP", hStdInWr , "Uint", 0, "Uint", 0)
 	DllCall("CreatePipe", "UintP", hStdOutRd, "UintP", hStdOutWr, "Uint", 0, "Uint", 0)
 	DllCall("SetHandleInformation", "Uint", hStdInRd , "Uint", 1, "Uint", 1)
@@ -64,7 +69,8 @@ Run(Cmd, Dir = "", Skip=0, Input = "", Stream = "")
 	loop 
 		if DllCall("ReadFile", "Uint", hStdOutRd, "Uint", &sTemp, "Uint", nTemp, "UintP", nSize:=0, "Uint", 0) && nSize
 		{
-			NumPut(0,sTemp,nSize,"Uchar"), VarSetCapacity(sTemp,-1),  sOutput .= sTemp
+			NumPut(0,sTemp,nSize,"Uchar"), VarSetCapacity(sTemp,-1)
+			sTemp := A_IsUnicode ? %StrGet%(&sTemp, nTemp, "UTF-8") : sTemp,  sOutput .= sTemp
 			if Stream
 				loop
 					if RegExMatch(sOutput, "S)[^\n]*\n", sTrim, nTrim)
