@@ -14,6 +14,8 @@
 	Remarks:
 			After the function finishes, ErrorLevel will be set to programs exit code.
 			You can't use function names for stream handler which consist only of numbers.
+			To see Unicode characters (AHKL required), use cmd.exe /u option. 
+			Not all command line programs support Unicode output (for instance sort.exe)
 
 	Examples:
 		(start code)
@@ -29,14 +31,10 @@
 			}
 		 (end code)
 
-	Remarks:
-			To see Unicode characters, use cmd.exe /u option. 
-			Not all command line programs support Unicode output (for instance sort.exe)
-
 	About:	
 			o v1.25
 			o Developed by Sean. Modified and documented by majkinetor.
-			o Licenced under GNU GPL <http://creativecommons.org/licenses/GPL/2.0/> 
+			o Unlicensed <http://unlicense.org/> 
  */
 Run(Cmd, Dir = "", Skip=0, Input = "", Stream = "") {
 	static StrGet := "StrGet"
