@@ -81,6 +81,7 @@ Panel_SetStyle(Hwnd, Style, ByRef hStyle="", ByRef hExStyle="") {
 	hStyle := h ? 0 : WS_VISIBLE,  hExStyle := 0
 
 
+
 	loop, parse, Style, %A_Tab%%A_Space%
 		IfEqual, A_LoopField, , continue
 		else if A_LoopField is integer
@@ -102,7 +103,6 @@ Panel_SetStyle(Hwnd, Style, ByRef hStyle="", ByRef hExStyle="") {
 		DetectHiddenWindows, %oldDetect%
 	}
 	
-	if InStr(pStyle, " hidden ")
 	;set custom styles
 		if j := InStr(pStyle, "scroll")
 		{
