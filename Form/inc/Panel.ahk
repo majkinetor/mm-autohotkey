@@ -77,8 +77,10 @@ Panel_SetStyle(Hwnd, Style, ByRef hStyle="", ByRef hExStyle="") {
 		   ,PS_BORDER=0x800000, PS_RESIZE=0x40000, PS_CAPTION=0xC00000, PS_CLOSE=0x80000, PS_MAX=0x10000, PS_MIN=0x20000, PS_TOOL=0x80
 		   ,PSEX_FRAME=1, PSEX_SUNKEN=0x200, PSEX_STATIC = 0x20000, PS_SCROLL=0  ;PS_SCROLL=0x300000 PS_VSCROLL=0x200000, PS_HSCROLL=0x100000
 
-	pStyle := " " Style " "
-	hStyle := InStr(pStyle, " hidden ") ? 0 : WS_VISIBLE,  hExStyle := 0
+	pStyle := " " Style " ", h := InStr(pStyle, " hidden ")
+	hStyle := h ? 0 : WS_VISIBLE,  hExStyle := 0
+
+
 	loop, parse, Style, %A_Tab%%A_Space%
 		IfEqual, A_LoopField, , continue
 		else if A_LoopField is integer
@@ -88,11 +90,19 @@ Panel_SetStyle(Hwnd, Style, ByRef hStyle="", ByRef hExStyle="") {
 		else if (v := PSEX_%A_LOOPFIELD%)
 			hExStyle |= v
 		else continue
-
+	
 	if (Hwnd) {
 		WinSet, Style, +%hStyle%, ahk_id %Hwnd%
 		WinSet, ExStyle, +%hExStyle%, ahk_id %Hwnd%
+
+	if h  {
+		oldDetect := A_DetectHiddenWindows
+		DetectHiddenWindows, on
+		WinHide, ahk_id %hwnd%
+		DetectHiddenWindows, %oldDetect%
+	}
 	
+	if InStr(pStyle, " hidden ")
 	;set custom styles
 		if j := InStr(pStyle, "scroll")
 		{
@@ -176,6 +186,6 @@ Panel_add2Form(hParent, Txt, Opt){
 }
 
 /* Group: About
-	o Ver 0.2 by majkinetor. 
+	o Ver 0.21 by majkinetor. 
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
 */
