@@ -49,6 +49,8 @@ Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
 		SysGet, sbs, 2		;Width of a vertical scroll bar
 		SysGet, sbas, 20	;Height of the arrow bitmap on a vertical scroll bar
 	}
+	WingetClass cls, ahk_id %hwnd%
+
 	Scroller_getScrollArea(Hwnd, left, top, right, bottom)
 	sWidth := right - left + MX, sHeight := bottom - top + MY
 	
@@ -62,7 +64,7 @@ Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
   ;Update horizontal scroll bar. 
 	if Bars in 1,3
 	{
-		NumPut(sWidth-1, SI, 12) ; Add -1 since if sWidth=pw scrollbar will still be visible.
+		NumPut(sWidth, SI, 12) ; Add -1 since if sWidth=pw scrollbar will still be visible.
 		NumPut(pw, SI, 16)		 ; nPage 
 		DllCall("SetScrollInfo", "uint", Hwnd, "uint", SB_HORZ, "uint", &si, "int", 1)
 	} else DllCall("ShowScrollBar", "uint", HCtrl, "uint", SB_HORZ, "uint", 0)
@@ -71,7 +73,7 @@ Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
     ;NumPut(SIF_RANGE | SIF_PAGE | SIF_DISABLENOSCROLL, SI, 4) ; fMask 
    	if Bars in 2,3
 	{	
-	    NumPut(sHeight-1, SI, 12) ; nMax 
+	    NumPut(sHeight, SI, 12) ; nMax 
 		NumPut(ph, SI, 16)		; nPage 
 	    DllCall("SetScrollInfo", "uint", Hwnd, "uint", SB_VERT, "uint", &si, "int", 1) 
 	} else DllCall("ShowScrollBar", "uint", Hwnd, "uint", SB_VERT, "uint", 0)
@@ -92,7 +94,7 @@ Scroller_getScrollArea(Hwnd, ByRef left, ByRef top, ByRef right, ByRef bottom) {
 	children := Win_GetChildren(Hwnd)
 
     Loop, Parse, children, `n
-    { 
+    {
 		ifEqual, A_LoopField,, continue
 		Win_GetRect(A_LoopField, "*xywh", cx, cy, cw, ch)
 		cr := cx+cw, cb := cy+ch
