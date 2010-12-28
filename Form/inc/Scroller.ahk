@@ -42,18 +42,20 @@ Scroller_Init(){
 			You can try to call this function 3 times in a row to fix the problem.
   */
 Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
-    static SIF_RANGE=0x1, SIF_PAGE=0x2, SIF_DISABLENOSCROLL=0x8, SB_HORZ=0, SB_VERT=1, sbs
+    static SIF_RANGE=0x1, SIF_PAGE=0x2, SIF_DISABLENOSCROLL=0x8, SB_HORZ=0, SB_VERT=1, sbs, sbas
 
 	if !sbs		;ScrollBar Size
-		SysGet, sbs, 2
-
+	{
+		SysGet, sbs, 2		;Width of a vertical scroll bar
+		SysGet, sbas, 20	;Height of the arrow bitmap on a vertical scroll bar
+	}
 	Scroller_getScrollArea(Hwnd, left, top, right, bottom)
 	sWidth := right - left + MX, sHeight := bottom - top + MY
-
+	
 
   ;Adjust scroll area to take into account scrollbars.
 	WinGetPos,,,pw,ph, ahk_id %Hwnd%
-	sWidth += (sHeight > ph) ? sbs : 0,  sHeight += (sWidth > pw) ? sbs : 0
+	sWidth += (sHeight > ph) ? sbs : 0,  sHeight +=(sWidth > pw) ? sbs : 0
 	VarSetCapacity(SI, 28, 0), NumPut(28, SI)
 	NumPut(SIF_RANGE | SIF_PAGE, SI, 4)
 
@@ -68,7 +70,7 @@ Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
   ;Update vertical scroll bar. 
     ;NumPut(SIF_RANGE | SIF_PAGE | SIF_DISABLENOSCROLL, SI, 4) ; fMask 
    	if Bars in 2,3
-	{
+	{	
 	    NumPut(sHeight-1, SI, 12) ; nMax 
 		NumPut(ph, SI, 16)		; nPage 
 	    DllCall("SetScrollInfo", "uint", Hwnd, "uint", SB_VERT, "uint", &si, "int", 1) 
@@ -85,9 +87,10 @@ Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
 
 ;=============================================== PRIVATE =====================================================
 Scroller_getScrollArea(Hwnd, ByRef left, ByRef top, ByRef right, ByRef bottom) {
-    left := top := 99999,   right := bottom := 0
+    left := top := right := bottom := 0
 	Win_Get(Hwnd, "NhBxy", th, bx, by)
 	children := Win_GetChildren(Hwnd)
+
     Loop, Parse, children, `n
     { 
 		ifEqual, A_LoopField,, continue
