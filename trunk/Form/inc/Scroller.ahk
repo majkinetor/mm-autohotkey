@@ -104,7 +104,7 @@ Scroller_getScrollArea(Hwnd, ByRef left, ByRef top, ByRef right, ByRef bottom) {
 
 Scroller_onScroll(WParam, LParam, Msg, Hwnd){
     static SIF_ALL=0x17, SCROLL_STEP=10
-
+	ifNotEqual, LParam, 0, return	;required so that UpDown and Slider controls don't take over.
 	bar := Msg = 0x115
     
     VarSetCapacity(SI, 28, 0), NumPut(28, SI) 
@@ -153,7 +153,7 @@ Scroller_onScroll(WParam, LParam, Msg, Hwnd){
 }
 
 /* Group: About
-	o Version 1.0 by majkinetor.
+	o Version 1.01 by majkinetor.
 	o Original code by Lexikos. See <http://www.autohotkey.com/forum/viewtopic.php?p=177673#177673>.
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */
