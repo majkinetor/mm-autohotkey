@@ -80,8 +80,6 @@ Panel_SetStyle(Hwnd, Style, ByRef hStyle="", ByRef hExStyle="") {
 	pStyle := " " Style " ", h := InStr(pStyle, " hidden ")
 	hStyle := h ? 0 : WS_VISIBLE,  hExStyle := 0
 
-
-
 	loop, parse, Style, %A_Tab%%A_Space%
 		IfEqual, A_LoopField, , continue
 		else if A_LoopField is integer
