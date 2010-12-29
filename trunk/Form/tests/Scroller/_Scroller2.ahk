@@ -7,7 +7,8 @@ _()
 
     Loop, 10
         Form_Add(hPanel, "Edit", "Edit " A_Index, "vscroll R5", "Align T, 100", "Attach w")
-
+    
+	Form_Add(hPanel, "Text", "Footer", "center", "Align T", "Attach w")
     Toolbar_Insert(hToolbar, "cut`ncopy`npaste`nredo`nundo")
 
     Panel_SetStyle(hPanel, "scroll")

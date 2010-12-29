@@ -7,6 +7,7 @@ _("mo!")
 		bPanel := A_Index = 2
 		Loop, 10
 			Form_Add(bPanel ? hPanel : hForm, "Edit", "Edit " bPanel "." A_Index, "vscroll R5 H100 W200")
+		Form_Add(bPanel ? hPanel : hForm, "Text", "Footer")
 	}
 	hp := Form_Add(hPanel, "Panel", "", "w200 h100 style='scroll frame'")
 	Form_Add(hP, "Edit", "", "x0 y0 w250 h300")

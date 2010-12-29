@@ -47,24 +47,23 @@ Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
 	if !sbs		;ScrollBar Size
 	{
 		SysGet, sbs, 2		;Width of a vertical scroll bar
-		SysGet, sbas, 20	;Height of the arrow bitmap on a vertical scroll bar
+		;SysGet, sbas, 20	;Height of the arrow bitmap on a vertical scroll bar
 	}
-	WingetClass cls, ahk_id %hwnd%
 
 	Scroller_getScrollArea(Hwnd, left, top, right, bottom)
-	sWidth := right - left + MX, sHeight := bottom - top + MY
+	sWidth := sWidth1 := right - left + MX, sHeight := sHeight1 := bottom - top + MY
 	
-
-  ;Adjust scroll area to take into account scrollbars.
 	WinGetPos,,,pw,ph, ahk_id %Hwnd%
-	sWidth += (sHeight > ph) ? sbs : 0,  sHeight +=(sWidth > pw) ? sbs : 0
+	
 	VarSetCapacity(SI, 28, 0), NumPut(28, SI)
 	NumPut(SIF_RANGE | SIF_PAGE, SI, 4)
 
   ;Update horizontal scroll bar. 
 	if Bars in 1,3
 	{
-		NumPut(sWidth, SI, 12) ; Add -1 since if sWidth=pw scrollbar will still be visible.
+		sWidth += sHeight1 > ph ? sbs : 0		;Adjust scroll area to take into account scrollbars.
+		sWidth -= sWidth = pw ? 1 :0			;if controls fit perfectly scrollbar shows; -1 px prevents that
+		NumPut(sWidth, SI, 12)
 		NumPut(pw, SI, 16)		 ; nPage 
 		DllCall("SetScrollInfo", "uint", Hwnd, "uint", SB_HORZ, "uint", &si, "int", 1)
 	} else DllCall("ShowScrollBar", "uint", HCtrl, "uint", SB_HORZ, "uint", 0)
@@ -73,6 +72,8 @@ Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
     ;NumPut(SIF_RANGE | SIF_PAGE | SIF_DISABLENOSCROLL, SI, 4) ; fMask 
    	if Bars in 2,3
 	{	
+		sHeight +=(sWidth1 > pw) ? sbs : 0		;Adjust scroll area to take into account scrollbars.            	
+		sHeight -= sHeight = ph ? 1 : 0			;if controls fit perfectly scrollbar shows; -1 px prevents that 
 	    NumPut(sHeight, SI, 12) ; nMax 
 		NumPut(ph, SI, 16)		; nPage 
 	    DllCall("SetScrollInfo", "uint", Hwnd, "uint", SB_VERT, "uint", &si, "int", 1) 
@@ -158,7 +159,7 @@ Scroller_onScroll(WParam, LParam, Msg, Hwnd){
 }
 
 /* Group: About
-	o Version 1.01 by majkinetor.
+	o Version 1.02 by majkinetor.
 	o Original code by Lexikos. See <http://www.autohotkey.com/forum/viewtopic.php?p=177673#177673>.
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */
