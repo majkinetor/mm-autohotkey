@@ -424,15 +424,15 @@ RichEdit_GetLine(hEdit, LineNumber=-1){
 	if (LineNumber = -1)
 		LineNumber := RichEdit_LineFromChar(hEdit, RichEdit_LineIndex(hEdit))
 	len := RichEdit_LineLength(hEdit, LineNumber)
-	ifEqual, len, 0, return
+	ifEqual, len, 0, return	
 
-	VarSetCapacity(txt, len, 0), NumPut(len = 1 ? 2 : len, txt)		; HiEdit bug! if line contains only 1 word SendMessage returns FAIL.
+	VarSetCapacity(txt, len * (A_IsUnicode ? 2 : 1), 0), NumPut(len, txt)
 	SendMessage, EM_GETLINE, LineNumber, &txt,, ahk_id %hEdit%
 	if ErrorLevel = FAIL
-		return "", ErrorLevel := A_ThisFunc "> Failed to get line with code: " A_LastError
+		return "", ErrorLevel := A_ThisFunc "> Failed to get line with code " A_LastError
 
 	VarSetCapacity(txt, -1)
-	return len = 1 ? SubStr(txt, 1, -1) : txt
+	return txt
 }
 
 /*
@@ -511,12 +511,13 @@ RichEdit_GetCharFormat(hCtrl, ByRef Face="", ByRef Style="", ByRef TextColor="",
   		  , CFM_CHARSET:=0x8000000, CFM_BACKCOLOR=0x4000000, CFM_COLOR:=0x40000000, CFM_FACE:=0x20000000, CFM_OFFSET:=0x10000000, CFM_SIZE:=0x80000000, CFM_WEIGHT=0x400000, CFM_UNDERLINETYPE=0x800000
 		  , CFE_HIDDEN=0x100, CFE_BOLD=1, CFE_ITALIC=2, CFE_LINK=0x20, CFE_PROTECTED=0x10, CFE_STRIKEOUT=8, CFE_UNDERLINE=4, CFE_SUPERSCRIPT=0x30000, CFE_SUBSCRIPT=0x30000
 		  , CFM_ALL2=0xFEFFFFFF, COLOR_WINDOW=5, COLOR_WINDOWTEXT=8
-		  , styles="HIDDEN BOLD ITALIC LINK PROTECTED STRIKEOUT UNDERLINE SUPERSCRIPT SUBSCRIPT"
+		  , styles="HIDDEN BOLD ITALIC LINK PROTECTED STRIKEOUT UNDERLINE SUPERSCRIPT SUBSCRIPT", StrGet = "StrGet"
 
 	VarSetCapacity(CF, 84, 0), NumPut(84, CF), NumPut(CFM_ALL2, CF, 4)
 	SendMessage, EM_GETCHARFORMAT, SCF_%Mode%, &CF,, ahk_id %hCtrl%
+;	HexView(&CF, 84)
 
-	Face := DllCall("MulDiv", "UInt", &CF+26, "Int",1, "Int",1, "str")
+	Face := DllCall("MulDiv", "UInt", &CF+26, "Int",1, "Int",1, A_IsUnicode ? "astr" : "str")
 
 	Style := "", dwEffects := NumGet(CF, 8, "UInt")
 	Loop, parse, styles, %A_SPACE%
@@ -690,7 +691,7 @@ RichEdit_GetSel(hCtrl, ByRef cpMin="", ByRef cpMax="" )  {
  (end code)
  */
 RichEdit_GetText(HCtrl, CpMin="-", CpMax="-", CodePage="")  {
-	static EM_EXGETSEL=0x434, EM_GETTEXTEX=0x45E, EM_GETTEXTRANGE=0x44B, GT_SELECTION=2
+	static EM_EXGETSEL=0x434, EM_GETTEXTEX=0x45E, EM_GETTEXTRANGE=0x44B, GT_SELECTION=2, StrGet="StrGet"
 
 	bufferLength := RichEdit_GetTextLength(hCtrl, "CLOSE", "UNICODE" )
 
@@ -704,18 +705,23 @@ RichEdit_GetText(HCtrl, CpMin="-", CpMax="-", CodePage="")  {
 		NumPut(CpMin, TEXTRANGE, 0, "UInt")
 		NumPut(CpMax, TEXTRANGE, 4, "UInt"), NumPut(&lpwstr, TEXTRANGE, 8, "UInt")
 		SendMessage, EM_GETTEXTRANGE,, &TEXTRANGE,, ahk_id %hCtrl%
-		; If not unicode, return ansi from string pointer..
-		if !InStr(RichEdit_TextMode(HCtrl), "MULTICODEPAGE")
-			return DllCall("MulDiv", "UInt", &lpwstr, "Int",1, "Int",1, "str")
+		
+		if !A_IsUnicode 
+		{
+			; If not unicode, return ansi from string pointer..
+			if !InStr(RichEdit_TextMode(HCtrl), "MULTICODEPAGE")
+				return DllCall("MulDiv", "UInt", &lpwstr, "Int",1, "Int",1, "str")
 
-		;..else, convert Unicode to Ansi..
-		nSz := DllCall("lstrlenW","UInt",&lpwstr) + 1, VarSetCapacity( ansi, nSz )
-		DllCall("WideCharToMultiByte" , "Int",0       , "Int",0
-									,"UInt",&LPWSTR ,"UInt",nSz+1
-									, "Str",ansi    ,"UInt",nSz+1
-									, "Int",0       , "Int",0 )
-		VarSetCapacity(ansi, -1)
-		return ansi
+			;..else, convert Unicode to Ansi..
+			nSz := DllCall("lstrlenW","UInt",&lpwstr) + 1, VarSetCapacity( ansi, nSz )
+			DllCall("WideCharToMultiByte" , "Int",0       , "Int",0
+										,"UInt",&LPWSTR ,"UInt",nSz+1
+										, "Str",ansi    ,"UInt",nSz+1
+										, "Int",0       , "Int",0 )
+			VarSetCapacity(ansi, -1)
+		} else VarSetCapacity(lpwstr, -1)
+
+		return A_IsUnicode ? lpwstr : ansi
 	}
 	else return "", errorlevel := A_ThisFunc "> Invalid use of cpMin or cpMax parameter."
 
@@ -724,7 +730,10 @@ RichEdit_GetText(HCtrl, CpMin="-", CpMax="-", CodePage="")  {
 	NumPut( (CodePage="unicode" || CodePage="u") ? 1200 : 0  , GETTEXTEX, 8, "UInt")
 	SendMessage, EM_GETTEXTEX, &GETTEXTEX, &BUFFER,, ahk_id %hCtrl%
 	VarSetCapacity(BUFFER, -1)
-	return BUFFER
+
+	
+
+	return A_IsUnicode ? %StrGet%(&BUFFER,"", "UTF-8") : BUFFER
 }
 
 /*
@@ -1226,14 +1235,17 @@ RichEdit_SetCharFormat(HCtrl, Face="", Style="", TextColor="", BackColor="", Mod
 		  , CFM_CHARSET:=0x8000000,CFM_COLOR:=0x40000000, CFM_FACE:=0x20000000, CFM_OFFSET:=0x10000000, CFM_SIZE:=0x80000000, CFM_WEIGHT=0x400000, CFM_UNDERLINETYPE=0x800000
 		  , CFM_HIDDEN=0x100, CFM_BOLD=1, CFM_ITALIC=2, CFM_DISABLED=0x2000, CFM_LINK=0x20, CFM_PROTECTED=0x10, CFM_STRIKEOUT=8, CFM_UNDERLINE=4, CFM_SUPERSCRIPT=0x30000, CFM_SUBSCRIPT=0x30000, CFM_BACKCOLOR=0x4000000, CFE_AUTOBACKCOLOR=0x4000000, CFE_AUTOCOLOR = 0x40000000
 		  , CFE_HIDDEN=0x100, CFE_BOLD=1, CFE_ITALIC=2, CFE_DISABLED=0x2000, CFE_LINK=0x20, CFE_PROTECTED=0x10, CFE_STRIKEOUT=8, CFE_UNDERLINE=4, CFE_SUBSCRIPT=0x10000, CFE_SUPERSCRIPT=0x20000, CFM_COLOR=0x40000000, CFM_AUTOBACKCOLOR=0x4000000, CFM_AUTOCOLOR=0x40000000
-		  , SCF_ALL=4, SCF_SELECTION=1, SCF_WORD=3	;, SCF_ASSOCIATEFONT=0x10
+		  , SCF_ALL=4, SCF_SELECTION=1, SCF_WORD=3, StrPut="StrPut"	;, SCF_ASSOCIATEFONT=0x10
 
 	;sz := S(_, "CHARFORMAT2A: cbSize dwMask dwEffects yHeight=.04 yOffset=.04 crTextColor bCharSet=.1 bPitchAndFamily=.1 szFaceName wWeight=60.2 sSpacing=.02 crBackColor lcid dwReserved sStyle=.02 wKerning=.2 bUnderlineType=.1 bAnimation=.1 bRevAuthor=.1 bReserved1=.1")
 
 	VarSetCapacity(CF, 84, 0),  NumPut(84, CF)
 	hMask := 0
-	if (Face != "") && (StrLen(Face) <= 32)
-		hMask |= CFM_FACE, DllCall("lstrcpy", "UInt", &CF+26, "Str", Face)
+	if (Face != "") && (StrLen(Face) <= 32) {
+		if A_IsUnicode
+			VarSetCapacity(faceAnsi, %StrPut%(Face, "cp0")), %StrPut%(Face, &faceAnsi, "cp0")
+		hMask |= CFM_FACE, DllCall("lstrcpyA", "UInt", &CF+26, "Uint", A_IsUnicode ? &faceAnsi : &Face)
+	}
 
 	if (TextColor != "")
 		TextColor := ((TextColor & 0xFF) << 16) + (TextColor & 0xFF00) + ((TextColor >> 16) & 0xFF)
@@ -1688,7 +1700,7 @@ RichEdit_SetSel(hCtrl, CpMin=0, CpMax=0)  {
  (end code)
  */
 RichEdit_SetText(HCtrl, Txt="", Flag=0, Pos="" )  {
-	static EM_SETTEXTEX=0x461, ST_KEEPUNDO=1, ST_SELECTION=2
+	static EM_SETTEXTEX=0x461, ST_KEEPUNDO=1, ST_SELECTION=2, StrPut = "StrPut"
 
 	hFlag=0
 	If Flag
@@ -1723,9 +1735,16 @@ RichEdit_SetText(HCtrl, Txt="", Flag=0, Pos="" )  {
 		}
 
 	VarSetCapacity(SETTEXTEX, 8), NumPut(hFlag, SETTEXTEX)
+	/* Didn't make the difference. 
 	NumPut(A_IsUnicode ? 1200 : 0, SETTEXTEX, 4)  ;The code page is used to translate the text to Unicode. If codepage is 1200 (Unicode code page),
 												  ; no translation is done. If codepage is CP_ACP (0), the system code page is used.
-	SendMessage, EM_SETTEXTEX, &SETTEXTEX, &Txt,, ahk_id %HCtrl%
+	*/	
+
+	tt := Txt
+	if A_IsUnicode
+		VarSetCapacity(tt, %StrPut%(Txt, "cp0")), %StrPut%(Txt, &tt, "cp0")
+	
+	SendMessage, EM_SETTEXTEX, &SETTEXTEX, &tt,, ahk_id %HCtrl%
 	return ERRORLEVEL, prevPos != "" ? RichEdit_SetSel(HCtrl, min, max) : ""
 }
 
@@ -2067,7 +2086,7 @@ RichEdit(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4=""
 }
 
 /* Group: About
-	o Version 1.0b2 by freakkk & majkinetor.
+	o Version 1.0c by freakkk & majkinetor.
 	o MSDN Reference : <http://msdn.microsoft.com/en-us/library/bb787605(VS.85).aspx>.
 	o RichEdit control shortcut keys: <http://msdn.microsoft.com/en-us/library/bb787873(VS.85).aspx#rich_edit_shortcut_keys>.
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.

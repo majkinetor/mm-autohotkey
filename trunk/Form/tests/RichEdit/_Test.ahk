@@ -328,7 +328,7 @@ _GetCharFormat:	;Determines the character formatting in a rich edit control.
 return
 
 _SetCharFormat:	;Set character formatting in a rich edit control.
-	r := RichEdit_SetCharFormat(hRichEdit, "Courier New", "BOLD S19 O100", ",0xff00", "word")
+	r := RichEdit_SetCharFormat(hRichEdit, "Courier New", "BOLD S19 O100", 0xff00, 0xaaaaaa, "word")
 	Log("Set Char Format: " r)
 return
 
