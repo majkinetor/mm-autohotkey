@@ -3,7 +3,7 @@
 
  Group: Overview
 
-		Forms framework is a group of modules used together to create rich AHK graphical user interfaces.
+		Forms framework is a group of modules used together to create rich AHK & AHK_L applications and graphical user interfaces.
 		It contains the list of optional module includes with each module designed to work with or *without* the framework in place.
 		It includes number of custom controls, extensions and useful libraries. <Form> module is a backbone of the framework.
 		
@@ -123,6 +123,6 @@
 
 /* 
  Group: About
-	o v0.7 (27.9.2010) by majkinetor.
+	o v0.8 (29.12.2010) by majkinetor.
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>
  */
