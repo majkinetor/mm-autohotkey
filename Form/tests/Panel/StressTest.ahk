@@ -17,14 +17,14 @@ _("mo! e w")
 
 	;=======================================================
 	
-	siblings  = 10		;desn't make a difference.
-	depthlevel = 25		;makes the difference; tests:  vista(32b, quad)=15, xppro(64b, quad)=5
+	siblings  = 25		;desn't make a difference.
+	depthlevel = 5		;makes the difference; tests:  vista(32b, quad)=15, xppro(64b, quad)=5
 
 	;=======================================================
 	hForm1	:=	Form_New("w500 h600 +Resize")
 	loop, %siblings%
 	{
-		hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "",		"Align T, 300", "Attach p")
+		hPanel	 :=	Form_Add(hForm1,  "Panel",	 "",	  "",		"Align T, 300", "Attach w")	; "Attach p" creates problem for scroller.
 		loop, %depthlevel%	
 			hPanel	 :=	Form_Add(hPanel,  "Panel",	 "",	  "",	"Align F", "Attach p r2")
 
@@ -33,15 +33,15 @@ _("mo! e w")
 		hCal1	:=  Form_Add(hPanel,  "ListView", A_Index,  "",	"Align F",		"Attach p r2")
 		LV_Add("",A_TickCount)
 	}
+
 	Form_Show()
 	Scroller_init()
-
-	; mhm....
-	loop, 3		
-		Scroller_UpdateBars(hForm1)
 return
 
-F1:: 	Scroller_UpdateBars(hForm1)
+
+Form1_Size:
+	 Scroller_UpdateBars(hForm1)
+return
 
 Form1_Close:
 	ExitApp
