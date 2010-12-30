@@ -6,6 +6,15 @@
 				(Edit, RichEdit, HiEdit...) or just rich edit control.
  */
 
+
+
+RichEdit_GetOleInterface(HCtrl) {	;lParam = (LPARAM) (IRichEditOleCallback FAR *) lpObj;
+    static EM_SETOLEINTERFACE = 1094, EM_GETOLEINTERFACE = 1084
+	lpObj := "aaaa"
+    SendMessage EM_GETOLEINTERFACE,,&lpObj,,ahk_id %HCtrl%
+	ifEqual, ErrorLevel, 0, return A_ThisFunc "> Can't get OLE interface."
+	return lpObj
+}
 /*
  Function:		Add
 				Create rich edit version 4.1 control. (requires at least Windows XP SP1)
