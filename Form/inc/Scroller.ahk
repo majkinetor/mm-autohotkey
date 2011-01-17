@@ -111,59 +111,55 @@ Scroller_getScrollArea(Hwnd, ByRef left, ByRef top, ByRef right, ByRef bottom) {
 Scroller_onScroll(WParam, LParam, Msg, Hwnd){
     static SIF_ALL=0x17, SCROLL_STEP=10
 	ifNotEqual, LParam, 0, return	;required so that UpDown and Slider controls don't take over.
-	isHorBar := Msg = 0x115
+	bar := Msg = 0x115
     
-	critical
     VarSetCapacity(SI, 28, 0), NumPut(28, SI) 
     NumPut(SIF_ALL, SI, 4) ; fMask 
 
-    if !DllCall("GetScrollInfo", "uint", Hwnd, "int", isHorBar, "uint", &SI) 
+    if !DllCall("GetScrollInfo", "uint", Hwnd, "int", bar, "uint", &si) 
         return 
 
     VarSetCapacity(rect, 16)
-    DllCall("GetClientRect", "uint", Hwnd, "uint", &rect)  
+    DllCall("GetClientRect", "uint", Hwnd, "uint", &rect) 
+    
+    old_pos := new_pos := NumGet(SI, 20) ; nPos 
 
-	min := NumGet(SI, 8, "int") 
-	max := NumGet(SI, 12, "int")
-	page := NumGet(SI, 16)
-    old_pos := new_pos := NumGet(SI, 20)
-	
 	action := WParam & 0xFFFF 
-
-    if action = 0						; SB_LINEUP 
+    if action = 0 ; SB_LINEUP 
         new_pos -= SCROLL_STEP 
-    else if action = 1					; SB_LINEDOWN 
+    else if action = 1 ; SB_LINEDOWN 
         new_pos += SCROLL_STEP 
-    else if action = 2					; SB_PAGEUP 
-        new_pos -= max - SCROLL_STEP 
-    else if action = 3					; SB_PAGEDOWN 
-        new_pos += min - SCROLL_STEP 
-    else if (action = 5 || action = 4)	; SB_THUMBTRACK || SB_THUMBPOSITION 
+    else if action = 2 ; SB_PAGEUP 
+        new_pos -= NumGet(rect, 12, "int") - SCROLL_STEP 
+    else if action = 3 ; SB_PAGEDOWN 
+        new_pos += NumGet(rect, 12, "int") - SCROLL_STEP 
+    else if (action = 5 || action = 4) ; SB_THUMBTRACK || SB_THUMBPOSITION 
         new_pos := WParam >> 16 
-    else if action = 6					; SB_TOP 
-        new_pos := min 
-    else if action = 7					; SB_BOTTOM 
-        new_pos := max
+    else if action = 6 ; SB_TOP 
+        new_pos := NumGet(SI, 8, "int") ; nMin 
+    else if action = 7 ; SB_BOTTOM 
+        new_pos := NumGet(SI, 12, "int") ; nMax 
     else return 
     
-    max := max - page + 1
+    min := NumGet(SI, 8, "int")							; nMin 
+    max := NumGet(SI, 12, "int") - NumGet(SI, 16) + 1	; nMax - nPage 
     new_pos := new_pos > max ? max : new_pos 
     new_pos := new_pos < min ? min : new_pos 
-   
+    
     x := y := 0 
-    if !isHorBar	; SB_HORZ 
+    if bar = 0	; SB_HORZ 
          x := old_pos - new_pos 
-    else y := old_pos - new_pos
+    else y := old_pos - new_pos 
 
     DllCall("ScrollWindow", "uint", Hwnd, "int", x, "int", y, "uint", 0, "uint", 0)    ; Scroll contents of window and invalidate uncovered area. 
     
   ; Update scroll bar. 
     NumPut(new_pos, SI, 20, "int") ; nPos 
-    DllCall("SetScrollInfo", "uint", Hwnd, "int", isHorBar, "uint", &si, "int", 1) 
+    DllCall("SetScrollInfo", "uint", Hwnd, "int", bar, "uint", &si, "int", 1) 
 }
 
 /* Group: About
-	o Version 1.02 by majkinetor.
+	o Version 1.03 by majkinetor.
 	o Original code by Lexikos. See <http://www.autohotkey.com/forum/viewtopic.php?p=177673#177673>.
 	o Licensed under BSD <http://creativecommons.org/licenses/BSD/>.
  */
