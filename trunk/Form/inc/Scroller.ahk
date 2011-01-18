@@ -42,7 +42,7 @@ The function will make scrollbars visible only if needed. You don't need to have
 			Calling this function 3 times in a row fixes the problem.
 			You cant use Attach's p option (proportional) with Scroller (known bug).
 
-			I discovered that SkinSharp when used in AHK app via its dll could cause Scroller missbiheavior when used together with Attach.
+			I discovered that SkinSharp when used in AHK app via its dll could cause Scroller missbehavior when used together with Attach.
   */
 Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
     static SIF_RANGE=0x1, SIF_PAGE=0x2, SIF_DISABLENOSCROLL=0x8, SB_HORZ=0, SB_VERT=1, sbs, sbas
