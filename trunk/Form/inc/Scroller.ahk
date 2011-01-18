@@ -26,12 +26,12 @@ Scroller_Init(){
 			MX, MY	- Set here x & y margin of your window. By default 0.
 
  Remarks:			
-			The function will make scrollbars visible only if needed. You don't need to have scroll styles on window prior to calling it.
+The function will make scrollbars visible only if needed. You don't need to have scroll styles on window prior to calling it.
 			You need to call this function after adding new controls to the GUI and after resizing window.
 			If used with resizable window, its enough to put call to this function in GuiSize routine (this might not work in same cases
 			of GUI creation). In any case, you need to update scrollbars after adding new controls to the GUI.
 			Scroller replaces message handlers for WM_VSCROLL & WM_HSCROLL messages at the moment which will influence <ScrollBar> control
-			if you have it (or vice-versa).
+			if you have it (or vice-versa), i.e. message stacking is not done as its not very probable that you will use those 2 modules together.
 
 			You can change the position of the vertical scrollbars by setting WS_EX_LEFTSCROLLBAR=0x4000.
 			For more control over scrollbars you need to use <ScrollBar> control.
@@ -39,7 +39,10 @@ Scroller_Init(){
 			If you use <Attach> function, you may experience some miscalculation of scrollable area (not happening if <Panel> is the host).
 			This is due to the fact that attached controls may be resized as a consequence of window resizing (WM_SIZE message is sent 
 			when scrollbars are added and it will trigger Attach handler) and module doesn't take that change into account. 
-			You can try to call this function 3 times in a row to fix the problem.
+			Calling this function 3 times in a row fixes the problem.
+			You cant use Attach's p option (proportional) with Scroller (known bug).
+
+			I discovered that SkinSharp when used in AHK app via its dll could cause Scroller missbiheavior when used together with Attach.
   */
 Scroller_UpdateBars(Hwnd, Bars=3, MX=0, MY=0){
     static SIF_RANGE=0x1, SIF_PAGE=0x2, SIF_DISABLENOSCROLL=0x8, SB_HORZ=0, SB_VERT=1, sbs, sbas
