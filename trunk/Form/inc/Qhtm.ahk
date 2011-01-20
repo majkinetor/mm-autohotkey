@@ -19,7 +19,7 @@
 			  Text		- HTML to display.
   			  Style		- List of control styles, optional.
 			  Handler	- Notification handler, optional.
-			  DllPath	- Path to the control's dll, optional. By default current folder.
+			  DllPath	- Path to the control's dll, optional. By default current folder. The dll name must be qhtml.dll.
 
 	Styles:
 			  Border	  - Add border arond the control.
@@ -46,7 +46,7 @@ QHTM_Add(Hwnd, X, Y, W, H, Text="", Style="", Handler="", DllPath=""){
 		ifEqual, DllPath, ,SetEnv, DllPath, qhtm.dll
 
 		if !QHTM_Init( DllPath )
-			return A_ThisFunc "> Initialization failed."
+			return A_ThisFunc "> Initialisation failed."
 
 		old := OnMessage(0x4E, "QHTM_onNotify"), MODULEID := 171108
 		if old != QHTM_onNotify
@@ -88,12 +88,11 @@ QHTM_Add(Hwnd, X, Y, W, H, Text="", Style="", Handler="", DllPath=""){
 
 	Parameters:
 			HTML	- QHTML to add to the control
-			bScroll	- Set to TRUE to scroll to the end, by default false	
-				
+			bScroll	- Set to TRUE to scroll to the end, by default false					
  */
 QHTM_AddHtml(hCtrl, HTML, bScroll=false){
-	static QHTM_ADD_HTML=0x40B
-	SendMessage, QHTM_ADD_HTML, bScroll, &HTML, ,ahk_id %hCtrl%		
+	static QHTM_ADD_HTMLA=0x40B, QHTM_ADD_HTMLW=0x412
+	SendMessage, A_IsUnicode ? QHTM_ADD_HTMLW : QHTM_ADD_HTMLA, bScroll, &HTML, ,ahk_id %hCtrl%		
 
 	;bScroll in add_html message doesn't work so do it manually
 	ControlSend, , {END}, ahk_id %hCtrl%
@@ -258,7 +257,7 @@ QHTM_Init( DllPath="qhtm.dll" ){
 	ifNotEqual, init, , return 1
 
 ;	i := DllCall("GetWindowLong", "uint", hGui, "int", GWL_HINSTANCE := -6)		;doesn't make any difference, I can just put 0.
-	
+
 	init := DllCall("LoadLibrary", "Str", DllPath)
 	DllCall("qhtm\QHTM_Initialize", "UInt", 0)
 	DllCall("qhtm\QHTM_EnableCooltips", "UInt", 0)
@@ -593,18 +592,17 @@ QHTM_onForm(hwndQHTM, pFormSubmit, lParam){
 	if !hwndQHTM
 		return fun := lParam
 
-	action := QHTM_StrAtAdr( NumGet(pFormSubmit+8) ), name := QHTM_StrAtAdr( NumGet(pFormSubmit+12) )
+	action := QHTM_strAtAdr( NumGet(pFormSubmit+8) ), name := QHTM_strAtAdr( NumGet(pFormSubmit+12) )
 	fc := NumGet( pFormSubmit+16 ),  adr := NumGet( pFormSubmit+20 )
 	loop, %fc%
-		n := QHTM_StrAtAdr( NumGet(adr+(A_Index-1)*8) ), v :=  QHTM_StrAtAdr( NumGet(adr+4+(A_Index-1)*8) ), 	fields .= n " " v "`n"
+		n := QHTM_strAtAdr( NumGet(adr+(A_Index-1)*8) ), v :=  QHTM_StrAtAdr( NumGet(adr+4+(A_Index-1)*8) ), 	fields .= n " " v "`n"
 
 	return %fun%(name, action, fc, fields)
 }
 
 
 QHTM_onNotify(Wparam, Lparam, Msg, Hwnd) {
-	static MODULEID=171108, oldNotify="*"
-
+	static MODULEID=171108, oldNotify="*", StrGet = "StrGet"
 
 	if (_ := (NumGet(Lparam+4))) != MODULEID
 	 ifLess _, 10000, return	;if ahk control, return asap (AHK increments control ID starting from 1. Custom controls use IDs > 10000 as its unlikely that u will use more then 10K ahk controls.
@@ -613,6 +611,7 @@ QHTM_onNotify(Wparam, Lparam, Msg, Hwnd) {
 		if oldNotify !=
 			return DllCall(oldNotify, "uint", Wparam, "uint", Lparam, "uint", Msg, "uint", Hwnd)
 	 }
+
   ;NMHDR 
 	hw := NumGet(Lparam+0)			;control sending the message
 	handler := QHTM(hw "Handler")
@@ -620,8 +619,7 @@ QHTM_onNotify(Wparam, Lparam, Msg, Hwnd) {
 	
 	Loop, 2
 		adr := NumGet(lparam+12+(A_Index-1)*8), len := DllCall("lstrlenW", "UInt", adr), VarSetCapacity(txt%A_Index%, len, 0)
-	    , DllCall("WideCharToMultiByte" , "UInt", 0, "UInt", 0, "UInt", adr, "Int", -1, "Str", txt%A_Index%, "Int", len, "UInt", 0, "UInt", 0) 
-		, VarSetCapacity(txt%A_Index%, -1)
+		, A_IsUnicode ? txt%A_Index% := QHTM_strAtAdr(adr) : (DllCall("WideCharToMultiByte" , "UInt", 0, "UInt", 0, "UInt", adr, "Int", -1, "Str", txt%A_Index%, "Int", len, "UInt", 0, "UInt", 0), VarSetCapacity(txt%A_Index%, -1))
 	
 	NumPut(%handler%(hw, txt1, txt2), Lparam+16)
 }
@@ -654,7 +652,7 @@ QHTM(var="", value="~`a", ByRef o1="", ByRef o2="", ByRef o3="", ByRef o4="", By
 
 /* 
  Group: About 
- 	o AHK module ver 1.03 by majkinetor.
+ 	o AHK module ver 1.04 by majkinetor.
 	o QHTML copyright © GipsySoft. See http://www.gipsysoft.com/qhtm/
 	o Licensed under Creative Commons Attribution-Noncommercial <http://creativecommons.org/licenses/by-nc/3.0/>.
  */
