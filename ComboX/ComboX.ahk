@@ -34,10 +34,10 @@ ComboX_Hide( HCtrl ) {
  Parameters:
 			HCtrl	- Handle of the control to be affected.
 			Handler	- Notification handler. Optional.
-			Options	- Space separated list of options. See below. OPtional, by default "Esc Enter".
+			Options	- Space separated list of options, see below. Optional, by default "Esc Enter".
 
  Options:
-			Space, Esc, Enter, Click	- Specifing one or more of these controls when to hide ComboX control.
+			Space, Esc, Enter, Click	- Specifing one or more of these keys controls when to hide ComboX control.
 			Hwnd	- Handle of the glue control in integer format. This control represents the "arrow button" in normal ComboBox control. When ComboX control is shown,
 					  it will be positioned relative to the glue control.			
 			PHW		- Letters specifying how control is positioned relative to the glue control. P specifies on which corner of glue control to bind (1..4), 
