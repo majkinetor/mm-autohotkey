@@ -8,7 +8,7 @@ _()
 ;	v_Month = 1
 
 	v_User = Administrator
-	v_Password = kljun7
+	v_Password = ******
 
 	msgbox % Scheduler_Create("v")
 ;	msgbox % Scheduler_Delete("My Task 3")
