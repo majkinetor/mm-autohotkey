@@ -2,7 +2,9 @@ Forms
 =====
 
 Forms framework is a group of modules used together to create rich AHK and AHK_L applications and graphical user interfaces. It contains the list of optional module includes with each module designed to work with or without the framework in place. It includes number of custom controls, extensions and useful libraries.
-https://github.com/majkinetor/mm-autohotkey/blob/master/_/_.html
+
+Modules
+-------
 
 - [Align](http://htmlpreview.github.io/?https://github.com/majkinetor/mm-autohotkey/blob/master/Align/Align.html)
 - [AppBar](http://htmlpreview.github.io/?https://github.com/majkinetor/mm-autohotkey/blob/master/Appbar/AppBar.html)
